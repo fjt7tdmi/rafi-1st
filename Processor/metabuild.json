@@ -1,0 +1,84 @@
+{
+    "common":
+        {
+            "type": "modelsim",
+            "work": "Work/ModelSim/Processor",
+            "packages": [
+                "../Modules/Packages/BasicTypes.sv",
+                "../Modules/Packages/Rv32Types.sv",
+                "../Modules/Packages/RvTypes.sv",
+                "../Modules/Tlb/Packages/TlbTypes.sv",
+                "Packages/ProcessorTypes.sv",
+                "Packages/CacheTypes.sv",
+                "Packages/MemoryTypes.sv",
+                "Packages/OpTypes.sv",
+                "Packages/TraceTypes.sv",
+                "Sources/Decoder/Packages/Decoder.sv",
+                "Sources/LoadStoreUnit/Packages/LoadStoreUnitTypes.sv"
+            ],
+            "sources": [
+                "../Modules/DivUnit/Sources/DivUnit.sv",
+                "../Modules/MulUnit/Sources/MulUnit.sv",
+                "../Modules/Memory/BlockRam.sv",
+                "../Modules/Memory/FlipFlopCam.sv",
+                "../Modules/Memory/InternalMemory.sv",
+                "../Modules/Memory/InternalSdram.sv",
+                "../Modules/Memory/SdramController.sv",
+                "../Modules/Tlb/Tlb.sv",
+                "../Modules/Tlb/TlbReplacer.sv",
+                "../Modules/Reset/ResetSequencer.sv",
+                "../Modules/Uart/Sources/UartInput.sv",
+                "../Modules/Uart/Sources/UartTx.sv",
+                "Sources/FetchUnit/FetchUnit.sv",
+                "Sources/FetchUnit/FetchUnitIF.sv",
+                "Sources/FetchUnit/ICacheInvalidater.sv",
+                "Sources/FetchUnit/ICacheReplacer.sv",
+                "Sources/LoadStoreUnit/DCacheReplacer.sv",
+                "Sources/LoadStoreUnit/LoadStoreUnitIF.sv",
+                "Sources/LoadStoreUnit/LoadStoreUnit.sv",
+                "Sources/MemoryAccessArbiter/MemoryAccessArbiter.sv",
+                "Sources/MemoryAccessArbiter/MemoryAccessArbiterIF.sv",
+                "Sources/BypassLogic.sv",
+                "Sources/BypassLogicIF.sv",
+                "Sources/ControlStatusRegister.sv",
+                "Sources/ControlStatusRegisterIF.sv",
+                "Sources/DecodeStage.sv",
+                "Sources/DecodeStageIF.sv",
+                "Sources/ExecuteStage.sv",
+                "Sources/ExecuteStageIF.sv",
+                "Sources/FetchStage.sv",
+                "Sources/FetchStageIF.sv",
+                "Sources/MemoryAccessStage.sv",
+                "Sources/MemoryAccessStageIF.sv",
+                "Sources/PipelineController.sv",
+                "Sources/PipelineControllerIF.sv",
+                "Sources/RegFile.sv",
+                "Sources/RegFileIF.sv",
+                "Sources/RegReadStage.sv",
+                "Sources/RegReadStageIF.sv",
+                "Sources/RegWriteStage.sv",
+                "Sources/Core.sv",
+                "Sources/System.sv"
+            ]
+        },
+    "projects": [
+        {
+            "name": "DecoderTest",
+            "sources": [
+                "Sources/Decoder/Tests/DecoderTest.sv"
+            ]
+        },
+        {
+            "name": "SystemTest",
+            "sources": [
+                "Tests/SystemTest/SystemTest.sv"
+            ]
+        },
+        {
+            "name": "SystemTestWithLoad",
+            "sources": [
+                "Tests/SystemTestWithLoad/SystemTestWithLoad.sv"
+            ]
+        }
+    ]
+}

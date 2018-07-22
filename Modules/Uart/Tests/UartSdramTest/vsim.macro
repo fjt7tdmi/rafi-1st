@@ -1,0 +1,6 @@
+radix -hex
+
+add wave -r -position end sim:/UartSdramTest/*
+add wave -r -position end sim:/UartSdramTest/m_Sdram/body
+
+run -all

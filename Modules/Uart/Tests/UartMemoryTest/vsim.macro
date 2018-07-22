@@ -1,0 +1,5 @@
+radix -hex
+
+add wave -r -position end sim:/UartMemoryTest/*
+
+run -all

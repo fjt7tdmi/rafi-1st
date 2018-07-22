@@ -1,0 +1,7 @@
+radix -hex
+
+add wave -r -position end sim:/UartTxTest/clk
+add wave -r -position end sim:/UartTxTest/rst
+add wave -r -position end sim:/UartTxTest/uartTx
+
+run -all
