@@ -14,12 +14,14 @@ transcript
 .ninja_deps
 .ninja_log
 
+build/
 Linux/
 Work/
 
 **/__pycache__/
 **/.vscode/
 **/Outputs/
+**/obj_dir/
 
 # for Quartus
 **/Quartus/**/*.txt

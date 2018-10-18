@@ -1,0 +1,31 @@
+# This file should be included from ${projectDir}/*.ninja
+
+pool modelsim_pool
+    depth = 1
+
+pool msbuild_pool
+    depth = 1
+
+rule mkdir
+    command = mkdir -p $out
+
+rule as
+    command = riscv64-unknown-elf-as -march=rv32ima $in -o $out
+
+rule objcopy
+    command = riscv64-unknown-elf-objcopy -O binary --set-start=$start --pad-to=$end $in $out
+
+rule BinaryToText
+    command = python ./Tools/BinaryToText.py $in -o $out
+
+rule MSBuild
+    command = cmd /c "chcp 65001 && MSBuild /t:Rebuild /p:Configuration=Release $project"
+    pool = msbuild_pool
+
+rule vlog
+    command = cmd /c "cd $work && vlog $srcs -work $project -incr -lint -ccwarn strict && exit 0"
+    pool = modelsim_pool
+
+rule vsim_setup
+    command = cmd /c "cd $work && vlib $project && vmap $project $project && exit 0"
+    pool = modelsim_pool
