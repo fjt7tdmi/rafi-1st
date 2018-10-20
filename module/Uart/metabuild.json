@@ -4,16 +4,16 @@
             "type": "modelsim",
             "work": "work/ModelSim/Modules/Uart",
             "packages": [
-                "../Packages/BasicTypes.sv",
-                "../Packages/Rv32Types.sv",
-                "../Packages/RvTypes.sv"
+                "../package/BasicTypes.sv",
+                "../package/Rv32Types.sv",
+                "../package/RvTypes.sv"
             ],
             "sources": [
-                "Sources/UartInput.sv",
-                "Sources/UartMemoryTestUnit.sv",
-                "Sources/UartSdramTestUnit.sv",
-                "Sources/UartTx.sv",
-                "Sources/UartTxTestUnit.sv",
+                "src/UartInput.sv",
+                "src/UartMemoryTestUnit.sv",
+                "src/UartSdramTestUnit.sv",
+                "src/UartTx.sv",
+                "src/UartTxTestUnit.sv",
                 "../Memory/InternalMemory.sv",
                 "../Memory/InternalSdram.sv",
                 "../Memory/SdramController.sv"

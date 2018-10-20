@@ -2,24 +2,24 @@
     "common":
         {
             "type": "modelsim",
-            "work": "work/ModelSim/Processor/FetchUnit",
+            "work": "work/ModelSim/cpu/FetchUnit",
             "packages": [
-                "../../../Modules/Packages/BasicTypes.sv",
-                "../../../Modules/Packages/Rv32Types.sv",
-                "../../../Modules/Packages/RvTypes.sv",
-                "../../../Modules/Tlb/Packages/TlbTypes.sv",
-                "../../Packages/ProcessorTypes.sv",
-                "Tests/Packages/CacheTypes.sv"
+                "../../../module/package/BasicTypes.sv",
+                "../../../module/package/Rv32Types.sv",
+                "../../../module/package/RvTypes.sv",
+                "../../../module/Tlb/package/TlbTypes.sv",
+                "../../package/ProcessorTypes.sv",
+                "Tests/package/CacheTypes.sv"
             ]
         },
     "projects": [
         {
             "name": "FetchUnitTest",
             "sources": [
-                "../../../Modules/Memory/BlockRam.sv",
-                "../../../Modules/Memory/FlipFlopCam.sv",
-                "../../../Modules/Tlb/TlbReplacer.sv",
-                "../../../Modules/Tlb/Tlb.sv",
+                "../../../module/Memory/BlockRam.sv",
+                "../../../module/Memory/FlipFlopCam.sv",
+                "../../../module/Tlb/TlbReplacer.sv",
+                "../../../module/Tlb/Tlb.sv",
                 "../MemoryAccessArbiter/MemoryAccessArbiter.sv",
                 "../MemoryAccessArbiter/MemoryAccessArbiterIF.sv",
                 "../PipelineControllerIF.sv",

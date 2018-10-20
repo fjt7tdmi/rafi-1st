@@ -2,14 +2,14 @@
     "common":
         {
             "type": "modelsim",
-            "work": "work/ModelSim/Modules/MulUnit",
+            "work": "work/ModelSim/module/MulUnit",
             "packages": [
-                "../Packages/BasicTypes.sv",
-                "../Packages/Rv32Types.sv",
-                "../Packages/RvTypes.sv"
+                "../package/BasicTypes.sv",
+                "../package/Rv32Types.sv",
+                "../package/RvTypes.sv"
             ],
             "sources": [
-                "Sources/MulUnit.sv"
+                "src/MulUnit.sv"
             ]
         },
     "projects": [

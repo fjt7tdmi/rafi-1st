@@ -2,14 +2,14 @@
     "common":
         {
             "type": "modelsim",
-            "work": "work/ModelSim/Modules/DivUnit",
+            "work": "work/ModelSim/module/DivUnit",
             "packages": [
-                "../Packages/BasicTypes.sv",
-                "../Packages/Rv32Types.sv",
-                "../Packages/RvTypes.sv"
+                "../package/BasicTypes.sv",
+                "../package/Rv32Types.sv",
+                "../package/RvTypes.sv"
             ],
             "sources": [
-                "Sources/DivUnit.sv"
+                "src/DivUnit.sv"
             ]
         },
     "projects": [

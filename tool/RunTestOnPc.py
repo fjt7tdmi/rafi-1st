@@ -25,7 +25,7 @@ from operator import or_
 DefaultTestCycle = 65536
 CheckIoPath = "./rafi-emu/Release/CheckIo.exe"
 EmulatorPath = "./rafi-emu/Release/RafiEmu.exe"
-BinaryDirPath = "./TargetPrograms/Outputs"
+BinaryDirPath = "./firmware/Outputs"
 TraceDirPath = "./work/Trace"
 
 #
@@ -53,7 +53,7 @@ def MakeEmulatorCommand(testname):
 
 def MakeSimulatorCommand(testname, cycle, all_dump):
     initial_memory_path = f"{BinaryDirPath}/{testname}.txt"
-    dump_path = f"{TraceDirPath}/Processor/{testname}.trace.bin"
+    dump_path = f"{TraceDirPath}/cpu/{testname}.trace.bin"
     enable_dump_memory = "1" if all_dump else "0"
     project = "SystemTest"
     return [
@@ -113,7 +113,7 @@ def RunSimulator(setting):
     cmd = MakeSimulatorCommand(testname, cycle, all_dump)
     print(f"Run {' '.join(cmd)}")
 
-    logPath = f"{TraceDirPath}/Processor/{testname}.vsim.log"
+    logPath = f"{TraceDirPath}/cpu/{testname}.vsim.log"
 
     result = None
     with open(logPath, "w") as f:
@@ -141,7 +141,7 @@ def RunTests(configs, all_dump, isEmulator, processor = None):
         with multiprocessing.Pool(multiprocessing.cpu_count()) as p:
             settings = list(map(lambda config: (config, all_dump, processor), configs))
             results = p.map(RunSimulator, settings)
-        VerifyTraces(list(map(lambda config: f"{TraceDirPath}/Processor/{config['name']}.trace.bin", configs)))
+        VerifyTraces(list(map(lambda config: f"{TraceDirPath}/cpu/{config['name']}.trace.bin", configs)))
     # TODO: Handle Emulation/Simulation Failure
 
 #

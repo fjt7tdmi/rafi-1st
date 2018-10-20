@@ -43,15 +43,15 @@ build work/vmlinux.bin: objcopy $
 """
 
 def make_test_build_rule():
-    src_dir = "./TargetPrograms/Sources"
-    out_dir = "./TargetPrograms/Outputs"
+    src_dir = "./firmware/src"
+    out_dir = "./firmware/build"
     names = list(map(lambda x: x.rstrip(".S"), os.listdir(src_dir)))
 
     rule = ""
     for name in names:
         rule += f"""
 build {out_dir}/{name}.o: as $
-    TargetPrograms/Sources/{name}.S $
+    firmware/src/{name}.S $
     | {out_dir}
 
 build {out_dir}/{name}.bin: objcopy $
