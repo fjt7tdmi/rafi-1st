@@ -42,12 +42,12 @@ function automatic word_t sext13(logic [12:0] val);
     end
 endfunction
 
-function automatic word_t sext20(logic [19:0] val);
-    if (val[19]) begin
-        return {12'b1111_1111_1111, val};
+function automatic word_t sext21(logic [20:0] val);
+    if (val[20]) begin
+        return {11'b111_1111_1111, val};
     end
     else begin
-        return {12'b0000_0000_0000, val};
+        return {11'b000_0000_0000, val};
     end
 endfunction
 
@@ -176,7 +176,7 @@ function automatic Op DecodeRV32I(insn_t insn);
         op.aluSrcType1 = AluSrcType1_Pc;
         op.aluSrcType2 = AluSrcType2_Imm;
         op.regWriteSrcType = RegWriteSrcType_NextPc;
-        op.imm = sext20({insn[31], insn[19:12], insn[20], insn[30:21], 1'b0});
+        op.imm = sext21({insn[31], insn[19:12], insn[20], insn[30:21], 1'b0});
         op.isBranch = 1;
         op.regWriteEnable = 1;
     end
@@ -228,7 +228,7 @@ function automatic Op DecodeRV32I(insn_t insn);
         if (funct3 == 3'b001) begin
             // slli
             op.aluCommand = AluCommand'({1'b0, funct3});
-            op.imm = {'0, shamt};
+            op.imm = {27'h0, shamt};
             if (funct7 != '0) begin
                 op.isUnknown = 1;
             end
@@ -236,7 +236,7 @@ function automatic Op DecodeRV32I(insn_t insn);
         else if (funct3 == 3'b101) begin
             // srli, srai
             op.aluCommand = AluCommand'({funct7[5], funct3});
-            op.imm = {'0, shamt};
+            op.imm = {27'h0, shamt};
             if ({funct7[6], funct7[4:0]} != '0) begin
                 op.isUnknown = 1;
             end
