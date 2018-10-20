@@ -8,9 +8,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 include_directories(C:/home/Programs/verilator-3.841/include)
 include_directories(C:/home/Programs/verilator-3.841/include/vltstd)
 
-add_executable(testTimer
+add_executable(test_Timer
     C:/home/Programs/verilator-3.841/include/verilated.cpp
-    Modules/Timer/obj_dir/VTimer__Syms.cpp
-    Modules/Timer/obj_dir/VTimer.cpp
-    Modules/Timer/test/testTimer.cpp
+    work/verilator/test_Timer/VTimer__Syms.cpp
+    work/verilator/test_Timer/VTimer.cpp
+    work/verilator/test_Timer/test/test_Timer.cpp
 )
