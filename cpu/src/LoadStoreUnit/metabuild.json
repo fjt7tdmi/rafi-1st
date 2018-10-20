@@ -1,0 +1,37 @@
+{
+    "common":
+        {
+            "type": "modelsim",
+            "work": "work/ModelSim/Processor/LoadStoreUnit",
+            "packages": [
+                "../../../module/package/BasicTypes.sv",
+                "../../../module/package/Rv32Types.sv",
+                "../../../module/package/RvTypes.sv",
+                "../../../module/Tlb/package/TlbTypes.sv",
+                "../../package/MemoryTypes.sv",
+                "../../package/OpTypes.sv",
+                "../../package/ProcessorTypes.sv",
+                "package/LoadStoreUnitTypes.sv",
+                "Tests/package/CacheTypes.sv"
+            ]
+        },
+    "projects": [
+        {
+            "name": "LoadStoreUnitTest",
+            "sources": [
+                "../../../module/Memory/BlockRam.sv",
+                "../../../module/Memory/FlipFlopCam.sv",
+                "../../../module/Tlb/TlbReplacer.sv",
+                "../../../module/Tlb/Tlb.sv",
+                "../MemoryAccessArbiter/MemoryAccessArbiter.sv",
+                "../MemoryAccessArbiter/MemoryAccessArbiterIF.sv",
+                "../ControlStatusRegisterIF.sv",
+                "../PipelineControllerIF.sv",
+                "LoadStoreUnit.sv",
+                "LoadStoreUnitIF.sv",
+                "DCacheReplacer.sv",
+                "Tests/LoadStoreUnitTest/LoadStoreUnitTest.sv"
+            ]
+        }
+    ]
+}

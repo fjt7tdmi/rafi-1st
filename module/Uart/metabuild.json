@@ -1,0 +1,48 @@
+{
+    "common":
+        {
+            "type": "modelsim",
+            "work": "work/ModelSim/Modules/Uart",
+            "packages": [
+                "../package/BasicTypes.sv",
+                "../package/Rv32Types.sv",
+                "../package/RvTypes.sv"
+            ],
+            "sources": [
+                "src/UartInput.sv",
+                "src/UartMemoryTestUnit.sv",
+                "src/UartSdramTestUnit.sv",
+                "src/UartTx.sv",
+                "src/UartTxTestUnit.sv",
+                "../Memory/InternalMemory.sv",
+                "../Memory/InternalSdram.sv",
+                "../Memory/SdramController.sv"
+            ]
+        },
+    "projects": [
+        {
+            "name": "UartMemoryTest",
+            "sources": [
+                "Tests/UartMemoryTest/UartMemoryTest.sv"
+            ]
+        },
+        {
+            "name": "UartSdramTest",
+            "sources": [
+                "Tests/UartSdramTest/UartSdramTest.sv"
+            ]
+        },
+        {
+            "name": "UartTest",
+            "sources": [
+                "Tests/UartTest/UartTest.sv"
+            ]
+        },
+        {
+            "name": "UartTxTest",
+            "sources": [
+                "Tests/UartTxTest/UartTxTest.sv"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,23 @@
+{
+    "common":
+        {
+            "type": "modelsim",
+            "work": "work/ModelSim/module/MulUnit",
+            "packages": [
+                "../package/BasicTypes.sv",
+                "../package/Rv32Types.sv",
+                "../package/RvTypes.sv"
+            ],
+            "sources": [
+                "src/MulUnit.sv"
+            ]
+        },
+    "projects": [
+        {
+            "name": "MulUnitTest",
+            "sources": [
+                "Tests/MulUnitTest/MulUnitTest.sv"
+            ]
+        }
+    ]
+}

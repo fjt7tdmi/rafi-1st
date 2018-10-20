@@ -11,4 +11,4 @@ fi
 cd `dirname $0`
 cd ..
 
-python ./Tools/RunTestOnPc.py -s -i ./TargetPrograms/TestConfig.json ${OPTION}
+python ./tool/RunTestOnPc.py -s -i ./firmware/TestConfig.json ${OPTION}

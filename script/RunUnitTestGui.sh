@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROJECT=DivUnitTest
-WORKDIR=Work/ModelSim/Modules/DivUnit
+WORKDIR=work/ModelSim/Modules/DivUnit
 VSIM_MACRO=Modules/DivUnit/Tests/DivUnitTest/vsim.macro
 
 # Move to project top directory

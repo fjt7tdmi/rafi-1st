@@ -16,7 +16,7 @@ transcript
 
 build/
 Linux/
-Work/
+work/
 
 **/__pycache__/
 **/.vscode/

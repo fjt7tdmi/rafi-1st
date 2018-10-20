@@ -1,0 +1,35 @@
+{
+    "common":
+        {
+            "type": "modelsim",
+            "work": "work/ModelSim/cpu/FetchUnit",
+            "packages": [
+                "../../../module/package/BasicTypes.sv",
+                "../../../module/package/Rv32Types.sv",
+                "../../../module/package/RvTypes.sv",
+                "../../../module/Tlb/package/TlbTypes.sv",
+                "../../package/ProcessorTypes.sv",
+                "Tests/package/CacheTypes.sv"
+            ]
+        },
+    "projects": [
+        {
+            "name": "FetchUnitTest",
+            "sources": [
+                "../../../module/Memory/BlockRam.sv",
+                "../../../module/Memory/FlipFlopCam.sv",
+                "../../../module/Tlb/TlbReplacer.sv",
+                "../../../module/Tlb/Tlb.sv",
+                "../MemoryAccessArbiter/MemoryAccessArbiter.sv",
+                "../MemoryAccessArbiter/MemoryAccessArbiterIF.sv",
+                "../PipelineControllerIF.sv",
+                "../ControlStatusRegisterIF.sv",
+                "FetchUnit.sv",
+                "FetchUnitIF.sv",
+                "ICacheInvalidater.sv",
+                "ICacheReplacer.sv",
+                "Tests/FetchUnitTest/FetchUnitTest.sv"
+            ]
+        }
+    ]
+}
