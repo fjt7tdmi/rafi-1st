@@ -17,14 +17,14 @@
 #include <memory>
 #include <cstdio>
 
-#include "../../../work/verilator/test_Timer/VTimer.h"
+#include "../../work/verilator/test_Core/VCore.h"
 
 int main()
 {
-    auto top = std::make_unique<VTimer>();
+    auto top = std::make_unique<VCore>();
 
     // reset
-    top->rst = 1;
+    top->rstIn = 1;
     top->clk = 0;
     top->eval();
 
@@ -32,20 +32,13 @@ int main()
     top->eval();
 
     top->clk = 0;
-    top->rst = 0;
-    top->addr = 0;
-    top->writeData = 0;
-    top->readEnable = 1;
-    top->writeEnable = 0;
+    top->rstIn = 0;
     top->eval();
 
     for (int i = 0; i < 10; i++)
     {
         top->clk = 1;
         top->eval();
-
-        int value = top->readData;
-        printf("value: %d\n", value);
 
         top->clk = 0;
         top->eval();
