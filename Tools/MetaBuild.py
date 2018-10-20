@@ -36,7 +36,7 @@ if outfile is None:
 
 def make_linux_rule():
     return """
-build Work/vmlinux.bin: objcopy $
+build work/vmlinux.bin: objcopy $
     Linux/vmlinux
     start = 0x00000000
     end = 0x00400000
@@ -67,9 +67,9 @@ build {out_dir}/{name}.txt: BinaryToText $
 
 def make_mkdir_rule():
     paths = [
-        "./Work/Trace/Emulator",
-        "./Work/Trace/Processor",
-        "./Work/PcLog",
+        "./work/Trace/Emulator",
+        "./work/Trace/Processor",
+        "./work/PcLog",
     ]
     rule = ""
     for path in paths:

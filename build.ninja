@@ -53,27 +53,27 @@ build ./TargetPrograms/Outputs/StoreToUartLong.bin: objcopy $
 build ./TargetPrograms/Outputs/StoreToUartLong.txt: BinaryToText $
     ./TargetPrograms/Outputs/StoreToUartLong.bin
 
-build ./Work/Trace/Emulator: mkdir
+build ./work/Trace/Emulator: mkdir
 
-build ./Work/Trace/Processor: mkdir
+build ./work/Trace/Processor: mkdir
 
-build ./Work/PcLog: mkdir
+build ./work/PcLog: mkdir
 
-build Work/ModelSim/Modules/DivUnit: mkdir
+build work/ModelSim/Modules/DivUnit: mkdir
 
-build Work/ModelSim/Modules/DivUnit/DivUnitTest: vsim_setup Work/ModelSim/Modules/DivUnit
-    work = Work/ModelSim/Modules/DivUnit
+build work/ModelSim/Modules/DivUnit/DivUnitTest: vsim_setup work/ModelSim/Modules/DivUnit
+    work = work/ModelSim/Modules/DivUnit
     project = DivUnitTest
 
-build Work/ModelSim/Modules/DivUnit/DivUnitTest/_vmake: vlog $
+build work/ModelSim/Modules/DivUnit/DivUnitTest/_vmake: vlog $
     Modules/Packages/BasicTypes.sv $
     Modules/Packages/Rv32Types.sv $
     Modules/Packages/RvTypes.sv $
     Modules/DivUnit/Sources/DivUnit.sv $
     Modules/DivUnit/Tests/DivUnitTest/DivUnitTest.sv $
-    Work/ModelSim/Modules/DivUnit/DivUnitTest
+    work/ModelSim/Modules/DivUnit/DivUnitTest
     project = DivUnitTest
-    work = Work/ModelSim/Modules/DivUnit
+    work = work/ModelSim/Modules/DivUnit
     srcs = $
         ../../../../Modules/Packages/BasicTypes.sv $
         ../../../../Modules/Packages/Rv32Types.sv $
@@ -81,21 +81,21 @@ build Work/ModelSim/Modules/DivUnit/DivUnitTest/_vmake: vlog $
         ../../../../Modules/DivUnit/Sources/DivUnit.sv $
         ../../../../Modules/DivUnit/Tests/DivUnitTest/DivUnitTest.sv
 
-build Work/ModelSim/Modules/MulUnit: mkdir
+build work/ModelSim/Modules/MulUnit: mkdir
 
-build Work/ModelSim/Modules/MulUnit/MulUnitTest: vsim_setup Work/ModelSim/Modules/MulUnit
-    work = Work/ModelSim/Modules/MulUnit
+build work/ModelSim/Modules/MulUnit/MulUnitTest: vsim_setup work/ModelSim/Modules/MulUnit
+    work = work/ModelSim/Modules/MulUnit
     project = MulUnitTest
 
-build Work/ModelSim/Modules/MulUnit/MulUnitTest/_vmake: vlog $
+build work/ModelSim/Modules/MulUnit/MulUnitTest/_vmake: vlog $
     Modules/Packages/BasicTypes.sv $
     Modules/Packages/Rv32Types.sv $
     Modules/Packages/RvTypes.sv $
     Modules/MulUnit/Sources/MulUnit.sv $
     Modules/MulUnit/Tests/MulUnitTest/MulUnitTest.sv $
-    Work/ModelSim/Modules/MulUnit/MulUnitTest
+    work/ModelSim/Modules/MulUnit/MulUnitTest
     project = MulUnitTest
-    work = Work/ModelSim/Modules/MulUnit
+    work = work/ModelSim/Modules/MulUnit
     srcs = $
         ../../../../Modules/Packages/BasicTypes.sv $
         ../../../../Modules/Packages/Rv32Types.sv $
@@ -103,13 +103,13 @@ build Work/ModelSim/Modules/MulUnit/MulUnitTest/_vmake: vlog $
         ../../../../Modules/MulUnit/Sources/MulUnit.sv $
         ../../../../Modules/MulUnit/Tests/MulUnitTest/MulUnitTest.sv
 
-build Work/ModelSim/Modules/Uart: mkdir
+build work/ModelSim/Modules/Uart: mkdir
 
-build Work/ModelSim/Modules/Uart/UartMemoryTest: vsim_setup Work/ModelSim/Modules/Uart
-    work = Work/ModelSim/Modules/Uart
+build work/ModelSim/Modules/Uart/UartMemoryTest: vsim_setup work/ModelSim/Modules/Uart
+    work = work/ModelSim/Modules/Uart
     project = UartMemoryTest
 
-build Work/ModelSim/Modules/Uart/UartMemoryTest/_vmake: vlog $
+build work/ModelSim/Modules/Uart/UartMemoryTest/_vmake: vlog $
     Modules/Packages/BasicTypes.sv $
     Modules/Packages/Rv32Types.sv $
     Modules/Packages/RvTypes.sv $
@@ -122,9 +122,9 @@ build Work/ModelSim/Modules/Uart/UartMemoryTest/_vmake: vlog $
     Modules/Memory/InternalSdram.sv $
     Modules/Memory/SdramController.sv $
     Modules/Uart/Tests/UartMemoryTest/UartMemoryTest.sv $
-    Work/ModelSim/Modules/Uart/UartMemoryTest
+    work/ModelSim/Modules/Uart/UartMemoryTest
     project = UartMemoryTest
-    work = Work/ModelSim/Modules/Uart
+    work = work/ModelSim/Modules/Uart
     srcs = $
         ../../../../Modules/Packages/BasicTypes.sv $
         ../../../../Modules/Packages/Rv32Types.sv $
@@ -139,11 +139,11 @@ build Work/ModelSim/Modules/Uart/UartMemoryTest/_vmake: vlog $
         ../../../../Modules/Memory/SdramController.sv $
         ../../../../Modules/Uart/Tests/UartMemoryTest/UartMemoryTest.sv
 
-build Work/ModelSim/Modules/Uart/UartSdramTest: vsim_setup Work/ModelSim/Modules/Uart
-    work = Work/ModelSim/Modules/Uart
+build work/ModelSim/Modules/Uart/UartSdramTest: vsim_setup work/ModelSim/Modules/Uart
+    work = work/ModelSim/Modules/Uart
     project = UartSdramTest
 
-build Work/ModelSim/Modules/Uart/UartSdramTest/_vmake: vlog $
+build work/ModelSim/Modules/Uart/UartSdramTest/_vmake: vlog $
     Modules/Packages/BasicTypes.sv $
     Modules/Packages/Rv32Types.sv $
     Modules/Packages/RvTypes.sv $
@@ -156,9 +156,9 @@ build Work/ModelSim/Modules/Uart/UartSdramTest/_vmake: vlog $
     Modules/Memory/InternalSdram.sv $
     Modules/Memory/SdramController.sv $
     Modules/Uart/Tests/UartSdramTest/UartSdramTest.sv $
-    Work/ModelSim/Modules/Uart/UartSdramTest
+    work/ModelSim/Modules/Uart/UartSdramTest
     project = UartSdramTest
-    work = Work/ModelSim/Modules/Uart
+    work = work/ModelSim/Modules/Uart
     srcs = $
         ../../../../Modules/Packages/BasicTypes.sv $
         ../../../../Modules/Packages/Rv32Types.sv $
@@ -173,11 +173,11 @@ build Work/ModelSim/Modules/Uart/UartSdramTest/_vmake: vlog $
         ../../../../Modules/Memory/SdramController.sv $
         ../../../../Modules/Uart/Tests/UartSdramTest/UartSdramTest.sv
 
-build Work/ModelSim/Modules/Uart/UartTest: vsim_setup Work/ModelSim/Modules/Uart
-    work = Work/ModelSim/Modules/Uart
+build work/ModelSim/Modules/Uart/UartTest: vsim_setup work/ModelSim/Modules/Uart
+    work = work/ModelSim/Modules/Uart
     project = UartTest
 
-build Work/ModelSim/Modules/Uart/UartTest/_vmake: vlog $
+build work/ModelSim/Modules/Uart/UartTest/_vmake: vlog $
     Modules/Packages/BasicTypes.sv $
     Modules/Packages/Rv32Types.sv $
     Modules/Packages/RvTypes.sv $
@@ -190,9 +190,9 @@ build Work/ModelSim/Modules/Uart/UartTest/_vmake: vlog $
     Modules/Memory/InternalSdram.sv $
     Modules/Memory/SdramController.sv $
     Modules/Uart/Tests/UartTest/UartTest.sv $
-    Work/ModelSim/Modules/Uart/UartTest
+    work/ModelSim/Modules/Uart/UartTest
     project = UartTest
-    work = Work/ModelSim/Modules/Uart
+    work = work/ModelSim/Modules/Uart
     srcs = $
         ../../../../Modules/Packages/BasicTypes.sv $
         ../../../../Modules/Packages/Rv32Types.sv $
@@ -207,11 +207,11 @@ build Work/ModelSim/Modules/Uart/UartTest/_vmake: vlog $
         ../../../../Modules/Memory/SdramController.sv $
         ../../../../Modules/Uart/Tests/UartTest/UartTest.sv
 
-build Work/ModelSim/Modules/Uart/UartTxTest: vsim_setup Work/ModelSim/Modules/Uart
-    work = Work/ModelSim/Modules/Uart
+build work/ModelSim/Modules/Uart/UartTxTest: vsim_setup work/ModelSim/Modules/Uart
+    work = work/ModelSim/Modules/Uart
     project = UartTxTest
 
-build Work/ModelSim/Modules/Uart/UartTxTest/_vmake: vlog $
+build work/ModelSim/Modules/Uart/UartTxTest/_vmake: vlog $
     Modules/Packages/BasicTypes.sv $
     Modules/Packages/Rv32Types.sv $
     Modules/Packages/RvTypes.sv $
@@ -224,9 +224,9 @@ build Work/ModelSim/Modules/Uart/UartTxTest/_vmake: vlog $
     Modules/Memory/InternalSdram.sv $
     Modules/Memory/SdramController.sv $
     Modules/Uart/Tests/UartTxTest/UartTxTest.sv $
-    Work/ModelSim/Modules/Uart/UartTxTest
+    work/ModelSim/Modules/Uart/UartTxTest
     project = UartTxTest
-    work = Work/ModelSim/Modules/Uart
+    work = work/ModelSim/Modules/Uart
     srcs = $
         ../../../../Modules/Packages/BasicTypes.sv $
         ../../../../Modules/Packages/Rv32Types.sv $
@@ -241,13 +241,13 @@ build Work/ModelSim/Modules/Uart/UartTxTest/_vmake: vlog $
         ../../../../Modules/Memory/SdramController.sv $
         ../../../../Modules/Uart/Tests/UartTxTest/UartTxTest.sv
 
-build Work/ModelSim/Processor: mkdir
+build work/ModelSim/Processor: mkdir
 
-build Work/ModelSim/Processor/DecoderTest: vsim_setup Work/ModelSim/Processor
-    work = Work/ModelSim/Processor
+build work/ModelSim/Processor/DecoderTest: vsim_setup work/ModelSim/Processor
+    work = work/ModelSim/Processor
     project = DecoderTest
 
-build Work/ModelSim/Processor/DecoderTest/_vmake: vlog $
+build work/ModelSim/Processor/DecoderTest/_vmake: vlog $
     Modules/Packages/BasicTypes.sv $
     Modules/Packages/Rv32Types.sv $
     Modules/Packages/RvTypes.sv $
@@ -302,9 +302,9 @@ build Work/ModelSim/Processor/DecoderTest/_vmake: vlog $
     Processor/Sources/Core.sv $
     Processor/Sources/System.sv $
     Processor/Sources/Decoder/Tests/DecoderTest.sv $
-    Work/ModelSim/Processor/DecoderTest
+    work/ModelSim/Processor/DecoderTest
     project = DecoderTest
-    work = Work/ModelSim/Processor
+    work = work/ModelSim/Processor
     srcs = $
         ../../../Modules/Packages/BasicTypes.sv $
         ../../../Modules/Packages/Rv32Types.sv $
@@ -361,11 +361,11 @@ build Work/ModelSim/Processor/DecoderTest/_vmake: vlog $
         ../../../Processor/Sources/System.sv $
         ../../../Processor/Sources/Decoder/Tests/DecoderTest.sv
 
-build Work/ModelSim/Processor/SystemTest: vsim_setup Work/ModelSim/Processor
-    work = Work/ModelSim/Processor
+build work/ModelSim/Processor/SystemTest: vsim_setup work/ModelSim/Processor
+    work = work/ModelSim/Processor
     project = SystemTest
 
-build Work/ModelSim/Processor/SystemTest/_vmake: vlog $
+build work/ModelSim/Processor/SystemTest/_vmake: vlog $
     Modules/Packages/BasicTypes.sv $
     Modules/Packages/Rv32Types.sv $
     Modules/Packages/RvTypes.sv $
@@ -420,9 +420,9 @@ build Work/ModelSim/Processor/SystemTest/_vmake: vlog $
     Processor/Sources/Core.sv $
     Processor/Sources/System.sv $
     Processor/Tests/SystemTest/SystemTest.sv $
-    Work/ModelSim/Processor/SystemTest
+    work/ModelSim/Processor/SystemTest
     project = SystemTest
-    work = Work/ModelSim/Processor
+    work = work/ModelSim/Processor
     srcs = $
         ../../../Modules/Packages/BasicTypes.sv $
         ../../../Modules/Packages/Rv32Types.sv $
@@ -479,11 +479,11 @@ build Work/ModelSim/Processor/SystemTest/_vmake: vlog $
         ../../../Processor/Sources/System.sv $
         ../../../Processor/Tests/SystemTest/SystemTest.sv
 
-build Work/ModelSim/Processor/SystemTestWithLoad: vsim_setup Work/ModelSim/Processor
-    work = Work/ModelSim/Processor
+build work/ModelSim/Processor/SystemTestWithLoad: vsim_setup work/ModelSim/Processor
+    work = work/ModelSim/Processor
     project = SystemTestWithLoad
 
-build Work/ModelSim/Processor/SystemTestWithLoad/_vmake: vlog $
+build work/ModelSim/Processor/SystemTestWithLoad/_vmake: vlog $
     Modules/Packages/BasicTypes.sv $
     Modules/Packages/Rv32Types.sv $
     Modules/Packages/RvTypes.sv $
@@ -538,9 +538,9 @@ build Work/ModelSim/Processor/SystemTestWithLoad/_vmake: vlog $
     Processor/Sources/Core.sv $
     Processor/Sources/System.sv $
     Processor/Tests/SystemTestWithLoad/SystemTestWithLoad.sv $
-    Work/ModelSim/Processor/SystemTestWithLoad
+    work/ModelSim/Processor/SystemTestWithLoad
     project = SystemTestWithLoad
-    work = Work/ModelSim/Processor
+    work = work/ModelSim/Processor
     srcs = $
         ../../../Modules/Packages/BasicTypes.sv $
         ../../../Modules/Packages/Rv32Types.sv $
@@ -597,13 +597,13 @@ build Work/ModelSim/Processor/SystemTestWithLoad/_vmake: vlog $
         ../../../Processor/Sources/System.sv $
         ../../../Processor/Tests/SystemTestWithLoad/SystemTestWithLoad.sv
 
-build Work/ModelSim/Processor/FetchUnit: mkdir
+build work/ModelSim/Processor/FetchUnit: mkdir
 
-build Work/ModelSim/Processor/FetchUnit/FetchUnitTest: vsim_setup Work/ModelSim/Processor/FetchUnit
-    work = Work/ModelSim/Processor/FetchUnit
+build work/ModelSim/Processor/FetchUnit/FetchUnitTest: vsim_setup work/ModelSim/Processor/FetchUnit
+    work = work/ModelSim/Processor/FetchUnit
     project = FetchUnitTest
 
-build Work/ModelSim/Processor/FetchUnit/FetchUnitTest/_vmake: vlog $
+build work/ModelSim/Processor/FetchUnit/FetchUnitTest/_vmake: vlog $
     Modules/Packages/BasicTypes.sv $
     Modules/Packages/Rv32Types.sv $
     Modules/Packages/RvTypes.sv $
@@ -623,9 +623,9 @@ build Work/ModelSim/Processor/FetchUnit/FetchUnitTest/_vmake: vlog $
     Processor/Sources/FetchUnit/ICacheInvalidater.sv $
     Processor/Sources/FetchUnit/ICacheReplacer.sv $
     Processor/Sources/FetchUnit/Tests/FetchUnitTest/FetchUnitTest.sv $
-    Work/ModelSim/Processor/FetchUnit/FetchUnitTest
+    work/ModelSim/Processor/FetchUnit/FetchUnitTest
     project = FetchUnitTest
-    work = Work/ModelSim/Processor/FetchUnit
+    work = work/ModelSim/Processor/FetchUnit
     srcs = $
         ../../../../Modules/Packages/BasicTypes.sv $
         ../../../../Modules/Packages/Rv32Types.sv $
@@ -647,13 +647,13 @@ build Work/ModelSim/Processor/FetchUnit/FetchUnitTest/_vmake: vlog $
         ../../../../Processor/Sources/FetchUnit/ICacheReplacer.sv $
         ../../../../Processor/Sources/FetchUnit/Tests/FetchUnitTest/FetchUnitTest.sv
 
-build Work/ModelSim/Processor/LoadStoreUnit: mkdir
+build work/ModelSim/Processor/LoadStoreUnit: mkdir
 
-build Work/ModelSim/Processor/LoadStoreUnit/LoadStoreUnitTest: vsim_setup Work/ModelSim/Processor/LoadStoreUnit
-    work = Work/ModelSim/Processor/LoadStoreUnit
+build work/ModelSim/Processor/LoadStoreUnit/LoadStoreUnitTest: vsim_setup work/ModelSim/Processor/LoadStoreUnit
+    work = work/ModelSim/Processor/LoadStoreUnit
     project = LoadStoreUnitTest
 
-build Work/ModelSim/Processor/LoadStoreUnit/LoadStoreUnitTest/_vmake: vlog $
+build work/ModelSim/Processor/LoadStoreUnit/LoadStoreUnitTest/_vmake: vlog $
     Modules/Packages/BasicTypes.sv $
     Modules/Packages/Rv32Types.sv $
     Modules/Packages/RvTypes.sv $
@@ -675,9 +675,9 @@ build Work/ModelSim/Processor/LoadStoreUnit/LoadStoreUnitTest/_vmake: vlog $
     Processor/Sources/LoadStoreUnit/LoadStoreUnitIF.sv $
     Processor/Sources/LoadStoreUnit/DCacheReplacer.sv $
     Processor/Sources/LoadStoreUnit/Tests/LoadStoreUnitTest/LoadStoreUnitTest.sv $
-    Work/ModelSim/Processor/LoadStoreUnit/LoadStoreUnitTest
+    work/ModelSim/Processor/LoadStoreUnit/LoadStoreUnitTest
     project = LoadStoreUnitTest
-    work = Work/ModelSim/Processor/LoadStoreUnit
+    work = work/ModelSim/Processor/LoadStoreUnit
     srcs = $
         ../../../../Modules/Packages/BasicTypes.sv $
         ../../../../Modules/Packages/Rv32Types.sv $
@@ -1094,14 +1094,6 @@ build TargetPrograms/Outputs/rv32ui-p-jalr.bin: objcopy $
 
 build TargetPrograms/Outputs/rv32ui-p-jalr.txt: BinaryToText $
     TargetPrograms/Outputs/rv32ui-p-jalr.bin
-
-build TargetPrograms/Outputs/rv32ui-p-lb.bin: objcopy $
-    ../riscv-tests/build/isa/rv32ui-p-lb
-    start = 0x80000000
-    end   = 0x80008000
-
-build TargetPrograms/Outputs/rv32ui-p-lb.txt: BinaryToText $
-    TargetPrograms/Outputs/rv32ui-p-lb.bin
 
 build TargetPrograms/Outputs/rv32ui-p-lbu.bin: objcopy $
     ../riscv-tests/build/isa/rv32ui-p-lbu

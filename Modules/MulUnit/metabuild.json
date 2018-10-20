@@ -2,7 +2,7 @@
     "common":
         {
             "type": "modelsim",
-            "work": "Work/ModelSim/Modules/MulUnit",
+            "work": "work/ModelSim/Modules/MulUnit",
             "packages": [
                 "../Packages/BasicTypes.sv",
                 "../Packages/Rv32Types.sv",

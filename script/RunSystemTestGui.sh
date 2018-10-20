@@ -6,7 +6,7 @@ if [ $# -ne 1 ]; then
 fi
 TESTNAME=$1
 
-WORKDIR="Work/ModelSim/Processor"
+WORKDIR="work/ModelSim/Processor"
 
 # Move to project top directory
 cd `dirname $0`
@@ -17,7 +17,7 @@ cd ${WORKDIR}
 
 vsim SystemTest -gui -do ../../../../Processor/Tests/SystemTest/vsim.macro -lib SystemTest \
     -G INITIAL_MEMORY_PATH="../../../../TargetPrograms/Outputs/${TESTNAME}.txt" \
-    -G DUMP_PATH="../../../../Work/Trace/Processor/${TESTNAME}.gui.trace.bin" \
+    -G DUMP_PATH="../../../../work/Trace/Processor/${TESTNAME}.gui.trace.bin" \
     -G SIMULATION_CYCLE=32768 \
     -G ENABLE_DUMP_CSR=0 \
     -G ENABLE_DUMP_MEMORY=0 \

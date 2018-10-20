@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROJECT=DivUnitTest
-WORKDIR=Work/ModelSim/Modules/DivUnit
+WORKDIR=work/ModelSim/Modules/DivUnit
 
 # Move to project top directory
 cd `dirname $0`

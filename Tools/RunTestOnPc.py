@@ -26,7 +26,7 @@ DefaultTestCycle = 65536
 CheckIoPath = "./rafi-emu/Release/CheckIo.exe"
 EmulatorPath = "./rafi-emu/Release/RafiEmu.exe"
 BinaryDirPath = "./TargetPrograms/Outputs"
-TraceDirPath = "./Work/Trace"
+TraceDirPath = "./work/Trace"
 
 #
 # Functions
@@ -117,7 +117,7 @@ def RunSimulator(setting):
 
     result = None
     with open(logPath, "w") as f:
-        result = subprocess.run(cmd, cwd=f"Work/ModelSim/Processor", stdout=f)
+        result = subprocess.run(cmd, cwd=f"work/ModelSim/Processor", stdout=f)
 
     if result.returncode != 0:
         print(f"Simulator program returns error. (code = {result.returncode})")

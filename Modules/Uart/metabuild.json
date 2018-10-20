@@ -2,7 +2,7 @@
     "common":
         {
             "type": "modelsim",
-            "work": "Work/ModelSim/Modules/Uart",
+            "work": "work/ModelSim/Modules/Uart",
             "packages": [
                 "../Packages/BasicTypes.sv",
                 "../Packages/Rv32Types.sv",

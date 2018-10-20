@@ -2,7 +2,7 @@
     "common":
         {
             "type": "modelsim",
-            "work": "Work/ModelSim/Processor/LoadStoreUnit",
+            "work": "work/ModelSim/Processor/LoadStoreUnit",
             "packages": [
                 "../../../Modules/Packages/BasicTypes.sv",
                 "../../../Modules/Packages/Rv32Types.sv",
