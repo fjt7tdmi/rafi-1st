@@ -79,7 +79,7 @@ module TlbReplacer #(
         return !entry.valid || (!entry.read && entry.write);
     endfunction
 
-    function automatic PageTableEntry getEntryIndex(paddr_t entryAddr);
+    function automatic _entry_index_t getEntryIndex(paddr_t entryAddr);
         return entryAddr[$clog2(PageTableEntrySize) + EntryIndexInLineWidth - 1 : $clog2(PageTableEntrySize)];
     endfunction
 
@@ -93,6 +93,7 @@ module TlbReplacer #(
         PageTableEntry [EntryCountInLine-1:0] retEntries;
         _line_t ret;
 
+        /* verilator lint_off WIDTH */
         for (int i = 0; i < EntryCountInLine; i++) begin
             if (i == entryIndex) begin
                 retEntries[i] = entry;

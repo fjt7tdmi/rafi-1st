@@ -1,12 +1,12 @@
 /*
  * Copyright 2018 Akifumi Fujita
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,7 +18,7 @@ import BasicTypes::*;
 import RvTypes::*;
 import Rv32Types::*;
 
-// Interface between D$, I$, arbiter and memory
+// Interface between D$, I$, arbiter and mem
 
 interface MemoryAccessArbiterIF #(
     // Bit width of cache line
@@ -47,35 +47,35 @@ interface MemoryAccessArbiterIF #(
     logic dcWriteReq;
     logic [LineWidth-1:0] dcWriteValue;
 
-    logic [AddrWidth-1:0] memoryAddr;
-    logic memoryDone;
-    logic memoryEnable;
-    logic memoryIsWrite;
-    logic [LineWidth-1:0] memoryReadValue;
-    logic [LineWidth-1:0] memoryWriteValue;
+    logic [AddrWidth-1:0] memAddr;
+    logic memDone;
+    logic memEnable;
+    logic memIsWrite;
+    logic [LineWidth-1:0] memReadValue;
+    logic [LineWidth-1:0] memWriteValue;
 
     modport FetchUnit(
     output
-        .addr(icAddr),
-        .readReq(icReadReq),
-        .writeReq(icWriteReq),
-        .writeValue(icWriteValue),
+        icAddr,
+        icReadReq,
+        icWriteReq,
+        icWriteValue,
     input
-        .readValue(icReadValue),
-        .readGrant(icReadGrant),
-        .writeGrant(icWriteGrant)
+        icReadValue,
+        icReadGrant,
+        icWriteGrant
     );
 
     modport LoadStoreUnit(
     output
-        .addr(dcAddr),
-        .readReq(dcReadReq),
-        .writeReq(dcWriteReq),
-        .writeValue(dcWriteValue),
+        dcAddr,
+        dcReadReq,
+        dcWriteReq,
+        dcWriteValue,
     input
-        .readGrant(dcReadGrant),
-        .readValue(dcReadValue),
-        .writeGrant(dcWriteGrant)
+        dcReadGrant,
+        dcReadValue,
+        dcWriteGrant
     );
 
     modport MemoryAccessArbiter(
@@ -86,10 +86,10 @@ interface MemoryAccessArbiterIF #(
         icReadGrant,
         icReadValue,
         icWriteGrant,
-        memoryAddr,
-        memoryEnable,
-        memoryIsWrite,
-        memoryWriteValue,
+        memAddr,
+        memEnable,
+        memIsWrite,
+        memWriteValue,
     input
         dcAddr,
         dcReadReq,
@@ -99,18 +99,18 @@ interface MemoryAccessArbiterIF #(
         icReadReq,
         icWriteReq,
         icWriteValue,
-        memoryDone,
-        memoryReadValue
+        memDone,
+        memReadValue
     );
 
     modport Memory(
     output
-        .done(memoryDone),
-        .readValue(memoryReadValue),
+        memDone,
+        memReadValue,
     input
-        .addr(memoryAddr),
-        .enable(memoryEnable),
-        .isWrite(memoryIsWrite),
-        .writeValue(memoryWriteValue)
+        memAddr,
+        memEnable,
+        memIsWrite,
+        memWriteValue
     );
 endinterface

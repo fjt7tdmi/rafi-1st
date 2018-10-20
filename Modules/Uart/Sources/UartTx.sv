@@ -30,9 +30,11 @@ module UartTx #(
     input   logic   rst
 );
     // localparam
-    localparam UartCycleLength = ClockFrequency / BaudRate;
-    localparam StopCycleLength = UartCycleLength * 2;
-    localparam CycleCountWidth = $clog2(StopCycleLength + 1);
+    localparam CounterWidth = $clog2(ClockFrequency / BaudRate) + 2;
+
+    /* verilator lint_off WIDTH */
+    localparam [CounterWidth-1:0] UartCycleLength = ClockFrequency / BaudRate;
+    localparam [CounterWidth-1:0] StopCycleLength = UartCycleLength * 2;
 
     typedef enum logic [2:0] {
         State_None          = 3'h0,
@@ -44,14 +46,14 @@ module UartTx #(
 
     // Registers
     State r_State;
-    logic [CycleCountWidth-1:0] r_CycleCount;
-    logic [$clog2(ByteWidth)-1:0] r_BitCount;
+    logic [CounterWidth-1:0] r_CycleCount;
+    logic [2:0] r_BitCount;
     int8_t r_Buffer;
 
     // Wires
     State nextState;
-    logic [CycleCountWidth-1:0] nextCycleCount;
-    logic [$clog2(ByteWidth):0] nextBitCount;
+    logic [CounterWidth-1:0] nextCycleCount;
+    logic [2:0] nextBitCount;
     int8_t nextBuffer;
 
     always_comb begin
@@ -70,7 +72,7 @@ module UartTx #(
             nextState = (r_CycleCount == UartCycleLength) ? State_SendData : r_State;
         end
         State_SendData: begin
-            nextState = (r_BitCount == ByteWidth - 1 && r_CycleCount == UartCycleLength)
+            nextState = (r_BitCount == 3'h7 && r_CycleCount == UartCycleLength)
                 ? State_SendStopBit
                 : r_State;
         end

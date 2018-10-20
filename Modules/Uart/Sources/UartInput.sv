@@ -38,6 +38,10 @@ module UartInput #(
     localparam HoldLength = UartCycleLength / 2; // cycle count to watch start bi
     localparam CycleCountWidth = $clog2(UartCycleLength + 1);
 
+    /* verilator lint_off WIDTH */
+    localparam [$clog2(ByteWidth):0] BitCountMax = ByteWidth - 1;
+    localparam [$clog2(LineSize):0] ByteCountMax = LineSize - 1;
+
     typedef enum logic [2:0]
     {
         State_None              = 3'h0,
@@ -60,8 +64,8 @@ module UartInput #(
     // Registers
     State r_State;
     logic [CycleCountWidth-1:0] r_CycleCount;
-    logic [$clog2(ByteWidth)-1:0] r_BitCount;
-    logic [$clog2(LineSize)-1:0] r_ByteCount;
+    logic [$clog2(ByteWidth):0] r_BitCount;
+    logic [$clog2(LineSize):0] r_ByteCount;
     _line_t r_LineBuffer;
     int32_t r_TotalMemoryWriteSize;
 
@@ -75,7 +79,7 @@ module UartInput #(
 
     always_comb begin
         state = {1'b0, r_State};
-        
+
         // module port
         totalMemoryWriteSize = r_TotalMemoryWriteSize;
         memoryWriteEnable = (r_State == State_WriteMemory);
@@ -95,13 +99,13 @@ module UartInput #(
             end
         end
         State_ReceiveData: begin
-            nextState = (r_BitCount == ByteWidth - 1 && r_CycleCount == UartCycleLength)
+            nextState = (r_BitCount == BitCountMax && r_CycleCount == UartCycleLength)
                 ? State_ReceiveStopBit
                 : r_State;
         end
         State_ReceiveStopBit: begin
             if (r_CycleCount == UartCycleLength) begin
-                nextState = (r_ByteCount == LineSize - 1) ? State_WriteMemory : State_None;
+                nextState = (r_ByteCount == ByteCountMax) ? State_WriteMemory : State_None;
             end
             else begin
                 nextState = r_State;

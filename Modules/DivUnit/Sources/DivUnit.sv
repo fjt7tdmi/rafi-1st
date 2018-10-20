@@ -47,7 +47,7 @@ module DivUnit #(
     // Functions
     function automatic _abs_t getAbs(logic [N-1:0] val, logic isSigned);
         _abs_t exVal;
-        
+
         if (isSigned) begin
             exVal = {val[N-1], val[N-1:0]};
         end
@@ -100,13 +100,13 @@ module DivUnit #(
         if (reg_State == State_Init && enable) begin
             if (divisor == '0) begin
                 next_Quotient = '1;
-                next_Dividend = dividend;
+                next_Dividend = '0;
                 next_DividendShifter = '0;
                 next_Divisor = '0;
                 next_QuontientNegative = '0;
                 next_RemnantNegative = '0;
                 next_Counter = '0;
-                next_State = State_Done;            
+                next_State = State_Done;
             end
             else if (isSigned && dividend[N-1] == 1'b1 && dividend[N-2:0] == '0 && divisor == '1) begin
                 // for 32 bit, dividend == 32'h80000000 && divisor == 32'hffffffff
@@ -121,7 +121,7 @@ module DivUnit #(
             end
             else begin
                 next_Quotient = '0;
-                next_Dividend = absDividend[N];
+                next_Dividend = absDividend;
                 next_DividendShifter = absDividend[N-1:0];
                 next_Divisor = absDivisor;
                 next_QuontientNegative = isSigned ? (dividend[N-1] ^ divisor[N-1]) : 1'b0;
@@ -132,18 +132,17 @@ module DivUnit #(
         end
         else if (reg_State == State_Process) begin
             next_Quotient = {reg_Quotient[N-2:0], cmpResult};
+            next_Dividend = {subResult[N-1:0], reg_DividendShifter[N-1]};
             next_DividendShifter = (reg_DividendShifter << 1);
             next_Divisor = reg_Divisor;
             next_QuontientNegative = reg_QuontientNegative;
             next_RemnantNegative = reg_RemnantNegative;
 
             if (reg_Counter < N) begin
-                next_Dividend = {subResult[N-2:0], reg_DividendShifter[N-1]};
                 next_Counter = reg_Counter + 1;
                 next_State = State_Process;
             end
             else begin
-                next_Dividend = subResult;
                 next_Counter = reg_Counter;
                 next_State = State_Done;
             end

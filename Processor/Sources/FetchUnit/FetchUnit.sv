@@ -95,6 +95,7 @@ module FetchUnit (
 
     logic                   tlbHit;
     logic                   tlbFault;
+    virtual_page_number_t   tlbReadKey;
     physical_page_number_t  tlbReadValue;
     logic                   tlbReadEnable;
     logic                   tlbWriteEnable;
@@ -156,7 +157,7 @@ module FetchUnit (
         .fault(tlbFault),
         .readValue(tlbReadValue),
         .readEnable(tlbReadEnable),
-        .readKey(nextPc[VirtualAddrWidth-1:PageOffsetWidth]),
+        .readKey(tlbReadKey),
         .readAccessType(MemoryAccessType_Instruction),
         .writeEnable(tlbWriteEnable),
         .writeKey(tlbWriteKey),
@@ -203,8 +204,8 @@ module FetchUnit (
         .arrayReadTag(validTagArrayReadValue.tag),
         .memAddr(cacheReplacerMemAddr),
         .memReadEnable(cacheReplacerMemReadEnable),
-        .memReadDone(mem.readGrant),
-        .memReadValue(mem.readValue),
+        .memReadDone(mem.icReadGrant),
+        .memReadValue(mem.icReadValue),
         .miss(cacheMiss),
         .done(cacheReplacerDone),
         .enable(cacheReplacerEnable),
@@ -222,11 +223,11 @@ module FetchUnit (
         .tlbWriteValue,
         .memAddr(tlbReplacerMemAddr),
         .memReadEnable(tlbReplacerMemReadEnable),
-        .memReadDone(mem.readGrant),
-        .memReadValue(mem.readValue),
-        .memWriteEnable(mem.writeReq),
-        .memWriteDone(mem.writeGrant),
-        .memWriteValue(mem.writeValue),
+        .memReadDone(mem.icReadGrant),
+        .memReadValue(mem.icReadValue),
+        .memWriteEnable(mem.icWriteReq),
+        .memWriteDone(mem.icWriteGrant),
+        .memWriteValue(mem.icWriteValue),
         .csrSatp(csr.satp),
         .done(tlbReplacerDone),
         .enable(tlbReplacerEnable),
@@ -236,11 +237,16 @@ module FetchUnit (
         .rst
     );
 
+    // Wires
+    always_comb begin
+        tlbReadKey = nextPc[VirtualAddrWidth-1:PageOffsetWidth];
+    end
+
     always_comb begin
         // Wires
         cacheMiss = r_ICacheRead && !r_TlbMiss &&
             (!validTagArrayReadValue.valid || r_PhysicalPc[TagMsb:TagLsb] != validTagArrayReadValue.tag);
-        stall = ctrl.stall || (r_StallCounter != '0);
+        stall = ctrl.ifStall || (r_StallCounter != '0);
 
         // Module port
         bus.valid = (r_ICacheRead && !r_TlbMiss && !cacheMiss) || r_Fault;
@@ -249,15 +255,68 @@ module FetchUnit (
         bus.iCacheLine = dataArrayReadValue;
 
         if (r_State == State_ReplaceTlb) begin
-            mem.addr = tlbReplacerMemAddr;
-            mem.readReq = tlbReplacerMemReadEnable;
+            mem.icAddr = tlbReplacerMemAddr;
+            mem.icReadReq = tlbReplacerMemReadEnable;
         end
         else begin
-            mem.addr = cacheReplacerMemAddr;
-            mem.readReq = cacheReplacerMemReadEnable;
+            mem.icAddr = cacheReplacerMemAddr;
+            mem.icReadReq = cacheReplacerMemReadEnable;
         end
 
-        // nextState
+        // Valid & tag array input signals
+        unique case (r_State)
+        State_Invalidate: begin
+            validTagArrayIndex = invalidaterArrayIndex;
+            validTagArrayWriteValue = {invalidaterArrayWriteValid, invalidaterArrayWriteTag};
+            validTagArrayWriteEnable = invalidaterArrayWriteEnable;
+        end
+        State_ReplaceCache: begin
+            validTagArrayIndex = cacheReplacerArrayIndex;
+            validTagArrayWriteValue = {cacheReplacerArrayWriteValid, cacheReplacerArrayWriteTag};
+            validTagArrayWriteEnable = cacheReplacerArrayWriteEnable;
+        end
+        default: begin
+            validTagArrayIndex = nextPhysicalPc[IndexMsb:IndexLsb];
+            validTagArrayWriteValue = '0;
+            validTagArrayWriteEnable = 0;
+        end
+        endcase
+
+        // Data array input signals
+        if (r_State == State_ReplaceCache) begin
+            dataArrayIndex = cacheReplacerArrayIndex;
+            dataArrayWriteEnable = cacheReplacerArrayWriteEnable;
+        end
+        else begin
+            dataArrayIndex = nextPhysicalPc[IndexMsb:IndexLsb];
+            dataArrayWriteEnable = 0;
+        end
+
+        // Module enable signals
+        tlbReadEnable = (r_State == State_Default);
+        invalidaterEnable = (r_State == State_Invalidate);
+        cacheReplacerEnable = (r_State == State_ReplaceCache);
+        tlbReplacerEnable = (r_State == State_ReplaceTlb);
+    end
+
+    // nextPc
+    always_comb begin
+        if (csr.trapInfo.valid || csr.trapReturn) begin
+            nextPc = csr.nextPc;
+        end
+        else if (ctrl.flush) begin
+            nextPc = ctrl.nextPc;
+        end
+        else if (stall || !bus.valid || r_State != State_Default) begin
+            nextPc = r_Pc;
+        end
+        else begin
+            nextPc = r_Pc + InsnSize;
+        end
+    end
+
+    // nextState
+    always_comb begin
         unique case (r_State)
         State_Invalidate: begin
             if (invalidaterDone && !waitInvalidate) begin
@@ -304,69 +363,21 @@ module FetchUnit (
             end
         end
         endcase
+    end
 
-        // nextPc
-        if (csr.trapInfo.valid || csr.trapReturn) begin
-            nextPc = csr.nextPc;
-        end
-        else if (ctrl.flush) begin
-            nextPc = ctrl.nextPc;
-        end
-        else if (stall || !bus.valid || r_State != State_Default) begin
-            nextPc = r_Pc;
-        end
-        else begin
-            nextPc = r_Pc + InsnSize;
-        end
-
-        // Wires
+    // Next register values
+    always_comb begin
         nextPhysicalPc = {tlbReadValue, nextPc[PageOffsetWidth-1:0]};
         nextICacheRead = (r_State == State_Default && !ctrl.flush && !stall && !waitInvalidate);
         nextTlbMiss = nextICacheRead && !tlbHit;
         nextFault = nextICacheRead && tlbHit && tlbFault;
-        
-        // nextStallCounter
+
         if (ctrl.flush) begin
             nextStallCounter = StallCycleAfterFlush;
         end
         else begin
             nextStallCounter = (r_StallCounter != '0) ? r_StallCounter - 1 : '0;
         end
-
-        // Valid & tag array input signals
-        unique case (r_State)
-        State_Invalidate: begin
-            validTagArrayIndex = invalidaterArrayIndex;
-            validTagArrayWriteValue = {invalidaterArrayWriteValid, invalidaterArrayWriteTag};
-            validTagArrayWriteEnable = invalidaterArrayWriteEnable;
-        end
-        State_ReplaceCache: begin
-            validTagArrayIndex = cacheReplacerArrayIndex;
-            validTagArrayWriteValue = {cacheReplacerArrayWriteValid, cacheReplacerArrayWriteTag};
-            validTagArrayWriteEnable = cacheReplacerArrayWriteEnable;
-        end
-        default: begin
-            validTagArrayIndex = nextPhysicalPc[IndexMsb:IndexLsb];
-            validTagArrayWriteValue = '0;
-            validTagArrayWriteEnable = 0;
-        end
-        endcase
-
-        // Data array input signals
-        if (r_State == State_ReplaceCache) begin
-            dataArrayIndex = cacheReplacerArrayIndex;
-            dataArrayWriteEnable = cacheReplacerArrayWriteEnable;
-        end
-        else begin
-            dataArrayIndex = nextPhysicalPc[IndexMsb:IndexLsb];
-            dataArrayWriteEnable = 0;
-        end
-
-        // Module enable signals
-        tlbReadEnable = (r_State == State_Default);
-        invalidaterEnable = (r_State == State_Invalidate);
-        cacheReplacerEnable = (r_State == State_ReplaceCache);
-        tlbReplacerEnable = (r_State == State_ReplaceTlb);
     end
 
     always_ff @(posedge clk) begin

@@ -49,10 +49,11 @@ module SdramController #(
     input   logic clk,
     input   logic rst
 );
-    // parameters
     localparam BankCount = UserLineWidth / MemoryDataWidth;
-    localparam BankIndexMax = BankCount - 1;
     localparam BankIndexWidth = $clog2(BankCount);
+
+    /* verilator lint_off WIDTH */
+    localparam [BankIndexWidth-1:0] BankIndexMax = BankCount - 1;
 
     // typedef
     typedef logic unsigned [$clog2(BankCount)-1:0] _bank_index_t;

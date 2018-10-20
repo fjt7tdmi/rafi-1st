@@ -1,12 +1,12 @@
 /*
  * Copyright 2018 Akifumi Fujita
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -56,33 +56,33 @@ module MemoryAccessArbiter (
             end
             default: begin
                 // State_DCacheRead, State_DCacheWrite, State_ICacheRead, State_ICacheWrite
-                nextState = bus.memoryDone ? State_None : r_State;
+                nextState = bus.memDone ? State_None : r_State;
             end
         endcase
 
         // bus
-        bus.icReadValue = bus.memoryReadValue;
-        bus.icReadGrant = (r_State == State_ICacheRead) && bus.memoryDone;
-        bus.icWriteGrant = (r_State == State_ICacheWrite) && bus.memoryDone;
+        bus.icReadValue = bus.memReadValue;
+        bus.icReadGrant = (r_State == State_ICacheRead) && bus.memDone;
+        bus.icWriteGrant = (r_State == State_ICacheWrite) && bus.memDone;
 
-        bus.dcReadValue = bus.memoryReadValue;
-        bus.dcReadGrant = (r_State == State_DCacheRead) && bus.memoryDone;
-        bus.dcWriteGrant = (r_State == State_DCacheWrite) && bus.memoryDone;
+        bus.dcReadValue = bus.memReadValue;
+        bus.dcReadGrant = (r_State == State_DCacheRead) && bus.memDone;
+        bus.dcWriteGrant = (r_State == State_DCacheWrite) && bus.memDone;
 
-        bus.memoryEnable = (r_State != State_None);
-        bus.memoryIsWrite = (r_State == State_DCacheWrite || r_State == State_ICacheWrite);
+        bus.memEnable = (r_State != State_None);
+        bus.memIsWrite = (r_State == State_DCacheWrite || r_State == State_ICacheWrite);
 
         if (r_State == State_DCacheRead || r_State == State_DCacheWrite) begin
-            bus.memoryAddr = bus.dcAddr;
-            bus.memoryWriteValue = bus.dcWriteValue;
+            bus.memAddr = bus.dcAddr;
+            bus.memWriteValue = bus.dcWriteValue;
         end
         else if (r_State == State_ICacheRead || r_State == State_ICacheWrite) begin
-            bus.memoryAddr = bus.icAddr;
-            bus.memoryWriteValue = bus.icWriteValue;
+            bus.memAddr = bus.icAddr;
+            bus.memWriteValue = bus.icWriteValue;
         end
         else begin
-            bus.memoryAddr = '0;
-            bus.memoryWriteValue = '0;
+            bus.memAddr = '0;
+            bus.memWriteValue = '0;
         end
     end
 

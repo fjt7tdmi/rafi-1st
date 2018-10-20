@@ -1,12 +1,12 @@
 /*
  * Copyright 2018 Akifumi Fujita
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,6 +36,7 @@ module BypassLogic(
 
     // Functions
     function automatic _index_t encodeIndex(logic [BypassDepth-1:0] depth);
+        /* verilator lint_off WIDTH */
         for (int i = 0; i < BypassDepth; i++) begin
             if (depth[i]) begin
                 return i;
@@ -48,34 +49,49 @@ module BypassLogic(
     PipelineEntry pipeline[BypassDepth];
 
     // Wires
+    logic hit[BypassReadPortCount];
+    reg_addr_t readAddr[BypassReadPortCount];
+    word_t readValue[BypassReadPortCount];
+
     logic loadHit[BypassReadPortCount];
+
     logic [BypassDepth-1:0] camHits[BypassReadPortCount];
     _index_t camIndex[BypassReadPortCount];
+
+    always_comb begin
+        hit[0] = bus.hit1;
+        hit[1] = bus.hit2;
+        readAddr[0] = bus.readAddr1;
+        readAddr[1] = bus.readAddr2;
+
+        bus.readValue1 = readValue[0];
+        bus.readValue2 = readValue[1];
+    end
 
     // Bypass CAM
     always_comb begin
         for (int i = 0; i < BypassReadPortCount; i++) begin
-            loadHit[i] = bus.loadWriteEnable && bus.loadWriteAddr == bus.readAddr[i];
+            loadHit[i] = bus.loadWriteEnable && bus.loadWriteAddr == readAddr[i];
 
             for (int j = 0; j < BypassDepth; j++) begin
-                camHits[i][j] = pipeline[j].valid && (pipeline[j].addr == bus.readAddr[i]);
+                camHits[i][j] = pipeline[j].valid && (pipeline[j].addr == readAddr[i]);
             end
             camIndex[i] = encodeIndex(camHits[i]);
 
-            bus.hit[i] = |(camHits[i]) || loadHit[i];
-            if (bus.readAddr[i] == '0) begin
+            hit[i] = |(camHits[i]) || loadHit[i];
+            if (readAddr[i] == '0) begin
                 // zero register
-                bus.readValue[i] = '0;
+                readValue[i] = '0;
             end
             else if (loadHit[i]) begin
-                bus.readValue[i] = bus.loadWriteValue;
+                readValue[i] = bus.loadWriteValue;
             end
             else if (|(camHits[i])) begin
-                bus.readValue[i] = pipeline[camIndex[i]].value;
+                readValue[i] = pipeline[camIndex[i]].value;
             end
             else begin
                 // bypass failure
-                bus.readValue[i] = '0;
+                readValue[i] = '0;
             end
         end
     end
@@ -87,7 +103,7 @@ module BypassLogic(
                 pipeline[i] <= '0;
             end
         end
-        else if (ctrl.stall) begin
+        else if (ctrl.bypassStall) begin
             for (int i = 0; i < BypassDepth; i++) begin
                 pipeline[i] <= pipeline[i];
             end
@@ -96,7 +112,7 @@ module BypassLogic(
             pipeline[0].valid <= bus.writeEnable;
             pipeline[0].addr <= bus.writeAddr;
             pipeline[0].value <= bus.writeValue;
-            
+
             if (bus.loadWriteEnable) begin
                 pipeline[1].valid <= bus.loadWriteEnable;
                 pipeline[1].addr <= bus.loadWriteAddr;
@@ -105,7 +121,7 @@ module BypassLogic(
             else begin
                 pipeline[1] <= pipeline[0];
             end
-            
+
             for (int i = 2; i < BypassDepth; i++) begin
                 pipeline[i] <= pipeline[i-1];
             end

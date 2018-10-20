@@ -124,7 +124,7 @@ endfunction
 
 function automatic csr_xstatus_t get_sstatus_mask();
     csr_xstatus_t mask = '0;
-    
+
     mask.sd     = '1;
     mask.mxr    = '1;
     mask.sum_    = '1;
@@ -135,16 +135,16 @@ function automatic csr_xstatus_t get_sstatus_mask();
     mask.upie   = '1;
     mask.sie    = '1;
     mask.uie    = '1;
-    
+
     return mask;
 endfunction
 
 function automatic csr_xstatus_t get_ustatus_mask();
     csr_xstatus_t mask = '0;
-    
+
     mask.upie   = '1;
     mask.uie    = '1;
-    
+
     return mask;
 endfunction
 
@@ -181,13 +181,13 @@ endfunction
 
 function automatic csr_xstatus_t update_xstatus_spp(csr_xstatus_t current, Privilege spp);
     csr_xstatus_t ret = current;
-    ret.spp = spp;
+    ret.spp = spp[0];
     return ret;
 endfunction
 
 function automatic csr_xstatus_t update_xstatus_spp_sie(csr_xstatus_t current, Privilege spp, logic sie);
     csr_xstatus_t ret = current;
-    ret.spp = spp;
+    ret.spp = spp[0];
     ret.sie = sie;
     return ret;
 endfunction
@@ -278,9 +278,9 @@ module ControlStatusRegister(
         csr_addr_cycle:     readValue = r_Cycle[31:0];
         csr_addr_time:      readValue = r_Cycle[31:0];
         csr_addr_instret:   readValue = bus.readOpId[31:0];
-        csr_addr_cycleh:    readValue = r_Cycle[63:0];
-        csr_addr_timeh:     readValue = r_Cycle[63:0];
-        csr_addr_instreth:  readValue = bus.readOpId[63:0];
+        csr_addr_cycleh:    readValue = r_Cycle[63:32];
+        csr_addr_timeh:     readValue = r_Cycle[63:32];
+        csr_addr_instreth:  readValue = bus.readOpId[63:32];
 
         csr_addr_mvendorid: readValue = VendorId;
         csr_addr_marchid:   readValue = ArchitectureId;
@@ -353,28 +353,13 @@ module ControlStatusRegister(
 
         // nextPc
         if (bus.trapInfo.valid && nextPrivilege == Privilege_Machine) begin
-            if (r_MachineTrapVector.mode == TrapVectorMode_Vectored) begin
-                nextPc = {r_MachineTrapVector.base + bus.trapInfo.cause, 2'b00};
-            end
-            else begin
-                nextPc = {r_MachineTrapVector.base, 2'b00};
-            end
+            nextPc = {r_MachineTrapVector.base, 2'b00};
         end
         else if (bus.trapInfo.valid && nextPrivilege == Privilege_Supervisor) begin
-            if (r_SupervisorTrapVector.mode == TrapVectorMode_Vectored) begin
-                nextPc = {r_SupervisorTrapVector.base + bus.trapInfo.cause, 2'b00};
-            end
-            else begin
-                nextPc = {r_SupervisorTrapVector.base, 2'b00};
-            end
+            nextPc = {r_SupervisorTrapVector.base, 2'b00};
         end
         else if (bus.trapInfo.valid && nextPrivilege == Privilege_User) begin
-            if (r_UserTrapVector.mode == TrapVectorMode_Vectored) begin
-                nextPc = {r_UserTrapVector.base + bus.trapInfo.cause, 2'b00};
-            end
-            else begin
-                nextPc = {r_UserTrapVector.base, 2'b00};
-            end
+            nextPc = {r_UserTrapVector.base, 2'b00};
         end
         else if (bus.trapReturn && bus.trapReturnPrivilege == Privilege_Machine) begin
             nextPc = r_MachineExceptionProgramCounter;
@@ -391,12 +376,7 @@ module ControlStatusRegister(
 
         // bus output
         bus.nextPc = nextPc;
-        if (bus.readEnable && !bus.readIllegal) begin
-            bus.readValue = readValue;
-        end
-        else begin
-            bus.readValue = 0;
-        end
+        bus.readValue = readValue;
         bus.readIllegal = 0; // TEMP: Disable illegal access exception for riscv-tests
 
         bus.satp = r_SupervisorAddressTranslationProtection;
@@ -454,7 +434,7 @@ module ControlStatusRegister(
                     ? bus.writeValue
                     : r_UserExceptionProgramCounter;
                 r_UserCause <= (bus.writeEnable && bus.writeAddr == csr_addr_ucause)
-                    ? bus.writeValue
+                    ? bus.writeValue[3:0]
                     : r_UserCause;
                 r_UserTrapValue <= (bus.writeEnable && bus.writeAddr == csr_addr_utval)
                     ? bus.writeValue
@@ -471,7 +451,7 @@ module ControlStatusRegister(
                     ? bus.writeValue
                     : r_SupervisorExceptionProgramCounter;
                 r_SupervisorCause <= (bus.writeEnable && bus.writeAddr == csr_addr_scause)
-                    ? bus.writeValue
+                    ? bus.writeValue[3:0]
                     : r_SupervisorCause;
                 r_SupervisorTrapValue <= (bus.writeEnable && bus.writeAddr == csr_addr_stval)
                     ? bus.writeValue
@@ -488,7 +468,7 @@ module ControlStatusRegister(
                     ? bus.writeValue
                     : r_MachineExceptionProgramCounter;
                 r_MachineCause <= (bus.writeEnable && bus.writeAddr == csr_addr_mcause)
-                    ? bus.writeValue
+                    ? bus.writeValue[3:0]
                     : r_MachineCause;
                 r_MachineTrapValue <= (bus.writeEnable && bus.writeAddr == csr_addr_mtval)
                     ? bus.writeValue

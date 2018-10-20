@@ -75,6 +75,7 @@ module LoadStoreUnit (
         bytes = value;
 
         for (int i = 0; i < WordSize; i++) begin
+            /* verilator lint_off WIDTH */
             if (shift + i < LineSize) begin
                 shiftedBytes[i] = bytes[shift + i];
             end
@@ -93,7 +94,7 @@ module LoadStoreUnit (
         bytes = value;
 
         for (int i = 0; i < LineSize; i++) begin
-            if (0 <= i - shift && i - shift < WordSize) begin
+            if (shift <= i) begin
                 shiftedBytes[i] = bytes[i - shift];
             end
             else begin
@@ -107,6 +108,7 @@ module LoadStoreUnit (
     function automatic _write_mask_t makeWriteMask(_shift_amount_t shift, LoadStoreType loadStoreType);
         _write_mask_t mask;
 
+        /* verilator lint_off WIDTH */
         unique case(loadStoreType)
         LoadStoreType_Word: begin
             mask = 4'b1111;
@@ -311,10 +313,10 @@ module LoadStoreUnit (
         .arrayReadData(dataArrayReadValue),
         .memAddr(cacheReplacerMemAddr),
         .memReadEnable(cacheReplacerMemReadEnable),
-        .memReadDone(mem.readGrant),
-        .memReadValue(mem.readValue),
+        .memReadDone(mem.dcReadGrant),
+        .memReadValue(mem.dcReadValue),
         .memWriteEnable(cacheReplacerMemWriteEnable),
-        .memWriteDone(mem.writeGrant),
+        .memWriteDone(mem.dcWriteGrant),
         .memWriteValue(cacheReplacerMemWriteValue),
         .done(cacheReplacerDone),
         .enable(cacheReplacerEnable),
@@ -332,10 +334,10 @@ module LoadStoreUnit (
         .tlbWriteKey,
         .tlbWriteValue,
         .memAddr(tlbReplacerMemAddr),
-        .memReadDone(mem.readGrant),
+        .memReadDone(mem.dcReadGrant),
         .memReadEnable(tlbReplacerMemReadEnable),
-        .memReadValue(mem.readValue),
-        .memWriteDone(mem.writeGrant),
+        .memReadValue(mem.dcReadValue),
+        .memWriteDone(mem.dcWriteGrant),
         .memWriteEnable(tlbReplacerMemWriteEnable),
         .memWriteValue(tlbReplacerMemWriteValue),
         .csrSatp(csr.satp),
@@ -347,17 +349,31 @@ module LoadStoreUnit (
         .rst
     );
 
+    // Wires
     always_comb begin
-        // Wires
         accessType = (bus.command == LoadStoreUnitCommand_Store || bus.command == LoadStoreUnitCommand_AtomicMemOp)
             ? MemoryAccessType_Store
             : MemoryAccessType_Load;
+    end
+
+    always_comb begin
         cacheMiss = r_DCacheRead && !r_TlbMiss &&
             (!tagArrayReadValue.valid || r_PhysicalAddr[TagMsb:TagLsb] != tagArrayReadValue.tag);
-        shiftedReadData = rightShift(dataArrayReadValue, r_Addr[$clog2(LineSize)-1:0]);
-        commandAddr = r_PhysicalAddr[PhysicalAddrWidth-1:IndexLsb];
+    end
 
+    always_comb begin
+        shiftedReadData = rightShift(dataArrayReadValue, r_Addr[$clog2(LineSize)-1:0]);
+    end
+
+    always_comb begin
+        commandAddr = r_PhysicalAddr[PhysicalAddrWidth-1:IndexLsb];
+    end
+
+    always_comb begin
         loadResult = extend(shiftedReadData, r_LoadStoreType);
+    end
+
+    always_comb begin
         storeAluValue = atomicAlu(bus.atomicType, r_StoreRegValue, loadResult);
         storeValue = (bus.command == LoadStoreUnitCommand_AtomicMemOp)
             ? storeAluValue
@@ -366,17 +382,23 @@ module LoadStoreUnit (
             (bus.command == LoadStoreUnitCommand_StoreConditional) &&
             (r_State == State_Load) &&
             (!r_TlbMiss && !cacheMiss && !tlbFault && tagArrayReadValue.reserved);
+    end
 
+    always_comb begin
         unique case (r_State)
         State_Invalidate:   command = CacheCommand_Invalidate;
         State_ReplaceCache: command = CacheCommand_Replace;
         State_WriteThrough: command = CacheCommand_WriteThrough;
         default:            command = CacheCommand_None;
         endcase
+    end
 
-        // Module port
+    // Module port
+    always_comb begin
         hostIoValue = r_HostIoValue;
-        
+    end
+
+    always_comb begin
         bus.done =
             (bus.command == LoadStoreUnitCommand_None && r_State == State_Default) ||
             (bus.command == LoadStoreUnitCommand_Load && r_State == State_Load && !r_TlbMiss && !cacheMiss) ||
@@ -395,21 +417,25 @@ module LoadStoreUnit (
         else begin
             bus.result = loadResult;
         end
+    end
 
+    always_comb begin
         if (r_State == State_ReplaceTlb) begin
-            mem.addr = tlbReplacerMemAddr;
-            mem.readReq = tlbReplacerMemReadEnable;
-            mem.writeReq = tlbReplacerMemWriteEnable;
-            mem.writeValue = tlbReplacerMemWriteValue;
+            mem.dcAddr = tlbReplacerMemAddr;
+            mem.dcReadReq = tlbReplacerMemReadEnable;
+            mem.dcWriteReq = tlbReplacerMemWriteEnable;
+            mem.dcWriteValue = tlbReplacerMemWriteValue;
         end
         else begin
-            mem.addr = cacheReplacerMemAddr;
-            mem.readReq = cacheReplacerMemReadEnable;
-            mem.writeReq = cacheReplacerMemWriteEnable;
-            mem.writeValue = cacheReplacerMemWriteValue;
+            mem.dcAddr = cacheReplacerMemAddr;
+            mem.dcReadReq = cacheReplacerMemReadEnable;
+            mem.dcWriteReq = cacheReplacerMemWriteEnable;
+            mem.dcWriteValue = cacheReplacerMemWriteValue;
         end
+    end
 
-        // nextState
+    // nextState
+    always_comb begin
         unique case (r_State)
         State_Invalidate: begin
             nextState = cacheReplacerDone ? State_Default : r_State;
@@ -478,8 +504,10 @@ module LoadStoreUnit (
             end
         end
         endcase
+    end
 
-        // nextAddr, nextAccessType, nextLoadStoreType, nextStoreRegValue
+    // nextAddr, nextAccessType, nextLoadStoreType, nextStoreRegValue
+    always_comb begin
         if (r_State == State_Default) begin
             nextAddr = bus.addr;
             nextAccessType = accessType;
@@ -492,31 +520,39 @@ module LoadStoreUnit (
             nextLoadStoreType = r_LoadStoreType;
             nextStoreRegValue = r_StoreRegValue;
         end
+    end
 
-        // nextLoadResult
+    // nextLoadResult
+    always_comb begin
         if (r_State == State_Load) begin
             nextLoadResult = loadResult;
         end
         else begin
             nextLoadResult = r_LoadResult;
         end
+    end
 
-        // Wires
+    always_comb begin
         nextDCacheRead = (r_State == State_Default) && bus.enable;
         nextTlbMiss = nextDCacheRead && !tlbHit;
         nextPhysicalAddr = {tlbReadValue, nextAddr[PageOffsetWidth-1:0]};
-        nextHostIoValue = (r_State == State_WriteThrough) && cacheReplacerDone && (nextPhysicalAddr == HostIoAddr) ?
-            r_StoreRegValue :
-            r_HostIoValue;
 
         if (bus.done) begin
             nextTlbFault = 0;
         end
         else begin
-            nextTlbFault |= (nextDCacheRead && tlbHit && tlbFault);
+            nextTlbFault = (nextDCacheRead && tlbHit && tlbFault);
         end
+    end
 
-        // Array input signals
+    always_comb begin
+        nextHostIoValue = (r_State == State_WriteThrough) && cacheReplacerDone && (nextPhysicalAddr == HostIoAddr) ?
+            r_StoreRegValue :
+            r_HostIoValue;
+    end
+
+    // Array input signals
+    always_comb begin
         if (r_State == State_ReplaceCache || r_State == State_Invalidate) begin
             tagArrayIndex = cacheReplacerArrayIndex;
             tagArrayWriteValue.valid = cacheReplacerArrayWriteValid;
@@ -563,8 +599,10 @@ module LoadStoreUnit (
             dataArrayWriteValue = '0;
         end
         endcase
+    end
 
-        // Module enable signals
+    // Module enable signals
+    always_comb begin
         tlbReadEnable = (r_State == State_Default);
         cacheReplacerEnable = (r_State == State_Invalidate || r_State == State_ReplaceCache || r_State == State_WriteThrough);
         tlbReplacerEnable = (r_State == State_ReplaceTlb);

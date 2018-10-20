@@ -45,11 +45,17 @@ module MemoryAccessStage(
     always_comb begin
         valid = prevStage.valid;
         op = prevStage.op;
+    end
+
+    always_comb begin
         dstRegValue = (op.regWriteSrcType == RegWriteSrcType_Memory) ?
             loadStoreUnit.result :
             prevStage.dstRegValue;
         nextOpCommitCount = valid ? r_OpCommitCount + 1 : r_OpCommitCount;
+    end
 
+    // trapInfo
+    always_comb begin
         if (valid && !prevStage.trapInfo.valid && loadStoreUnit.fault) begin
             trapInfo.valid = '1;
             trapInfo.cause = op.isStore ? ExceptionCode_StorePageFault : ExceptionCode_LoadPageFault;
@@ -58,7 +64,9 @@ module MemoryAccessStage(
         else begin
             trapInfo = prevStage.trapInfo;
         end
+    end
 
+    always_comb begin
         loadStoreUnit.addr = prevStage.memAddr;
         loadStoreUnit.enable = valid && (op.isLoad || op.isStore || op.isFence || op.isAtomic) && !prevStage.trapInfo.valid;
         loadStoreUnit.invalidateTlb = valid && op.isFence && op.fenceType == FenceType_Vma;
@@ -87,15 +95,19 @@ module MemoryAccessStage(
         else begin
             loadStoreUnit.command = LoadStoreUnitCommand_None;
         end
+    end
 
+    always_comb begin
         fetchUnit.invalidateICache = valid && op.isFence &&
             (op.fenceType == FenceType_I || op.fenceType == FenceType_Vma);
         fetchUnit.invalidateTlb = valid && op.isFence && op.fenceType == FenceType_Vma;
+    end
 
+    always_comb begin
         ctrl.opCommitCount = r_OpCommitCount;
-        ctrl.stallReq = loadStoreUnit.enable && !loadStoreUnit.done;
+        ctrl.maStallReq = loadStoreUnit.enable && !loadStoreUnit.done;
         // TODO: implement for VM (page fault exception, etc.)
-        ctrl.flushReq = valid && !ctrl.stallReq && (
+        ctrl.flushReq = valid && !ctrl.maStallReq && (
             (op.isBranch && prevStage.branchTaken) ||
             op.csrWriteEnable ||
             fetchUnit.invalidateICache ||
@@ -109,14 +121,16 @@ module MemoryAccessStage(
         else begin
             ctrl.nextPc = prevStage.pc + InsnSize;
         end
+    end
 
-        bypass.writeAddr = prevStage.dstRegAddr;
-        bypass.writeValue = dstRegValue;
-        bypass.writeEnable = valid && op.regWriteEnable && (op.isLoad || op.isAtomic) && !ctrl.stallReq;
+    always_comb begin
+        bypass.loadWriteAddr = prevStage.dstRegAddr;
+        bypass.loadWriteValue = dstRegValue;
+        bypass.loadWriteEnable = valid && op.regWriteEnable && (op.isLoad || op.isAtomic) && !ctrl.maStallReq;
     end
 
     always_ff @(posedge clk) begin
-        if (rst || ctrl.stallReq) begin
+        if (rst || ctrl.maStallReq) begin
             nextStage.valid <= '0;
             nextStage.op <= '0;
             nextStage.pc <= '0;
@@ -146,7 +160,7 @@ module MemoryAccessStage(
         if (rst) begin
             r_OpCommitCount <= '0;
         end
-        else if (ctrl.stallReq) begin
+        else if (ctrl.maStallReq) begin
             r_OpCommitCount <= r_OpCommitCount;
         end
         else begin

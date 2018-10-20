@@ -46,6 +46,7 @@ module FlipFlopCam #(
 
     // Functions
     function automatic _index_t encodeIndex(logic [EntryCount-1:0] value);
+        /* verilator lint_off WIDTH */
         for (int i = 0; i < EntryCount; i++) begin
             if (value[i]) begin
                 return i;

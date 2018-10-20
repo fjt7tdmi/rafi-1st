@@ -1,12 +1,12 @@
 /*
  * Copyright 2018 Akifumi Fujita
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -109,6 +109,13 @@ module ExecuteStage_MulDivUnit(
     );
 
     always_comb begin
+        mulHigh = (mulDivType == MulDivType_Mulh || mulDivType == MulDivType_Mulhsu || mulDivType == MulDivType_Mulhu);
+        mulSrcSigned1 = (mulDivType == MulDivType_Mulh || mulDivType == MulDivType_Mulhsu);
+        mulSrcSigned2 = (mulDivType == MulDivType_Mulh);
+        divSigned = (mulDivType == MulDivType_Div || mulDivType == MulDivType_Rem);
+    end
+
+    always_comb begin
         if (mulDivType == MulDivType_Mul || mulDivType == MulDivType_Mulh || mulDivType == MulDivType_Mulhsu || mulDivType == MulDivType_Mulhu) begin
             done = mulDone;
             result = mulResult;
@@ -121,11 +128,6 @@ module ExecuteStage_MulDivUnit(
             done = divDone;
             result = remnant;
         end
-
-        mulHigh = (mulDivType == MulDivType_Mulh || mulDivType == MulDivType_Mulhsu || mulDivType == MulDivType_Mulhu);
-        mulSrcSigned1 = (mulDivType == MulDivType_Mulh || mulDivType == MulDivType_Mulhsu);
-        mulSrcSigned2 = (mulDivType == MulDivType_Mulh);
-        divSigned = (mulDivType == MulDivType_Div || mulDivType == MulDivType_Rem);
     end
 endmodule
 
@@ -170,7 +172,7 @@ module ExecuteStage(
         .src1(srcRegValue1),
         .src2(srcRegValue2),
         .enable(enableMulDiv),
-        .stall(ctrl.stall),
+        .stall(ctrl.exStall),
         .flush(ctrl.flush),
         .clk,
         .rst
@@ -179,9 +181,14 @@ module ExecuteStage(
     always_comb begin
         valid = prevStage.valid && !ctrl.flush;
         op = prevStage.op;
+    end
 
+    always_comb begin
         enableMulDiv = valid && (op.resultType == ResultType_MulDiv);
+    end
 
+    // src
+    always_comb begin
         srcRegValue1 = bypass.hit1 ? bypass.readValue1 : prevStage.srcRegValue1;
         srcRegValue2 = bypass.hit2 ? bypass.readValue2 : prevStage.srcRegValue2;
 
@@ -202,10 +209,12 @@ module ExecuteStage(
         AluSrcType2_Csr: aluSrc2 = prevStage.srcCsrValue;
         default: aluSrc2 = 'x;
         endcase
+    end
 
+    // result
+    always_comb begin
         resultAlu = ALU(op.aluCommand, aluSrc1, aluSrc2);
-        
-        // result
+
         unique case (op.resultType)
         ResultType_Alu:     result = resultAlu;
         ResultType_MulDiv:  result = resultMulDiv;
@@ -222,15 +231,21 @@ module ExecuteStage(
         RegWriteSrcType_Csr:    dstRegValue = prevStage.srcCsrValue;
         default: dstRegValue = '0;
         endcase
+    end
 
-        ctrl.stallReq = enableMulDiv && (!doneMulDiv);
+    always_comb begin
+        ctrl.exStallReq = enableMulDiv && (!doneMulDiv);
+    end
 
+    always_comb begin
         bypass.readAddr1 = prevStage.srcRegAddr1;
         bypass.readAddr2 = prevStage.srcRegAddr2;
         bypass.writeAddr = prevStage.dstRegAddr;
         bypass.writeValue = dstRegValue;
         bypass.writeEnable = valid && op.regWriteEnable && !op.isLoad;
+    end
 
+    always_comb begin
         // trapInfo
         if (prevStage.trapInfo.valid) begin
             trapInfo = prevStage.trapInfo;
@@ -277,7 +292,7 @@ module ExecuteStage(
             nextStage.trapInfo <= '0;
             nextStage.trapReturn <= '0;
         end
-        else if (ctrl.stall) begin
+        else if (ctrl.exStall) begin
             nextStage.valid <= nextStage.valid;
             nextStage.op <= nextStage.op;
             nextStage.pc <= nextStage.pc;
@@ -292,7 +307,7 @@ module ExecuteStage(
             nextStage.trapInfo <= nextStage.trapInfo;
             nextStage.trapReturn <= nextStage.trapReturn;
         end
-        else if (ctrl.stallReq) begin
+        else if (ctrl.exStallReq) begin
             nextStage.valid <= '0;
             nextStage.op <= '0;
             nextStage.pc <= '0;

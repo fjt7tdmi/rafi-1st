@@ -21,11 +21,11 @@ import Rv32Types::*;
 import MemoryTypes::*;
 
 module System #(
-    parameter SdramAddrWidth,
-    parameter SdramBankWidth,
-    parameter SdramDataWidth,
-    parameter BaudRate,
-    parameter ClockFrequency
+    parameter SdramAddrWidth = 20,
+    parameter SdramBankWidth = 3,
+    parameter SdramDataWidth = 16,
+    parameter BaudRate = 115200,
+    parameter ClockFrequency = 50 * 1000 * 1000
 )(
     // Signals for sdram
     output  logic sdramWriteReq,

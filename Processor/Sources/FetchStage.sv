@@ -1,12 +1,12 @@
 /*
  * Copyright 2018 Akifumi Fujita
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,7 +50,7 @@ module FetchStage(
             nextStage.insn <= '0;
             nextStage.trapInfo <= '0;
         end
-        else if (ctrl.stall) begin
+        else if (ctrl.ifStall) begin
             nextStage.valid <= nextStage.valid;
             nextStage.pc <= nextStage.pc;
             nextStage.insn <= nextStage.insn;
@@ -60,9 +60,9 @@ module FetchStage(
             nextStage.valid <= fetchUnit.valid;
             nextStage.pc <= fetchUnit.pc;
             nextStage.insn <= '0;
-            nextStage.trapInfo.valid = '1;
-            nextStage.trapInfo.cause = ExceptionCode_InsnPageFault;
-            nextStage.trapInfo.value = fetchUnit.pc;
+            nextStage.trapInfo.valid <= '1;
+            nextStage.trapInfo.cause <= ExceptionCode_InsnPageFault;
+            nextStage.trapInfo.value <= fetchUnit.pc;
         end
         else begin
             nextStage.valid <= fetchUnit.valid;

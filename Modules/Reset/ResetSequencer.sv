@@ -26,6 +26,7 @@ module ResetSequencer #(
     input logic clk
 );
     localparam CounterWidth = $clog2(ResetCycle + 1);
+    localparam CounterMax = ResetCycle[CounterWidth-1:0];
 
     // Registers
     logic [CounterWidth-1:0] r_Counter;
@@ -37,7 +38,7 @@ module ResetSequencer #(
         rstOut = (r_Counter != '0);
 
         if (rstIn) begin
-            nextCounter = ResetCycle;
+            nextCounter = CounterMax;
         end
         else if (r_Counter != '0) begin
             nextCounter = r_Counter - 1;

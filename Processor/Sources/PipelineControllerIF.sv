@@ -1,12 +1,12 @@
 /*
  * Copyright 2018 Akifumi Fujita
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,6 +24,7 @@ interface PipelineControllerIF;
     logic flush;
     logic flushReq;
 
+    logic bypassStall;
     logic ifStall;
     logic idStall;
     logic rrStall;
@@ -36,54 +37,55 @@ interface PipelineControllerIF;
 
     modport FetchStage(
     input
-        .stall(ifStall),
-        .flush(flush)
+        ifStall,
+        flush
     );
 
     modport DecodeStage(
     input
-        .stall(idStall),
-        .flush(flush),
-        .opCommitCount(opCommitCount)
+        idStall,
+        flush,
+        opCommitCount
     );
 
     modport RegReadStage(
     input
-        .stall(rrStall),
-        .flush(flush)
+        rrStall,
+        flush
     );
 
     modport ExecuteStage(
     output
-        .stallReq(exStallReq),
+        exStallReq,
     input
-        .stall(exStall),
-        .flush(flush)
+        exStall,
+        flush
     );
 
     modport MemoryAccessStage(
     output
-        .stallReq(maStallReq),
-        .flushReq(flushReq),
-        .nextPc(nextPc),
-        .opCommitCount(opCommitCount)
+        maStallReq,
+        flushReq,
+        nextPc,
+        opCommitCount
     );
 
     modport BypassLogic(
     input
-        .stall(rrStall),
-        .flush(flush)
+        bypassStall,
+        flush
     );
 
     modport FetchUnit(
     input
-        .stall(ifStall),
-        .flush(flush),
-        .nextPc(nextPc)
+        ifStall,
+        flush,
+        nextPc
     );
 
     modport PipelineController(
     output
+        bypassStall,
         ifStall,
         idStall,
         rrStall,

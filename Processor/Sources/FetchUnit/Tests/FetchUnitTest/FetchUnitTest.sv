@@ -50,13 +50,13 @@ module TestMemory #(
     logic [EntryIndexWidth-1:0] entryIndex;
 
     always_comb begin
-        entryIndex = bus.addr[EntryIndexWidth-1:0];
-        bus.readValue = body[entryIndex];
+        entryIndex = bus.memAddr[EntryIndexWidth-1:0];
+        bus.memReadValue = body[entryIndex];
     end
 
     always_ff @(posedge clk) begin
-        if (bus.writeEnable) begin
-            body[entryIndex] <= bus.writeValue;
+        if (bus.memWriteEnable) begin
+            body[entryIndex] <= bus.memWriteValue;
         end
     end
 endmodule
