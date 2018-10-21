@@ -24,7 +24,10 @@ set(Boost_LIBRARIES "boost_program_options")
 
 add_executable(test_Core
     ~/local/share/verilator/include/verilated.cpp
+    ~/local/share/verilator/include/verilated_vcd_c.cpp
     work/verilator/test_Core/VCore__Syms.cpp
+	work/verilator/test_Core/VCore__Trace.cpp
+	work/verilator/test_Core/VCore__Trace__Slow.cpp
 	work/verilator/test_Core/VCore.cpp
 	work/verilator/test_Core/VCore_Core.cpp
 	work/verilator/test_Core/VCore___024unit.cpp

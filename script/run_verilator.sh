@@ -6,7 +6,7 @@ cd ..
 
 mkdir -p work/verilator
 
-verilator -Mdir work/verilator/test_Core --cc --top-module Core \
+verilator -Mdir work/verilator/test_Core --cc --trace --top-module Core \
     module/package/BasicTypes.sv \
     module/package/Rv32Types.sv \
     module/package/RvTypes.sv \

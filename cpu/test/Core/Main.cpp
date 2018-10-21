@@ -19,6 +19,9 @@
 
 #include <boost/program_options.hpp>
 
+#include <verilated.h>
+#include <verilated_vcd_c.h>
+
 #include "../../../work/verilator/test_Core/VCore.h"
 
 #include "Dumper.h"
@@ -29,9 +32,17 @@ int main(int argc, char** argv)
 {
     Option option(argc, argv);
 
+    Verilated::traceEverOn(true);
+
+    auto tfp = std::make_unique<VerilatedVcdC>();
+
     auto memory = std::make_unique<Memory>();
     auto core = std::make_unique<VCore>();
     auto dumper = std::make_unique<Dumper>(option.GetDumpPath(), core.get());
+
+    core->trace(tfp.get(), 20);
+
+    tfp->open("core.vcd");
 
     // begin reset
     core->rstIn = 1;
@@ -63,7 +74,11 @@ int main(int argc, char** argv)
         dumper->DumpCycle(cycle);
 
         memory->UpdateCore(core.get());
+
+        tfp->dump(cycle);
     }
 
     core->final();
+
+    tfp->close();
 }
