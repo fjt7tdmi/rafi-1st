@@ -155,7 +155,7 @@ module System #(
         .ClockFrequency(ClockFrequency),
         .LineSize(MemoryLineSize)
     ) m_UartInput (
-        .state(debugOut[28:26]),
+        .state(debugOut[31:28]),
         .totalMemoryWriteSize(uartTotalMemoryWriteSize),
         .memoryWriteEnable(uartInputWriteEnable),
         .memoryWriteValue(uartInputWriteValue),
@@ -186,29 +186,37 @@ module System #(
         else begin
             next_CoreReset = 0;
         end
+    end
 
-        debugOut[31:30] = '0;
-        debugOut[29] = uartRx;
-        debugOut[25] = r_State;
+    always_comb begin
+        debugOut[27] = uartRx;
+        debugOut[26:25] = r_State;
         debugOut[24] = r_CoreReset;
         debugOut[23:0] = debugIn[0] ? uartTotalMemoryWriteSize[23:0] : hostIoValue[23:0];
+    end
 
+    always_comb begin
         if (r_State == State_Load) begin
             memoryAddr = uartTotalMemoryWriteSize[$clog2(MemoryCapacity) - 1 : $clog2(MemoryLineSize)];
-            memoryEnable = uartInputWriteEnable;
             memoryIsWrite = 1;
             memoryWriteValue = uartInputWriteValue;
-
-            coreDone = 0;
-            coreReadValue = '0;
-
-            uartTxWriteEnable = 0;
         end
         else begin
             memoryAddr = coreAddr[InternalMemoryAddrWidth - 1 : 0];
             memoryIsWrite = coreIsWrite;
             memoryWriteValue = coreWriteValue;
+        end
+    end
 
+    always_comb begin
+        if (r_State == State_Load) begin
+            coreDone = 0;
+            coreReadValue = '0;
+
+            memoryEnable = uartInputWriteEnable;
+            uartTxWriteEnable = 0;
+        end
+        else begin
             // TODO: avoid using comparator
             if (coreAddr == getCoreAddr(UartAddr)) begin
                 coreDone = 1;
@@ -232,7 +240,9 @@ module System #(
                 uartTxWriteEnable = 0;
             end
         end
+    end
 
+    always_comb begin
         uartTxWriteValue = coreWriteValue[ByteWidth-1:0];
     end
 

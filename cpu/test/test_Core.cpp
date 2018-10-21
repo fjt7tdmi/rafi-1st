@@ -40,6 +40,11 @@ int main()
         top->clk = 1;
         top->eval();
 
+        for (int i = 0; i < 32; i++)
+        {
+            printf("0x%08x\n", top->Core__DOT__m_RegFile__DOT__body[i]);
+        }
+
         top->clk = 0;
         top->eval();
     }

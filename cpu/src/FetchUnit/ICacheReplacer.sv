@@ -1,12 +1,12 @@
 /*
  * Copyright 2018 Akifumi Fujita
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -85,22 +85,28 @@ module ICacheReplacer #(
     State nextState;
     _line_t nextLine;
 
-    always_comb begin
         // Cache array access
+    always_comb begin
         arrayWriteEnable = (r_State == State_WriteCache);
         arrayIndex = makeIndex(r_MissAddr);
         arrayWriteValid = 1;
         arrayWriteTag = makeTag(r_MissAddr);
         arrayWriteData = r_Line;
+    end
 
-        // Memory accses
+    // Memory accses
+    always_comb begin
         memAddr = r_MissAddr;
         memReadEnable = (r_State == State_ReadMemory);
+    end
 
-        // Control
+    // Control
+    always_comb begin
         done = (r_State == State_WriteCache);
+    end
 
-        // Wires
+    // Wires
+    always_comb begin
         unique case (r_State)
         State_None: begin
             nextState = (enable) ? State_InvalidateCache : r_State;
