@@ -6,7 +6,7 @@ cd ..
 
 mkdir -p work/verilator
 
-verilator -Mdir work/verilator/test_Core --cc --top-module System \
+verilator -Mdir work/verilator/test_Core --cc --top-module Core \
     module/package/BasicTypes.sv \
     module/package/Rv32Types.sv \
     module/package/RvTypes.sv \
@@ -21,14 +21,9 @@ verilator -Mdir work/verilator/test_Core --cc --top-module System \
     module/MulUnit/src/MulUnit.sv \
     module/Memory/BlockRam.sv \
     module/Memory/FlipFlopCam.sv \
-    module/Memory/InternalMemory.sv \
-    module/Memory/InternalSdram.sv \
-    module/Memory/SdramController.sv \
     module/Tlb/Tlb.sv \
     module/Tlb/TlbReplacer.sv \
     module/Reset/ResetSequencer.sv \
-    module/Uart/src/UartInput.sv \
-    module/Uart/src/UartTx.sv \
     cpu/src/FetchUnit/FetchUnit.sv \
     cpu/src/FetchUnit/FetchUnitIF.sv \
     cpu/src/FetchUnit/ICacheInvalidater.sv \
@@ -57,7 +52,6 @@ verilator -Mdir work/verilator/test_Core --cc --top-module System \
     cpu/src/RegReadStage.sv \
     cpu/src/RegReadStageIF.sv \
     cpu/src/RegWriteStage.sv \
-    cpu/src/System.sv \
     cpu/src/Core.sv
 
 verilator -Mdir work/verilator/test_Timer --cc \

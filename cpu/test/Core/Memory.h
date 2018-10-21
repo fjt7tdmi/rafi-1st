@@ -14,40 +14,27 @@
  * limitations under the License.
  */
 
-#include <memory>
+#pragma once
+
 #include <cstdio>
 
-#include "../../work/verilator/test_Core/VCore.h"
+#include <rvtrace/writer.h>
 
-int main()
+#include "../../../work/verilator/test_Core/VCore.h"
+
+class Memory final
 {
-    auto top = std::make_unique<VCore>();
+public:
+    Memory();
+    ~Memory();
 
-    // reset
-    top->rstIn = 1;
-    top->clk = 0;
-    top->eval();
+    void LoadFile(const char* path);
 
-    top->clk = 1;
-    top->eval();
+    void UpdateCore(VCore* core);
 
-    top->clk = 0;
-    top->rstIn = 0;
-    top->eval();
+private:
+    static const int Capacity = 64 * 1024 * 1024;
+    static const int LineSize = 16;
 
-    for (int i = 0; i < 10; i++)
-    {
-        top->clk = 1;
-        top->eval();
-
-        for (int i = 0; i < 32; i++)
-        {
-            printf("0x%08x\n", top->Core__DOT__m_RegFile__DOT__body[i]);
-        }
-
-        top->clk = 0;
-        top->eval();
-    }
-
-    top->final();
-}
+	char* m_pBody;
+};
