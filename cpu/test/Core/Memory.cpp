@@ -64,7 +64,7 @@ void Memory::UpdateCore(VCore* core)
         std::memcpy(&m_pBody[offset], core->memoryWriteValue, lineSize);
 
     }
-    else if (core->memoryEnable && core->memoryIsWrite)
+    else if (core->memoryEnable && !core->memoryIsWrite)
     {
         // read
         core->memoryDone = 1;
