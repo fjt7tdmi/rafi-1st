@@ -14,42 +14,27 @@
  * limitations under the License.
  */
 
-#include <memory>
+#pragma once
+
 #include <cstdio>
 
-#include "../../../work/verilator/test_Timer/VTimer.h"
+#include <rvtrace/writer.h>
 
-int main()
+#include "../../../work/verilator/test_Core/VCore.h"
+
+class Memory final
 {
-    auto top = std::make_unique<VTimer>();
+public:
+    Memory();
+    ~Memory();
 
-    // reset
-    top->rst = 1;
-    top->clk = 0;
-    top->eval();
+    void LoadFile(const char* path);
 
-    top->clk = 1;
-    top->eval();
+    void UpdateCore(VCore* core);
 
-    top->clk = 0;
-    top->rst = 0;
-    top->addr = 0;
-    top->writeData = 0;
-    top->readEnable = 1;
-    top->writeEnable = 0;
-    top->eval();
+private:
+    static const int Capacity = 64 * 1024 * 1024;
+    static const int LineSize = 16;
 
-    for (int i = 0; i < 10; i++)
-    {
-        top->clk = 1;
-        top->eval();
-
-        int value = top->readData;
-        printf("value: %d\n", value);
-
-        top->clk = 0;
-        top->eval();
-    }
-
-    top->final();
-}
+	char* m_pBody;
+};

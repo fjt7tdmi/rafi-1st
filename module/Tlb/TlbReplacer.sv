@@ -140,15 +140,15 @@ module TlbReplacer #(
     paddr_t entryAddr1;
     paddr_t entryAddr0;
 
+    // Wires
     always_comb begin
-        // ----------------------------------------
-        // Wires
-
         writePageTableEntry1 = makeEntryForWrite(r_PageTableEntry1, r_AccessType);
         writePageTableEntry0 = makeEntryForWrite(r_PageTableEntry0, r_AccessType);
         entryAddr1 = {csrSatp.ppn, r_VirtualPageNumber.vpn1, 2'b00};
         entryAddr0 = {r_PageTableEntry1.ppn1, r_PageTableEntry1.ppn0, r_VirtualPageNumber.vpn0, 2'b00};
+    end
 
+    always_comb begin
         unique case(r_State)
         State_Default: begin
             nextState = enable ? State_PageTableRead1 : State_Default;
@@ -228,9 +228,10 @@ module TlbReplacer #(
         nextLine = (r_State == State_PageTableRead1 || r_State == State_PageTableRead0) && memReadDone ?
             memReadValue :
             r_Line;
+    end
 
-        // ----------------------------------------
-        // TLB access
+    // TLB access
+    always_comb begin
         tlbWriteEnable = (r_State == State_TlbWrite || r_State == State_TlbWriteForFault);
         tlbWriteKey = r_VirtualPageNumber;
 
@@ -246,9 +247,10 @@ module TlbReplacer #(
             tlbWriteValue.pageNumber = r_PhysicalPageNumber;
             tlbWriteValue.flags = r_Flags;
         end
+    end
 
-        // ----------------------------------------
-        // Memory access
+    // Memory access
+    always_comb begin
         memAddr = (r_State == State_PageTableRead1 || r_State == State_PageTableDecode1 || r_State == State_PageTableWrite1) ?
             entryAddr1[PhysicalAddrWidth - 1 : PhysicalAddrWidth - MemAddrWidth] :
             entryAddr0[PhysicalAddrWidth - 1 : PhysicalAddrWidth - MemAddrWidth];
@@ -267,9 +269,10 @@ module TlbReplacer #(
             memWriteValue = '0;
         end
         endcase
+    end
 
-        // ----------------------------------------
-        // Control
+    // Control
+    always_comb begin
         done = (r_State == State_TlbWrite || r_State == State_TlbWriteForFault);
     end
 

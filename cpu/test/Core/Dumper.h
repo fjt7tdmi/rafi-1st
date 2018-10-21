@@ -14,42 +14,27 @@
  * limitations under the License.
  */
 
-#include <memory>
+#pragma once
+
 #include <cstdio>
 
-#include "../../../work/verilator/test_Timer/VTimer.h"
+#include <rvtrace/writer.h>
 
-int main()
+#include "../../../work/verilator/test_Core/VCore.h"
+
+class Dumper final
 {
-    auto top = std::make_unique<VTimer>();
+public:
+    Dumper(const char* path, VCore* pCore);
 
-    // reset
-    top->rst = 1;
-    top->clk = 0;
-    top->eval();
+    ~Dumper();
 
-    top->clk = 1;
-    top->eval();
+    void DumpCycle(int cycle);
 
-    top->clk = 0;
-    top->rst = 0;
-    top->addr = 0;
-    top->writeData = 0;
-    top->readEnable = 1;
-    top->writeEnable = 0;
-    top->eval();
+private:
+    int32_t m_Pc {0};
+    int32_t m_OpId {0};
 
-    for (int i = 0; i < 10; i++)
-    {
-        top->clk = 1;
-        top->eval();
-
-        int value = top->readData;
-        printf("value: %d\n", value);
-
-        top->clk = 0;
-        top->eval();
-    }
-
-    top->final();
-}
+    rvtrace::FileTraceWriter m_FileTraceWriter;
+    VCore* m_pCore;
+};

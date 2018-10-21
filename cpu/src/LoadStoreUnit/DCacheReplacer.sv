@@ -93,21 +93,25 @@ module DCacheReplacer #(
     State nextState;
     _line_t nextLine;
 
+    // Cache array access
     always_comb begin
-        // Cache array access
         arrayWriteEnable = (r_State == State_Invalidate) || (r_State == State_WriteCache);
         arrayIndex = makeIndex(commandAddr);
         arrayWriteValid = (r_State == State_Invalidate) ? 0 : 1;
         arrayWriteTag = makeTag(commandAddr);
         arrayWriteData = r_Line;
+    end
 
-        // Memory accses
+    // Memory accses
+    always_comb begin
         memAddr = commandAddr;
         memReadEnable = (r_State == State_ReadMemory);
         memWriteEnable = (r_State == State_WriteMemory);
         memWriteValue = r_Line;
+    end
 
-        // Control
+    // Control
+    always_comb begin
         done = (r_State == State_WriteMemory && memWriteDone) ||
             (r_State == State_WriteCache) ||
             (r_State == State_Invalidate);

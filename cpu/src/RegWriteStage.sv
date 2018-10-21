@@ -1,12 +1,12 @@
 /*
  * Copyright 2018 Akifumi Fujita
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,11 +32,13 @@ module RegWriteStage(
     logic valid;
     logic commit;
     Op op;
-   
+    addr_t pc /* verilator public */;
+
     always_comb begin
         valid = prevStage.valid;
         commit = valid && !prevStage.trapInfo.valid;
         op = prevStage.op;
+        pc = prevStage.pc;
 
         csr.writeEnable = commit && op.csrWriteEnable;
         csr.writeAddr = prevStage.csrAddr;
