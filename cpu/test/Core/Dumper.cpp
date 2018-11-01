@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include <cstdio>
 #include <memory>
 #include <string>
 #include <sstream>
@@ -37,6 +38,18 @@ Dumper::~Dumper()
 }
 
 void Dumper::DumpCycle(int cycle)
+{
+    if (m_Valid)
+    {
+        Dump(cycle);
+    }
+
+    // Save PC
+    m_Valid = m_pCore->Core->m_RegWriteStage->valid;
+    m_Pc = m_pCore->Core->m_RegWriteStage->pc;
+}
+
+void Dumper::Dump(int cycle)
 {
     // TraceHeader
     const int32_t flags = NodeFlag_BasicInfo | NodeFlag_Pc32 | NodeFlag_IntReg32 | NodeFlag_Io;
@@ -79,7 +92,4 @@ void Dumper::DumpCycle(int cycle)
     builder.SetNode(ioNode);
 
     m_FileTraceWriter.Write(builder.GetData(), builder.GetDataSize());
-
-    // Save PC
-    m_Pc = m_pCore->Core->m_RegWriteStage->pc;
 }

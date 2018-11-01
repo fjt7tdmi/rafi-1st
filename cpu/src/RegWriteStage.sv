@@ -29,7 +29,7 @@ module RegWriteStage(
     input   logic rst
 );
     // Wires
-    logic valid;
+    logic valid /* verilator public */;
     logic commit;
     Op op;
     addr_t pc /* verilator public */;
