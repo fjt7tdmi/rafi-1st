@@ -32,6 +32,9 @@ public:
     void DumpCycle(int cycle);
 
 private:
+    void Dump(int cycle);
+
+    bool m_Valid {false};
     int32_t m_Pc {0};
     int32_t m_OpId {0};
 

@@ -59,13 +59,13 @@ module BypassLogic(
     _index_t camIndex[BypassReadPortCount];
 
     always_comb begin
-        hit[0] = bus.hit1;
-        hit[1] = bus.hit2;
         readAddr[0] = bus.readAddr1;
         readAddr[1] = bus.readAddr2;
 
         bus.readValue1 = readValue[0];
         bus.readValue2 = readValue[1];
+        bus.hit1 = hit[0];
+        bus.hit2 = hit[1];
     end
 
     // Bypass CAM
