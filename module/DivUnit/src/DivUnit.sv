@@ -14,10 +14,6 @@
  * limitations under the License.
  */
 
-import BasicTypes::*;
-import RvTypes::*;
-import Rv32Types::*;
-
 module DivUnit #(
     parameter N = 32
 )(
