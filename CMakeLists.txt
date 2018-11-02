@@ -56,9 +56,27 @@ add_executable(test_Core
 
 add_executable(test_Timer
     ~/local/share/verilator/include/verilated.cpp
+    ~/local/share/verilator/include/verilated_vcd_c.cpp
     work/verilator/test_Timer/VTimer__Syms.cpp
+    work/verilator/test_Timer/VTimer__Syms.h
+    work/verilator/test_Timer/VTimer__Trace__Slow.cpp
+    work/verilator/test_Timer/VTimer__Trace.cpp
     work/verilator/test_Timer/VTimer.cpp
+    work/verilator/test_Timer/VTimer.h
     module/Timer/test/test_Timer.cpp
+)
+
+add_executable(test_DivUnit
+    ~/local/share/verilator/include/verilated.cpp
+    ~/local/share/verilator/include/verilated_vcd_c.cpp
+    work/verilator/test_DivUnit/VDivUnit32__Syms.cpp
+    work/verilator/test_DivUnit/VDivUnit32__Syms.h
+    work/verilator/test_DivUnit/VDivUnit32__Trace__Slow.cpp
+    work/verilator/test_DivUnit/VDivUnit32__Trace.cpp
+    work/verilator/test_DivUnit/VDivUnit32__Syms.cpp
+    work/verilator/test_DivUnit/VDivUnit32.cpp
+    work/verilator/test_DivUnit/VDivUnit32.h
+    module/DivUnit/test/test_DivUnit.cpp
 )
 
 target_link_libraries(test_Core librvtrace ${Boost_LIBRARIES})

@@ -54,7 +54,11 @@ verilator -Mdir work/verilator/test_Core --cc --trace --top-module Core \
     cpu/src/RegWriteStage.sv \
     cpu/src/Core.sv
 
-verilator -Mdir work/verilator/test_Timer --cc \
+verilator -Mdir work/verilator/test_DivUnit --cc --trace --top-module DivUnit32 \
+    module/DivUnit/src/DivUnit.sv \
+    module/DivUnit/src/DivUnit32.sv
+
+verilator -Mdir work/verilator/test_Timer --cc  --trace --top-module Timer \
     module/Timer/Timer.sv
 
 popd
