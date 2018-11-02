@@ -53,10 +53,11 @@ int main()
 
     const int maxCycle = 100;
 
-    for (int i = 0; i < maxCycle; i++)
+    for (int cycle = 0; cycle < maxCycle; cycle++)
     {
         top->clk = 1;
         top->eval();
+        vcd->dump(cycle * 10);
 
         if (top->done)
         {
@@ -65,6 +66,7 @@ int main()
 
         top->clk = 0;
         top->eval();
+        vcd->dump(cycle * 10 + 5);
     }
 
     if (top->done)
