@@ -45,7 +45,7 @@ int main(int argc, char** argv)
     tfp->open("core.vcd");
 
     // begin reset
-    core->rstIn = 1;
+    core->rst = 1;
 
     core->clk = 0;
     core->eval();
@@ -61,7 +61,7 @@ int main(int argc, char** argv)
     memory->UpdateCore(core.get());
 
     // end reset
-    core->rstIn = 0;
+    core->rst = 0;
 
     for (int cycle = 0; cycle < option.GetCycle(); cycle++)
     {

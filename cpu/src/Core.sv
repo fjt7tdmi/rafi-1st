@@ -34,9 +34,9 @@ module Core #(
     input   logic [MemoryLineWidth-1:0] memoryReadValue,
     input   logic memoryDone,
     input   logic clk,
-    input   logic rstIn
+    input   logic rst
 );
-    logic rst;
+    logic rstInternal;
 
     FetchStageIF m_FetchStageIF();
     DecodeStageIF m_DecodeStageIF();
@@ -58,8 +58,8 @@ module Core #(
     ResetSequencer #(
         .ResetCycle(CacheResetCycle)
     ) m_ResetSequencer (
-        .rstOut(rst),
-        .rstIn(rstIn),
+        .rstOut(rstInternal),
+        .rstIn(rst),
         .clk
     );
 
@@ -69,14 +69,14 @@ module Core #(
         .ctrl(m_PipelineControllerIF.FetchStage),
         .csr(m_ControlStatusRegisterIF.FetchStage),
         .clk,
-        .rst
+        .rst(rstInternal)
     );
     DecodeStage m_DecodeStage(
         .prevStage(m_FetchStageIF.NextStage),
         .nextStage(m_DecodeStageIF.ThisStage),
         .ctrl(m_PipelineControllerIF.DecodeStage),
         .clk,
-        .rst
+        .rst(rstInternal)
     );
     RegReadStage m_RegReadStage(
         .prevStage(m_DecodeStageIF.NextStage),
@@ -85,7 +85,7 @@ module Core #(
         .csr(m_ControlStatusRegisterIF.RegReadStage),
         .regFile(m_RegFileIF.RegReadStage),
         .clk,
-        .rst
+        .rst(rstInternal)
     );
     ExecuteStage m_ExecuteStage(
         .prevStage(m_RegReadStageIF.NextStage),
@@ -94,7 +94,7 @@ module Core #(
         .csr(m_ControlStatusRegisterIF.ExecuteStage),
         .bypass(m_BypassLogicIF.ExecuteStage),
         .clk,
-        .rst
+        .rst(rstInternal)
     );
     MemoryAccessStage m_MemoryAccessStage(
         .prevStage(m_ExecuteStageIF.NextStage),
@@ -104,36 +104,36 @@ module Core #(
         .ctrl(m_PipelineControllerIF.MemoryAccessStage),
         .bypass(m_BypassLogicIF.MemoryAccessStage),
         .clk,
-        .rst
+        .rst(rstInternal)
     );
     RegWriteStage m_RegWriteStage(
         .prevStage(m_MemoryAccessStageIF.NextStage),
         .csr(m_ControlStatusRegisterIF.RegWriteStage),
         .regFile(m_RegFileIF.RegWriteStage),
         .clk,
-        .rst
+        .rst(rstInternal)
     );
 
     RegFile m_RegFile(
         .bus(m_RegFileIF.RegFile),
         .clk,
-        .rst
+        .rst(rstInternal)
     );
     BypassLogic m_BypassLogic(
         .bus(m_BypassLogicIF.BypassLogic),
         .ctrl(m_PipelineControllerIF.BypassLogic),
         .clk,
-        .rst
+        .rst(rstInternal)
     );
     ControlStatusRegister m_ControlStatusRegister(
         .bus(m_ControlStatusRegisterIF.ControlStatusRegister),
         .clk,
-        .rst
+        .rst(rstInternal)
     );
     PipelineController m_PipelineController(
         .bus(m_PipelineControllerIF.PipelineController),
         .clk,
-        .rst
+        .rst(rstInternal)
     );
 
     FetchUnit m_FetchUnit(
@@ -142,7 +142,7 @@ module Core #(
         .ctrl(m_PipelineControllerIF.FetchUnit),
         .csr(m_ControlStatusRegisterIF.FetchUnit),
         .clk,
-        .rst
+        .rst(rstInternal)
     );
     LoadStoreUnit m_LoadStoreUnit(
         .bus(m_LoadStoreUnitIF.LoadStoreUnit),
@@ -150,12 +150,12 @@ module Core #(
         .csr(m_ControlStatusRegisterIF.LoadStoreUnit),
         .hostIoValue,
         .clk,
-        .rst
+        .rst(rstInternal)
     );
     MemoryAccessArbiter m_MemoryAccessArbiter(
         .bus(m_MemoryAccessArbiterIF.MemoryAccessArbiter),
         .clk,
-        .rst
+        .rst(rstInternal)
     );
 
     always_comb begin
