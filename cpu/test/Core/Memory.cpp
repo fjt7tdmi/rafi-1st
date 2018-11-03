@@ -50,32 +50,31 @@ void Memory::LoadFile(const char* path)
 
 void Memory::UpdateCore(VCore* core)
 {
-    const int lineSize = sizeof(core->memoryReadValue);
-    const int wordSize = sizeof(core->memoryReadValue[0]);
-    const int offset = (core->memoryAddr * lineSize) % Capacity;
+    const int wordSize = sizeof(core->rdata);
+    const int offset = core->addr % Capacity;
 
-    if (core->memoryEnable && core->memoryIsWrite)
+    if (core->enable && core->write)
     {
         // write
-        core->memoryDone = 1;
-        std::memset(core->memoryReadValue, 0, lineSize);
+        core->ready = 1;
+        std::memset(&core->rdata, 0, wordSize);
 
-        assert(offset + lineSize < Capacity);
-        std::memcpy(&m_pBody[offset], core->memoryWriteValue, lineSize);
+        assert(offset + wordSize < Capacity);
+        std::memcpy(&m_pBody[offset], &core->wdata, wordSize);
 
     }
-    else if (core->memoryEnable && !core->memoryIsWrite)
+    else if (core->enable && !core->write)
     {
         // read
-        core->memoryDone = 1;
+        core->ready = 1;
 
-        assert(offset + lineSize < Capacity);
-        std::memcpy(core->memoryReadValue, &m_pBody[offset], lineSize);
+        assert(offset + wordSize < Capacity);
+        std::memcpy(&core->rdata, &m_pBody[offset], wordSize);
     }
     else
     {
         // no op
-        core->memoryDone = 0;
-        std::memset(core->memoryReadValue, 0, lineSize);
+        core->ready = 0;
+        std::memset(&core->rdata, 0, wordSize);
     }
 }

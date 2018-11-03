@@ -22,17 +22,20 @@ import CacheTypes::*;
 import OpTypes::*;
 import ProcessorTypes::*;
 
-module Core #(
-    parameter MemoryAddrWidth = 30,
-    parameter MemoryLineWidth = 128
-)(
+module Core (
+    // Debug signals
     output  logic [31:0] hostIoValue,
-    output  logic [MemoryAddrWidth-1:0] memoryAddr,
-    output  logic memoryEnable,
-    output  logic memoryIsWrite,
-    output  logic [MemoryLineWidth-1:0] memoryWriteValue,
-    input   logic [MemoryLineWidth-1:0] memoryReadValue,
-    input   logic memoryDone,
+
+    // APB like bus
+    output  logic [31:0] addr,
+    output  logic select,
+    output  logic enable,
+    output  logic write,
+    output  logic [31:0] wdata,
+    input   logic [31:0] rdata,
+    input   logic ready,
+    input   logic irq,
+    input   logic irqTimer,
     input   logic clk,
     input   logic rst
 );
@@ -49,11 +52,7 @@ module Core #(
     LoadStoreUnitIF m_LoadStoreUnitIF();
     ControlStatusRegisterIF m_ControlStatusRegisterIF();
     FetchUnitIF m_FetchUnitIF();
-    // TODO: Remove parameter settings
-    MemoryAccessArbiterIF #(
-        .LineSize(DCacheLineSize),
-        .AddrWidth(DCacheMemAddrWidth)
-    ) m_MemoryAccessArbiterIF();
+    BusAccessUnitIF m_BusAccessUnitIF();
 
     ResetSequencer #(
         .ResetCycle(CacheResetCycle)
@@ -138,7 +137,7 @@ module Core #(
 
     FetchUnit m_FetchUnit(
         .bus(m_FetchUnitIF.FetchUnit),
-        .mem(m_MemoryAccessArbiterIF.FetchUnit),
+        .mem(m_BusAccessUnitIF.FetchUnit),
         .ctrl(m_PipelineControllerIF.FetchUnit),
         .csr(m_ControlStatusRegisterIF.FetchUnit),
         .clk,
@@ -146,26 +145,24 @@ module Core #(
     );
     LoadStoreUnit m_LoadStoreUnit(
         .bus(m_LoadStoreUnitIF.LoadStoreUnit),
-        .mem(m_MemoryAccessArbiterIF.LoadStoreUnit),
+        .mem(m_BusAccessUnitIF.LoadStoreUnit),
         .csr(m_ControlStatusRegisterIF.LoadStoreUnit),
         .hostIoValue,
         .clk,
         .rst(rstInternal)
     );
-    MemoryAccessArbiter m_MemoryAccessArbiter(
-        .bus(m_MemoryAccessArbiterIF.MemoryAccessArbiter),
+    BusAccessUnit m_BusAccessUnit(
+        .core(m_BusAccessUnitIF.BusAccessUnit),
+        .addr,
+        .select,
+        .enable,
+        .write,
+        .wdata,
+        .rdata,
+        .ready,
+        .irq,
+        .irqTimer,
         .clk,
         .rst(rstInternal)
     );
-
-    always_comb begin
-        // Currently, MemoryAddrWidth must be equal with DCacheLineWidth and ICacheLineWidth
-        memoryAddr[MemoryAddrWidth-1:0] = m_MemoryAccessArbiterIF.memAddr[MemoryAddrWidth-1:0];
-        memoryEnable = m_MemoryAccessArbiterIF.memEnable;
-        memoryIsWrite = m_MemoryAccessArbiterIF.memIsWrite;
-        memoryWriteValue = m_MemoryAccessArbiterIF.memWriteValue;
-
-        m_MemoryAccessArbiterIF.memDone = memoryDone;
-        m_MemoryAccessArbiterIF.memReadValue = memoryReadValue;
-    end
 endmodule

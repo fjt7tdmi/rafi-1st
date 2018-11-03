@@ -18,41 +18,26 @@ import BasicTypes::*;
 import RvTypes::*;
 import Rv32Types::*;
 
-// Interface between D$, I$, arbiter and mem
+import CacheTypes::*;
 
-interface MemoryAccessArbiterIF #(
-    // Bit width of cache line
-    // e.g. if cache line size is 64 byte, LineSize = 64
-    parameter LineSize,
+// Interface between D$, I$ and BusAccessUnit
 
-    // Address to specify cacheline
-    // e.g. if virtual address is 32 bit and cache line size is 64 (2^6) byte, AddrWidth = (32-6) = 26
-    parameter AddrWidth
-);
-    localparam LineWidth = LineSize * ByteWidth;
-
-    logic [AddrWidth-1:0] icAddr;
+interface BusAccessUnitIF;
+    icache_mem_addr_t icAddr;
     logic icReadGrant;
     logic icReadReq;
-    logic [LineWidth-1:0] icReadValue;
+    icache_line_t icReadValue;
     logic icWriteGrant;
     logic icWriteReq;
-    logic [LineWidth-1:0] icWriteValue;
+    icache_line_t icWriteValue;
 
-    logic [AddrWidth-1:0] dcAddr;
+    dcache_mem_addr_t dcAddr;
     logic dcReadGrant;
     logic dcReadReq;
-    logic [LineWidth-1:0] dcReadValue;
+    dcache_line_t dcReadValue;
     logic dcWriteGrant;
     logic dcWriteReq;
-    logic [LineWidth-1:0] dcWriteValue;
-
-    logic [AddrWidth-1:0] memAddr;
-    logic memDone;
-    logic memEnable;
-    logic memIsWrite;
-    logic [LineWidth-1:0] memReadValue;
-    logic [LineWidth-1:0] memWriteValue;
+    dcache_line_t dcWriteValue;
 
     modport FetchUnit(
     output
@@ -78,7 +63,7 @@ interface MemoryAccessArbiterIF #(
         dcWriteGrant
     );
 
-    modport MemoryAccessArbiter(
+    modport BusAccessUnit(
     output
         dcReadGrant,
         dcReadValue,
@@ -86,10 +71,6 @@ interface MemoryAccessArbiterIF #(
         icReadGrant,
         icReadValue,
         icWriteGrant,
-        memAddr,
-        memEnable,
-        memIsWrite,
-        memWriteValue,
     input
         dcAddr,
         dcReadReq,
@@ -98,19 +79,6 @@ interface MemoryAccessArbiterIF #(
         icAddr,
         icReadReq,
         icWriteReq,
-        icWriteValue,
-        memDone,
-        memReadValue
-    );
-
-    modport Memory(
-    output
-        memDone,
-        memReadValue,
-    input
-        memAddr,
-        memEnable,
-        memIsWrite,
-        memWriteValue
+        icWriteValue
     );
 endinterface
