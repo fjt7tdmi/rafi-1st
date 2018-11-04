@@ -16,13 +16,15 @@
 
 #include <memory>
 #include <cstdio>
-
+#include <iostream>
 #include <boost/program_options.hpp>
 
 #include <verilated.h>
 #include <verilated_vcd_c.h>
 
 #include "../../../work/verilator/test_Core/VCore.h"
+
+#include <rafi/Exception.h>
 
 #include "../../../rafi-emu/src/rafi-emu/MemoryMap.h"
 
@@ -71,20 +73,34 @@ int main(int argc, char** argv)
     // end reset
     core->rst = 0;
 
-    for (int cycle = 0; cycle < option.GetCycle(); cycle++)
+    int cycle = 0;
+
+    try
     {
-        system->ProcessPositiveEdge();
+        for (cycle = 0; cycle < option.GetCycle(); cycle++)
+        {
+            system->ProcessPositiveEdge();
 
-        tfp->dump(cycle * 10 + 5);
+            tfp->dump(cycle * 10 + 5);
 
-        system->ProcessNegativeEdge();
+            system->ProcessNegativeEdge();
 
-        tfp->dump(cycle * 10 + 10);
+            tfp->dump(cycle * 10 + 10);
 
-        dumper->DumpCycle(cycle);
+            dumper->DumpCycle(cycle);
 
-        system->UpdateSignal();
+            system->UpdateSignal();
+        }
     }
+    catch (rafi::emu::InvalidAccessException e)
+    {
+        e.PrintMessage();
+    }
+
+    std::cout << "Simulation finished @ cycle "
+        << std::dec << cycle
+        << std::hex << " (0x" << cycle << ")" << std::endl;
+
 
     core->final();
 
