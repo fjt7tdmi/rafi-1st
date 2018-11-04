@@ -5,6 +5,6 @@ pushd `dirname $0`
 cd ..
 
 source ./rafi-emu/script/common.sh.inc
-${RAFI_PYTHON} ./tool/run_diff.py -i ./rafi-emu/test/riscv_tests.config.json $@
+${RAFI_PYTHON} ./tool/diff_riscv_tests.py -i ./rafi-emu/test/riscv_tests.config.json $@
 
 popd
