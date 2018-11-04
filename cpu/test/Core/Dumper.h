@@ -36,6 +36,7 @@ private:
 
     bool m_Valid {false};
     int32_t m_Pc {0};
+    int32_t m_Insn {0};
     int32_t m_OpId {0};
 
     rvtrace::FileTraceWriter m_FileTraceWriter;

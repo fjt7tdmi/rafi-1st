@@ -291,6 +291,7 @@ module ExecuteStage(
             nextStage.branchTarget <= '0;
             nextStage.trapInfo <= '0;
             nextStage.trapReturn <= '0;
+            nextStage.debugInsn <= '0;
         end
         else if (ctrl.exStall) begin
             nextStage.valid <= nextStage.valid;
@@ -306,6 +307,7 @@ module ExecuteStage(
             nextStage.branchTarget <= nextStage.branchTarget;
             nextStage.trapInfo <= nextStage.trapInfo;
             nextStage.trapReturn <= nextStage.trapReturn;
+            nextStage.debugInsn <= nextStage.debugInsn;
         end
         else if (ctrl.exStallReq) begin
             nextStage.valid <= '0;
@@ -321,6 +323,7 @@ module ExecuteStage(
             nextStage.branchTarget <= '0;
             nextStage.trapInfo <= '0;
             nextStage.trapReturn <= '0;
+            nextStage.debugInsn <= '0;
         end
         else begin
             nextStage.valid <= prevStage.valid;
@@ -336,6 +339,7 @@ module ExecuteStage(
             nextStage.branchTarget <= branchTarget;
             nextStage.trapInfo <= trapInfo;
             nextStage.trapReturn <= trapReturn;
+            nextStage.debugInsn <= prevStage.insn;
          end
     end
 
