@@ -30,7 +30,7 @@ TraceDirPath = "work/zephyr/trace"
 VcdDirPath = "work/zephyr/vcd"
 ZephyrDirPath = os.environ["ZEPHYR_BASE"]
 
-DefaultCycle = 100000
+DefaultCycle = 5000
 DefaultTestName = "philosophers"
 
 #
@@ -50,7 +50,7 @@ def MakeTestCoreCommand(testname, cycle):
     trace_path = f"{TraceDirPath}/{testname}.trace.bin"
     vcd_path = f"{VcdDirPath}/{testname}.vcd"
 
-    return [
+    cmd = [
         TestCorePath,
         "--cycle", str(cycle),
         "--ram-path", f"{ram_bin_path}",
@@ -58,7 +58,9 @@ def MakeTestCoreCommand(testname, cycle):
         "--dump-path", trace_path,
         "--vcd-path", vcd_path,
     ]
-
+    if config['enable_dump_memory']:
+        cmd.append("--enable-dump-memory")
+    return cmd
 
 def MakeDumpCommand(testname):
     trace_bin_path = f"{TraceDirPath}/{testname}.trace.bin"
@@ -124,12 +126,14 @@ if __name__ == '__main__':
     parser.add_option("-n", dest="name", default=DefaultTestName, help="Test name.")
     parser.add_option("--dump", dest="dump", action="store_true", default=False, help="Run rafi-dump after emulation.")
     parser.add_option("--dump-pc", dest="dump_pc", action="store_true", default=False, help="Run rafi-dump-pc and addr2line after emulation.")
+    parser.add_option("--enable-dump-memory", dest="enable_dump_memory", action="store_true", default=False, help="Enable memory dump.")
 
     (options, args) = parser.parse_args()
 
     config = {
         'name': options.name,
-        'cycle': options.cycle
+        'cycle': options.cycle,
+        'enable_dump_memory': options.enable_dump_memory,
     }
 
     InitializeDirectory(TraceDirPath)

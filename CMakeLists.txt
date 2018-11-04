@@ -62,6 +62,7 @@ add_executable(test_Core
     rafi-emu/src/rafi-emu/include/rafi/Event.h
     rafi-emu/src/rafi-emu/include/rafi/Exception.h
     rafi-emu/src/rafi-emu/include/rafi/IInterruptSource.h
+    rafi-emu/src/rafi-emu/include/rafi/MemoryMap.h
     rafi-emu/src/rafi-emu/include/rafi/Util.h
     rafi-emu/src/rafi-emu/io/IIo.h
     rafi-emu/src/rafi-emu/io/IoInterruptSource.cpp
@@ -77,7 +78,6 @@ add_executable(test_Core
     rafi-emu/src/rafi-emu/timer/Timer.cpp
     rafi-emu/src/rafi-emu/timer/Timer.h
     rafi-emu/src/rafi-emu/timer/TimerTypes.h
-    rafi-emu/src/rafi-emu/MemoryMap.h
 )
 
 add_executable(test_Timer
