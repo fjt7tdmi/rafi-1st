@@ -29,11 +29,11 @@ Option::Option(int argc, char** argv)
     desc.add_options()
         ("cycle", po::value<int>(&m_Cycle)->default_value(0), "number of emulation cycles")
         ("dump-path", po::value<std::string>(), "path of dump file")
-        ("enable-dump-memory", po::value<std::string>(), "output memory contents to dump file")
+        ("enable-dump-memory", "output memory contents to dump file")
+        ("enable-monitor-host-io", "stop emulation when host io value is changed")
         ("ram-path", po::value<std::string>(), "path of binary file that is loaded to RAM")
         ("rom-path", po::value<std::string>(), "path of binary file that is loaded to ROM")
         ("vcd-path", po::value<std::string>(), "path of vcd file")
-        ("stop-by-host-io", "stop emulation when host io value is changed")
         ("help", "show help");
 
     po::variables_map options;
