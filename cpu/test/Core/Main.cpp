@@ -68,14 +68,16 @@ int main(int argc, char** argv)
         core->clk = 1;
         core->eval();
 
+        tfp->dump(cycle * 10 + 5);
+
         core->clk = 0;
         core->eval();
+
+        tfp->dump(cycle * 10 + 10);
 
         dumper->DumpCycle(cycle);
 
         memory->UpdateCore(core.get());
-
-        tfp->dump(cycle);
     }
 
     core->final();
