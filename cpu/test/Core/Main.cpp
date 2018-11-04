@@ -42,7 +42,7 @@ int main(int argc, char** argv)
 
     core->trace(tfp.get(), 20);
 
-    tfp->open("core.vcd");
+    tfp->open(option.GetVcdPath());
 
     // begin reset
     core->rst = 1;

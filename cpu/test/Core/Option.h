@@ -29,6 +29,8 @@ public:
 
     const char* GetLoadPath() const;
 
+    const char* GetVcdPath() const;
+
     int GetCycle() const;
 
     bool IsStopByHostIo() const;
@@ -36,6 +38,7 @@ public:
 private:
     std::string m_DumpPath;
     std::string m_LoadPath;
+    std::string m_VcdPath;
     int m_Cycle;
     bool m_IsStopByHostIo;
 };

@@ -41,8 +41,8 @@ void Memory::LoadFile(const char* path)
     f.open(path, std::fstream::binary | std::fstream::in);
     if (!f.is_open())
     {
-        printf("Failed to load file to Memory (failed to open file).");
-        std::abort();
+        printf("[Memory] Failed to load file to Memory (%s).\n", path);
+        std::exit(1);
     }
     f.read(m_pBody, Capacity);
     f.close();
@@ -59,7 +59,7 @@ void Memory::UpdateCore(VCore* core)
         core->ready = 1;
         std::memset(&core->rdata, 0, wordSize);
 
-        assert(offset + wordSize < Capacity);
+        assert(offset + wordSize <= Capacity);
         std::memcpy(&m_pBody[offset], &core->wdata, wordSize);
 
     }
@@ -68,7 +68,7 @@ void Memory::UpdateCore(VCore* core)
         // read
         core->ready = 1;
 
-        assert(offset + wordSize < Capacity);
+        assert(offset + wordSize <= Capacity);
         std::memcpy(&core->rdata, &m_pBody[offset], wordSize);
     }
     else
