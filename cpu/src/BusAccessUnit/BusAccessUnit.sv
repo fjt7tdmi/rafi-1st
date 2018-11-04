@@ -63,6 +63,8 @@ module BusAccessUnit (
     int32_t [ICacheWordCount-1:0] icValue;
 
     // Wires
+    logic rdataValid;
+
     State nextState;
     BusState nextBusState;
     logic nextDone;
@@ -100,9 +102,13 @@ module BusAccessUnit (
             wdata = '0;
         end
 
-        select = !done && (busState == BusState_Setup || busState == BusState_Access);
-        enable = !done && (busState == BusState_Access);
-        write = !done && (busState == BusState_Access) && (state == State_DCacheWrite || state == State_ICacheWrite);
+        select = (busState == BusState_Setup || busState == BusState_Access);
+        enable = (busState == BusState_Access);
+        write = (busState == BusState_Access) && (state == State_DCacheWrite || state == State_ICacheWrite);
+    end
+
+    always_comb begin
+        rdataValid = (busState == BusState_Access) && ready;
     end
 
     // next
@@ -129,7 +135,9 @@ module BusAccessUnit (
                 nextState = done ? State_Idle : state;
             end
         endcase
+    end
 
+    always_comb begin
         if (state == State_Idle || done) begin
             nextBusState = BusState_Idle;
         end
@@ -141,52 +149,60 @@ module BusAccessUnit (
                 default: nextBusState = BusState_Setup;
             endcase
         end
+    end
 
+    always_comb begin
         if (state == State_DCacheRead || state == State_DCacheWrite) begin
-            nextDone = ready && (dcWordIndex == _dcache_word_index_t'(DCacheWordCount - 1));
+            nextDone = rdataValid && (dcWordIndex == _dcache_word_index_t'(DCacheWordCount - 1));
         end
         else if (state == State_ICacheRead || state == State_ICacheWrite) begin
-            nextDone = ready && (icWordIndex == _icache_word_index_t'(ICacheWordCount - 1));
+            nextDone = rdataValid && (icWordIndex == _icache_word_index_t'(ICacheWordCount - 1));
         end
         else begin
             nextDone = 1'b0;
         end
+    end
 
+    always_comb begin
         if (state == State_DCacheRead || state == State_DCacheWrite) begin
-            nextDcWordIndex = (busState == BusState_Access && ready) ? dcWordIndex + 1 : dcWordIndex;
+            nextDcWordIndex = (busState == BusState_Access && rdataValid) ? dcWordIndex + 1 : dcWordIndex;
         end
         else begin
             nextDcWordIndex = '0;
         end
 
         if (state == State_ICacheRead || state == State_ICacheWrite) begin
-            nextIcWordIndex = (busState == BusState_Access && ready) ? icWordIndex + 1 : icWordIndex;
+            nextIcWordIndex = (busState == BusState_Access && rdataValid) ? icWordIndex + 1 : icWordIndex;
         end
         else begin
             nextIcWordIndex = '0;
         end
+    end
 
+    always_comb begin
         unique case(state)
             State_Idle: begin
                 nextDcValue = (core.dcWriteReq) ? core.dcWriteValue : '0;
             end
             State_DCacheRead: begin
                 for (int i = 0; i < DCacheWordCount; i++) begin
-                    nextDcValue[i] = (_dcache_word_index_t'(i) == dcWordIndex && ready) ? rdata : dcValue[i];
+                    nextDcValue[i] = (_dcache_word_index_t'(i) == dcWordIndex && rdataValid) ? rdata : dcValue[i];
                 end
             end
             default: begin
                 nextDcValue = '0;
             end
         endcase
+    end
 
+    always_comb begin
         unique case(state)
             State_Idle: begin
                 nextIcValue = (core.icWriteReq) ? core.icWriteValue : '0;
             end
             State_ICacheRead: begin
                 for (int i = 0; i < ICacheWordCount; i++) begin
-                    nextIcValue[i] = (_icache_word_index_t'(i) == icWordIndex && ready) ? rdata : icValue[i];
+                    nextIcValue[i] = (_icache_word_index_t'(i) == icWordIndex && rdataValid) ? rdata : icValue[i];
                 end
             end
             default: begin
