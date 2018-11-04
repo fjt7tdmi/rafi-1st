@@ -28,6 +28,7 @@ Option::Option(int argc, char** argv)
         ("cycle", po::value<int>(&m_Cycle)->default_value(0), "number of emulation cycles")
         ("dump-path", po::value<std::string>(), "path of dump file")
         ("load-path", po::value<std::string>(), "path of binary file that is loaded to memory")
+        ("vcd-path", po::value<std::string>(), "path of vcd file")
         ("stop-by-host-io", "stop emulation when host io value is changed")
         ("help", "show help");
 
@@ -43,7 +44,7 @@ Option::Option(int argc, char** argv)
     }
     po::notify(options);
 
-    if (options.count("help") || options.count("dump-path") == 0 || options.count("load-path") == 0)
+    if (options.count("help") || options.count("dump-path") == 0 || options.count("load-path") == 0 || options.count("vcd-path") == 0)
     {
         std::cout << desc << std::endl;
         exit(0);
@@ -57,6 +58,11 @@ Option::Option(int argc, char** argv)
     if (options.count("load-path"))
     {
         m_LoadPath = options["load-path"].as<std::string>();
+    }
+
+    if (options.count("vcd-path"))
+    {
+        m_VcdPath = options["vcd-path"].as<std::string>();
     }
 
     m_IsStopByHostIo = options.count("stop-by-host-io") != 0;
@@ -75,6 +81,11 @@ const char* Option::GetDumpPath() const
 const char* Option::GetLoadPath() const
 {
     return m_LoadPath.c_str();
+}
+
+const char* Option::GetVcdPath() const
+{
+    return m_VcdPath.c_str();
 }
 
 bool Option::IsStopByHostIo() const

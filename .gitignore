@@ -12,6 +12,8 @@
 *.qws
 *.bak
 
+core
+core.*
 transcript
 .ninja_deps
 .ninja_log

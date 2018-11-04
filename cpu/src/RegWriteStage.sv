@@ -32,14 +32,18 @@ module RegWriteStage(
     logic valid /* verilator public */;
     logic commit;
     Op op;
-    addr_t pc /* verilator public */;
+    addr_t debugPc /* verilator public */;
+    insn_t debugInsn /* verilator public */;
 
     always_comb begin
         valid = prevStage.valid;
         commit = valid && !prevStage.trapInfo.valid;
         op = prevStage.op;
-        pc = prevStage.pc;
+        debugPc = prevStage.pc;
+        debugInsn = prevStage.debugInsn;
+    end
 
+    always_comb begin
         csr.writeEnable = commit && op.csrWriteEnable;
         csr.writeAddr = prevStage.csrAddr;
         csr.writeValue = prevStage.dstCsrValue;

@@ -35,7 +35,7 @@ add_executable(test_Core
 	work/verilator/test_Core/VCore_RegWriteStage.cpp
 	work/verilator/test_Core/VCore_FetchUnitIF.cpp
 	work/verilator/test_Core/VCore_LoadStoreUnitIF.cpp
-	work/verilator/test_Core/VCore_MemoryAccessArbiterIF__L10_A1e.cpp
+	work/verilator/test_Core/VCore_BusAccessUnitIF.cpp
 	work/verilator/test_Core/VCore_BypassLogicIF.cpp
 	work/verilator/test_Core/VCore_ControlStatusRegisterIF.cpp
 	work/verilator/test_Core/VCore_DecodeStageIF.cpp

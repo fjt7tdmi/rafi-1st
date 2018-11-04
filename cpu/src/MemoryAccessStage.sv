@@ -142,6 +142,7 @@ module MemoryAccessStage(
             nextStage.branchTarget <= '0;
             nextStage.trapInfo <= '0;
             nextStage.trapReturn <= '0;
+            nextStage.debugInsn <= '0;
         end
         else begin
             nextStage.valid <= prevStage.valid;
@@ -155,6 +156,7 @@ module MemoryAccessStage(
             nextStage.branchTarget <= prevStage.branchTarget;
             nextStage.trapInfo <= trapInfo;
             nextStage.trapReturn <= prevStage.trapReturn;
+            nextStage.debugInsn <= prevStage.debugInsn;
         end
 
         if (rst) begin

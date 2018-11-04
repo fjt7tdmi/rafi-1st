@@ -24,7 +24,7 @@ import TlbTypes::*;
 
 module FetchUnit (
     FetchUnitIF.FetchUnit bus,
-    MemoryAccessArbiterIF.FetchUnit mem,
+    BusAccessUnitIF.FetchUnit mem,
     PipelineControllerIF.FetchUnit ctrl,
     ControlStatusRegisterIF.FetchUnit csr,
     input logic clk,

@@ -23,22 +23,23 @@ from functools import reduce
 from operator import or_
 
 if os.name == "nt":
-    CheckIoPath = "rafi-emu/build/Debug/rafi-check-io.exe"
+    CheckIoPath = "build/rafi-emu/Debug/rafi-check-io.exe"
     TestCorePath = "build/Debug/test_Core.exe"
 else:
-    CheckIoPath = "rafi-emu/build/rafi-check-io"
+    CheckIoPath = "build/rafi-emu/rafi-check-io"
     TestCorePath = "build/test_Core"
 
 BinaryDirPath = "rafi-emu/work/riscv_tests"
 TraceDirPath = "work/riscv_tests/trace"
+VcdDirPath = "work/riscv_tests/vcd"
 
 #
 # Functions
 #
 def InitializeDirectory(path):
     os.makedirs(path, exist_ok=True)
-    for filename in os.listdir(f"{TraceDirPath}"):
-        os.remove(f"{TraceDirPath}/{filename}")
+    for filename in os.listdir(f"{path}"):
+        os.remove(f"{path}/{filename}")
 
 def MakeCheckIoCommand(trace_paths):
     cmd = [CheckIoPath]
@@ -48,15 +49,18 @@ def MakeCheckIoCommand(trace_paths):
 def MakeTestCoreCommand(testname, cycle):
     binary_path = f"{BinaryDirPath}/{testname}.bin"
     trace_path = f"{TraceDirPath}/{testname}.trace.bin"
+    vcd_path = f"{VcdDirPath}/{testname}.vcd"
     return [
         TestCorePath,
         "--cycle", str(cycle),
         "--load-path", f"{binary_path}",
         "--dump-path", trace_path,
+        "--vcd-path", vcd_path,
     ]
 
 def VerifyTraces(paths):
     cmd = MakeCheckIoCommand(paths)
+    print(f"Run {' '.join(cmd)}")
     subprocess.run(cmd)
 
 def RunTestCore(config):
@@ -104,6 +108,7 @@ if __name__ == '__main__':
 
     print("-------------------------------------------------------------")
     InitializeDirectory(TraceDirPath)
+    InitializeDirectory(VcdDirPath)
 
     print("Run test on verilator:")
     RunTests(configs)

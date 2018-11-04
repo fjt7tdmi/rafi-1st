@@ -31,8 +31,8 @@ verilator -Mdir work/verilator/test_Core --cc --trace --top-module Core \
     cpu/src/LoadStoreUnit/DCacheReplacer.sv \
     cpu/src/LoadStoreUnit/LoadStoreUnitIF.sv \
     cpu/src/LoadStoreUnit/LoadStoreUnit.sv \
-    cpu/src/MemoryAccessArbiter/MemoryAccessArbiter.sv \
-    cpu/src/MemoryAccessArbiter/MemoryAccessArbiterIF.sv \
+    cpu/src/BusAccessUnit/BusAccessUnit.sv \
+    cpu/src/BusAccessUnit/BusAccessUnitIF.sv \
     cpu/src/BypassLogic.sv \
     cpu/src/BypassLogicIF.sv \
     cpu/src/ControlStatusRegister.sv \

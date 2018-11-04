@@ -22,21 +22,24 @@ import CacheTypes::*;
 import OpTypes::*;
 import ProcessorTypes::*;
 
-module Core #(
-    parameter MemoryAddrWidth = 30,
-    parameter MemoryLineWidth = 128
-)(
+module Core (
+    // Debug signals
     output  logic [31:0] hostIoValue,
-    output  logic [MemoryAddrWidth-1:0] memoryAddr,
-    output  logic memoryEnable,
-    output  logic memoryIsWrite,
-    output  logic [MemoryLineWidth-1:0] memoryWriteValue,
-    input   logic [MemoryLineWidth-1:0] memoryReadValue,
-    input   logic memoryDone,
+
+    // APB like bus
+    output  logic [31:0] addr,
+    output  logic select,
+    output  logic enable,
+    output  logic write,
+    output  logic [31:0] wdata,
+    input   logic [31:0] rdata,
+    input   logic ready,
+    input   logic irq,
+    input   logic irqTimer,
     input   logic clk,
-    input   logic rstIn
+    input   logic rst
 );
-    logic rst;
+    logic rstInternal;
 
     FetchStageIF m_FetchStageIF();
     DecodeStageIF m_DecodeStageIF();
@@ -49,17 +52,13 @@ module Core #(
     LoadStoreUnitIF m_LoadStoreUnitIF();
     ControlStatusRegisterIF m_ControlStatusRegisterIF();
     FetchUnitIF m_FetchUnitIF();
-    // TODO: Remove parameter settings
-    MemoryAccessArbiterIF #(
-        .LineSize(DCacheLineSize),
-        .AddrWidth(DCacheMemAddrWidth)
-    ) m_MemoryAccessArbiterIF();
+    BusAccessUnitIF m_BusAccessUnitIF();
 
     ResetSequencer #(
         .ResetCycle(CacheResetCycle)
     ) m_ResetSequencer (
-        .rstOut(rst),
-        .rstIn(rstIn),
+        .rstOut(rstInternal),
+        .rstIn(rst),
         .clk
     );
 
@@ -69,14 +68,14 @@ module Core #(
         .ctrl(m_PipelineControllerIF.FetchStage),
         .csr(m_ControlStatusRegisterIF.FetchStage),
         .clk,
-        .rst
+        .rst(rstInternal)
     );
     DecodeStage m_DecodeStage(
         .prevStage(m_FetchStageIF.NextStage),
         .nextStage(m_DecodeStageIF.ThisStage),
         .ctrl(m_PipelineControllerIF.DecodeStage),
         .clk,
-        .rst
+        .rst(rstInternal)
     );
     RegReadStage m_RegReadStage(
         .prevStage(m_DecodeStageIF.NextStage),
@@ -85,7 +84,7 @@ module Core #(
         .csr(m_ControlStatusRegisterIF.RegReadStage),
         .regFile(m_RegFileIF.RegReadStage),
         .clk,
-        .rst
+        .rst(rstInternal)
     );
     ExecuteStage m_ExecuteStage(
         .prevStage(m_RegReadStageIF.NextStage),
@@ -94,7 +93,7 @@ module Core #(
         .csr(m_ControlStatusRegisterIF.ExecuteStage),
         .bypass(m_BypassLogicIF.ExecuteStage),
         .clk,
-        .rst
+        .rst(rstInternal)
     );
     MemoryAccessStage m_MemoryAccessStage(
         .prevStage(m_ExecuteStageIF.NextStage),
@@ -104,68 +103,66 @@ module Core #(
         .ctrl(m_PipelineControllerIF.MemoryAccessStage),
         .bypass(m_BypassLogicIF.MemoryAccessStage),
         .clk,
-        .rst
+        .rst(rstInternal)
     );
     RegWriteStage m_RegWriteStage(
         .prevStage(m_MemoryAccessStageIF.NextStage),
         .csr(m_ControlStatusRegisterIF.RegWriteStage),
         .regFile(m_RegFileIF.RegWriteStage),
         .clk,
-        .rst
+        .rst(rstInternal)
     );
 
     RegFile m_RegFile(
         .bus(m_RegFileIF.RegFile),
         .clk,
-        .rst
+        .rst(rstInternal)
     );
     BypassLogic m_BypassLogic(
         .bus(m_BypassLogicIF.BypassLogic),
         .ctrl(m_PipelineControllerIF.BypassLogic),
         .clk,
-        .rst
+        .rst(rstInternal)
     );
     ControlStatusRegister m_ControlStatusRegister(
         .bus(m_ControlStatusRegisterIF.ControlStatusRegister),
         .clk,
-        .rst
+        .rst(rstInternal)
     );
     PipelineController m_PipelineController(
         .bus(m_PipelineControllerIF.PipelineController),
         .clk,
-        .rst
+        .rst(rstInternal)
     );
 
     FetchUnit m_FetchUnit(
         .bus(m_FetchUnitIF.FetchUnit),
-        .mem(m_MemoryAccessArbiterIF.FetchUnit),
+        .mem(m_BusAccessUnitIF.FetchUnit),
         .ctrl(m_PipelineControllerIF.FetchUnit),
         .csr(m_ControlStatusRegisterIF.FetchUnit),
         .clk,
-        .rst
+        .rst(rstInternal)
     );
     LoadStoreUnit m_LoadStoreUnit(
         .bus(m_LoadStoreUnitIF.LoadStoreUnit),
-        .mem(m_MemoryAccessArbiterIF.LoadStoreUnit),
+        .mem(m_BusAccessUnitIF.LoadStoreUnit),
         .csr(m_ControlStatusRegisterIF.LoadStoreUnit),
         .hostIoValue,
         .clk,
-        .rst
+        .rst(rstInternal)
     );
-    MemoryAccessArbiter m_MemoryAccessArbiter(
-        .bus(m_MemoryAccessArbiterIF.MemoryAccessArbiter),
+    BusAccessUnit m_BusAccessUnit(
+        .core(m_BusAccessUnitIF.BusAccessUnit),
+        .addr,
+        .select,
+        .enable,
+        .write,
+        .wdata,
+        .rdata,
+        .ready,
+        .irq,
+        .irqTimer,
         .clk,
-        .rst
+        .rst(rstInternal)
     );
-
-    always_comb begin
-        // Currently, MemoryAddrWidth must be equal with DCacheLineWidth and ICacheLineWidth
-        memoryAddr[MemoryAddrWidth-1:0] = m_MemoryAccessArbiterIF.memAddr[MemoryAddrWidth-1:0];
-        memoryEnable = m_MemoryAccessArbiterIF.memEnable;
-        memoryIsWrite = m_MemoryAccessArbiterIF.memIsWrite;
-        memoryWriteValue = m_MemoryAccessArbiterIF.memWriteValue;
-
-        m_MemoryAccessArbiterIF.memDone = memoryDone;
-        m_MemoryAccessArbiterIF.memReadValue = memoryReadValue;
-    end
 endmodule

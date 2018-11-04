@@ -46,7 +46,8 @@ void Dumper::DumpCycle(int cycle)
 
     // Save PC
     m_Valid = m_pCore->Core->m_RegWriteStage->valid;
-    m_Pc = m_pCore->Core->m_RegWriteStage->pc;
+    m_Pc = m_pCore->Core->m_RegWriteStage->debugPc;
+    m_Insn = m_pCore->Core->m_RegWriteStage->debugInsn;
 }
 
 void Dumper::Dump(int cycle)
@@ -61,7 +62,7 @@ void Dumper::Dump(int cycle)
     {
         cycle,
         m_OpId,
-        0x00000000, // Not implemented
+        m_Insn,
         PrivilegeLevel::Reserved, // Not implemented
     };
     builder.SetNode(basicInfoNode);

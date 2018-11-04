@@ -42,10 +42,10 @@ int main(int argc, char** argv)
 
     core->trace(tfp.get(), 20);
 
-    tfp->open("core.vcd");
+    tfp->open(option.GetVcdPath());
 
     // begin reset
-    core->rstIn = 1;
+    core->rst = 1;
 
     core->clk = 0;
     core->eval();
@@ -61,21 +61,23 @@ int main(int argc, char** argv)
     memory->UpdateCore(core.get());
 
     // end reset
-    core->rstIn = 0;
+    core->rst = 0;
 
     for (int cycle = 0; cycle < option.GetCycle(); cycle++)
     {
         core->clk = 1;
         core->eval();
 
+        tfp->dump(cycle * 10 + 5);
+
         core->clk = 0;
         core->eval();
+
+        tfp->dump(cycle * 10 + 10);
 
         dumper->DumpCycle(cycle);
 
         memory->UpdateCore(core.get());
-
-        tfp->dump(cycle);
     }
 
     core->final();
