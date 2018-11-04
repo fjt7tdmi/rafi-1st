@@ -48,10 +48,36 @@ add_executable(test_Core
     cpu/test/Core/Dumper.cpp
     cpu/test/Core/Dumper.h
     cpu/test/Core/Main.cpp
-    cpu/test/Core/Memory.cpp
-    cpu/test/Core/Memory.h
     cpu/test/Core/Option.cpp
     cpu/test/Core/Option.h
+    cpu/test/Core/Processor.cpp
+    cpu/test/Core/Processor.h
+    cpu/test/Core/System.cpp
+    cpu/test/Core/System.h
+    rafi-emu/src/rafi-emu/bus/Bus.cpp
+    rafi-emu/src/rafi-emu/bus/Bus.h
+    rafi-emu/src/rafi-emu/include/rafi/BasicTypes.h
+    rafi-emu/src/rafi-emu/include/rafi/BitField.h
+    rafi-emu/src/rafi-emu/include/rafi/Common.h
+    rafi-emu/src/rafi-emu/include/rafi/Event.h
+    rafi-emu/src/rafi-emu/include/rafi/Exception.h
+    rafi-emu/src/rafi-emu/include/rafi/IInterruptSource.h
+    rafi-emu/src/rafi-emu/include/rafi/Util.h
+    rafi-emu/src/rafi-emu/io/IIo.h
+    rafi-emu/src/rafi-emu/io/IoInterruptSource.cpp
+    rafi-emu/src/rafi-emu/io/IoInterruptSource.h
+    rafi-emu/src/rafi-emu/mem/IMemory.h
+    rafi-emu/src/rafi-emu/mem/Ram.cpp
+    rafi-emu/src/rafi-emu/mem/Ram.h
+    rafi-emu/src/rafi-emu/mem/Rom.cpp
+    rafi-emu/src/rafi-emu/mem/Rom.h
+    rafi-emu/src/rafi-emu/uart/Uart.cpp
+    rafi-emu/src/rafi-emu/uart/Uart.h
+    rafi-emu/src/rafi-emu/uart/UartTypes.h
+    rafi-emu/src/rafi-emu/timer/Timer.cpp
+    rafi-emu/src/rafi-emu/timer/Timer.h
+    rafi-emu/src/rafi-emu/timer/TimerTypes.h
+    rafi-emu/src/rafi-emu/MemoryMap.h
 )
 
 add_executable(test_Timer
@@ -78,5 +104,7 @@ add_executable(test_DivUnit
     work/verilator/test_DivUnit/VDivUnit32.h
     module/DivUnit/test/test_DivUnit.cpp
 )
+
+include_directories(test_Core include rafi-emu/src/rafi-emu/include)
 
 target_link_libraries(test_Core librvtrace ${Boost_LIBRARIES})

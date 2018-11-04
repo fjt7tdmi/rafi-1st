@@ -24,9 +24,11 @@
 
 #include "../../../work/verilator/test_Core/VCore.h"
 
+#include "../../../rafi-emu/src/rafi-emu/MemoryMap.h"
+
 #include "Dumper.h"
-#include "Memory.h"
 #include "Option.h"
+#include "System.h"
 
 int main(int argc, char** argv)
 {
@@ -36,9 +38,9 @@ int main(int argc, char** argv)
 
     auto tfp = std::make_unique<VerilatedVcdC>();
 
-    auto memory = std::make_unique<Memory>();
     auto core = std::make_unique<VCore>();
     auto dumper = std::make_unique<Dumper>(option.GetDumpPath(), core.get());
+    auto system = std::make_unique<rafi::v1::System>(core.get());
 
     core->trace(tfp.get(), 20);
 
@@ -57,27 +59,31 @@ int main(int argc, char** argv)
     core->eval();
 
     // init memory
-    memory->LoadFile(option.GetLoadPath());
-    memory->UpdateCore(core.get());
+    if (option.IsRamPathValid())
+    {
+        system->LoadFileToMemory(option.GetRamPath(), rafi::emu::RamAddr);
+    }
+    if (option.IsRomPathValid())
+    {
+        system->LoadFileToMemory(option.GetRomPath(), rafi::emu::RomAddr);
+    }
 
     // end reset
     core->rst = 0;
 
     for (int cycle = 0; cycle < option.GetCycle(); cycle++)
     {
-        core->clk = 1;
-        core->eval();
+        system->ProcessPositiveEdge();
 
         tfp->dump(cycle * 10 + 5);
 
-        core->clk = 0;
-        core->eval();
+        system->ProcessNegativeEdge();
 
         tfp->dump(cycle * 10 + 10);
 
         dumper->DumpCycle(cycle);
 
-        memory->UpdateCore(core.get());
+        system->UpdateSignal();
     }
 
     core->final();

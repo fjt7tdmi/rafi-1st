@@ -27,7 +27,8 @@ Option::Option(int argc, char** argv)
     desc.add_options()
         ("cycle", po::value<int>(&m_Cycle)->default_value(0), "number of emulation cycles")
         ("dump-path", po::value<std::string>(), "path of dump file")
-        ("load-path", po::value<std::string>(), "path of binary file that is loaded to memory")
+        ("ram-path", po::value<std::string>(), "path of binary file that is loaded to RAM")
+        ("rom-path", po::value<std::string>(), "path of binary file that is loaded to ROM")
         ("vcd-path", po::value<std::string>(), "path of vcd file")
         ("stop-by-host-io", "stop emulation when host io value is changed")
         ("help", "show help");
@@ -44,7 +45,7 @@ Option::Option(int argc, char** argv)
     }
     po::notify(options);
 
-    if (options.count("help") || options.count("dump-path") == 0 || options.count("load-path") == 0 || options.count("vcd-path") == 0)
+    if (options.count("help") || options.count("dump-path") == 0 || options.count("vcd-path") == 0)
     {
         std::cout << desc << std::endl;
         exit(0);
@@ -55,9 +56,16 @@ Option::Option(int argc, char** argv)
         m_DumpPath = options["dump-path"].as<std::string>();
     }
 
-    if (options.count("load-path"))
+    if (options.count("rom-path"))
     {
-        m_LoadPath = options["load-path"].as<std::string>();
+        m_RomPath = options["rom-path"].as<std::string>();
+        m_RomPathValid = true;
+    }
+
+    if (options.count("ram-path"))
+    {
+        m_RamPath = options["ram-path"].as<std::string>();
+        m_RamPathValid = true;
     }
 
     if (options.count("vcd-path"))
@@ -65,7 +73,7 @@ Option::Option(int argc, char** argv)
         m_VcdPath = options["vcd-path"].as<std::string>();
     }
 
-    m_IsStopByHostIo = options.count("stop-by-host-io") != 0;
+    m_StopByHostIo = options.count("stop-by-host-io") != 0;
 }
 
 int Option::GetCycle() const
@@ -78,9 +86,14 @@ const char* Option::GetDumpPath() const
     return m_DumpPath.c_str();
 }
 
-const char* Option::GetLoadPath() const
+const char* Option::GetRamPath() const
 {
-    return m_LoadPath.c_str();
+    return m_RamPath.c_str();
+}
+
+const char* Option::GetRomPath() const
+{
+    return m_RomPath.c_str();
 }
 
 const char* Option::GetVcdPath() const
@@ -88,7 +101,17 @@ const char* Option::GetVcdPath() const
     return m_VcdPath.c_str();
 }
 
+bool Option::IsRamPathValid() const
+{
+    return m_RamPathValid;
+}
+
+bool Option::IsRomPathValid() const
+{
+    return m_RomPathValid;
+}
+
 bool Option::IsStopByHostIo() const
 {
-    return m_IsStopByHostIo;
+    return m_StopByHostIo;
 }
