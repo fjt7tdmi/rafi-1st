@@ -19,11 +19,11 @@ import subprocess
 if os.name == "nt":
     DumpPath = "./build/Debug/rafi-dump.exe"
     DumpPcPath = "./build/Debug/rafi-dump-pc.exe"
-    EmulatorPath = "./build/Debug/rafi-emu.exe"
+    TestCorePath = "./build/Debug/test_Core.exe"
 else:
     DumpPath = "./build/rafi-dump"
     DumpPcPath = "./build/rafi-dump-pc"
-    EmulatorPath = "./build/rafi-emu"
+    TestCorePath = "./build/test_Core"
 
 BinaryDirPath = "rafi-emu/work/zephyr"
 TraceDirPath = "work/zephyr/trace"
@@ -124,19 +124,17 @@ if __name__ == '__main__':
     parser.add_option("-n", dest="name", default=DefaultTestName, help="Test name.")
     parser.add_option("--dump", dest="dump", action="store_true", default=False, help="Run rafi-dump after emulation.")
     parser.add_option("--dump-pc", dest="dump_pc", action="store_true", default=False, help="Run rafi-dump-pc and addr2line after emulation.")
-    parser.add_option("--dump-skip-cycle", dest="dump_skip_cycle", default=0, help="Skip dump for specified cycles.")
 
     (options, args) = parser.parse_args()
 
     config = {
         'name': options.name,
-        'cycle': options.cycle,
-        'dump_skip_cycle': options.dump_skip_cycle,
+        'cycle': options.cycle
     }
 
     InitializeDirectory(TraceDirPath)
 
-    result = RunEmulator(config)
+    result = RunTestCore(config)
     if result != 0:
         exit(result)
 
