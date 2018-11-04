@@ -38,10 +38,8 @@ VcdDirPath = "work/riscv_tests/vcd"
 #
 def InitializeDirectory(path):
     os.makedirs(path, exist_ok=True)
-    for filename in os.listdir(f"{TraceDirPath}"):
-        os.remove(f"{TraceDirPath}/{filename}")
-    for filename in os.listdir(f"{VcdDirPath}"):
-        os.remove(f"{VcdDirPath}/{filename}")
+    for filename in os.listdir(f"{path}"):
+        os.remove(f"{path}/{filename}")
 
 def MakeCheckIoCommand(trace_paths):
     cmd = [CheckIoPath]
@@ -110,6 +108,7 @@ if __name__ == '__main__':
 
     print("-------------------------------------------------------------")
     InitializeDirectory(TraceDirPath)
+    InitializeDirectory(VcdDirPath)
 
     print("Run test on verilator:")
     RunTests(configs)
