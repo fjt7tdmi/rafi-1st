@@ -26,19 +26,25 @@ public:
     Option(int argc, char** argv);
 
     const char* GetDumpPath() const;
-
-    const char* GetLoadPath() const;
-
+    const char* GetRamPath() const;
+    const char* GetRomPath() const;
     const char* GetVcdPath() const;
 
     int GetCycle() const;
 
+    bool IsRamPathValid() const;
+    bool IsRomPathValid() const;
     bool IsStopByHostIo() const;
 
 private:
     std::string m_DumpPath;
-    std::string m_LoadPath;
+    std::string m_RamPath;
+    std::string m_RomPath;
     std::string m_VcdPath;
-    int m_Cycle;
-    bool m_IsStopByHostIo;
+
+    int m_Cycle {0};
+
+    bool m_RamPathValid {false};
+    bool m_RomPathValid {false};
+    bool m_StopByHostIo {false};
 };

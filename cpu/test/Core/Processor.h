@@ -20,21 +20,35 @@
 
 #include <rvtrace/writer.h>
 
+#include <rafi/IInterruptSource.h>
+
+#include "../../../rafi-emu/src/rafi-emu/bus/Bus.h"
+
 #include "../../../work/verilator/test_Core/VCore.h"
 
-class Memory final
+namespace rafi { namespace v1 {
+
+class Processor final
 {
 public:
-    Memory();
-    ~Memory();
+    explicit Processor(VCore* pCore, emu::bus::Bus* pBus);
+    ~Processor();
 
-    void LoadFile(const char* path);
+    // Interrupt source
+    void RegisterExternalInterruptSource(emu::IInterruptSource* pInterruptSource);
+    void RegisterTimerInterruptSource(emu::IInterruptSource* pInterruptSource);
 
-    void UpdateCore(VCore* core);
+    // Process
+    void ProcessPositiveEdge();
+    void ProcessNegativeEdge();
+    void UpdateSignal();
 
 private:
-    static const int Capacity = 64 * 1024 * 1024;
-    static const int LineSize = 16;
+    emu::IInterruptSource* m_pExternalInterruptSource;
+    emu::IInterruptSource* m_pTimerInterruptSource;
 
-	char* m_pBody;
+    VCore* m_pCore;
+    emu::bus::Bus* m_pBus;
 };
+
+}}

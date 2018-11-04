@@ -53,7 +53,7 @@ def MakeTestCoreCommand(testname, cycle):
     return [
         TestCorePath,
         "--cycle", str(cycle),
-        "--load-path", f"{binary_path}",
+        "--ram-path", f"{binary_path}",
         "--dump-path", trace_path,
         "--vcd-path", vcd_path,
     ]
