@@ -27,14 +27,22 @@
 
 using namespace rvtrace;
 
-Dumper::Dumper(const char* path, VCore* pCore)
+namespace rafi { namespace v1 {
+
+Dumper::Dumper(const char* path, VCore* pCore, System* pSystem)
     : m_FileTraceWriter(path)
     , m_pCore(pCore)
+    , m_pSystem(pSystem)
 {
 }
 
 Dumper::~Dumper()
 {
+}
+
+void Dumper::EnableDumpMemory()
+{
+    m_MemoryDumpEnabled = true;
 }
 
 void Dumper::DumpCycle(int cycle)
@@ -53,9 +61,16 @@ void Dumper::DumpCycle(int cycle)
 void Dumper::Dump(int cycle)
 {
     // TraceHeader
-    const int32_t flags = NodeFlag_BasicInfo | NodeFlag_Pc32 | NodeFlag_IntReg32 | NodeFlag_Io;
+    int32_t flags = NodeFlag_BasicInfo | NodeFlag_Pc32 | NodeFlag_IntReg32 | NodeFlag_Io;
 
-    TraceCycleBuilder builder(flags);
+    if (m_MemoryDumpEnabled)
+    {
+        flags |= NodeFlag_Memory;
+    }
+
+    const int ramSize = m_pSystem->GetRamSize();
+
+    TraceCycleBuilder builder(flags, 0, ramSize);
 
     // BasicInfoNode
     BasicInfoNode basicInfoNode
@@ -84,6 +99,15 @@ void Dumper::Dump(int cycle)
     }
     builder.SetNode(intRegNode);
 
+    // Memory
+    if (m_MemoryDumpEnabled)
+    {
+        const auto size = static_cast<size_t>(builder.GetNodeSize(NodeType::Memory));
+        auto buffer = builder.GetPointerToNode(NodeType::Memory);
+
+        m_pSystem->CopyRam(buffer, size);
+    }
+
     // IoNode
     IoNode ioNode
     {
@@ -94,3 +118,5 @@ void Dumper::Dump(int cycle)
 
     m_FileTraceWriter.Write(builder.GetData(), builder.GetDataSize());
 }
+
+}}

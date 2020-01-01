@@ -42,6 +42,10 @@ public:
     void ProcessNegativeEdge();
     void UpdateSignal();
 
+    // Dump
+    int GetRamSize() const;
+    void CopyRam(void* buffer, size_t size) const;
+
 private:
     emu::bus::Bus m_Bus;
     emu::mem::Ram m_Ram;

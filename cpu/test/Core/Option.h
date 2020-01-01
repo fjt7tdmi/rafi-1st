@@ -20,6 +20,8 @@
 
 #include <rvtrace/writer.h>
 
+namespace rafi { namespace v1 {
+
 class Option final
 {
 public:
@@ -32,6 +34,7 @@ public:
 
     int GetCycle() const;
 
+    bool IsMemoryDumpEnabled() const;
     bool IsRamPathValid() const;
     bool IsRomPathValid() const;
     bool IsStopByHostIo() const;
@@ -44,7 +47,10 @@ private:
 
     int m_Cycle {0};
 
+    bool m_MemoryDumpEnabled {false};
     bool m_RamPathValid {false};
     bool m_RomPathValid {false};
     bool m_StopByHostIo {false};
 };
+
+}}
