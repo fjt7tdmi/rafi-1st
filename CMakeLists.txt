@@ -14,17 +14,15 @@ if (NOT ${Boost_FOUND})
 endif()
 
 include_directories(${Boost_INCLUDE_DIRS})
-include_directories(~/local/share/verilator/include)
-include_directories(~/local/share/verilator/include/vltstd)
+include_directories(c:/home/msys64/mingw64/share/verilator/include)
+include_directories(c:/home/msys64/mingw64/share/verilator/include/vltstd)
 include_directories(rafi-emu/include)
 
 link_directories(${Boost_LIBRARY_DIRS})
 
-set(Boost_LIBRARIES "boost_program_options")
-
 add_executable(test_Core
-    ~/local/share/verilator/include/verilated.cpp
-    ~/local/share/verilator/include/verilated_vcd_c.cpp
+    c:/home/msys64/mingw64/share/verilator/include/verilated.cpp
+    c:/home/msys64/mingw64/share/verilator/include/verilated_vcd_c.cpp
     work/verilator/test_Core/VCore__Syms.cpp
 	work/verilator/test_Core/VCore__Trace.cpp
 	work/verilator/test_Core/VCore__Trace__Slow.cpp
@@ -81,8 +79,8 @@ add_executable(test_Core
 )
 
 add_executable(test_Timer
-    ~/local/share/verilator/include/verilated.cpp
-    ~/local/share/verilator/include/verilated_vcd_c.cpp
+    c:/home/msys64/mingw64/share/verilator/include/verilated.cpp
+    c:/home/msys64/mingw64/share/verilator/include/verilated_vcd_c.cpp
     work/verilator/test_Timer/VTimer__Syms.cpp
     work/verilator/test_Timer/VTimer__Syms.h
     work/verilator/test_Timer/VTimer__Trace__Slow.cpp
@@ -93,8 +91,8 @@ add_executable(test_Timer
 )
 
 add_executable(test_DivUnit
-    ~/local/share/verilator/include/verilated.cpp
-    ~/local/share/verilator/include/verilated_vcd_c.cpp
+    c:/home/msys64/mingw64/share/verilator/include/verilated.cpp
+    c:/home/msys64/mingw64/share/verilator/include/verilated_vcd_c.cpp
     work/verilator/test_DivUnit/VDivUnit32__Syms.cpp
     work/verilator/test_DivUnit/VDivUnit32__Syms.h
     work/verilator/test_DivUnit/VDivUnit32__Trace__Slow.cpp
