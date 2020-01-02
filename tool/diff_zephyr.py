@@ -23,9 +23,9 @@ from functools import reduce
 from operator import or_
 
 if os.name == "nt":
-    DiffPath = "rafi-emu/build/Debug/rafi-diff.exe"
+    DiffPath = "build/rafi-emu/Debug/rafi-diff.exe"
 else:
-    DiffPath = "rafi-emu/build/rafi-diff"
+    DiffPath = "build/rafi-emu/rafi-diff"
 
 EmuTraceDirPath = "rafi-emu/work/zephyr/trace"
 SimTraceDirPath = "work/zephyr/trace"

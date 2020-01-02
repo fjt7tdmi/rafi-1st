@@ -26,7 +26,7 @@
 
 #include <rafi/Exception.h>
 
-#include "../../../rafi-emu/src/rafi-emu/MemoryMap.h"
+#include "../../../rafi-emu/src/rafi-emu/include/rafi/MemoryMap.h"
 
 #include "Dumper.h"
 #include "Option.h"
@@ -34,19 +34,24 @@
 
 int main(int argc, char** argv)
 {
-    Option option(argc, argv);
+    rafi::v1::Option option(argc, argv);
 
     Verilated::traceEverOn(true);
 
     auto tfp = std::make_unique<VerilatedVcdC>();
 
     auto core = std::make_unique<VCore>();
-    auto dumper = std::make_unique<Dumper>(option.GetDumpPath(), core.get());
     auto system = std::make_unique<rafi::v1::System>(core.get());
+    auto dumper = std::make_unique<rafi::v1::Dumper>(option.GetDumpPath(), core.get(), system.get());
 
     core->trace(tfp.get(), 20);
 
     tfp->open(option.GetVcdPath());
+
+    if (option.IsMemoryDumpEnabled())
+    {
+        dumper->EnableDumpMemory();
+    }
 
     // begin reset
     core->rst = 1;
@@ -100,7 +105,6 @@ int main(int argc, char** argv)
     std::cout << "Simulation finished @ cycle "
         << std::dec << cycle
         << std::hex << " (0x" << cycle << ")" << std::endl;
-
 
     core->final();
 

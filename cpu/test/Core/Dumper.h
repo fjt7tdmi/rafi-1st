@@ -20,25 +20,37 @@
 
 #include <rvtrace/writer.h>
 
+#include "../../../rafi-emu/src/rafi-emu/mem/Ram.h"
 #include "../../../work/verilator/test_Core/VCore.h"
+
+#include "System.h"
+
+namespace rafi { namespace v1 {
 
 class Dumper final
 {
 public:
-    Dumper(const char* path, VCore* pCore);
-
+    Dumper(const char* path, VCore* pCore, System* pSystem);
     ~Dumper();
+
+    void EnableDumpMemory();
 
     void DumpCycle(int cycle);
 
 private:
     void Dump(int cycle);
 
-    bool m_Valid {false};
+    rvtrace::FileTraceWriter m_FileTraceWriter;
+    VCore* m_pCore;
+    System* m_pSystem;
+
+    bool m_MemoryDumpEnabled {false};
+
+    // op info
     int32_t m_Pc {0};
     int32_t m_Insn {0};
     int32_t m_OpId {0};
-
-    rvtrace::FileTraceWriter m_FileTraceWriter;
-    VCore* m_pCore;
+    bool m_Valid {false};
 };
+
+}}

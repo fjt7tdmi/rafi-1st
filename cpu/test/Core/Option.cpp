@@ -21,16 +21,19 @@
 
 namespace po = boost::program_options;
 
+namespace rafi { namespace v1 {
+
 Option::Option(int argc, char** argv)
 {
     po::options_description desc("options");
     desc.add_options()
         ("cycle", po::value<int>(&m_Cycle)->default_value(0), "number of emulation cycles")
         ("dump-path", po::value<std::string>(), "path of dump file")
+        ("enable-dump-memory", "output memory contents to dump file")
+        ("enable-monitor-host-io", "stop emulation when host io value is changed")
         ("ram-path", po::value<std::string>(), "path of binary file that is loaded to RAM")
         ("rom-path", po::value<std::string>(), "path of binary file that is loaded to ROM")
         ("vcd-path", po::value<std::string>(), "path of vcd file")
-        ("stop-by-host-io", "stop emulation when host io value is changed")
         ("help", "show help");
 
     po::variables_map options;
@@ -54,6 +57,11 @@ Option::Option(int argc, char** argv)
     if (options.count("dump-path"))
     {
         m_DumpPath = options["dump-path"].as<std::string>();
+    }
+
+    if (options.count("enable-dump-memory"))
+    {
+        m_MemoryDumpEnabled = true;
     }
 
     if (options.count("rom-path"))
@@ -101,6 +109,11 @@ const char* Option::GetVcdPath() const
     return m_VcdPath.c_str();
 }
 
+bool Option::IsMemoryDumpEnabled() const
+{
+    return m_MemoryDumpEnabled;
+}
+
 bool Option::IsRamPathValid() const
 {
     return m_RamPathValid;
@@ -115,3 +128,5 @@ bool Option::IsStopByHostIo() const
 {
     return m_StopByHostIo;
 }
+
+}}
