@@ -35,7 +35,7 @@ else()
     set(FS_LIBRARIES "stdc++fs")
 
     set(GoogleTest_LIBRARIES "gtest" "gtest_main" "pthread")
-    set(GoogleTest_LIBRARY_DIRS "third_party/googletest/build/googletest")
+    set(GoogleTest_LIBRARY_DIRS "third_party/googletest/build/lib")
 endif()
 
 set(Softfloat_INCLUDE_DIRS third_party/berkeley-softfloat-3/source/include third_party/berkeley-softfloat-3/source/RISCV src/librafi_fp/include)
