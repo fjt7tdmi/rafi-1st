@@ -1,0 +1,1698 @@
+
+include Build/Rules.ninja
+
+build ./firmware/build/StoreImmediate.o: as $
+    firmware/src/StoreImmediate.S $
+    | ./firmware/build
+
+build ./firmware/build/StoreImmediate.bin: objcopy $
+    ./firmware/build/StoreImmediate.o
+    section = .text
+    start = 0x00000000
+    end = 0x00000040
+
+build ./firmware/build/StoreImmediate.txt: BinaryToText $
+    ./firmware/build/StoreImmediate.bin
+
+build ./firmware/build/StoreImmediateLong.o: as $
+    firmware/src/StoreImmediateLong.S $
+    | ./firmware/build
+
+build ./firmware/build/StoreImmediateLong.bin: objcopy $
+    ./firmware/build/StoreImmediateLong.o
+    section = .text
+    start = 0x00000000
+    end = 0x00000040
+
+build ./firmware/build/StoreImmediateLong.txt: BinaryToText $
+    ./firmware/build/StoreImmediateLong.bin
+
+build ./firmware/build/StoreToUart.o: as $
+    firmware/src/StoreToUart.S $
+    | ./firmware/build
+
+build ./firmware/build/StoreToUart.bin: objcopy $
+    ./firmware/build/StoreToUart.o
+    section = .text
+    start = 0x00000000
+    end = 0x00000040
+
+build ./firmware/build/StoreToUart.txt: BinaryToText $
+    ./firmware/build/StoreToUart.bin
+
+build ./firmware/build/StoreToUartLong.o: as $
+    firmware/src/StoreToUartLong.S $
+    | ./firmware/build
+
+build ./firmware/build/StoreToUartLong.bin: objcopy $
+    ./firmware/build/StoreToUartLong.o
+    section = .text
+    start = 0x00000000
+    end = 0x00000040
+
+build ./firmware/build/StoreToUartLong.txt: BinaryToText $
+    ./firmware/build/StoreToUartLong.bin
+
+build ./work/Trace/Emulator: mkdir
+
+build ./work/Trace/Processor: mkdir
+
+build ./work/PcLog: mkdir
+
+build work/ModelSim/module/DivUnit: mkdir
+
+build work/ModelSim/module/DivUnit/DivUnitTest: vsim_setup work/ModelSim/module/DivUnit
+    work = work/ModelSim/module/DivUnit
+    project = DivUnitTest
+
+build work/ModelSim/module/DivUnit/DivUnitTest/_vmake: vlog $
+    module/package/BasicTypes.sv $
+    module/package/Rv32Types.sv $
+    module/package/RvTypes.sv $
+    module/DivUnit/src/DivUnit.sv $
+    module/DivUnit/Tests/DivUnitTest/DivUnitTest.sv $
+    work/ModelSim/module/DivUnit/DivUnitTest
+    project = DivUnitTest
+    work = work/ModelSim/module/DivUnit
+    srcs = $
+        ../../../../module/package/BasicTypes.sv $
+        ../../../../module/package/Rv32Types.sv $
+        ../../../../module/package/RvTypes.sv $
+        ../../../../module/DivUnit/src/DivUnit.sv $
+        ../../../../module/DivUnit/Tests/DivUnitTest/DivUnitTest.sv
+
+build work/ModelSim/module/MulUnit: mkdir
+
+build work/ModelSim/module/MulUnit/MulUnitTest: vsim_setup work/ModelSim/module/MulUnit
+    work = work/ModelSim/module/MulUnit
+    project = MulUnitTest
+
+build work/ModelSim/module/MulUnit/MulUnitTest/_vmake: vlog $
+    module/package/BasicTypes.sv $
+    module/package/Rv32Types.sv $
+    module/package/RvTypes.sv $
+    module/MulUnit/src/MulUnit.sv $
+    module/MulUnit/Tests/MulUnitTest/MulUnitTest.sv $
+    work/ModelSim/module/MulUnit/MulUnitTest
+    project = MulUnitTest
+    work = work/ModelSim/module/MulUnit
+    srcs = $
+        ../../../../module/package/BasicTypes.sv $
+        ../../../../module/package/Rv32Types.sv $
+        ../../../../module/package/RvTypes.sv $
+        ../../../../module/MulUnit/src/MulUnit.sv $
+        ../../../../module/MulUnit/Tests/MulUnitTest/MulUnitTest.sv
+
+build work/ModelSim/Modules/Uart: mkdir
+
+build work/ModelSim/Modules/Uart/UartMemoryTest: vsim_setup work/ModelSim/Modules/Uart
+    work = work/ModelSim/Modules/Uart
+    project = UartMemoryTest
+
+build work/ModelSim/Modules/Uart/UartMemoryTest/_vmake: vlog $
+    module/package/BasicTypes.sv $
+    module/package/Rv32Types.sv $
+    module/package/RvTypes.sv $
+    module/Uart/src/UartInput.sv $
+    module/Uart/src/UartMemoryTestUnit.sv $
+    module/Uart/src/UartSdramTestUnit.sv $
+    module/Uart/src/UartTx.sv $
+    module/Uart/src/UartTxTestUnit.sv $
+    module/Memory/InternalMemory.sv $
+    module/Memory/InternalSdram.sv $
+    module/Memory/SdramController.sv $
+    module/Uart/Tests/UartMemoryTest/UartMemoryTest.sv $
+    work/ModelSim/Modules/Uart/UartMemoryTest
+    project = UartMemoryTest
+    work = work/ModelSim/Modules/Uart
+    srcs = $
+        ../../../../module/package/BasicTypes.sv $
+        ../../../../module/package/Rv32Types.sv $
+        ../../../../module/package/RvTypes.sv $
+        ../../../../module/Uart/src/UartInput.sv $
+        ../../../../module/Uart/src/UartMemoryTestUnit.sv $
+        ../../../../module/Uart/src/UartSdramTestUnit.sv $
+        ../../../../module/Uart/src/UartTx.sv $
+        ../../../../module/Uart/src/UartTxTestUnit.sv $
+        ../../../../module/Memory/InternalMemory.sv $
+        ../../../../module/Memory/InternalSdram.sv $
+        ../../../../module/Memory/SdramController.sv $
+        ../../../../module/Uart/Tests/UartMemoryTest/UartMemoryTest.sv
+
+build work/ModelSim/Modules/Uart/UartSdramTest: vsim_setup work/ModelSim/Modules/Uart
+    work = work/ModelSim/Modules/Uart
+    project = UartSdramTest
+
+build work/ModelSim/Modules/Uart/UartSdramTest/_vmake: vlog $
+    module/package/BasicTypes.sv $
+    module/package/Rv32Types.sv $
+    module/package/RvTypes.sv $
+    module/Uart/src/UartInput.sv $
+    module/Uart/src/UartMemoryTestUnit.sv $
+    module/Uart/src/UartSdramTestUnit.sv $
+    module/Uart/src/UartTx.sv $
+    module/Uart/src/UartTxTestUnit.sv $
+    module/Memory/InternalMemory.sv $
+    module/Memory/InternalSdram.sv $
+    module/Memory/SdramController.sv $
+    module/Uart/Tests/UartSdramTest/UartSdramTest.sv $
+    work/ModelSim/Modules/Uart/UartSdramTest
+    project = UartSdramTest
+    work = work/ModelSim/Modules/Uart
+    srcs = $
+        ../../../../module/package/BasicTypes.sv $
+        ../../../../module/package/Rv32Types.sv $
+        ../../../../module/package/RvTypes.sv $
+        ../../../../module/Uart/src/UartInput.sv $
+        ../../../../module/Uart/src/UartMemoryTestUnit.sv $
+        ../../../../module/Uart/src/UartSdramTestUnit.sv $
+        ../../../../module/Uart/src/UartTx.sv $
+        ../../../../module/Uart/src/UartTxTestUnit.sv $
+        ../../../../module/Memory/InternalMemory.sv $
+        ../../../../module/Memory/InternalSdram.sv $
+        ../../../../module/Memory/SdramController.sv $
+        ../../../../module/Uart/Tests/UartSdramTest/UartSdramTest.sv
+
+build work/ModelSim/Modules/Uart/UartTest: vsim_setup work/ModelSim/Modules/Uart
+    work = work/ModelSim/Modules/Uart
+    project = UartTest
+
+build work/ModelSim/Modules/Uart/UartTest/_vmake: vlog $
+    module/package/BasicTypes.sv $
+    module/package/Rv32Types.sv $
+    module/package/RvTypes.sv $
+    module/Uart/src/UartInput.sv $
+    module/Uart/src/UartMemoryTestUnit.sv $
+    module/Uart/src/UartSdramTestUnit.sv $
+    module/Uart/src/UartTx.sv $
+    module/Uart/src/UartTxTestUnit.sv $
+    module/Memory/InternalMemory.sv $
+    module/Memory/InternalSdram.sv $
+    module/Memory/SdramController.sv $
+    module/Uart/Tests/UartTest/UartTest.sv $
+    work/ModelSim/Modules/Uart/UartTest
+    project = UartTest
+    work = work/ModelSim/Modules/Uart
+    srcs = $
+        ../../../../module/package/BasicTypes.sv $
+        ../../../../module/package/Rv32Types.sv $
+        ../../../../module/package/RvTypes.sv $
+        ../../../../module/Uart/src/UartInput.sv $
+        ../../../../module/Uart/src/UartMemoryTestUnit.sv $
+        ../../../../module/Uart/src/UartSdramTestUnit.sv $
+        ../../../../module/Uart/src/UartTx.sv $
+        ../../../../module/Uart/src/UartTxTestUnit.sv $
+        ../../../../module/Memory/InternalMemory.sv $
+        ../../../../module/Memory/InternalSdram.sv $
+        ../../../../module/Memory/SdramController.sv $
+        ../../../../module/Uart/Tests/UartTest/UartTest.sv
+
+build work/ModelSim/Modules/Uart/UartTxTest: vsim_setup work/ModelSim/Modules/Uart
+    work = work/ModelSim/Modules/Uart
+    project = UartTxTest
+
+build work/ModelSim/Modules/Uart/UartTxTest/_vmake: vlog $
+    module/package/BasicTypes.sv $
+    module/package/Rv32Types.sv $
+    module/package/RvTypes.sv $
+    module/Uart/src/UartInput.sv $
+    module/Uart/src/UartMemoryTestUnit.sv $
+    module/Uart/src/UartSdramTestUnit.sv $
+    module/Uart/src/UartTx.sv $
+    module/Uart/src/UartTxTestUnit.sv $
+    module/Memory/InternalMemory.sv $
+    module/Memory/InternalSdram.sv $
+    module/Memory/SdramController.sv $
+    module/Uart/Tests/UartTxTest/UartTxTest.sv $
+    work/ModelSim/Modules/Uart/UartTxTest
+    project = UartTxTest
+    work = work/ModelSim/Modules/Uart
+    srcs = $
+        ../../../../module/package/BasicTypes.sv $
+        ../../../../module/package/Rv32Types.sv $
+        ../../../../module/package/RvTypes.sv $
+        ../../../../module/Uart/src/UartInput.sv $
+        ../../../../module/Uart/src/UartMemoryTestUnit.sv $
+        ../../../../module/Uart/src/UartSdramTestUnit.sv $
+        ../../../../module/Uart/src/UartTx.sv $
+        ../../../../module/Uart/src/UartTxTestUnit.sv $
+        ../../../../module/Memory/InternalMemory.sv $
+        ../../../../module/Memory/InternalSdram.sv $
+        ../../../../module/Memory/SdramController.sv $
+        ../../../../module/Uart/Tests/UartTxTest/UartTxTest.sv
+
+build work/ModelSim/Processor: mkdir
+
+build work/ModelSim/Processor/DecoderTest: vsim_setup work/ModelSim/Processor
+    work = work/ModelSim/Processor
+    project = DecoderTest
+
+build work/ModelSim/Processor/DecoderTest/_vmake: vlog $
+    Modules/Packages/BasicTypes.sv $
+    Modules/Packages/Rv32Types.sv $
+    Modules/Packages/RvTypes.sv $
+    Modules/Tlb/Packages/TlbTypes.sv $
+    cpu/Packages/ProcessorTypes.sv $
+    cpu/Packages/CacheTypes.sv $
+    cpu/Packages/MemoryTypes.sv $
+    cpu/Packages/OpTypes.sv $
+    cpu/Packages/TraceTypes.sv $
+    cpu/src/Decoder/Packages/Decoder.sv $
+    cpu/src/LoadStoreUnit/Packages/LoadStoreUnitTypes.sv $
+    Modules/DivUnit/src/DivUnit.sv $
+    Modules/MulUnit/src/MulUnit.sv $
+    Modules/Memory/BlockRam.sv $
+    Modules/Memory/FlipFlopCam.sv $
+    Modules/Memory/InternalMemory.sv $
+    Modules/Memory/InternalSdram.sv $
+    Modules/Memory/SdramController.sv $
+    Modules/Tlb/Tlb.sv $
+    Modules/Tlb/TlbReplacer.sv $
+    Modules/Reset/ResetSequencer.sv $
+    Modules/Uart/src/UartInput.sv $
+    Modules/Uart/src/UartTx.sv $
+    cpu/src/FetchUnit/FetchUnit.sv $
+    cpu/src/FetchUnit/FetchUnitIF.sv $
+    cpu/src/FetchUnit/ICacheInvalidater.sv $
+    cpu/src/FetchUnit/ICacheReplacer.sv $
+    cpu/src/LoadStoreUnit/DCacheReplacer.sv $
+    cpu/src/LoadStoreUnit/LoadStoreUnitIF.sv $
+    cpu/src/LoadStoreUnit/LoadStoreUnit.sv $
+    cpu/src/MemoryAccessArbiter/MemoryAccessArbiter.sv $
+    cpu/src/MemoryAccessArbiter/MemoryAccessArbiterIF.sv $
+    cpu/src/BypassLogic.sv $
+    cpu/src/BypassLogicIF.sv $
+    cpu/src/ControlStatusRegister.sv $
+    cpu/src/ControlStatusRegisterIF.sv $
+    cpu/src/DecodeStage.sv $
+    cpu/src/DecodeStageIF.sv $
+    cpu/src/ExecuteStage.sv $
+    cpu/src/ExecuteStageIF.sv $
+    cpu/src/FetchStage.sv $
+    cpu/src/FetchStageIF.sv $
+    cpu/src/MemoryAccessStage.sv $
+    cpu/src/MemoryAccessStageIF.sv $
+    cpu/src/PipelineController.sv $
+    cpu/src/PipelineControllerIF.sv $
+    cpu/src/RegFile.sv $
+    cpu/src/RegFileIF.sv $
+    cpu/src/RegReadStage.sv $
+    cpu/src/RegReadStageIF.sv $
+    cpu/src/RegWriteStage.sv $
+    cpu/src/Core.sv $
+    cpu/src/System.sv $
+    work/ModelSim/Processor/DecoderTest
+    project = DecoderTest
+    work = work/ModelSim/Processor
+    srcs = $
+        ../../../Modules/Packages/BasicTypes.sv $
+        ../../../Modules/Packages/Rv32Types.sv $
+        ../../../Modules/Packages/RvTypes.sv $
+        ../../../Modules/Tlb/Packages/TlbTypes.sv $
+        ../../../cpu/Packages/ProcessorTypes.sv $
+        ../../../cpu/Packages/CacheTypes.sv $
+        ../../../cpu/Packages/MemoryTypes.sv $
+        ../../../cpu/Packages/OpTypes.sv $
+        ../../../cpu/Packages/TraceTypes.sv $
+        ../../../cpu/src/Decoder/Packages/Decoder.sv $
+        ../../../cpu/src/LoadStoreUnit/Packages/LoadStoreUnitTypes.sv $
+        ../../../Modules/DivUnit/src/DivUnit.sv $
+        ../../../Modules/MulUnit/src/MulUnit.sv $
+        ../../../Modules/Memory/BlockRam.sv $
+        ../../../Modules/Memory/FlipFlopCam.sv $
+        ../../../Modules/Memory/InternalMemory.sv $
+        ../../../Modules/Memory/InternalSdram.sv $
+        ../../../Modules/Memory/SdramController.sv $
+        ../../../Modules/Tlb/Tlb.sv $
+        ../../../Modules/Tlb/TlbReplacer.sv $
+        ../../../Modules/Reset/ResetSequencer.sv $
+        ../../../Modules/Uart/src/UartInput.sv $
+        ../../../Modules/Uart/src/UartTx.sv $
+        ../../../cpu/src/FetchUnit/FetchUnit.sv $
+        ../../../cpu/src/FetchUnit/FetchUnitIF.sv $
+        ../../../cpu/src/FetchUnit/ICacheInvalidater.sv $
+        ../../../cpu/src/FetchUnit/ICacheReplacer.sv $
+        ../../../cpu/src/LoadStoreUnit/DCacheReplacer.sv $
+        ../../../cpu/src/LoadStoreUnit/LoadStoreUnitIF.sv $
+        ../../../cpu/src/LoadStoreUnit/LoadStoreUnit.sv $
+        ../../../cpu/src/MemoryAccessArbiter/MemoryAccessArbiter.sv $
+        ../../../cpu/src/MemoryAccessArbiter/MemoryAccessArbiterIF.sv $
+        ../../../cpu/src/BypassLogic.sv $
+        ../../../cpu/src/BypassLogicIF.sv $
+        ../../../cpu/src/ControlStatusRegister.sv $
+        ../../../cpu/src/ControlStatusRegisterIF.sv $
+        ../../../cpu/src/DecodeStage.sv $
+        ../../../cpu/src/DecodeStageIF.sv $
+        ../../../cpu/src/ExecuteStage.sv $
+        ../../../cpu/src/ExecuteStageIF.sv $
+        ../../../cpu/src/FetchStage.sv $
+        ../../../cpu/src/FetchStageIF.sv $
+        ../../../cpu/src/MemoryAccessStage.sv $
+        ../../../cpu/src/MemoryAccessStageIF.sv $
+        ../../../cpu/src/PipelineController.sv $
+        ../../../cpu/src/PipelineControllerIF.sv $
+        ../../../cpu/src/RegFile.sv $
+        ../../../cpu/src/RegFileIF.sv $
+        ../../../cpu/src/RegReadStage.sv $
+        ../../../cpu/src/RegReadStageIF.sv $
+        ../../../cpu/src/RegWriteStage.sv $
+        ../../../cpu/src/Core.sv $
+        ../../../cpu/src/System.sv
+
+build work/ModelSim/Processor/SystemTest: vsim_setup work/ModelSim/Processor
+    work = work/ModelSim/Processor
+    project = SystemTest
+
+build work/ModelSim/Processor/SystemTest/_vmake: vlog $
+    Modules/Packages/BasicTypes.sv $
+    Modules/Packages/Rv32Types.sv $
+    Modules/Packages/RvTypes.sv $
+    Modules/Tlb/Packages/TlbTypes.sv $
+    cpu/Packages/ProcessorTypes.sv $
+    cpu/Packages/CacheTypes.sv $
+    cpu/Packages/MemoryTypes.sv $
+    cpu/Packages/OpTypes.sv $
+    cpu/Packages/TraceTypes.sv $
+    cpu/src/Decoder/Packages/Decoder.sv $
+    cpu/src/LoadStoreUnit/Packages/LoadStoreUnitTypes.sv $
+    Modules/DivUnit/src/DivUnit.sv $
+    Modules/MulUnit/src/MulUnit.sv $
+    Modules/Memory/BlockRam.sv $
+    Modules/Memory/FlipFlopCam.sv $
+    Modules/Memory/InternalMemory.sv $
+    Modules/Memory/InternalSdram.sv $
+    Modules/Memory/SdramController.sv $
+    Modules/Tlb/Tlb.sv $
+    Modules/Tlb/TlbReplacer.sv $
+    Modules/Reset/ResetSequencer.sv $
+    Modules/Uart/src/UartInput.sv $
+    Modules/Uart/src/UartTx.sv $
+    cpu/src/FetchUnit/FetchUnit.sv $
+    cpu/src/FetchUnit/FetchUnitIF.sv $
+    cpu/src/FetchUnit/ICacheInvalidater.sv $
+    cpu/src/FetchUnit/ICacheReplacer.sv $
+    cpu/src/LoadStoreUnit/DCacheReplacer.sv $
+    cpu/src/LoadStoreUnit/LoadStoreUnitIF.sv $
+    cpu/src/LoadStoreUnit/LoadStoreUnit.sv $
+    cpu/src/MemoryAccessArbiter/MemoryAccessArbiter.sv $
+    cpu/src/MemoryAccessArbiter/MemoryAccessArbiterIF.sv $
+    cpu/src/BypassLogic.sv $
+    cpu/src/BypassLogicIF.sv $
+    cpu/src/ControlStatusRegister.sv $
+    cpu/src/ControlStatusRegisterIF.sv $
+    cpu/src/DecodeStage.sv $
+    cpu/src/DecodeStageIF.sv $
+    cpu/src/ExecuteStage.sv $
+    cpu/src/ExecuteStageIF.sv $
+    cpu/src/FetchStage.sv $
+    cpu/src/FetchStageIF.sv $
+    cpu/src/MemoryAccessStage.sv $
+    cpu/src/MemoryAccessStageIF.sv $
+    cpu/src/PipelineController.sv $
+    cpu/src/PipelineControllerIF.sv $
+    cpu/src/RegFile.sv $
+    cpu/src/RegFileIF.sv $
+    cpu/src/RegReadStage.sv $
+    cpu/src/RegReadStageIF.sv $
+    cpu/src/RegWriteStage.sv $
+    cpu/src/Core.sv $
+    cpu/src/System.sv $
+    work/ModelSim/Processor/SystemTest
+    project = SystemTest
+    work = work/ModelSim/Processor
+    srcs = $
+        ../../../Modules/Packages/BasicTypes.sv $
+        ../../../Modules/Packages/Rv32Types.sv $
+        ../../../Modules/Packages/RvTypes.sv $
+        ../../../Modules/Tlb/Packages/TlbTypes.sv $
+        ../../../cpu/Packages/ProcessorTypes.sv $
+        ../../../cpu/Packages/CacheTypes.sv $
+        ../../../cpu/Packages/MemoryTypes.sv $
+        ../../../cpu/Packages/OpTypes.sv $
+        ../../../cpu/Packages/TraceTypes.sv $
+        ../../../cpu/src/Decoder/Packages/Decoder.sv $
+        ../../../cpu/src/LoadStoreUnit/Packages/LoadStoreUnitTypes.sv $
+        ../../../Modules/DivUnit/src/DivUnit.sv $
+        ../../../Modules/MulUnit/src/MulUnit.sv $
+        ../../../Modules/Memory/BlockRam.sv $
+        ../../../Modules/Memory/FlipFlopCam.sv $
+        ../../../Modules/Memory/InternalMemory.sv $
+        ../../../Modules/Memory/InternalSdram.sv $
+        ../../../Modules/Memory/SdramController.sv $
+        ../../../Modules/Tlb/Tlb.sv $
+        ../../../Modules/Tlb/TlbReplacer.sv $
+        ../../../Modules/Reset/ResetSequencer.sv $
+        ../../../Modules/Uart/src/UartInput.sv $
+        ../../../Modules/Uart/src/UartTx.sv $
+        ../../../cpu/src/FetchUnit/FetchUnit.sv $
+        ../../../cpu/src/FetchUnit/FetchUnitIF.sv $
+        ../../../cpu/src/FetchUnit/ICacheInvalidater.sv $
+        ../../../cpu/src/FetchUnit/ICacheReplacer.sv $
+        ../../../cpu/src/LoadStoreUnit/DCacheReplacer.sv $
+        ../../../cpu/src/LoadStoreUnit/LoadStoreUnitIF.sv $
+        ../../../cpu/src/LoadStoreUnit/LoadStoreUnit.sv $
+        ../../../cpu/src/MemoryAccessArbiter/MemoryAccessArbiter.sv $
+        ../../../cpu/src/MemoryAccessArbiter/MemoryAccessArbiterIF.sv $
+        ../../../cpu/src/BypassLogic.sv $
+        ../../../cpu/src/BypassLogicIF.sv $
+        ../../../cpu/src/ControlStatusRegister.sv $
+        ../../../cpu/src/ControlStatusRegisterIF.sv $
+        ../../../cpu/src/DecodeStage.sv $
+        ../../../cpu/src/DecodeStageIF.sv $
+        ../../../cpu/src/ExecuteStage.sv $
+        ../../../cpu/src/ExecuteStageIF.sv $
+        ../../../cpu/src/FetchStage.sv $
+        ../../../cpu/src/FetchStageIF.sv $
+        ../../../cpu/src/MemoryAccessStage.sv $
+        ../../../cpu/src/MemoryAccessStageIF.sv $
+        ../../../cpu/src/PipelineController.sv $
+        ../../../cpu/src/PipelineControllerIF.sv $
+        ../../../cpu/src/RegFile.sv $
+        ../../../cpu/src/RegFileIF.sv $
+        ../../../cpu/src/RegReadStage.sv $
+        ../../../cpu/src/RegReadStageIF.sv $
+        ../../../cpu/src/RegWriteStage.sv $
+        ../../../cpu/src/Core.sv $
+        ../../../cpu/src/System.sv
+
+build work/ModelSim/Processor/SystemTestWithLoad: vsim_setup work/ModelSim/Processor
+    work = work/ModelSim/Processor
+    project = SystemTestWithLoad
+
+build work/ModelSim/Processor/SystemTestWithLoad/_vmake: vlog $
+    Modules/Packages/BasicTypes.sv $
+    Modules/Packages/Rv32Types.sv $
+    Modules/Packages/RvTypes.sv $
+    Modules/Tlb/Packages/TlbTypes.sv $
+    cpu/Packages/ProcessorTypes.sv $
+    cpu/Packages/CacheTypes.sv $
+    cpu/Packages/MemoryTypes.sv $
+    cpu/Packages/OpTypes.sv $
+    cpu/Packages/TraceTypes.sv $
+    cpu/src/Decoder/Packages/Decoder.sv $
+    cpu/src/LoadStoreUnit/Packages/LoadStoreUnitTypes.sv $
+    Modules/DivUnit/src/DivUnit.sv $
+    Modules/MulUnit/src/MulUnit.sv $
+    Modules/Memory/BlockRam.sv $
+    Modules/Memory/FlipFlopCam.sv $
+    Modules/Memory/InternalMemory.sv $
+    Modules/Memory/InternalSdram.sv $
+    Modules/Memory/SdramController.sv $
+    Modules/Tlb/Tlb.sv $
+    Modules/Tlb/TlbReplacer.sv $
+    Modules/Reset/ResetSequencer.sv $
+    Modules/Uart/src/UartInput.sv $
+    Modules/Uart/src/UartTx.sv $
+    cpu/src/FetchUnit/FetchUnit.sv $
+    cpu/src/FetchUnit/FetchUnitIF.sv $
+    cpu/src/FetchUnit/ICacheInvalidater.sv $
+    cpu/src/FetchUnit/ICacheReplacer.sv $
+    cpu/src/LoadStoreUnit/DCacheReplacer.sv $
+    cpu/src/LoadStoreUnit/LoadStoreUnitIF.sv $
+    cpu/src/LoadStoreUnit/LoadStoreUnit.sv $
+    cpu/src/MemoryAccessArbiter/MemoryAccessArbiter.sv $
+    cpu/src/MemoryAccessArbiter/MemoryAccessArbiterIF.sv $
+    cpu/src/BypassLogic.sv $
+    cpu/src/BypassLogicIF.sv $
+    cpu/src/ControlStatusRegister.sv $
+    cpu/src/ControlStatusRegisterIF.sv $
+    cpu/src/DecodeStage.sv $
+    cpu/src/DecodeStageIF.sv $
+    cpu/src/ExecuteStage.sv $
+    cpu/src/ExecuteStageIF.sv $
+    cpu/src/FetchStage.sv $
+    cpu/src/FetchStageIF.sv $
+    cpu/src/MemoryAccessStage.sv $
+    cpu/src/MemoryAccessStageIF.sv $
+    cpu/src/PipelineController.sv $
+    cpu/src/PipelineControllerIF.sv $
+    cpu/src/RegFile.sv $
+    cpu/src/RegFileIF.sv $
+    cpu/src/RegReadStage.sv $
+    cpu/src/RegReadStageIF.sv $
+    cpu/src/RegWriteStage.sv $
+    cpu/src/Core.sv $
+    cpu/src/System.sv $
+    work/ModelSim/Processor/SystemTestWithLoad
+    project = SystemTestWithLoad
+    work = work/ModelSim/Processor
+    srcs = $
+        ../../../Modules/Packages/BasicTypes.sv $
+        ../../../Modules/Packages/Rv32Types.sv $
+        ../../../Modules/Packages/RvTypes.sv $
+        ../../../Modules/Tlb/Packages/TlbTypes.sv $
+        ../../../cpu/Packages/ProcessorTypes.sv $
+        ../../../cpu/Packages/CacheTypes.sv $
+        ../../../cpu/Packages/MemoryTypes.sv $
+        ../../../cpu/Packages/OpTypes.sv $
+        ../../../cpu/Packages/TraceTypes.sv $
+        ../../../cpu/src/Decoder/Packages/Decoder.sv $
+        ../../../cpu/src/LoadStoreUnit/Packages/LoadStoreUnitTypes.sv $
+        ../../../Modules/DivUnit/src/DivUnit.sv $
+        ../../../Modules/MulUnit/src/MulUnit.sv $
+        ../../../Modules/Memory/BlockRam.sv $
+        ../../../Modules/Memory/FlipFlopCam.sv $
+        ../../../Modules/Memory/InternalMemory.sv $
+        ../../../Modules/Memory/InternalSdram.sv $
+        ../../../Modules/Memory/SdramController.sv $
+        ../../../Modules/Tlb/Tlb.sv $
+        ../../../Modules/Tlb/TlbReplacer.sv $
+        ../../../Modules/Reset/ResetSequencer.sv $
+        ../../../Modules/Uart/src/UartInput.sv $
+        ../../../Modules/Uart/src/UartTx.sv $
+        ../../../cpu/src/FetchUnit/FetchUnit.sv $
+        ../../../cpu/src/FetchUnit/FetchUnitIF.sv $
+        ../../../cpu/src/FetchUnit/ICacheInvalidater.sv $
+        ../../../cpu/src/FetchUnit/ICacheReplacer.sv $
+        ../../../cpu/src/LoadStoreUnit/DCacheReplacer.sv $
+        ../../../cpu/src/LoadStoreUnit/LoadStoreUnitIF.sv $
+        ../../../cpu/src/LoadStoreUnit/LoadStoreUnit.sv $
+        ../../../cpu/src/MemoryAccessArbiter/MemoryAccessArbiter.sv $
+        ../../../cpu/src/MemoryAccessArbiter/MemoryAccessArbiterIF.sv $
+        ../../../cpu/src/BypassLogic.sv $
+        ../../../cpu/src/BypassLogicIF.sv $
+        ../../../cpu/src/ControlStatusRegister.sv $
+        ../../../cpu/src/ControlStatusRegisterIF.sv $
+        ../../../cpu/src/DecodeStage.sv $
+        ../../../cpu/src/DecodeStageIF.sv $
+        ../../../cpu/src/ExecuteStage.sv $
+        ../../../cpu/src/ExecuteStageIF.sv $
+        ../../../cpu/src/FetchStage.sv $
+        ../../../cpu/src/FetchStageIF.sv $
+        ../../../cpu/src/MemoryAccessStage.sv $
+        ../../../cpu/src/MemoryAccessStageIF.sv $
+        ../../../cpu/src/PipelineController.sv $
+        ../../../cpu/src/PipelineControllerIF.sv $
+        ../../../cpu/src/RegFile.sv $
+        ../../../cpu/src/RegFileIF.sv $
+        ../../../cpu/src/RegReadStage.sv $
+        ../../../cpu/src/RegReadStageIF.sv $
+        ../../../cpu/src/RegWriteStage.sv $
+        ../../../cpu/src/Core.sv $
+        ../../../cpu/src/System.sv
+
+build work/ModelSim/cpu/FetchUnit: mkdir
+
+build work/ModelSim/cpu/FetchUnit/FetchUnitTest: vsim_setup work/ModelSim/cpu/FetchUnit
+    work = work/ModelSim/cpu/FetchUnit
+    project = FetchUnitTest
+
+build work/ModelSim/cpu/FetchUnit/FetchUnitTest/_vmake: vlog $
+    module/package/BasicTypes.sv $
+    module/package/Rv32Types.sv $
+    module/package/RvTypes.sv $
+    module/Tlb/package/TlbTypes.sv $
+    cpu/package/ProcessorTypes.sv $
+    cpu/src/FetchUnit/Tests/package/CacheTypes.sv $
+    module/Memory/BlockRam.sv $
+    module/Memory/FlipFlopCam.sv $
+    module/Tlb/TlbReplacer.sv $
+    module/Tlb/Tlb.sv $
+    cpu/src/MemoryAccessArbiter/MemoryAccessArbiter.sv $
+    cpu/src/MemoryAccessArbiter/MemoryAccessArbiterIF.sv $
+    cpu/src/PipelineControllerIF.sv $
+    cpu/src/ControlStatusRegisterIF.sv $
+    cpu/src/FetchUnit/FetchUnit.sv $
+    cpu/src/FetchUnit/FetchUnitIF.sv $
+    cpu/src/FetchUnit/ICacheInvalidater.sv $
+    cpu/src/FetchUnit/ICacheReplacer.sv $
+    cpu/src/FetchUnit/Tests/FetchUnitTest/FetchUnitTest.sv $
+    work/ModelSim/cpu/FetchUnit/FetchUnitTest
+    project = FetchUnitTest
+    work = work/ModelSim/cpu/FetchUnit
+    srcs = $
+        ../../../../module/package/BasicTypes.sv $
+        ../../../../module/package/Rv32Types.sv $
+        ../../../../module/package/RvTypes.sv $
+        ../../../../module/Tlb/package/TlbTypes.sv $
+        ../../../../cpu/package/ProcessorTypes.sv $
+        ../../../../cpu/src/FetchUnit/Tests/package/CacheTypes.sv $
+        ../../../../module/Memory/BlockRam.sv $
+        ../../../../module/Memory/FlipFlopCam.sv $
+        ../../../../module/Tlb/TlbReplacer.sv $
+        ../../../../module/Tlb/Tlb.sv $
+        ../../../../cpu/src/MemoryAccessArbiter/MemoryAccessArbiter.sv $
+        ../../../../cpu/src/MemoryAccessArbiter/MemoryAccessArbiterIF.sv $
+        ../../../../cpu/src/PipelineControllerIF.sv $
+        ../../../../cpu/src/ControlStatusRegisterIF.sv $
+        ../../../../cpu/src/FetchUnit/FetchUnit.sv $
+        ../../../../cpu/src/FetchUnit/FetchUnitIF.sv $
+        ../../../../cpu/src/FetchUnit/ICacheInvalidater.sv $
+        ../../../../cpu/src/FetchUnit/ICacheReplacer.sv $
+        ../../../../cpu/src/FetchUnit/Tests/FetchUnitTest/FetchUnitTest.sv
+
+build work/ModelSim/Processor/LoadStoreUnit: mkdir
+
+build work/ModelSim/Processor/LoadStoreUnit/LoadStoreUnitTest: vsim_setup work/ModelSim/Processor/LoadStoreUnit
+    work = work/ModelSim/Processor/LoadStoreUnit
+    project = LoadStoreUnitTest
+
+build work/ModelSim/Processor/LoadStoreUnit/LoadStoreUnitTest/_vmake: vlog $
+    module/package/BasicTypes.sv $
+    module/package/Rv32Types.sv $
+    module/package/RvTypes.sv $
+    module/Tlb/package/TlbTypes.sv $
+    cpu/package/MemoryTypes.sv $
+    cpu/package/OpTypes.sv $
+    cpu/package/ProcessorTypes.sv $
+    cpu/src/LoadStoreUnit/package/LoadStoreUnitTypes.sv $
+    cpu/src/LoadStoreUnit/Tests/package/CacheTypes.sv $
+    module/Memory/BlockRam.sv $
+    module/Memory/FlipFlopCam.sv $
+    module/Tlb/TlbReplacer.sv $
+    module/Tlb/Tlb.sv $
+    cpu/src/MemoryAccessArbiter/MemoryAccessArbiter.sv $
+    cpu/src/MemoryAccessArbiter/MemoryAccessArbiterIF.sv $
+    cpu/src/ControlStatusRegisterIF.sv $
+    cpu/src/PipelineControllerIF.sv $
+    cpu/src/LoadStoreUnit/LoadStoreUnit.sv $
+    cpu/src/LoadStoreUnit/LoadStoreUnitIF.sv $
+    cpu/src/LoadStoreUnit/DCacheReplacer.sv $
+    cpu/src/LoadStoreUnit/Tests/LoadStoreUnitTest/LoadStoreUnitTest.sv $
+    work/ModelSim/Processor/LoadStoreUnit/LoadStoreUnitTest
+    project = LoadStoreUnitTest
+    work = work/ModelSim/Processor/LoadStoreUnit
+    srcs = $
+        ../../../../module/package/BasicTypes.sv $
+        ../../../../module/package/Rv32Types.sv $
+        ../../../../module/package/RvTypes.sv $
+        ../../../../module/Tlb/package/TlbTypes.sv $
+        ../../../../cpu/package/MemoryTypes.sv $
+        ../../../../cpu/package/OpTypes.sv $
+        ../../../../cpu/package/ProcessorTypes.sv $
+        ../../../../cpu/src/LoadStoreUnit/package/LoadStoreUnitTypes.sv $
+        ../../../../cpu/src/LoadStoreUnit/Tests/package/CacheTypes.sv $
+        ../../../../module/Memory/BlockRam.sv $
+        ../../../../module/Memory/FlipFlopCam.sv $
+        ../../../../module/Tlb/TlbReplacer.sv $
+        ../../../../module/Tlb/Tlb.sv $
+        ../../../../cpu/src/MemoryAccessArbiter/MemoryAccessArbiter.sv $
+        ../../../../cpu/src/MemoryAccessArbiter/MemoryAccessArbiterIF.sv $
+        ../../../../cpu/src/ControlStatusRegisterIF.sv $
+        ../../../../cpu/src/PipelineControllerIF.sv $
+        ../../../../cpu/src/LoadStoreUnit/LoadStoreUnit.sv $
+        ../../../../cpu/src/LoadStoreUnit/LoadStoreUnitIF.sv $
+        ../../../../cpu/src/LoadStoreUnit/DCacheReplacer.sv $
+        ../../../../cpu/src/LoadStoreUnit/Tests/LoadStoreUnitTest/LoadStoreUnitTest.sv
+
+build firmware/Outputs: mkdir
+
+build firmware/Outputs/rv32mi-p-breakpoint.bin: objcopy $
+    ../riscv-tests/build/isa/rv32mi-p-breakpoint
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32mi-p-breakpoint.txt: BinaryToText $
+    firmware/Outputs/rv32mi-p-breakpoint.bin
+
+build firmware/Outputs/rv32mi-p-csr.bin: objcopy $
+    ../riscv-tests/build/isa/rv32mi-p-csr
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32mi-p-csr.txt: BinaryToText $
+    firmware/Outputs/rv32mi-p-csr.bin
+
+build firmware/Outputs/rv32mi-p-illegal.bin: objcopy $
+    ../riscv-tests/build/isa/rv32mi-p-illegal
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32mi-p-illegal.txt: BinaryToText $
+    firmware/Outputs/rv32mi-p-illegal.bin
+
+build firmware/Outputs/rv32mi-p-ma_addr.bin: objcopy $
+    ../riscv-tests/build/isa/rv32mi-p-ma_addr
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32mi-p-ma_addr.txt: BinaryToText $
+    firmware/Outputs/rv32mi-p-ma_addr.bin
+
+build firmware/Outputs/rv32mi-p-ma_fetch.bin: objcopy $
+    ../riscv-tests/build/isa/rv32mi-p-ma_fetch
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32mi-p-ma_fetch.txt: BinaryToText $
+    firmware/Outputs/rv32mi-p-ma_fetch.bin
+
+build firmware/Outputs/rv32mi-p-mcsr.bin: objcopy $
+    ../riscv-tests/build/isa/rv32mi-p-mcsr
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32mi-p-mcsr.txt: BinaryToText $
+    firmware/Outputs/rv32mi-p-mcsr.bin
+
+build firmware/Outputs/rv32mi-p-sbreak.bin: objcopy $
+    ../riscv-tests/build/isa/rv32mi-p-sbreak
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32mi-p-sbreak.txt: BinaryToText $
+    firmware/Outputs/rv32mi-p-sbreak.bin
+
+build firmware/Outputs/rv32mi-p-scall.bin: objcopy $
+    ../riscv-tests/build/isa/rv32mi-p-scall
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32mi-p-scall.txt: BinaryToText $
+    firmware/Outputs/rv32mi-p-scall.bin
+
+build firmware/Outputs/rv32mi-p-shamt.bin: objcopy $
+    ../riscv-tests/build/isa/rv32mi-p-shamt
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32mi-p-shamt.txt: BinaryToText $
+    firmware/Outputs/rv32mi-p-shamt.bin
+
+build firmware/Outputs/rv32si-p-csr.bin: objcopy $
+    ../riscv-tests/build/isa/rv32si-p-csr
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32si-p-csr.txt: BinaryToText $
+    firmware/Outputs/rv32si-p-csr.bin
+
+build firmware/Outputs/rv32si-p-dirty.bin: objcopy $
+    ../riscv-tests/build/isa/rv32si-p-dirty
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32si-p-dirty.txt: BinaryToText $
+    firmware/Outputs/rv32si-p-dirty.bin
+
+build firmware/Outputs/rv32si-p-ma_fetch.bin: objcopy $
+    ../riscv-tests/build/isa/rv32si-p-ma_fetch
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32si-p-ma_fetch.txt: BinaryToText $
+    firmware/Outputs/rv32si-p-ma_fetch.bin
+
+build firmware/Outputs/rv32si-p-sbreak.bin: objcopy $
+    ../riscv-tests/build/isa/rv32si-p-sbreak
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32si-p-sbreak.txt: BinaryToText $
+    firmware/Outputs/rv32si-p-sbreak.bin
+
+build firmware/Outputs/rv32si-p-scall.bin: objcopy $
+    ../riscv-tests/build/isa/rv32si-p-scall
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32si-p-scall.txt: BinaryToText $
+    firmware/Outputs/rv32si-p-scall.bin
+
+build firmware/Outputs/rv32si-p-wfi.bin: objcopy $
+    ../riscv-tests/build/isa/rv32si-p-wfi
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32si-p-wfi.txt: BinaryToText $
+    firmware/Outputs/rv32si-p-wfi.bin
+
+build firmware/Outputs/rv32ua-p-amoadd_w.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ua-p-amoadd_w
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ua-p-amoadd_w.txt: BinaryToText $
+    firmware/Outputs/rv32ua-p-amoadd_w.bin
+
+build firmware/Outputs/rv32ua-p-amoand_w.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ua-p-amoand_w
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ua-p-amoand_w.txt: BinaryToText $
+    firmware/Outputs/rv32ua-p-amoand_w.bin
+
+build firmware/Outputs/rv32ua-p-amomaxu_w.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ua-p-amomaxu_w
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ua-p-amomaxu_w.txt: BinaryToText $
+    firmware/Outputs/rv32ua-p-amomaxu_w.bin
+
+build firmware/Outputs/rv32ua-p-amomax_w.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ua-p-amomax_w
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ua-p-amomax_w.txt: BinaryToText $
+    firmware/Outputs/rv32ua-p-amomax_w.bin
+
+build firmware/Outputs/rv32ua-p-amominu_w.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ua-p-amominu_w
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ua-p-amominu_w.txt: BinaryToText $
+    firmware/Outputs/rv32ua-p-amominu_w.bin
+
+build firmware/Outputs/rv32ua-p-amomin_w.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ua-p-amomin_w
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ua-p-amomin_w.txt: BinaryToText $
+    firmware/Outputs/rv32ua-p-amomin_w.bin
+
+build firmware/Outputs/rv32ua-p-amoor_w.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ua-p-amoor_w
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ua-p-amoor_w.txt: BinaryToText $
+    firmware/Outputs/rv32ua-p-amoor_w.bin
+
+build firmware/Outputs/rv32ua-p-amoswap_w.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ua-p-amoswap_w
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ua-p-amoswap_w.txt: BinaryToText $
+    firmware/Outputs/rv32ua-p-amoswap_w.bin
+
+build firmware/Outputs/rv32ua-p-amoxor_w.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ua-p-amoxor_w
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ua-p-amoxor_w.txt: BinaryToText $
+    firmware/Outputs/rv32ua-p-amoxor_w.bin
+
+build firmware/Outputs/rv32ua-p-lrsc.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ua-p-lrsc
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ua-p-lrsc.txt: BinaryToText $
+    firmware/Outputs/rv32ua-p-lrsc.bin
+
+build firmware/Outputs/rv32ua-v-amoadd_w.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ua-v-amoadd_w
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ua-v-amoadd_w.txt: BinaryToText $
+    firmware/Outputs/rv32ua-v-amoadd_w.bin
+
+build firmware/Outputs/rv32ua-v-amoand_w.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ua-v-amoand_w
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ua-v-amoand_w.txt: BinaryToText $
+    firmware/Outputs/rv32ua-v-amoand_w.bin
+
+build firmware/Outputs/rv32ua-v-amomaxu_w.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ua-v-amomaxu_w
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ua-v-amomaxu_w.txt: BinaryToText $
+    firmware/Outputs/rv32ua-v-amomaxu_w.bin
+
+build firmware/Outputs/rv32ua-v-amomax_w.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ua-v-amomax_w
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ua-v-amomax_w.txt: BinaryToText $
+    firmware/Outputs/rv32ua-v-amomax_w.bin
+
+build firmware/Outputs/rv32ua-v-amominu_w.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ua-v-amominu_w
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ua-v-amominu_w.txt: BinaryToText $
+    firmware/Outputs/rv32ua-v-amominu_w.bin
+
+build firmware/Outputs/rv32ua-v-amomin_w.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ua-v-amomin_w
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ua-v-amomin_w.txt: BinaryToText $
+    firmware/Outputs/rv32ua-v-amomin_w.bin
+
+build firmware/Outputs/rv32ua-v-amoor_w.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ua-v-amoor_w
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ua-v-amoor_w.txt: BinaryToText $
+    firmware/Outputs/rv32ua-v-amoor_w.bin
+
+build firmware/Outputs/rv32ua-v-amoswap_w.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ua-v-amoswap_w
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ua-v-amoswap_w.txt: BinaryToText $
+    firmware/Outputs/rv32ua-v-amoswap_w.bin
+
+build firmware/Outputs/rv32ua-v-amoxor_w.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ua-v-amoxor_w
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ua-v-amoxor_w.txt: BinaryToText $
+    firmware/Outputs/rv32ua-v-amoxor_w.bin
+
+build firmware/Outputs/rv32ua-v-lrsc.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ua-v-lrsc
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ua-v-lrsc.txt: BinaryToText $
+    firmware/Outputs/rv32ua-v-lrsc.bin
+
+build firmware/Outputs/rv32ui-p-add.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-add
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-add.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-add.bin
+
+build firmware/Outputs/rv32ui-p-addi.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-addi
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-addi.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-addi.bin
+
+build firmware/Outputs/rv32ui-p-and.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-and
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-and.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-and.bin
+
+build firmware/Outputs/rv32ui-p-andi.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-andi
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-andi.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-andi.bin
+
+build firmware/Outputs/rv32ui-p-auipc.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-auipc
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-auipc.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-auipc.bin
+
+build firmware/Outputs/rv32ui-p-beq.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-beq
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-beq.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-beq.bin
+
+build firmware/Outputs/rv32ui-p-bge.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-bge
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-bge.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-bge.bin
+
+build firmware/Outputs/rv32ui-p-bgeu.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-bgeu
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-bgeu.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-bgeu.bin
+
+build firmware/Outputs/rv32ui-p-blt.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-blt
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-blt.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-blt.bin
+
+build firmware/Outputs/rv32ui-p-bltu.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-bltu
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-bltu.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-bltu.bin
+
+build firmware/Outputs/rv32ui-p-bne.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-bne
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-bne.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-bne.bin
+
+build firmware/Outputs/rv32ui-p-fence_i.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-fence_i
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-fence_i.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-fence_i.bin
+
+build firmware/Outputs/rv32ui-p-jal.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-jal
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-jal.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-jal.bin
+
+build firmware/Outputs/rv32ui-p-jalr.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-jalr
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-jalr.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-jalr.bin
+
+build firmware/Outputs/rv32ui-p-lbu.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-lbu
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-lbu.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-lbu.bin
+
+build firmware/Outputs/rv32ui-p-lh.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-lh
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-lh.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-lh.bin
+
+build firmware/Outputs/rv32ui-p-lhu.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-lhu
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-lhu.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-lhu.bin
+
+build firmware/Outputs/rv32ui-p-lui.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-lui
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-lui.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-lui.bin
+
+build firmware/Outputs/rv32ui-p-lw.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-lw
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-lw.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-lw.bin
+
+build firmware/Outputs/rv32ui-p-or.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-or
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-or.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-or.bin
+
+build firmware/Outputs/rv32ui-p-ori.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-ori
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-ori.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-ori.bin
+
+build firmware/Outputs/rv32ui-p-sb.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-sb
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-sb.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-sb.bin
+
+build firmware/Outputs/rv32ui-p-sh.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-sh
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-sh.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-sh.bin
+
+build firmware/Outputs/rv32ui-p-simple.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-simple
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-simple.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-simple.bin
+
+build firmware/Outputs/rv32ui-p-sll.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-sll
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-sll.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-sll.bin
+
+build firmware/Outputs/rv32ui-p-slli.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-slli
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-slli.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-slli.bin
+
+build firmware/Outputs/rv32ui-p-slt.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-slt
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-slt.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-slt.bin
+
+build firmware/Outputs/rv32ui-p-slti.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-slti
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-slti.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-slti.bin
+
+build firmware/Outputs/rv32ui-p-sltiu.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-sltiu
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-sltiu.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-sltiu.bin
+
+build firmware/Outputs/rv32ui-p-sltu.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-sltu
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-sltu.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-sltu.bin
+
+build firmware/Outputs/rv32ui-p-sra.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-sra
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-sra.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-sra.bin
+
+build firmware/Outputs/rv32ui-p-srai.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-srai
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-srai.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-srai.bin
+
+build firmware/Outputs/rv32ui-p-srl.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-srl
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-srl.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-srl.bin
+
+build firmware/Outputs/rv32ui-p-srli.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-srli
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-srli.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-srli.bin
+
+build firmware/Outputs/rv32ui-p-sub.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-sub
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-sub.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-sub.bin
+
+build firmware/Outputs/rv32ui-p-sw.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-sw
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-sw.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-sw.bin
+
+build firmware/Outputs/rv32ui-p-xor.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-xor
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-xor.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-xor.bin
+
+build firmware/Outputs/rv32ui-p-xori.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-p-xori
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-p-xori.txt: BinaryToText $
+    firmware/Outputs/rv32ui-p-xori.bin
+
+build firmware/Outputs/rv32ui-v-add.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-add
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-add.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-add.bin
+
+build firmware/Outputs/rv32ui-v-addi.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-addi
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-addi.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-addi.bin
+
+build firmware/Outputs/rv32ui-v-and.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-and
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-and.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-and.bin
+
+build firmware/Outputs/rv32ui-v-andi.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-andi
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-andi.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-andi.bin
+
+build firmware/Outputs/rv32ui-v-auipc.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-auipc
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-auipc.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-auipc.bin
+
+build firmware/Outputs/rv32ui-v-beq.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-beq
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-beq.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-beq.bin
+
+build firmware/Outputs/rv32ui-v-bge.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-bge
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-bge.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-bge.bin
+
+build firmware/Outputs/rv32ui-v-bgeu.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-bgeu
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-bgeu.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-bgeu.bin
+
+build firmware/Outputs/rv32ui-v-blt.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-blt
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-blt.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-blt.bin
+
+build firmware/Outputs/rv32ui-v-bltu.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-bltu
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-bltu.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-bltu.bin
+
+build firmware/Outputs/rv32ui-v-bne.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-bne
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-bne.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-bne.bin
+
+build firmware/Outputs/rv32ui-v-fence_i.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-fence_i
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-fence_i.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-fence_i.bin
+
+build firmware/Outputs/rv32ui-v-jal.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-jal
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-jal.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-jal.bin
+
+build firmware/Outputs/rv32ui-v-jalr.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-jalr
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-jalr.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-jalr.bin
+
+build firmware/Outputs/rv32ui-v-lh.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-lh
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-lh.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-lh.bin
+
+build firmware/Outputs/rv32ui-v-lhu.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-lhu
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-lhu.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-lhu.bin
+
+build firmware/Outputs/rv32ui-v-lui.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-lui
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-lui.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-lui.bin
+
+build firmware/Outputs/rv32ui-v-lw.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-lw
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-lw.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-lw.bin
+
+build firmware/Outputs/rv32ui-v-or.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-or
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-or.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-or.bin
+
+build firmware/Outputs/rv32ui-v-ori.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-ori
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-ori.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-ori.bin
+
+build firmware/Outputs/rv32ui-v-sh.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-sh
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-sh.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-sh.bin
+
+build firmware/Outputs/rv32ui-v-simple.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-simple
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-simple.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-simple.bin
+
+build firmware/Outputs/rv32ui-v-sll.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-sll
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-sll.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-sll.bin
+
+build firmware/Outputs/rv32ui-v-slli.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-slli
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-slli.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-slli.bin
+
+build firmware/Outputs/rv32ui-v-slt.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-slt
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-slt.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-slt.bin
+
+build firmware/Outputs/rv32ui-v-slti.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-slti
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-slti.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-slti.bin
+
+build firmware/Outputs/rv32ui-v-sltiu.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-sltiu
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-sltiu.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-sltiu.bin
+
+build firmware/Outputs/rv32ui-v-sltu.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-sltu
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-sltu.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-sltu.bin
+
+build firmware/Outputs/rv32ui-v-sra.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-sra
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-sra.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-sra.bin
+
+build firmware/Outputs/rv32ui-v-srai.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-srai
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-srai.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-srai.bin
+
+build firmware/Outputs/rv32ui-v-srl.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-srl
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-srl.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-srl.bin
+
+build firmware/Outputs/rv32ui-v-srli.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-srli
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-srli.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-srli.bin
+
+build firmware/Outputs/rv32ui-v-sub.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-sub
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-sub.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-sub.bin
+
+build firmware/Outputs/rv32ui-v-sw.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-sw
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-sw.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-sw.bin
+
+build firmware/Outputs/rv32ui-v-xor.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-xor
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-xor.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-xor.bin
+
+build firmware/Outputs/rv32ui-v-xori.bin: objcopy $
+    ../riscv-tests/build/isa/rv32ui-v-xori
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32ui-v-xori.txt: BinaryToText $
+    firmware/Outputs/rv32ui-v-xori.bin
+
+build firmware/Outputs/rv32um-p-div.bin: objcopy $
+    ../riscv-tests/build/isa/rv32um-p-div
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32um-p-div.txt: BinaryToText $
+    firmware/Outputs/rv32um-p-div.bin
+
+build firmware/Outputs/rv32um-p-divu.bin: objcopy $
+    ../riscv-tests/build/isa/rv32um-p-divu
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32um-p-divu.txt: BinaryToText $
+    firmware/Outputs/rv32um-p-divu.bin
+
+build firmware/Outputs/rv32um-p-mul.bin: objcopy $
+    ../riscv-tests/build/isa/rv32um-p-mul
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32um-p-mul.txt: BinaryToText $
+    firmware/Outputs/rv32um-p-mul.bin
+
+build firmware/Outputs/rv32um-p-mulh.bin: objcopy $
+    ../riscv-tests/build/isa/rv32um-p-mulh
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32um-p-mulh.txt: BinaryToText $
+    firmware/Outputs/rv32um-p-mulh.bin
+
+build firmware/Outputs/rv32um-p-mulhsu.bin: objcopy $
+    ../riscv-tests/build/isa/rv32um-p-mulhsu
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32um-p-mulhsu.txt: BinaryToText $
+    firmware/Outputs/rv32um-p-mulhsu.bin
+
+build firmware/Outputs/rv32um-p-mulhu.bin: objcopy $
+    ../riscv-tests/build/isa/rv32um-p-mulhu
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32um-p-mulhu.txt: BinaryToText $
+    firmware/Outputs/rv32um-p-mulhu.bin
+
+build firmware/Outputs/rv32um-p-rem.bin: objcopy $
+    ../riscv-tests/build/isa/rv32um-p-rem
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32um-p-rem.txt: BinaryToText $
+    firmware/Outputs/rv32um-p-rem.bin
+
+build firmware/Outputs/rv32um-p-remu.bin: objcopy $
+    ../riscv-tests/build/isa/rv32um-p-remu
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32um-p-remu.txt: BinaryToText $
+    firmware/Outputs/rv32um-p-remu.bin
+
+build firmware/Outputs/rv32um-v-div.bin: objcopy $
+    ../riscv-tests/build/isa/rv32um-v-div
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32um-v-div.txt: BinaryToText $
+    firmware/Outputs/rv32um-v-div.bin
+
+build firmware/Outputs/rv32um-v-divu.bin: objcopy $
+    ../riscv-tests/build/isa/rv32um-v-divu
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32um-v-divu.txt: BinaryToText $
+    firmware/Outputs/rv32um-v-divu.bin
+
+build firmware/Outputs/rv32um-v-mul.bin: objcopy $
+    ../riscv-tests/build/isa/rv32um-v-mul
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32um-v-mul.txt: BinaryToText $
+    firmware/Outputs/rv32um-v-mul.bin
+
+build firmware/Outputs/rv32um-v-mulh.bin: objcopy $
+    ../riscv-tests/build/isa/rv32um-v-mulh
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32um-v-mulh.txt: BinaryToText $
+    firmware/Outputs/rv32um-v-mulh.bin
+
+build firmware/Outputs/rv32um-v-mulhsu.bin: objcopy $
+    ../riscv-tests/build/isa/rv32um-v-mulhsu
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32um-v-mulhsu.txt: BinaryToText $
+    firmware/Outputs/rv32um-v-mulhsu.bin
+
+build firmware/Outputs/rv32um-v-mulhu.bin: objcopy $
+    ../riscv-tests/build/isa/rv32um-v-mulhu
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32um-v-mulhu.txt: BinaryToText $
+    firmware/Outputs/rv32um-v-mulhu.bin
+
+build firmware/Outputs/rv32um-v-rem.bin: objcopy $
+    ../riscv-tests/build/isa/rv32um-v-rem
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32um-v-rem.txt: BinaryToText $
+    firmware/Outputs/rv32um-v-rem.bin
+
+build firmware/Outputs/rv32um-v-remu.bin: objcopy $
+    ../riscv-tests/build/isa/rv32um-v-remu
+    start = 0x80000000
+    end   = 0x80008000
+
+build firmware/Outputs/rv32um-v-remu.txt: BinaryToText $
+    firmware/Outputs/rv32um-v-remu.bin
