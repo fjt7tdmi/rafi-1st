@@ -1,4 +1,4 @@
-name: run-test
+name: run-emu-test
 
 on: [push]
 
