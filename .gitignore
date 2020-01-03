@@ -1,31 +1,50 @@
+*.bak
 *.bin
+*.cmake
 *.db
+*.dir
+*.filters
 *.o
 *.opendb
 *.out
+*.pof
 *.pyc
+*.qws
+*.sln
+*.user
+*.vcd
+*.vcxproj
 *.wlf
 
-*.vcd
-
-*.pof
-*.qws
-*.bak
-
-core
-core.*
-transcript
-.ninja_deps
-.ninja_log
-
-build/
-Linux/
+# Working directories
+build_Debug/
+build_Release/
+dtb/
 work/
 
+# CMake
+CMakeFiles/
+CMakeCache.txt
+
+# Editor
+.vscode/ipch/
+.vscode/settings.json
+.vscode/c_cpp_properties.json
+
+# Windows (MSVC)
+.vs/
+Debug/
+Release/
+Win32/
+ipch/
+x64/
+x86/
+
+# manually checked-out submodules
+third_party/rafi-prebuilt-binary
+
+# Python
 **/__pycache__/
-**/.vscode/
-**/Outputs/
-**/obj_dir/
 
 # for Quartus
 **/Quartus/**/*.txt

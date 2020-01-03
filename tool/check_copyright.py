@@ -16,33 +16,44 @@ import os
 import functools
 import operator
 
-Extensions = [".cpp", ".h", ".py", ".S", ".sv"]
+Directories = ["include", "src", "test", "script"]
+Extensions = [".cpp", ".h", ".py"]
 LinesToRead = 10
 KeyWords = ["Copyright", "Akifumi", "Fujita"]
 
-filesToCheck = []
-for root, dirs, files in os.walk(os.getcwd()):
-    for name in files:
-        path = os.path.join(root, name)
-        (_, ext) = os.path.splitext(path)
-        if ext in Extensions:
-            filesToCheck.append(path)
+def list_files_to_check(directory_path):
+    files_to_check = []
+    for root, dirs, files in os.walk(directory_path):
+        for name in files:
+            path = os.path.join(root, name)
+            (_, ext) = os.path.splitext(path)
+            if ext in Extensions:
+                files_to_check.append(path)
+    return files_to_check
 
-error = False
-
-for path in filesToCheck:
+def is_copyright_included(path):
     with open(path, "r", encoding='utf8') as f:
-        copyrightFound = False
+        included = False
         for i in range(LinesToRead):
             line = f.readline()
             if line is None:
                 break
             if functools.reduce(operator.and_, map(lambda keyword: keyword in line, KeyWords)):
-                copyrightFound = True
+                included = True
                 break
-        if not copyrightFound:
-            error = True
-            print(f"Copyright is not found in '{path}'.'")
-        
-if not error:
+        return included
+
+files = []
+for directory in Directories:
+    path = os.path.join(os.getcwd(), directory)
+    files.extend(list_files_to_check(path))
+
+error = 0
+
+for path in files:
+    if not is_copyright_included(path):
+        print(f"Copyright is not found in '{path}'.'")
+        error += 1
+
+if error == 0:
     print(f"No error.")
