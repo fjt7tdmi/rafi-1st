@@ -14,8 +14,7 @@ jobs:
     # Workaround for a bug of GitHub Actions
     #   - https://github.com/actions/virtual-environments/issues/83
     #   - https://github.com/actions/virtual-environments/issues/110
-    - name: install additional packages
-      run: >
-        sudo apt-get install -y verilator
+    - name: build verilator
+      run: ./script/build_verilator.sh
     - name: run verilator
       run: ./script/run_verilator.sh
