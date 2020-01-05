@@ -7,6 +7,8 @@ pushd `dirname $0`
 source ./common.sh.inc
 cd ..
 
+export VERILATOR_ROOT=`pwd`/third_party/verilator
+
 mkdir -p build_Release
 cd build_Release
 
