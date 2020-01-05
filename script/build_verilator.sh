@@ -10,7 +10,7 @@ cd ../third_party/verilator
 export VERILATOR_ROOT=`pwd`
 
 autoconf
-./configure
+./configure CFLAGS="-I/usr/include" CPPFLAGS="-I/usr/include"
 make -j${RAFI_NUM_CPU}
 exit_code="$?"
 
