@@ -11,7 +11,7 @@ export VERILATOR_ROOT=`pwd`
 
 autoconf
 ./configure
-make
+make -j${RAFI_NUM_CPU}
 exit_code="$?"
 
 popd
