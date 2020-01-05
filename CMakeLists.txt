@@ -12,13 +12,16 @@ if(MSVC)
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
 endif()
 
+# Boost
 find_package(Boost)
-
 if (NOT ${Boost_FOUND})
     message(FATAL_ERROR "Cannot find boost.")
 endif()
 
+# verilator
+find_package(verilator HINTS $ENV{VERILATOR_ROOT} ${VERILATOR_ROOT})
 
+# GoogleTest
 set(GoogleTest_INCLUDE_DIRS "third_party/googletest/googletest/include")
 if (MSVC)
     set(Socket_LIBRARIES "ws2_32")
@@ -412,3 +415,13 @@ target_link_libraries(rafi-diff librafi_trace librafi_common ${Boost_LIBRARIES} 
 target_link_libraries(rafi-dump librafi_trace librafi_common ${Boost_LIBRARIES} ${FS_LIBRARIES})
 target_link_libraries(rafi-emu librafi_trace librafi_fp librafi_common ${Boost_LIBRARIES} ${FS_LIBRARIES} ${Socket_LIBRARIES})
 target_link_libraries(rafi-unit-test librafi_trace librafi_common ${GoogleTest_LIBRARIES})
+
+if (verilator_FOUND)
+    add_executable(rafi-verilator-test
+        src/hw/module/Timer/test/test_Timer.cpp
+    )
+    verilate(rafi-verilator-test
+        SOURCES src/hw/module/Timer/Timer.sv)
+else()
+  message(WARNING "Verilator was not found. Skip building SystemVerilog codes")
+endif()

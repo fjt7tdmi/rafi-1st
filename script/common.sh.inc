@@ -13,4 +13,4 @@ if [[ "$(uname)" =~ Darwin ]]; then
     export CXX=/usr/local/bin/g++-8
 fi
 
-export RAFI_NUM_CPU=`grep physical.id /proc/cpuinfo | sort -u | wc -l`
+export RAFI_NUM_CPU=`grep processor /proc/cpuinfo | wc -l`

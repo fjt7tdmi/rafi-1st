@@ -17,7 +17,7 @@
 #include <memory>
 #include <cstdio>
 
-#include "../../../work/verilator/test_Timer/VTimer.h"
+#include "VTimer.h"
 
 int main()
 {
