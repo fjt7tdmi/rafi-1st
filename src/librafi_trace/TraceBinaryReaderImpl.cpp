@@ -27,7 +27,11 @@
 
 #include "TraceBinaryReaderImpl.h"
 
+#if defined(__GNUC__)
 namespace fs = std::experimental::filesystem;
+#else
+namespace fs = std::filesystem;
+#endif
 
 namespace rafi { namespace trace {
 
