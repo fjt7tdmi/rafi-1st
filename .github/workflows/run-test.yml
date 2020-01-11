@@ -32,4 +32,4 @@ jobs:
     - name: run_linux
       run: ./script/run_linux.sh
     - name: run_verilator_test
-      run: ./script/run_verilator_test.sh
+      run: ./script/run_verilator_test.sh Release
