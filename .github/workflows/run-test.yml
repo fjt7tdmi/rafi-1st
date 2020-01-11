@@ -1,4 +1,4 @@
-name: run-emu-test
+name: run-test
 
 on: [push]
 
@@ -11,6 +11,8 @@ jobs:
         submodules: true
     - name: checkout prebuilt binary
       run: ./script/checkout_prebuilt_binary_for_ci.sh ${{ secrets.RAFI_PREBUILT_BINARY_USER }} ${{ secrets.RAFI_PREBUILT_BINARY_ACCESS_TOKEN }}
+    - name: check revision
+      run: (cd third_party/rafi-prebuilt-binary; git log -1)
     # Workaround for a bug of GitHub Actions
     #   - https://github.com/actions/virtual-environments/issues/83
     #   - https://github.com/actions/virtual-environments/issues/110
@@ -29,3 +31,5 @@ jobs:
       run: ./script/run_riscv_tests.sh
     - name: run_linux
       run: ./script/run_linux.sh
+    - name: run_verilator_test
+      run: ./script/run_verilator_test.sh Release

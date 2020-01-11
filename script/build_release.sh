@@ -7,7 +7,11 @@ pushd `dirname $0`
 source ./common.sh.inc
 cd ..
 
-export VERILATOR_ROOT=`pwd`/third_party/verilator
+if [[ -v RAFI_WIN ]]; then
+    export VERILATOR_ROOT=`pwd`/third_party/verilator
+else
+    export VERILATOR_ROOT=`pwd`/third_party/rafi-prebuilt-binary/verilator/Linux-x86_64
+fi
 
 mkdir -p build_Release
 cd build_Release
