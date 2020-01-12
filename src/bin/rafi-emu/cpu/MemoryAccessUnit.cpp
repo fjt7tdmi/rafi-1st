@@ -29,7 +29,7 @@ MemoryAccessUnit::MemoryAccessUnit(XLEN xlen)
     m_Events.clear();
 }
 
-void MemoryAccessUnit::Initialize(bus::Bus* pBus, Csr* pCsr)
+void MemoryAccessUnit::Initialize(Bus* pBus, Csr* pCsr)
 {
     m_pBus = pBus;
     m_pCsr = pCsr;

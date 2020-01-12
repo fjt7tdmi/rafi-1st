@@ -23,7 +23,7 @@
 
 #include "Rom.h"
 
-namespace rafi { namespace emu { namespace mem {
+namespace rafi { namespace emu {
 
 Rom::Rom()
 {
@@ -71,4 +71,4 @@ void Rom::Write(const void* pBuffer, size_t size, uint64_t address)
     RAFI_EMU_ERROR("Rom does not support write operation.\n");
 }
 
-}}}
+}}

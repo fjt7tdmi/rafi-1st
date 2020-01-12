@@ -24,7 +24,7 @@ using namespace rvtrace;
 
 namespace rafi { namespace v1 {
 
-Processor::Processor(VCore* pCore, emu::bus::Bus* pBus)
+Processor::Processor(VCore* pCore, emu::Bus* pBus)
     : m_pCore(pCore)
     , m_pBus(pBus)
 {

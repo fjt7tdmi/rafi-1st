@@ -24,11 +24,11 @@
 #include "../io/IIo.h"
 #include "../mem/IMemory.h"
 
-namespace rafi { namespace emu { namespace bus {
+namespace rafi { namespace emu {
 
 struct MemoryInfo
 {
-    mem::IMemory* pMemory;
+    IMemory* pMemory;
     paddr_t address;
     size_t size;
 };
@@ -42,7 +42,7 @@ struct IoInfo
 
 struct MemoryLocation
 {
-    mem::IMemory* pMemory;
+    IMemory* pMemory;
     int offset;
 };
 
@@ -68,7 +68,7 @@ public:
     void WriteUInt32(paddr_t address, uint32_t value);
     void WriteUInt64(paddr_t address, uint64_t value);
 
-    void RegisterMemory(mem::IMemory* pMemory, paddr_t address, size_t size);
+    void RegisterMemory(IMemory* pMemory, paddr_t address, size_t size);
     void RegisterIo(io::IIo* pIo, paddr_t address, size_t size);
 
     bool IsValidAddress(paddr_t address, size_t accessSize) const;
@@ -83,4 +83,4 @@ private:
     std::vector<IoInfo> m_IoList;
 };
 
-}}}
+}}

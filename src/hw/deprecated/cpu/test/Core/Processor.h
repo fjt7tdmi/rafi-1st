@@ -48,7 +48,7 @@ private:
     emu::IInterruptSource* m_pTimerInterruptSource;
 
     VCore* m_pCore;
-    emu::bus::Bus* m_pBus;
+    emu::Bus* m_pBus;
 };
 
 }}

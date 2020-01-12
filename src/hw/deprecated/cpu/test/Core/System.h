@@ -47,9 +47,9 @@ public:
     void CopyRam(void* buffer, size_t size) const;
 
 private:
-    emu::bus::Bus m_Bus;
-    emu::mem::Ram m_Ram;
-    emu::mem::Rom m_Rom;
+    emu::Bus m_Bus;
+    emu::Ram m_Ram;
+    emu::Rom m_Rom;
     emu::uart::Uart m_Uart;
     emu::timer::Timer m_Timer;
 

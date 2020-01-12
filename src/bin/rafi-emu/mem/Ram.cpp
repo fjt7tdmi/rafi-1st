@@ -23,7 +23,7 @@
 
 #include "Ram.h"
 
-namespace rafi { namespace emu { namespace mem {
+namespace rafi { namespace emu {
 
 Ram::Ram(size_t capacity)
     : m_Capacity(capacity)
@@ -77,4 +77,4 @@ void Ram::Write(const void* pBuffer, size_t size, uint64_t address)
     std::memcpy(&m_pBody[address], pBuffer, size);
 }
 
-}}}
+}}

@@ -18,7 +18,7 @@
 
 #include <cstdint>
 
-namespace rafi { namespace emu { namespace mem {
+namespace rafi { namespace emu {
 
 class IMemory
 {
@@ -31,4 +31,4 @@ public:
     virtual void Write(const void* pBuffer, size_t size, uint64_t address) = 0;
 };
 
-}}}
+}}

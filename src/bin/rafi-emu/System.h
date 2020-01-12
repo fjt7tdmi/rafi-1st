@@ -95,9 +95,9 @@ private:
     static const paddr_t AddrUart   = 0x40002000;
     static const paddr_t AddrTimer  = 0x40000000;
 
-    bus::Bus m_Bus;
-    mem::Ram m_Ram;
-    mem::Rom m_Rom;
+    Bus m_Bus;
+    Ram m_Ram;
+    Rom m_Rom;
 
     // E31 compatible IOs
     io::Clint m_Clint;

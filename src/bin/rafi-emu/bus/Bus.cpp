@@ -19,7 +19,7 @@
 
 #include "Bus.h"
 
-namespace rafi { namespace emu { namespace bus {
+namespace rafi { namespace emu {
 
 void Bus::Read(void* pOutBuffer, size_t size, paddr_t address)
 {
@@ -109,7 +109,7 @@ void Bus::WriteUInt64(paddr_t address, uint64_t value)
     Write(&value, sizeof(value), address);
 }
 
-void Bus::RegisterMemory(mem::IMemory* pMemory, paddr_t address, size_t size)
+void Bus::RegisterMemory(IMemory* pMemory, paddr_t address, size_t size)
 {
     MemoryInfo info { pMemory, address, size };
     m_MemoryList.push_back(info);
@@ -194,4 +194,4 @@ IoLocation Bus::ConvertToIoLocation(paddr_t address) const
     RAFI_EMU_ERROR("Invalid addresss: 0x%016" PRIx64 "\n", address);
 }
 
-}}}
+}}
