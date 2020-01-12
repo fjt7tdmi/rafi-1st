@@ -325,8 +325,8 @@ add_executable(rafi-check-io
 include_directories(rafi-check-io include)
 
 target_link_libraries(rafi-check-io
-    librafi_common
     librafi_trace
+    librafi_common
     ${Boost_LIBRARIES}
     ${FS_LIBRARIES}
 )
@@ -343,8 +343,8 @@ add_executable(rafi-conv
 include_directories(rafi-conv include)
 
 target_link_libraries(rafi-conv
-    librafi_common
     librafi_trace
+    librafi_common
     ${Boost_LIBRARIES}
     ${FS_LIBRARIES}
 )
@@ -365,8 +365,8 @@ add_executable(rafi-diff
 include_directories(rafi-diff include)
 
 target_link_libraries(rafi-diff
-    librafi_common
     librafi_trace
+    librafi_common
     ${Boost_LIBRARIES}
     ${FS_LIBRARIES}
 )
@@ -387,8 +387,8 @@ add_executable(rafi-dump
 include_directories(rafi-dump include)
 
 target_link_libraries(rafi-dump
-    librafi_common
     librafi_trace
+    librafi_common
     ${Boost_LIBRARIES}
     ${FS_LIBRARIES}
 )
@@ -461,10 +461,10 @@ add_executable(rafi-emu
 include_directories(rafi-emu include src/bin/rafi-emu/include)
 
 target_link_libraries(rafi-emu
-    librafi_common
+    librafi_emu
     librafi_fp
     librafi_trace
-    librafi_emu
+    librafi_common
     ${Boost_LIBRARIES}
     ${FS_LIBRARIES}
     ${Socket_LIBRARIES}
@@ -494,8 +494,8 @@ add_executable(rafi-emu-test
 include_directories(rafi-emu-test include)
 
 target_link_libraries(rafi-emu-test
-    librafi_common
     librafi_trace
+    librafi_common
     ${GoogleTest_LIBRARIES}
 )
 
