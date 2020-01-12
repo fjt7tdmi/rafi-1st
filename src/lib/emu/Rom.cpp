@@ -15,6 +15,7 @@
  */
 
 #include <cassert>
+#include <cstring>
 #include <cstdint>
 #include <fstream>
 
