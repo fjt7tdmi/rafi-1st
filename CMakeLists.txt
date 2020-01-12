@@ -419,11 +419,17 @@ target_link_libraries(rafi-emu librafi_trace librafi_fp librafi_common ${Boost_L
 target_link_libraries(rafi-emu-test librafi_trace librafi_common ${GoogleTest_LIBRARIES})
 
 if (verilator_FOUND)
-    add_executable(rafi-verilator-test
-        src/hw/module/Timer/test/test_Timer.cpp
+    # =========================================================================
+    # rafi-vtest-timer
+    #
+    add_executable(rafi-vtest-timer
+        src/hw/timer/TimerTest.cpp
     )
-    verilate(rafi-verilator-test
-        SOURCES src/hw/module/Timer/Timer.sv)
+    verilate(rafi-vtest-timer
+        SOURCES src/hw/timer/Timer.sv
+    )
+    target_link_libraries(rafi-vtest-timer
+        PRIVATE ${GoogleTest_LIBRARIES})
 else()
   message(WARNING "Verilator was not found. Skip building SystemVerilog codes")
 endif()

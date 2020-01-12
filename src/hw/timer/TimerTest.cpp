@@ -17,9 +17,14 @@
 #include <memory>
 #include <cstdio>
 
+#pragma warning(push)
+#pragma warning(disable : 4389)
+#include <gtest/gtest.h>
+#pragma warning(pop)
+
 #include "VTimer.h"
 
-int main()
+TEST(TimerTest, Basic)
 {
     auto top = std::make_unique<VTimer>();
 
@@ -45,7 +50,7 @@ int main()
         top->eval();
 
         int value = top->readData;
-        printf("value: %d\n", value);
+        ASSERT_EQ(i + 1, value);
 
         top->clk = 0;
         top->eval();
