@@ -71,7 +71,7 @@ apt-get install \
 
 ## Run unit test of emulator
 ```
-./script/run_unit_test.sh
+./script/run_emu_test.sh
 ```
 
 ## How to run riscv-tests and linux on emulator

@@ -13,9 +13,9 @@ source script/common.sh.inc
 
 
 if [[ "$(uname)" =~ ^MINGW ]]; then
-    ./build_${build_type}/${build_type}/rafi-unit-test
+    ./build_${build_type}/${build_type}/rafi-emu-test
 else
-    ./build_${build_type}/rafi-unit-test
+    ./build_${build_type}/rafi-emu-test
 fi
 
 exit_code=$?

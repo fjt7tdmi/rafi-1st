@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.8)
 
+project(Rafi)
+
 enable_language(CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -41,7 +43,7 @@ else()
     set(GoogleTest_LIBRARY_DIRS "third_party/googletest/build/lib")
 endif()
 
-set(Softfloat_INCLUDE_DIRS third_party/berkeley-softfloat-3/source/include third_party/berkeley-softfloat-3/source/RISCV src/librafi_fp/include)
+set(Softfloat_INCLUDE_DIRS third_party/berkeley-softfloat-3/source/include third_party/berkeley-softfloat-3/source/RISCV src/lib/fp/include)
 
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${GoogleTest_INCLUDE_DIRS})
@@ -61,11 +63,11 @@ add_library(librafi_common
     include/rafi/common/RvPageTable.h
     include/rafi/common/RvTypes.h
     include/rafi/common/Util.h
-    src/librafi_common/Decoder.cpp
-    src/librafi_common/DecoderImpl.cpp
-    src/librafi_common/DecoderImpl.h
-    src/librafi_common/OpApi.cpp
-    src/librafi_common/RvApi.cpp
+    src/lib/common/Decoder.cpp
+    src/lib/common/DecoderImpl.cpp
+    src/lib/common/DecoderImpl.h
+    src/lib/common/OpApi.cpp
+    src/lib/common/RvApi.cpp
 )
 
 add_library(librafi_fp
@@ -74,9 +76,9 @@ add_library(librafi_fp
     include/rafi/common/BitField.h
     include/rafi/fp/FpApi.h
     include/rafi/fp/ScopedFpRound.h
-    src/librafi_fp/include/platform.h
-    src/librafi_fp/FpApi.cpp
-    src/librafi_fp/ScopedFpRound.cpp
+    src/lib/fp/include/platform.h
+    src/lib/fp/FpApi.cpp
+    src/lib/fp/ScopedFpRound.cpp
 
     # berkeley-softfloat-3 include
     third_party/berkeley-softfloat-3/source/include/internals.h
@@ -233,78 +235,78 @@ add_library(librafi_trace
     include/rafi/trace/TracePcPrinter.h
     include/rafi/trace/TraceTextPrinter.h
     include/rafi/trace/TraceTextReader.h
-    src/librafi_trace/BinaryCycle.cpp
-    src/librafi_trace/BinaryCycle.h
-    src/librafi_trace/BinaryCycleLogger.cpp
-    src/librafi_trace/BinaryCycleLoggerImpl.cpp
-    src/librafi_trace/BinaryCycleLoggerImpl.h
-    src/librafi_trace/GdbCycle.cpp
-    src/librafi_trace/GdbCycle.h
-    src/librafi_trace/GdbTrace.cpp
-    src/librafi_trace/GdbTrace.h
-    src/librafi_trace/GdbTraceReader.cpp
-    src/librafi_trace/TextCycle.cpp
-    src/librafi_trace/TextCycle.h
-    src/librafi_trace/TextTrace.cpp
-    src/librafi_trace/TextTrace.h
-    src/librafi_trace/TraceBinaryMemoryReader.cpp
-    src/librafi_trace/TraceBinaryMemoryReaderImpl.cpp
-    src/librafi_trace/TraceBinaryMemoryReaderImpl.h
-    src/librafi_trace/TraceBinaryMemoryWriter.cpp
-    src/librafi_trace/TraceBinaryMemoryWriterImpl.cpp
-    src/librafi_trace/TraceBinaryMemoryWriterImpl.h
-    src/librafi_trace/TraceBinaryReader.cpp
-    src/librafi_trace/TraceBinaryReaderImpl.cpp
-    src/librafi_trace/TraceBinaryReaderImpl.h
-    src/librafi_trace/TraceBinaryWriter.cpp
-    src/librafi_trace/TraceBinaryWriterImpl.cpp
-    src/librafi_trace/TraceBinaryWriterImpl.h
-    src/librafi_trace/TraceIndexReader.cpp
-    src/librafi_trace/TraceIndexReaderImpl.cpp
-    src/librafi_trace/TraceIndexReaderImpl.h
-    src/librafi_trace/TraceIndexWriter.cpp
-    src/librafi_trace/TraceIndexWriterImpl.cpp
-    src/librafi_trace/TraceIndexWriterImpl.h
-    src/librafi_trace/TraceJsonPrinter.cpp
-    src/librafi_trace/TraceJsonPrinterImpl.cpp
-    src/librafi_trace/TraceJsonPrinterImpl.h
-    src/librafi_trace/TracePcPrinter.cpp
-    src/librafi_trace/TraceTextPrinter.cpp
-    src/librafi_trace/TraceTextPrinterImpl.cpp
-    src/librafi_trace/TraceTextPrinterImpl.h
-    src/librafi_trace/TraceTextReader.cpp
+    src/lib/trace/BinaryCycle.cpp
+    src/lib/trace/BinaryCycle.h
+    src/lib/trace/BinaryCycleLogger.cpp
+    src/lib/trace/BinaryCycleLoggerImpl.cpp
+    src/lib/trace/BinaryCycleLoggerImpl.h
+    src/lib/trace/GdbCycle.cpp
+    src/lib/trace/GdbCycle.h
+    src/lib/trace/GdbTrace.cpp
+    src/lib/trace/GdbTrace.h
+    src/lib/trace/GdbTraceReader.cpp
+    src/lib/trace/TextCycle.cpp
+    src/lib/trace/TextCycle.h
+    src/lib/trace/TextTrace.cpp
+    src/lib/trace/TextTrace.h
+    src/lib/trace/TraceBinaryMemoryReader.cpp
+    src/lib/trace/TraceBinaryMemoryReaderImpl.cpp
+    src/lib/trace/TraceBinaryMemoryReaderImpl.h
+    src/lib/trace/TraceBinaryMemoryWriter.cpp
+    src/lib/trace/TraceBinaryMemoryWriterImpl.cpp
+    src/lib/trace/TraceBinaryMemoryWriterImpl.h
+    src/lib/trace/TraceBinaryReader.cpp
+    src/lib/trace/TraceBinaryReaderImpl.cpp
+    src/lib/trace/TraceBinaryReaderImpl.h
+    src/lib/trace/TraceBinaryWriter.cpp
+    src/lib/trace/TraceBinaryWriterImpl.cpp
+    src/lib/trace/TraceBinaryWriterImpl.h
+    src/lib/trace/TraceIndexReader.cpp
+    src/lib/trace/TraceIndexReaderImpl.cpp
+    src/lib/trace/TraceIndexReaderImpl.h
+    src/lib/trace/TraceIndexWriter.cpp
+    src/lib/trace/TraceIndexWriterImpl.cpp
+    src/lib/trace/TraceIndexWriterImpl.h
+    src/lib/trace/TraceJsonPrinter.cpp
+    src/lib/trace/TraceJsonPrinterImpl.cpp
+    src/lib/trace/TraceJsonPrinterImpl.h
+    src/lib/trace/TracePcPrinter.cpp
+    src/lib/trace/TraceTextPrinter.cpp
+    src/lib/trace/TraceTextPrinterImpl.cpp
+    src/lib/trace/TraceTextPrinterImpl.h
+    src/lib/trace/TraceTextReader.cpp
 )
 
 add_executable(rafi-check-io
-    src/rafi-check-io/Main.cpp
-    src/util/TraceUtil.cpp
-    src/util/TraceUtil.h
+    src/bin/rafi-check-io/Main.cpp
+    src/bin/util/TraceUtil.cpp
+    src/bin/util/TraceUtil.h
 )
 
 add_executable(rafi-conv
-    src/rafi-conv/Main.cpp
-    src/util/TraceUtil.cpp
-    src/util/TraceUtil.h
+    src/bin/rafi-conv/Main.cpp
+    src/bin/util/TraceUtil.cpp
+    src/bin/util/TraceUtil.h
 )
 
 add_executable(rafi-diff
-    src/rafi-diff/Main.cpp
-    src/rafi-diff/CommandLineOption.cpp
-    src/rafi-diff/CommandLineOption.h
-    src/rafi-diff/CycleComparator.cpp
-    src/rafi-diff/CycleComparator.h
-    src/util/TraceUtil.cpp
-    src/util/TraceUtil.h
+    src/bin/rafi-diff/Main.cpp
+    src/bin/rafi-diff/CommandLineOption.cpp
+    src/bin/rafi-diff/CommandLineOption.h
+    src/bin/rafi-diff/CycleComparator.cpp
+    src/bin/rafi-diff/CycleComparator.h
+    src/bin/util/TraceUtil.cpp
+    src/bin/util/TraceUtil.h
 )
 
 add_executable(rafi-dump
-    src/rafi-dump/CommandLineOption.cpp
-    src/rafi-dump/CommandLineOption.h
-    src/rafi-dump/CycleFilter.cpp
-    src/rafi-dump/CycleFilter.h
-    src/rafi-dump/Main.cpp
-    src/util/TraceUtil.cpp
-    src/util/TraceUtil.h
+    src/bin/rafi-dump/CommandLineOption.cpp
+    src/bin/rafi-dump/CommandLineOption.h
+    src/bin/rafi-dump/CycleFilter.cpp
+    src/bin/rafi-dump/CycleFilter.h
+    src/bin/rafi-dump/Main.cpp
+    src/bin/util/TraceUtil.cpp
+    src/bin/util/TraceUtil.h
 )
 
 add_executable(rafi-emu
@@ -314,91 +316,91 @@ add_executable(rafi-emu
     include/rafi/emu/Exception.h
     include/rafi/emu/IInterruptSource.h
     include/rafi/emu/Macro.h
-    src/rafi-emu/cpu/AtomicManager.cpp
-    src/rafi-emu/cpu/AtomicManager.h
-    src/rafi-emu/bus/Bus.cpp
-    src/rafi-emu/bus/Bus.h
-    src/rafi-emu/cpu/Csr.cpp
-    src/rafi-emu/cpu/Csr.h
-    src/rafi-emu/cpu/Executor.cpp
-    src/rafi-emu/cpu/Executor.h
-    src/rafi-emu/cpu/FpRegFile.cpp
-    src/rafi-emu/cpu/FpRegFile.h
-    src/rafi-emu/cpu/InterruptController.cpp
-    src/rafi-emu/cpu/InterruptController.h
-    src/rafi-emu/cpu/IntRegFile.cpp
-    src/rafi-emu/cpu/IntRegFile.h
-    src/rafi-emu/cpu/MemoryAccessUnit.cpp
-    src/rafi-emu/cpu/MemoryAccessUnit.h
-    src/rafi-emu/cpu/Processor.cpp
-    src/rafi-emu/cpu/Processor.h
-    src/rafi-emu/cpu/Trap.cpp
-    src/rafi-emu/cpu/Trap.h
-    src/rafi-emu/cpu/TrapProcessor.cpp
-    src/rafi-emu/cpu/TrapProcessor.h
-    src/rafi-emu/gdb/GdbCommandFactory.cpp
-    src/rafi-emu/gdb/GdbCommandFactory.h
-    src/rafi-emu/gdb/GdbCommands.cpp
-    src/rafi-emu/gdb/GdbCommands.h
-    src/rafi-emu/gdb/GdbData.cpp
-    src/rafi-emu/gdb/GdbData.h
-    src/rafi-emu/gdb/GdbException.h
-    src/rafi-emu/gdb/GdbTypes.h
-    src/rafi-emu/gdb/GdbServer.cpp
-    src/rafi-emu/gdb/GdbServer.h
-    src/rafi-emu/gdb/GdbUtil.cpp
-    src/rafi-emu/gdb/GdbUtil.h
-    src/rafi-emu/io/Clint.cpp
-    src/rafi-emu/io/Clint.h
-    src/rafi-emu/io/IIo.h
-    src/rafi-emu/io/IoInterruptSource.cpp
-    src/rafi-emu/io/IoInterruptSource.h
-    src/rafi-emu/io/Plic.cpp
-    src/rafi-emu/io/Plic.h
-    src/rafi-emu/io/Uart.cpp
-    src/rafi-emu/io/Uart.h
-    src/rafi-emu/io/Uart16550.cpp
-    src/rafi-emu/io/Uart16550.h
-    src/rafi-emu/io/Timer.cpp
-    src/rafi-emu/io/Timer.h
-    src/rafi-emu/io/VirtIo.cpp
-    src/rafi-emu/io/VirtIo.h
-    src/rafi-emu/mem/IMemory.h
-    src/rafi-emu/mem/Ram.cpp
-    src/rafi-emu/mem/Ram.h
-    src/rafi-emu/mem/Rom.cpp
-    src/rafi-emu/mem/Rom.h
-    src/rafi-emu/CommandLineOption.cpp
-    src/rafi-emu/CommandLineOption.h
-    src/rafi-emu/Emulator.cpp
-    src/rafi-emu/Emulator.h
-    src/rafi-emu/IEmulator.h
-    src/rafi-emu/Main.cpp
-    src/rafi-emu/Socket.cpp
-    src/rafi-emu/Socket.h
-    src/rafi-emu/System.cpp
-    src/rafi-emu/System.h
-    src/rafi-emu/TraceLogger.cpp
-    src/rafi-emu/TraceLogger.h
-    src/rafi-emu/TraceLoggerConfig.h
+    src/bin/rafi-emu/cpu/AtomicManager.cpp
+    src/bin/rafi-emu/cpu/AtomicManager.h
+    src/bin/rafi-emu/bus/Bus.cpp
+    src/bin/rafi-emu/bus/Bus.h
+    src/bin/rafi-emu/cpu/Csr.cpp
+    src/bin/rafi-emu/cpu/Csr.h
+    src/bin/rafi-emu/cpu/Executor.cpp
+    src/bin/rafi-emu/cpu/Executor.h
+    src/bin/rafi-emu/cpu/FpRegFile.cpp
+    src/bin/rafi-emu/cpu/FpRegFile.h
+    src/bin/rafi-emu/cpu/InterruptController.cpp
+    src/bin/rafi-emu/cpu/InterruptController.h
+    src/bin/rafi-emu/cpu/IntRegFile.cpp
+    src/bin/rafi-emu/cpu/IntRegFile.h
+    src/bin/rafi-emu/cpu/MemoryAccessUnit.cpp
+    src/bin/rafi-emu/cpu/MemoryAccessUnit.h
+    src/bin/rafi-emu/cpu/Processor.cpp
+    src/bin/rafi-emu/cpu/Processor.h
+    src/bin/rafi-emu/cpu/Trap.cpp
+    src/bin/rafi-emu/cpu/Trap.h
+    src/bin/rafi-emu/cpu/TrapProcessor.cpp
+    src/bin/rafi-emu/cpu/TrapProcessor.h
+    src/bin/rafi-emu/gdb/GdbCommandFactory.cpp
+    src/bin/rafi-emu/gdb/GdbCommandFactory.h
+    src/bin/rafi-emu/gdb/GdbCommands.cpp
+    src/bin/rafi-emu/gdb/GdbCommands.h
+    src/bin/rafi-emu/gdb/GdbData.cpp
+    src/bin/rafi-emu/gdb/GdbData.h
+    src/bin/rafi-emu/gdb/GdbException.h
+    src/bin/rafi-emu/gdb/GdbTypes.h
+    src/bin/rafi-emu/gdb/GdbServer.cpp
+    src/bin/rafi-emu/gdb/GdbServer.h
+    src/bin/rafi-emu/gdb/GdbUtil.cpp
+    src/bin/rafi-emu/gdb/GdbUtil.h
+    src/bin/rafi-emu/io/Clint.cpp
+    src/bin/rafi-emu/io/Clint.h
+    src/bin/rafi-emu/io/IIo.h
+    src/bin/rafi-emu/io/IoInterruptSource.cpp
+    src/bin/rafi-emu/io/IoInterruptSource.h
+    src/bin/rafi-emu/io/Plic.cpp
+    src/bin/rafi-emu/io/Plic.h
+    src/bin/rafi-emu/io/Uart.cpp
+    src/bin/rafi-emu/io/Uart.h
+    src/bin/rafi-emu/io/Uart16550.cpp
+    src/bin/rafi-emu/io/Uart16550.h
+    src/bin/rafi-emu/io/Timer.cpp
+    src/bin/rafi-emu/io/Timer.h
+    src/bin/rafi-emu/io/VirtIo.cpp
+    src/bin/rafi-emu/io/VirtIo.h
+    src/bin/rafi-emu/mem/IMemory.h
+    src/bin/rafi-emu/mem/Ram.cpp
+    src/bin/rafi-emu/mem/Ram.h
+    src/bin/rafi-emu/mem/Rom.cpp
+    src/bin/rafi-emu/mem/Rom.h
+    src/bin/rafi-emu/CommandLineOption.cpp
+    src/bin/rafi-emu/CommandLineOption.h
+    src/bin/rafi-emu/Emulator.cpp
+    src/bin/rafi-emu/Emulator.h
+    src/bin/rafi-emu/IEmulator.h
+    src/bin/rafi-emu/Main.cpp
+    src/bin/rafi-emu/Socket.cpp
+    src/bin/rafi-emu/Socket.h
+    src/bin/rafi-emu/System.cpp
+    src/bin/rafi-emu/System.h
+    src/bin/rafi-emu/TraceLogger.cpp
+    src/bin/rafi-emu/TraceLogger.h
+    src/bin/rafi-emu/TraceLoggerConfig.h
 )
 
-add_executable(rafi-unit-test
-    src/rafi-emu/gdb/GdbCommandFactory.cpp
-    src/rafi-emu/gdb/GdbCommandFactory.h
-    src/rafi-emu/gdb/GdbCommands.cpp
-    src/rafi-emu/gdb/GdbCommands.h
-    src/rafi-emu/gdb/GdbData.cpp
-    src/rafi-emu/gdb/GdbData.h
-    src/rafi-emu/gdb/GdbException.h
-    src/rafi-emu/gdb/GdbTypes.h
-    src/rafi-emu/gdb/GdbUtil.cpp
-    src/rafi-emu/gdb/GdbUtil.h
-    src/rafi-unit-test/GdbTest.cpp
-    src/rafi-unit-test/OpGetStringTest.cpp
-    src/rafi-unit-test/StubEmulator.cpp
-    src/rafi-unit-test/StubEmulator.h
-    src/rafi-unit-test/TextTraceTest.cpp
+add_executable(rafi-emu-test
+    src/bin/rafi-emu/gdb/GdbCommandFactory.cpp
+    src/bin/rafi-emu/gdb/GdbCommandFactory.h
+    src/bin/rafi-emu/gdb/GdbCommands.cpp
+    src/bin/rafi-emu/gdb/GdbCommands.h
+    src/bin/rafi-emu/gdb/GdbData.cpp
+    src/bin/rafi-emu/gdb/GdbData.h
+    src/bin/rafi-emu/gdb/GdbException.h
+    src/bin/rafi-emu/gdb/GdbTypes.h
+    src/bin/rafi-emu/gdb/GdbUtil.cpp
+    src/bin/rafi-emu/gdb/GdbUtil.h
+    src/bin/rafi-emu-test/GdbTest.cpp
+    src/bin/rafi-emu-test/OpGetStringTest.cpp
+    src/bin/rafi-emu-test/StubEmulator.cpp
+    src/bin/rafi-emu-test/StubEmulator.h
+    src/bin/rafi-emu-test/TextTraceTest.cpp
 )
 
 include_directories(librafi_fp include ${Softfloat_INCLUDE_DIRS})
@@ -406,15 +408,15 @@ include_directories(rafi-check-io include)
 include_directories(rafi-conv include)
 include_directories(rafi-diff include)
 include_directories(rafi-dump include)
-include_directories(rafi-emu include src/rafi-emu/include)
-include_directories(rafi-unit-test include)
+include_directories(rafi-emu include src/bin/rafi-emu/include)
+include_directories(rafi-emu-test include)
 
 target_link_libraries(rafi-check-io librafi_trace librafi_common ${Boost_LIBRARIES} ${FS_LIBRARIES})
 target_link_libraries(rafi-conv librafi_trace librafi_common ${Boost_LIBRARIES} ${FS_LIBRARIES})
 target_link_libraries(rafi-diff librafi_trace librafi_common ${Boost_LIBRARIES} ${FS_LIBRARIES})
 target_link_libraries(rafi-dump librafi_trace librafi_common ${Boost_LIBRARIES} ${FS_LIBRARIES})
 target_link_libraries(rafi-emu librafi_trace librafi_fp librafi_common ${Boost_LIBRARIES} ${FS_LIBRARIES} ${Socket_LIBRARIES})
-target_link_libraries(rafi-unit-test librafi_trace librafi_common ${GoogleTest_LIBRARIES})
+target_link_libraries(rafi-emu-test librafi_trace librafi_common ${GoogleTest_LIBRARIES})
 
 if (verilator_FOUND)
     add_executable(rafi-verilator-test
