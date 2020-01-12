@@ -503,7 +503,7 @@ if (verilator_FOUND)
 
     # disable warnings for verilator
     if (MSVC)
-        target_compile_options(rafi-vtest-core
+        target_compile_options(rafi-vtest-timer
             PUBLIC /wd"4267"
         )
     endif()
