@@ -9,7 +9,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 if(MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /wd4267") # disable C4267 for verilator
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
 endif()
@@ -419,11 +419,94 @@ target_link_libraries(rafi-emu librafi_trace librafi_fp librafi_common ${Boost_L
 target_link_libraries(rafi-emu-test librafi_trace librafi_common ${GoogleTest_LIBRARIES})
 
 if (verilator_FOUND)
-    add_executable(rafi-verilator-test
-        src/hw/module/Timer/test/test_Timer.cpp
+    # =========================================================================
+    # rafi-vtest-core
+    #
+    add_executable(rafi-vtest-core
+        src/hw/core/CoreTest.cpp
     )
-    verilate(rafi-verilator-test
-        SOURCES src/hw/module/Timer/Timer.sv)
+    verilate(rafi-vtest-core
+        PREFIX VCore
+        THREADS 2
+        SOURCES
+        src/hw/def/BasicTypes.sv
+        src/hw/def/Rv32Types.sv
+        src/hw/def/RvTypes.sv
+        src/hw/def/TlbTypes.sv
+        src/hw/def/ProcessorTypes.sv
+        src/hw/def/CacheTypes.sv
+        src/hw/def/MemoryTypes.sv
+        src/hw/def/OpTypes.sv
+        src/hw/def/Decoder.sv
+        src/hw/def/LoadStoreUnitTypes.sv
+        src/hw/core/DivUnit.sv
+        src/hw/core/MulUnit.sv
+        src/hw/core/BlockRam.sv
+        src/hw/core/FlipFlopCam.sv
+        src/hw/core/Tlb.sv
+        src/hw/core/TlbReplacer.sv
+        src/hw/core/ResetSequencer.sv
+        src/hw/core/FetchUnit.sv
+        src/hw/core/FetchUnitIF.sv
+        src/hw/core/ICacheInvalidater.sv
+        src/hw/core/ICacheReplacer.sv
+        src/hw/core/DCacheReplacer.sv
+        src/hw/core/LoadStoreUnitIF.sv
+        src/hw/core/LoadStoreUnit.sv
+        src/hw/core/BusAccessUnit.sv
+        src/hw/core/BusAccessUnitIF.sv
+        src/hw/core/BypassLogic.sv
+        src/hw/core/BypassLogicIF.sv
+        src/hw/core/ControlStatusRegister.sv
+        src/hw/core/ControlStatusRegisterIF.sv
+        src/hw/core/DecodeStage.sv
+        src/hw/core/DecodeStageIF.sv
+        src/hw/core/ExecuteStage.sv
+        src/hw/core/ExecuteStageIF.sv
+        src/hw/core/FetchStage.sv
+        src/hw/core/FetchStageIF.sv
+        src/hw/core/MemoryAccessStage.sv
+        src/hw/core/MemoryAccessStageIF.sv
+        src/hw/core/PipelineController.sv
+        src/hw/core/PipelineControllerIF.sv
+        src/hw/core/RegFile.sv
+        src/hw/core/RegFileIF.sv
+        src/hw/core/RegReadStage.sv
+        src/hw/core/RegReadStageIF.sv
+        src/hw/core/RegWriteStage.sv
+        src/hw/core/Core.sv
+    )
+    target_link_libraries(rafi-vtest-core
+        PRIVATE ${GoogleTest_LIBRARIES})
+
+    # disable warnings for verilator
+    if (MSVC)
+        target_compile_options(rafi-vtest-core
+            PUBLIC /wd"4018"
+            PUBLIC /wd"4267"
+            PUBLIC /wd"4273"
+        )
+    endif()
+
+    # =========================================================================
+    # rafi-vtest-timer
+    #
+    add_executable(rafi-vtest-timer
+        src/hw/timer/TimerTest.cpp
+    )
+    verilate(rafi-vtest-timer
+        SOURCES src/hw/timer/Timer.sv
+    )
+    target_link_libraries(rafi-vtest-timer
+        PRIVATE ${GoogleTest_LIBRARIES}
+    )
+
+    # disable warnings for verilator
+    if (MSVC)
+        target_compile_options(rafi-vtest-core
+            PUBLIC /wd"4267"
+        )
+    endif()
 else()
   message(WARNING "Verilator was not found. Skip building SystemVerilog codes")
 endif()

@@ -17,39 +17,14 @@
 #include <memory>
 #include <cstdio>
 
-#include "VTimer.h"
+#pragma warning(push)
+#pragma warning(disable : 4389)
+#include <gtest/gtest.h>
+#pragma warning(pop)
 
-int main()
+#include "VCore.h"
+
+TEST(CoreTest, Dummy)
 {
-    auto top = std::make_unique<VTimer>();
-
-    // reset
-    top->rst = 1;
-    top->clk = 0;
-    top->eval();
-
-    top->clk = 1;
-    top->eval();
-
-    top->clk = 0;
-    top->rst = 0;
-    top->addr = 0;
-    top->writeData = 0;
-    top->readEnable = 1;
-    top->writeEnable = 0;
-    top->eval();
-
-    for (int i = 0; i < 10; i++)
-    {
-        top->clk = 1;
-        top->eval();
-
-        int value = top->readData;
-        printf("value: %d\n", value);
-
-        top->clk = 0;
-        top->eval();
-    }
-
-    top->final();
+    auto top = std::make_unique<VCore>();
 }
