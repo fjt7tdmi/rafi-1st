@@ -277,6 +277,23 @@ add_library(librafi_trace
     src/lib/trace/TraceTextReader.cpp
 )
 
+add_library(librafi_emu
+    include/rafi/emu.h
+    include/rafi/emu/BasicTypes.h
+    include/rafi/emu/Bus.h
+    include/rafi/emu/Event.h
+    include/rafi/emu/Exception.h
+    include/rafi/emu/IInterruptSource.h
+    include/rafi/emu/IIo.h
+    include/rafi/emu/IMemory.h
+    include/rafi/emu/Macro.h
+    include/rafi/emu/Rom.h
+    include/rafi/emu/Ram.h
+    src/lib/emu/Bus.cpp
+    src/lib/emu/Ram.cpp
+    src/lib/emu/Rom.cpp
+)
+
 add_executable(rafi-check-io
     src/bin/rafi-check-io/Main.cpp
     src/bin/util/TraceUtil.cpp
@@ -310,16 +327,8 @@ add_executable(rafi-dump
 )
 
 add_executable(rafi-emu
-    include/rafi/emu.h
-    include/rafi/emu/BasicTypes.h
-    include/rafi/emu/Event.h
-    include/rafi/emu/Exception.h
-    include/rafi/emu/IInterruptSource.h
-    include/rafi/emu/Macro.h
     src/bin/rafi-emu/cpu/AtomicManager.cpp
     src/bin/rafi-emu/cpu/AtomicManager.h
-    src/bin/rafi-emu/bus/Bus.cpp
-    src/bin/rafi-emu/bus/Bus.h
     src/bin/rafi-emu/cpu/Csr.cpp
     src/bin/rafi-emu/cpu/Csr.h
     src/bin/rafi-emu/cpu/Executor.cpp
@@ -352,7 +361,6 @@ add_executable(rafi-emu
     src/bin/rafi-emu/gdb/GdbUtil.h
     src/bin/rafi-emu/io/Clint.cpp
     src/bin/rafi-emu/io/Clint.h
-    src/bin/rafi-emu/io/IIo.h
     src/bin/rafi-emu/io/IoInterruptSource.cpp
     src/bin/rafi-emu/io/IoInterruptSource.h
     src/bin/rafi-emu/io/Plic.cpp
@@ -365,11 +373,6 @@ add_executable(rafi-emu
     src/bin/rafi-emu/io/Timer.h
     src/bin/rafi-emu/io/VirtIo.cpp
     src/bin/rafi-emu/io/VirtIo.h
-    src/bin/rafi-emu/mem/IMemory.h
-    src/bin/rafi-emu/mem/Ram.cpp
-    src/bin/rafi-emu/mem/Ram.h
-    src/bin/rafi-emu/mem/Rom.cpp
-    src/bin/rafi-emu/mem/Rom.h
     src/bin/rafi-emu/CommandLineOption.cpp
     src/bin/rafi-emu/CommandLineOption.h
     src/bin/rafi-emu/Emulator.cpp
@@ -415,7 +418,7 @@ target_link_libraries(rafi-check-io librafi_trace librafi_common ${Boost_LIBRARI
 target_link_libraries(rafi-conv librafi_trace librafi_common ${Boost_LIBRARIES} ${FS_LIBRARIES})
 target_link_libraries(rafi-diff librafi_trace librafi_common ${Boost_LIBRARIES} ${FS_LIBRARIES})
 target_link_libraries(rafi-dump librafi_trace librafi_common ${Boost_LIBRARIES} ${FS_LIBRARIES})
-target_link_libraries(rafi-emu librafi_trace librafi_fp librafi_common ${Boost_LIBRARIES} ${FS_LIBRARIES} ${Socket_LIBRARIES})
+target_link_libraries(rafi-emu librafi_trace librafi_fp librafi_common librafi_emu ${Boost_LIBRARIES} ${FS_LIBRARIES} ${Socket_LIBRARIES})
 target_link_libraries(rafi-emu-test librafi_trace librafi_common ${GoogleTest_LIBRARIES})
 
 if (verilator_FOUND)

@@ -17,35 +17,16 @@
 #pragma once
 
 #include <cstdint>
-#include <cstring>
-
-#include "IMemory.h"
 
 namespace rafi { namespace emu {
 
-class Ram : public IMemory
+class IIo
 {
-    Ram(const Ram&) = delete;
-    Ram(Ram&&) = delete;
-    Ram& operator=(const Ram&) = delete;
-    Ram& operator=(Ram&&) = delete;
-
 public:
-    explicit Ram(size_t capacity);
-    ~Ram();
-
-    void Copy(void* pOut, size_t size) const;
-
-    size_t GetCapacity() const;
-
-    virtual void LoadFile(const char* path, int offset) override;
-
-    virtual void Read(void* pOutBuffer, size_t size, uint64_t address) const override;
-    virtual void Write(const void* pBuffer, size_t size, uint64_t address) override;
-
-private:
-    size_t m_Capacity;
-	char* m_pBody;
+    virtual void Read(void* pOutBuffer, size_t size, uint64_t address) = 0;
+    virtual void Write(const void* pBuffer, size_t size, uint64_t address) = 0;
+    virtual int GetSize() const = 0;
+    virtual bool IsInterruptRequested() const = 0;
 };
 
 }}

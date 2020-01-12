@@ -18,7 +18,6 @@
 
 #include <rafi/emu.h>
 
-#include "bus/Bus.h"
 #include "cpu/Processor.h"
 #include "io/IoInterruptSource.h"
 #include "io/Clint.h"
@@ -27,8 +26,6 @@
 #include "io/Uart16550.h"
 #include "io/Timer.h"
 #include "io/VirtIo.h"
-#include "mem/Ram.h"
-#include "mem/Rom.h"
 
 #include "IEmulator.h"
 

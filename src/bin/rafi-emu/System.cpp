@@ -59,8 +59,7 @@ System::System(XLEN xlen, vaddr_t pc, size_t ramSize)
 
 void System::LoadFileToMemory(const char* path, paddr_t address)
 {
-    auto location = m_Bus.ConvertToMemoryLocation(address);
-    location.pMemory->LoadFile(path, location.offset);
+    m_Bus.LoadFileToMemory(path, address);
 }
 
 void System::SetDtbAddress(vaddr_t address)
@@ -116,10 +115,8 @@ size_t System::GetMemoryAccessEventCount() const
 
 uint32_t System::GetHostIoValue() const
 {
-    const auto location = m_Bus.ConvertToMemoryLocation(m_HostIoAddress);
-
     uint32_t value;
-    m_Ram.Read(&value, sizeof(value), location.offset);
+    m_Ram.Read(&value, sizeof(value), m_HostIoAddress - AddrRam);
 
     return value;
 }

@@ -18,17 +18,31 @@
 
 #include <cstdint>
 
-namespace rafi { namespace emu { namespace io {
+#include "IMemory.h"
 
-class IIo
+namespace rafi { namespace emu {
+
+class RomImpl;
+
+class Rom final
+    : public IMemory
 {
+    Rom(const Rom&) = delete;
+    Rom(Rom&&) = delete;
+    Rom& operator=(const Rom&) = delete;
+    Rom& operator=(Rom&&) = delete;
+
 public:
-    virtual void Read(void* pOutBuffer, size_t size, uint64_t address) = 0;
-    virtual void Write(const void* pBuffer, size_t size, uint64_t address) = 0;
+    Rom();
+    virtual ~Rom();
 
-    virtual int GetSize() const = 0;
+    virtual size_t GetCapacity() const;
+    virtual void LoadFile(const char* path, int offset) override;
+    virtual void Read(void* pOutBuffer, size_t size, uint64_t address) const override;
+    virtual void Write(const void* pBuffer, size_t size, uint64_t address) override;
 
-    virtual bool IsInterruptRequested() const = 0;
+private:
+	RomImpl* m_pImpl;
 };
 
-}}}
+}}

@@ -22,8 +22,6 @@
 
 #include <rafi/IInterruptSource.h>
 
-#include "../../../rafi-emu/src/rafi-emu/bus/Bus.h"
-
 #include "../../../work/verilator/test_Core/VCore.h"
 
 namespace rafi { namespace v1 {

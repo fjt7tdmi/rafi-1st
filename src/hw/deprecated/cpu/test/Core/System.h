@@ -19,9 +19,6 @@
 #include "../../../rafi-emu/src/rafi-emu/io/IoInterruptSource.h"
 #include "../../../rafi-emu/src/rafi-emu/uart/Uart.h"
 #include "../../../rafi-emu/src/rafi-emu/timer/Timer.h"
-#include "../../../rafi-emu/src/rafi-emu/mem/Ram.h"
-#include "../../../rafi-emu/src/rafi-emu/mem/Rom.h"
-#include "../../../rafi-emu/src/rafi-emu/bus/Bus.h"
 
 #include "Processor.h"
 

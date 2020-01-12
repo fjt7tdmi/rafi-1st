@@ -20,8 +20,6 @@
 
 #include <rafi/trace.h>
 
-#include "bus/Bus.h"
-
 #include "TraceLogger.h"
 
 #pragma warning (disable: 4996)

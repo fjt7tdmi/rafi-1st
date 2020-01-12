@@ -18,17 +18,33 @@
 
 #include <cstdint>
 
+#include "IMemory.h"
+
 namespace rafi { namespace emu {
 
-class IMemory
+class RamImpl;
+
+class Ram final
+    : public IMemory
 {
+    Ram(const Ram&) = delete;
+    Ram(Ram&&) = delete;
+    Ram& operator=(const Ram&) = delete;
+    Ram& operator=(Ram&&) = delete;
+
 public:
-    virtual size_t GetCapacity() const = 0;
+    explicit Ram(size_t capacity);
+    virtual ~Ram();
 
-    virtual void LoadFile(const char* path, int offset) = 0;
+    void Copy(void* pOut, size_t size) const;
 
-    virtual void Read(void* pOutBuffer, size_t size, uint64_t address) const = 0;
-    virtual void Write(const void* pBuffer, size_t size, uint64_t address) = 0;
+    virtual size_t GetCapacity() const override;
+    virtual void LoadFile(const char* path, int offset) override;
+    virtual void Read(void* pOutBuffer, size_t size, uint64_t address) const override;
+    virtual void Write(const void* pBuffer, size_t size, uint64_t address) override;
+
+private:
+	RamImpl* m_pImpl;
 };
 
 }}

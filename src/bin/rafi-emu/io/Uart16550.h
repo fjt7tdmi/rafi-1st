@@ -20,8 +20,6 @@
 
 #include <rafi/emu.h>
 
-#include "../io/IIo.h"
-
 namespace rafi { namespace emu { namespace io {
 
 /*

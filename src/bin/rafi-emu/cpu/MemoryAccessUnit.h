@@ -22,8 +22,6 @@
 
 #include <rafi/emu.h>
 
-#include "../bus/Bus.h"
-
 #include "Csr.h"
 
 namespace rafi { namespace emu { namespace cpu {

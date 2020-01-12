@@ -21,7 +21,6 @@
 
 #include <rafi/emu.h>
 
-#include "bus/Bus.h"
 #include "gdb/GdbServer.h"
 
 #include "CommandLineOption.h"

@@ -20,8 +20,6 @@
 
 #include <rafi/emu.h>
 
-#include "IIo.h"
-
 namespace rafi { namespace emu { namespace io {
 
 class IoInterruptSource : public IInterruptSource
