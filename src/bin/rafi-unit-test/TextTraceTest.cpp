@@ -23,7 +23,7 @@
 
 #include <rafi/trace.h>
 
-#include "../../src/librafi_trace/TextTrace.h"
+#include "../../librafi_trace/TextTrace.h"
 
 namespace rafi { namespace trace {
 

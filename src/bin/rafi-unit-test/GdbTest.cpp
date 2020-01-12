@@ -24,8 +24,8 @@
 
 #include <rafi/trace.h>
 
-#include "../../src/rafi-emu/gdb/GdbCommandFactory.h"
-#include "../../src/rafi-emu/gdb/GdbUtil.h"
+#include "../rafi-emu/gdb/GdbCommandFactory.h"
+#include "../rafi-emu/gdb/GdbUtil.h"
 
 using namespace rafi::emu;
 
