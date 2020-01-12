@@ -18,5 +18,55 @@
 
 #include <cstdint>
 
+#include <rafi/common.h>
+#include <rafi/trace.h>
+
 using vaddr_t = uint64_t;
 using paddr_t = uint64_t;
+
+namespace rafi { namespace emu {
+
+struct RafiEmuException
+{
+};
+
+struct CsrReadEvent
+{
+    csr_addr_t address;
+    uint32_t value;
+};
+
+struct CsrWriteEvent
+{
+    csr_addr_t address;
+    uint32_t value;
+};
+
+struct MemoryAccessEvent
+{
+    MemoryAccessType accessType;
+    uint32_t size;
+    uint64_t value;
+    uint64_t virtualAddress;
+    paddr_t physicalAddress;
+};
+
+struct OpEvent
+{
+    uint32_t opId;
+    uint32_t insn;
+    PrivilegeLevel privilegeLevel;
+    vaddr_t virtualPc;
+    paddr_t physicalPc;
+};
+
+struct TrapEvent
+{
+    TrapType trapType;
+    uint32_t trapCause;
+    PrivilegeLevel from;
+    PrivilegeLevel to;
+    uint64_t trapValue;
+};
+
+}}

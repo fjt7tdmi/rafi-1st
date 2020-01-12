@@ -34,7 +34,7 @@ class Processor
 {
 public:
     // Setup
-    Processor(XLEN xlen, bus::Bus* pBus, vaddr_t initialPc);
+    Processor(XLEN xlen, Bus* pBus, vaddr_t initialPc);
 
     void SetIntReg(int regId, uint32_t regValue);
 

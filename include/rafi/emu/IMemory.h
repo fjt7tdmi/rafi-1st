@@ -18,49 +18,19 @@
 
 #include <cstdint>
 
-#include <rafi/trace.h>
-
-#include "BasicTypes.h"
-
 namespace rafi { namespace emu {
 
-struct CsrReadEvent
+class IMemory
 {
-    csr_addr_t address;
-    uint32_t value;
-};
+public:
+    virtual ~IMemory()
+    {        
+    }
 
-struct CsrWriteEvent
-{
-    csr_addr_t address;
-    uint32_t value;
-};
-
-struct MemoryAccessEvent
-{
-    MemoryAccessType accessType;
-    uint32_t size;
-    uint64_t value;
-    uint64_t virtualAddress;
-    paddr_t physicalAddress;
-};
-
-struct OpEvent
-{
-    uint32_t opId;
-    uint32_t insn;
-    PrivilegeLevel privilegeLevel;
-    vaddr_t virtualPc;
-    paddr_t physicalPc;
-};
-
-struct TrapEvent
-{
-    TrapType trapType;
-    uint32_t trapCause;
-    PrivilegeLevel from;
-    PrivilegeLevel to;
-    uint64_t trapValue;
+    virtual size_t GetCapacity() const = 0;
+    virtual void LoadFile(const char* path, int offset) = 0;
+    virtual void Read(void* pOutBuffer, size_t size, uint64_t address) const = 0;
+    virtual void Write(const void* pBuffer, size_t size, uint64_t address) = 0;
 };
 
 }}

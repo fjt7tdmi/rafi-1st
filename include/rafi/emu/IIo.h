@@ -18,17 +18,15 @@
 
 #include <cstdint>
 
-namespace rafi { namespace emu { namespace mem {
+namespace rafi { namespace emu {
 
-class IMemory
+class IIo
 {
 public:
-    virtual size_t GetCapacity() const = 0;
-
-    virtual void LoadFile(const char* path, int offset) = 0;
-
-    virtual void Read(void* pOutBuffer, size_t size, uint64_t address) const = 0;
+    virtual void Read(void* pOutBuffer, size_t size, uint64_t address) = 0;
     virtual void Write(const void* pBuffer, size_t size, uint64_t address) = 0;
+    virtual int GetSize() const = 0;
+    virtual bool IsInterruptRequested() const = 0;
 };
 
-}}}
+}}

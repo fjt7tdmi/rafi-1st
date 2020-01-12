@@ -22,8 +22,6 @@
 
 #include <rafi/emu.h>
 
-#include "../bus/Bus.h"
-
 #include "Csr.h"
 
 namespace rafi { namespace emu { namespace cpu {
@@ -33,7 +31,7 @@ class MemoryAccessUnit
 public:
     explicit MemoryAccessUnit(XLEN xlen);
 
-    void Initialize(bus::Bus* pBus, Csr* pCsr);
+    void Initialize(Bus* pBus, Csr* pCsr);
 
     uint8_t LoadUInt8(vaddr_t addr);
     uint16_t LoadUInt16(vaddr_t addr);
@@ -181,7 +179,7 @@ private:
         return entry.template GetMember<typename EntryType::R>() || entry.template GetMember<typename EntryType::E>();
     }
 
-    bus::Bus* m_pBus{ nullptr };
+    Bus* m_pBus{ nullptr };
     Csr* m_pCsr{ nullptr };
 
     XLEN m_XLEN;

@@ -21,7 +21,6 @@
 #include <rafi/emu.h>
 
 #include "../cpu/Processor.h"
-#include "../io/IIo.h"
 
 namespace rafi { namespace emu { namespace io {
 

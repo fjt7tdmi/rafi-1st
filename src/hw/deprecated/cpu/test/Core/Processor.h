@@ -22,8 +22,6 @@
 
 #include <rafi/IInterruptSource.h>
 
-#include "../../../rafi-emu/src/rafi-emu/bus/Bus.h"
-
 #include "../../../work/verilator/test_Core/VCore.h"
 
 namespace rafi { namespace v1 {
@@ -48,7 +46,7 @@ private:
     emu::IInterruptSource* m_pTimerInterruptSource;
 
     VCore* m_pCore;
-    emu::bus::Bus* m_pBus;
+    emu::Bus* m_pBus;
 };
 
 }}

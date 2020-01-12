@@ -20,7 +20,7 @@
 #include <string>
 #include <iostream>
 
-#include "Exception.h"
+#include "BasicTypes.h"
 
 #define RAFI_EMU_ERROR(...) \
     do { \

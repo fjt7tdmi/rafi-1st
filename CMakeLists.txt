@@ -14,13 +14,20 @@ if(MSVC)
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
 endif()
 
-# Boost
+# =========================================================================
+# boost
+#
 find_package(Boost)
 if (NOT ${Boost_FOUND})
     message(FATAL_ERROR "Cannot find boost.")
 endif()
 
+include_directories(${Boost_INCLUDE_DIRS})
+link_directories(${Boost_LIBRARY_DIRS})
+
+# =========================================================================
 # verilator
+#
 find_package(verilator HINTS $ENV{VERILATOR_ROOT} ${VERILATOR_ROOT})
 
 # GoogleTest
@@ -43,14 +50,17 @@ else()
     set(GoogleTest_LIBRARY_DIRS "third_party/googletest/build/lib")
 endif()
 
-set(Softfloat_INCLUDE_DIRS third_party/berkeley-softfloat-3/source/include third_party/berkeley-softfloat-3/source/RISCV src/lib/fp/include)
-
-include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${GoogleTest_INCLUDE_DIRS})
-
-link_directories(${Boost_LIBRARY_DIRS})
 link_directories(${GoogleTest_LIBRARY_DIRS})
 
+# =========================================================================
+# softfloat
+#
+set(Softfloat_INCLUDE_DIRS third_party/berkeley-softfloat-3/source/include third_party/berkeley-softfloat-3/source/RISCV src/lib/fp/include)
+
+# =========================================================================
+# librafi_common
+#
 add_library(librafi_common
     include/rafi/common.h
     include/rafi/common/BitField.h
@@ -70,6 +80,9 @@ add_library(librafi_common
     src/lib/common/RvApi.cpp
 )
 
+# =========================================================================
+# librafi_fp
+#
 add_library(librafi_fp
     include/rafi/common.h
     include/rafi/fp.h
@@ -216,6 +229,11 @@ if (MSVC)
         )
 endif()
 
+include_directories(librafi_fp include ${Softfloat_INCLUDE_DIRS})
+
+# =========================================================================
+# librafi_trace
+#
 add_library(librafi_trace
     include/rafi/trace.h
     include/rafi/trace/BinaryCycleLogger.h
@@ -277,18 +295,63 @@ add_library(librafi_trace
     src/lib/trace/TraceTextReader.cpp
 )
 
+# =========================================================================
+# librafi_emu
+#
+add_library(librafi_emu
+    include/rafi/emu.h
+    include/rafi/emu/BasicTypes.h
+    include/rafi/emu/Bus.h
+    include/rafi/emu/IInterruptSource.h
+    include/rafi/emu/IIo.h
+    include/rafi/emu/IMemory.h
+    include/rafi/emu/Macro.h
+    include/rafi/emu/Rom.h
+    include/rafi/emu/Ram.h
+    src/lib/emu/Bus.cpp
+    src/lib/emu/Ram.cpp
+    src/lib/emu/Rom.cpp
+)
+
+# =========================================================================
+# rafi-check-io
+#
 add_executable(rafi-check-io
     src/bin/rafi-check-io/Main.cpp
     src/bin/util/TraceUtil.cpp
     src/bin/util/TraceUtil.h
 )
 
+include_directories(rafi-check-io include)
+
+target_link_libraries(rafi-check-io
+    librafi_trace
+    librafi_common
+    ${Boost_LIBRARIES}
+    ${FS_LIBRARIES}
+)
+
+# =========================================================================
+# rafi-conv
+#
 add_executable(rafi-conv
     src/bin/rafi-conv/Main.cpp
     src/bin/util/TraceUtil.cpp
     src/bin/util/TraceUtil.h
 )
 
+include_directories(rafi-conv include)
+
+target_link_libraries(rafi-conv
+    librafi_trace
+    librafi_common
+    ${Boost_LIBRARIES}
+    ${FS_LIBRARIES}
+)
+
+# =========================================================================
+# rafi-diff
+#
 add_executable(rafi-diff
     src/bin/rafi-diff/Main.cpp
     src/bin/rafi-diff/CommandLineOption.cpp
@@ -299,6 +362,18 @@ add_executable(rafi-diff
     src/bin/util/TraceUtil.h
 )
 
+include_directories(rafi-diff include)
+
+target_link_libraries(rafi-diff
+    librafi_trace
+    librafi_common
+    ${Boost_LIBRARIES}
+    ${FS_LIBRARIES}
+)
+
+# =========================================================================
+# rafi-dump
+#
 add_executable(rafi-dump
     src/bin/rafi-dump/CommandLineOption.cpp
     src/bin/rafi-dump/CommandLineOption.h
@@ -309,17 +384,21 @@ add_executable(rafi-dump
     src/bin/util/TraceUtil.h
 )
 
+include_directories(rafi-dump include)
+
+target_link_libraries(rafi-dump
+    librafi_trace
+    librafi_common
+    ${Boost_LIBRARIES}
+    ${FS_LIBRARIES}
+)
+
+# =========================================================================
+# rafi-emu
+#
 add_executable(rafi-emu
-    include/rafi/emu.h
-    include/rafi/emu/BasicTypes.h
-    include/rafi/emu/Event.h
-    include/rafi/emu/Exception.h
-    include/rafi/emu/IInterruptSource.h
-    include/rafi/emu/Macro.h
     src/bin/rafi-emu/cpu/AtomicManager.cpp
     src/bin/rafi-emu/cpu/AtomicManager.h
-    src/bin/rafi-emu/bus/Bus.cpp
-    src/bin/rafi-emu/bus/Bus.h
     src/bin/rafi-emu/cpu/Csr.cpp
     src/bin/rafi-emu/cpu/Csr.h
     src/bin/rafi-emu/cpu/Executor.cpp
@@ -352,7 +431,6 @@ add_executable(rafi-emu
     src/bin/rafi-emu/gdb/GdbUtil.h
     src/bin/rafi-emu/io/Clint.cpp
     src/bin/rafi-emu/io/Clint.h
-    src/bin/rafi-emu/io/IIo.h
     src/bin/rafi-emu/io/IoInterruptSource.cpp
     src/bin/rafi-emu/io/IoInterruptSource.h
     src/bin/rafi-emu/io/Plic.cpp
@@ -365,11 +443,6 @@ add_executable(rafi-emu
     src/bin/rafi-emu/io/Timer.h
     src/bin/rafi-emu/io/VirtIo.cpp
     src/bin/rafi-emu/io/VirtIo.h
-    src/bin/rafi-emu/mem/IMemory.h
-    src/bin/rafi-emu/mem/Ram.cpp
-    src/bin/rafi-emu/mem/Ram.h
-    src/bin/rafi-emu/mem/Rom.cpp
-    src/bin/rafi-emu/mem/Rom.h
     src/bin/rafi-emu/CommandLineOption.cpp
     src/bin/rafi-emu/CommandLineOption.h
     src/bin/rafi-emu/Emulator.cpp
@@ -385,6 +458,21 @@ add_executable(rafi-emu
     src/bin/rafi-emu/TraceLoggerConfig.h
 )
 
+include_directories(rafi-emu include src/bin/rafi-emu/include)
+
+target_link_libraries(rafi-emu
+    librafi_emu
+    librafi_fp
+    librafi_trace
+    librafi_common
+    ${Boost_LIBRARIES}
+    ${FS_LIBRARIES}
+    ${Socket_LIBRARIES}
+)
+
+# =========================================================================
+# rafi-emu-test
+#
 add_executable(rafi-emu-test
     src/bin/rafi-emu/gdb/GdbCommandFactory.cpp
     src/bin/rafi-emu/gdb/GdbCommandFactory.h
@@ -403,20 +491,13 @@ add_executable(rafi-emu-test
     src/bin/rafi-emu-test/TextTraceTest.cpp
 )
 
-include_directories(librafi_fp include ${Softfloat_INCLUDE_DIRS})
-include_directories(rafi-check-io include)
-include_directories(rafi-conv include)
-include_directories(rafi-diff include)
-include_directories(rafi-dump include)
-include_directories(rafi-emu include src/bin/rafi-emu/include)
 include_directories(rafi-emu-test include)
 
-target_link_libraries(rafi-check-io librafi_trace librafi_common ${Boost_LIBRARIES} ${FS_LIBRARIES})
-target_link_libraries(rafi-conv librafi_trace librafi_common ${Boost_LIBRARIES} ${FS_LIBRARIES})
-target_link_libraries(rafi-diff librafi_trace librafi_common ${Boost_LIBRARIES} ${FS_LIBRARIES})
-target_link_libraries(rafi-dump librafi_trace librafi_common ${Boost_LIBRARIES} ${FS_LIBRARIES})
-target_link_libraries(rafi-emu librafi_trace librafi_fp librafi_common ${Boost_LIBRARIES} ${FS_LIBRARIES} ${Socket_LIBRARIES})
-target_link_libraries(rafi-emu-test librafi_trace librafi_common ${GoogleTest_LIBRARIES})
+target_link_libraries(rafi-emu-test
+    librafi_trace
+    librafi_common
+    ${GoogleTest_LIBRARIES}
+)
 
 if (verilator_FOUND)
     # =========================================================================
@@ -503,7 +584,7 @@ if (verilator_FOUND)
 
     # disable warnings for verilator
     if (MSVC)
-        target_compile_options(rafi-vtest-core
+        target_compile_options(rafi-vtest-timer
             PUBLIC /wd"4267"
         )
     endif()

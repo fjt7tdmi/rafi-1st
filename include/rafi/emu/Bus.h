@@ -16,45 +16,25 @@
 
 #pragma once
 
-#include <vector>
-#include <utility>
+#include <rafi/common.h>
+#include <rafi/emu/IMemory.h>
+#include <rafi/emu/IIo.h>
 
-#include <rafi/emu.h>
+namespace rafi { namespace emu {
 
-#include "../io/IIo.h"
-#include "../mem/IMemory.h"
+class BusImpl;
 
-namespace rafi { namespace emu { namespace bus {
-
-struct MemoryInfo
+class Bus final
 {
-    mem::IMemory* pMemory;
-    paddr_t address;
-    size_t size;
-};
+    Bus(const Bus&) = delete;
+    Bus(Bus&&) = delete;
+    Bus& operator=(const Bus&) = delete;
+    Bus& operator=(Bus&&) = delete;
 
-struct IoInfo
-{
-    io::IIo* pIo;
-    paddr_t address;
-    size_t size;
-};
-
-struct MemoryLocation
-{
-    mem::IMemory* pMemory;
-    int offset;
-};
-
-struct IoLocation
-{
-    io::IIo* pIo;
-    int offset;
-};
-
-class Bus
-{
 public:
+    Bus();
+    ~Bus();
+
     void Read(void* pOutBuffer, size_t size, paddr_t address);
     void Write(const void* pBuffer, size_t size, paddr_t address);
 
@@ -68,19 +48,17 @@ public:
     void WriteUInt32(paddr_t address, uint32_t value);
     void WriteUInt64(paddr_t address, uint64_t value);
 
-    void RegisterMemory(mem::IMemory* pMemory, paddr_t address, size_t size);
-    void RegisterIo(io::IIo* pIo, paddr_t address, size_t size);
+    void LoadFileToMemory(const char* path, paddr_t address);
+
+    void RegisterMemory(IMemory* pMemory, paddr_t address, size_t size);
+    void RegisterIo(IIo* pIo, paddr_t address, size_t size);
 
     bool IsValidAddress(paddr_t address, size_t accessSize) const;
     bool IsMemoryAddress(paddr_t address, size_t accessSize) const;
     bool IsIoAddress(paddr_t address, size_t accessSize) const;
 
-    MemoryLocation ConvertToMemoryLocation(paddr_t address) const;
-    IoLocation ConvertToIoLocation(paddr_t address) const;
-
 private:
-    std::vector<MemoryInfo> m_MemoryList;
-    std::vector<IoInfo> m_IoList;
+    BusImpl* m_pImpl;
 };
 
-}}}
+}}
