@@ -20,8 +20,6 @@
 
 #include "emu/BasicTypes.h"
 #include "emu/Bus.h"
-#include "emu/Event.h"
-#include "emu/Exception.h"
 #include "emu/IInterruptSource.h"
 #include "emu/IIo.h"
 #include "emu/IMemory.h"

@@ -281,8 +281,6 @@ add_library(librafi_emu
     include/rafi/emu.h
     include/rafi/emu/BasicTypes.h
     include/rafi/emu/Bus.h
-    include/rafi/emu/Event.h
-    include/rafi/emu/Exception.h
     include/rafi/emu/IInterruptSource.h
     include/rafi/emu/IIo.h
     include/rafi/emu/IMemory.h
