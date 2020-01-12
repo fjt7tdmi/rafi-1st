@@ -420,6 +420,67 @@ target_link_libraries(rafi-emu-test librafi_trace librafi_common ${GoogleTest_LI
 
 if (verilator_FOUND)
     # =========================================================================
+    # rafi-vtest-core
+    #
+    add_executable(rafi-vtest-core
+        src/hw/core/CoreTest.cpp
+    )
+    verilate(rafi-vtest-core
+        VERILATOR_ARGS --cc
+        VERILATOR_ARGS --trace
+        VERILATOR_ARGS --top-module
+        VERILATOR_ARGS Core
+        SOURCES src/hw/def/BasicTypes.sv
+        SOURCES src/hw/def/Rv32Types.sv
+        SOURCES src/hw/def/RvTypes.sv
+        SOURCES src/hw/def/TlbTypes.sv
+        SOURCES src/hw/def/ProcessorTypes.sv
+        SOURCES src/hw/def/CacheTypes.sv
+        SOURCES src/hw/def/MemoryTypes.sv
+        SOURCES src/hw/def/OpTypes.sv
+        SOURCES src/hw/def/Decoder.sv
+        SOURCES src/hw/def/LoadStoreUnitTypes.sv
+        SOURCES src/hw/core/DivUnit.sv
+        SOURCES src/hw/core/MulUnit.sv
+        SOURCES src/hw/core/BlockRam.sv
+        SOURCES src/hw/core/FlipFlopCam.sv
+        SOURCES src/hw/core/Tlb.sv
+        SOURCES src/hw/core/TlbReplacer.sv
+        SOURCES src/hw/core/ResetSequencer.sv
+        SOURCES src/hw/core/FetchUnit.sv
+        SOURCES src/hw/core/FetchUnitIF.sv
+        SOURCES src/hw/core/ICacheInvalidater.sv
+        SOURCES src/hw/core/ICacheReplacer.sv
+        SOURCES src/hw/core/DCacheReplacer.sv
+        SOURCES src/hw/core/LoadStoreUnitIF.sv
+        SOURCES src/hw/core/LoadStoreUnit.sv
+        SOURCES src/hw/core/BusAccessUnit.sv
+        SOURCES src/hw/core/BusAccessUnitIF.sv
+        SOURCES src/hw/core/BypassLogic.sv
+        SOURCES src/hw/core/BypassLogicIF.sv
+        SOURCES src/hw/core/ControlStatusRegister.sv
+        SOURCES src/hw/core/ControlStatusRegisterIF.sv
+        SOURCES src/hw/core/DecodeStage.sv
+        SOURCES src/hw/core/DecodeStageIF.sv
+        SOURCES src/hw/core/ExecuteStage.sv
+        SOURCES src/hw/core/ExecuteStageIF.sv
+        SOURCES src/hw/core/FetchStage.sv
+        SOURCES src/hw/core/FetchStageIF.sv
+        SOURCES src/hw/core/MemoryAccessStage.sv
+        SOURCES src/hw/core/MemoryAccessStageIF.sv
+        SOURCES src/hw/core/PipelineController.sv
+        SOURCES src/hw/core/PipelineControllerIF.sv
+        SOURCES src/hw/core/RegFile.sv
+        SOURCES src/hw/core/RegFileIF.sv
+        SOURCES src/hw/core/RegReadStage.sv
+        SOURCES src/hw/core/RegReadStageIF.sv
+        SOURCES src/hw/core/RegWriteStage.sv
+        SOURCES src/hw/core/Core.sv
+    )
+    target_link_libraries(rafi-vtest-core
+        PRIVATE ${GoogleTest_LIBRARIES})
+
+    # =========================================================================
     # rafi-vtest-timer
     #
     add_executable(rafi-vtest-timer
