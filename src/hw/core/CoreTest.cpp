@@ -22,9 +22,9 @@
 #include <gtest/gtest.h>
 #pragma warning(pop)
 
-#include "VBasicTypes_Core.h"
+#include "VCore.h"
 
 TEST(CoreTest, Dummy)
 {
-    auto top = std::make_unique<VBasicTypes_Core>();
+    auto top = std::make_unique<VCore>();
 }

@@ -9,7 +9,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 if(MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /wd4267") # disable C4267 for verilator
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
 endif()
@@ -426,59 +426,67 @@ if (verilator_FOUND)
         src/hw/core/CoreTest.cpp
     )
     verilate(rafi-vtest-core
-        VERILATOR_ARGS --cc
-        VERILATOR_ARGS --trace
-        VERILATOR_ARGS --top-module
-        VERILATOR_ARGS Core
-        SOURCES src/hw/def/BasicTypes.sv
-        SOURCES src/hw/def/Rv32Types.sv
-        SOURCES src/hw/def/RvTypes.sv
-        SOURCES src/hw/def/TlbTypes.sv
-        SOURCES src/hw/def/ProcessorTypes.sv
-        SOURCES src/hw/def/CacheTypes.sv
-        SOURCES src/hw/def/MemoryTypes.sv
-        SOURCES src/hw/def/OpTypes.sv
-        SOURCES src/hw/def/Decoder.sv
-        SOURCES src/hw/def/LoadStoreUnitTypes.sv
-        SOURCES src/hw/core/DivUnit.sv
-        SOURCES src/hw/core/MulUnit.sv
-        SOURCES src/hw/core/BlockRam.sv
-        SOURCES src/hw/core/FlipFlopCam.sv
-        SOURCES src/hw/core/Tlb.sv
-        SOURCES src/hw/core/TlbReplacer.sv
-        SOURCES src/hw/core/ResetSequencer.sv
-        SOURCES src/hw/core/FetchUnit.sv
-        SOURCES src/hw/core/FetchUnitIF.sv
-        SOURCES src/hw/core/ICacheInvalidater.sv
-        SOURCES src/hw/core/ICacheReplacer.sv
-        SOURCES src/hw/core/DCacheReplacer.sv
-        SOURCES src/hw/core/LoadStoreUnitIF.sv
-        SOURCES src/hw/core/LoadStoreUnit.sv
-        SOURCES src/hw/core/BusAccessUnit.sv
-        SOURCES src/hw/core/BusAccessUnitIF.sv
-        SOURCES src/hw/core/BypassLogic.sv
-        SOURCES src/hw/core/BypassLogicIF.sv
-        SOURCES src/hw/core/ControlStatusRegister.sv
-        SOURCES src/hw/core/ControlStatusRegisterIF.sv
-        SOURCES src/hw/core/DecodeStage.sv
-        SOURCES src/hw/core/DecodeStageIF.sv
-        SOURCES src/hw/core/ExecuteStage.sv
-        SOURCES src/hw/core/ExecuteStageIF.sv
-        SOURCES src/hw/core/FetchStage.sv
-        SOURCES src/hw/core/FetchStageIF.sv
-        SOURCES src/hw/core/MemoryAccessStage.sv
-        SOURCES src/hw/core/MemoryAccessStageIF.sv
-        SOURCES src/hw/core/PipelineController.sv
-        SOURCES src/hw/core/PipelineControllerIF.sv
-        SOURCES src/hw/core/RegFile.sv
-        SOURCES src/hw/core/RegFileIF.sv
-        SOURCES src/hw/core/RegReadStage.sv
-        SOURCES src/hw/core/RegReadStageIF.sv
-        SOURCES src/hw/core/RegWriteStage.sv
-        SOURCES src/hw/core/Core.sv
+        PREFIX VCore
+        THREADS 2
+        SOURCES
+        src/hw/def/BasicTypes.sv
+        src/hw/def/Rv32Types.sv
+        src/hw/def/RvTypes.sv
+        src/hw/def/TlbTypes.sv
+        src/hw/def/ProcessorTypes.sv
+        src/hw/def/CacheTypes.sv
+        src/hw/def/MemoryTypes.sv
+        src/hw/def/OpTypes.sv
+        src/hw/def/Decoder.sv
+        src/hw/def/LoadStoreUnitTypes.sv
+        src/hw/core/DivUnit.sv
+        src/hw/core/MulUnit.sv
+        src/hw/core/BlockRam.sv
+        src/hw/core/FlipFlopCam.sv
+        src/hw/core/Tlb.sv
+        src/hw/core/TlbReplacer.sv
+        src/hw/core/ResetSequencer.sv
+        src/hw/core/FetchUnit.sv
+        src/hw/core/FetchUnitIF.sv
+        src/hw/core/ICacheInvalidater.sv
+        src/hw/core/ICacheReplacer.sv
+        src/hw/core/DCacheReplacer.sv
+        src/hw/core/LoadStoreUnitIF.sv
+        src/hw/core/LoadStoreUnit.sv
+        src/hw/core/BusAccessUnit.sv
+        src/hw/core/BusAccessUnitIF.sv
+        src/hw/core/BypassLogic.sv
+        src/hw/core/BypassLogicIF.sv
+        src/hw/core/ControlStatusRegister.sv
+        src/hw/core/ControlStatusRegisterIF.sv
+        src/hw/core/DecodeStage.sv
+        src/hw/core/DecodeStageIF.sv
+        src/hw/core/ExecuteStage.sv
+        src/hw/core/ExecuteStageIF.sv
+        src/hw/core/FetchStage.sv
+        src/hw/core/FetchStageIF.sv
+        src/hw/core/MemoryAccessStage.sv
+        src/hw/core/MemoryAccessStageIF.sv
+        src/hw/core/PipelineController.sv
+        src/hw/core/PipelineControllerIF.sv
+        src/hw/core/RegFile.sv
+        src/hw/core/RegFileIF.sv
+        src/hw/core/RegReadStage.sv
+        src/hw/core/RegReadStageIF.sv
+        src/hw/core/RegWriteStage.sv
+        src/hw/core/Core.sv
     )
     target_link_libraries(rafi-vtest-core
         PRIVATE ${GoogleTest_LIBRARIES})
+
+    # disable warnings for verilator
+    if (MSVC)
+        target_compile_options(rafi-vtest-core
+            PUBLIC /wd"4018"
+            PUBLIC /wd"4267"
+            PUBLIC /wd"4273"
+        )
+    endif()
 
     # =========================================================================
     # rafi-vtest-timer
@@ -490,7 +498,15 @@ if (verilator_FOUND)
         SOURCES src/hw/timer/Timer.sv
     )
     target_link_libraries(rafi-vtest-timer
-        PRIVATE ${GoogleTest_LIBRARIES})
+        PRIVATE ${GoogleTest_LIBRARIES}
+    )
+
+    # disable warnings for verilator
+    if (MSVC)
+        target_compile_options(rafi-vtest-core
+            PUBLIC /wd"4267"
+        )
+    endif()
 else()
   message(WARNING "Verilator was not found. Skip building SystemVerilog codes")
 endif()
