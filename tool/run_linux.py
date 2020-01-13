@@ -24,12 +24,6 @@ DefaultCycle = 5 * 1000 * 1000
 #
 # Functions
 #
-def GetDumpPath(build_type):
-    if os.name == "nt":
-        return f"./build_{build_type}/{build_type}/rafi-dump.exe"
-    else:
-        return f"./build_{build_type}/rafi-dump"
-
 def GetEmulatorPath(build_type):
     if os.name == "nt":
         return f"./build_{build_type}/{build_type}/rafi-emu.exe"
@@ -73,14 +67,10 @@ def MakeEmulatorCommand(config):
             "--dump-path", trace_path,
             "--dump-skip-cycle", str(config['dump_skip_cycle'])
         ])
-    if config['enable_dump_csr']:
-        cmd.append("--enable-dump-csr")
     if config['enable_dump_fp_reg']:
         cmd.append("--enable-dump-fp-reg")
     if config['enable_dump_int_reg']:
         cmd.append("--enable-dump-int-reg")
-    if config['enable_dump_memory']:
-        cmd.append("--enable-dump-memory")
     if config['gdb'] != 0:
         cmd.extend(["--gdb", config['gdb']])
     return cmd
@@ -98,13 +88,11 @@ if __name__ == '__main__':
     parser = optparse.OptionParser()
     parser.add_option("-c", dest="cycle", default=DefaultCycle, help="Number of emulation cycles.")
     parser.add_option("-d", dest="debug", action="store_true", default=False, help="Use debug build.")
-    parser.add_option("--dump", dest="dump", action="store_true", default=False, help="Run rafi-dump after emulation.")
+    parser.add_option("--dump", dest="dump", action="store_true", default=False, help="Enable dump.")
     parser.add_option("--dump-skip-cycle", dest="dump_skip_cycle", default=0, help="Skip dump for specified cycles.")
-    parser.add_option("--enable-dump-csr", dest="enable_dump_csr", action="store_true", default=False, help="Enable csr dump.")
     parser.add_option("--enable-dump-fp-reg", dest="enable_dump_fp_reg", action="store_true", default=False, help="Enable fp register dump.")
     parser.add_option("--enable-dump-int-reg", dest="enable_dump_int_reg", action="store_true", default=False, help="Enable integer register dump.")
-    parser.add_option("--enable-dump-memory", dest="enable_dump_memory", action="store_true", default=False, help="Enable memory dump.")
-    parser.add_option("--gdb", dest="gdb", default=0, help="Run rafi-dump after emulation.")
+    parser.add_option("--gdb", dest="gdb", default=0, help="Enable gdb.")
 
     (options, args) = parser.parse_args()
 
@@ -115,10 +103,8 @@ if __name__ == '__main__':
         'cycle': options.cycle,
         'dump': options.dump,
         'dump_skip_cycle': options.dump_skip_cycle,
-        'enable_dump_csr': options.enable_dump_csr,
         'enable_dump_fp_reg': options.enable_dump_fp_reg,
         'enable_dump_int_reg': options.enable_dump_int_reg,
-        'enable_dump_memory': options.enable_dump_memory,
         'gdb': options.gdb,
     }
     result = RunEmulator(config)

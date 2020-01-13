@@ -25,10 +25,8 @@ namespace rafi { namespace emu {
 struct TraceLoggerConfig
 {
     bool enabled;
-    bool enableDumpCsr;
     bool enableDumpFpReg;
     bool enableDumpIntReg;
-    bool enableDumpMemory;
     bool enableDumpHostIo;
     std::string path;
 };

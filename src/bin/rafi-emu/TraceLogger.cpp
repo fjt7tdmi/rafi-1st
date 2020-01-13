@@ -96,11 +96,6 @@ void TraceLogger::RecordState()
         NodeIo node = { m_pSystem->GetHostIoValue(), 0 };
         m_pCurrentCycle->Add(node);
     }
-
-    if (m_Config.enableDumpCsr || m_Config.enableDumpMemory)
-    {
-        RAFI_NOT_IMPLEMENTED;
-    }
 }
 
 void TraceLogger::RecordEvent()
