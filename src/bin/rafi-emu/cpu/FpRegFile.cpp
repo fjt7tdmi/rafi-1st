@@ -27,11 +27,11 @@ FpRegFile::FpRegFile()
     std::memset(m_Entries, 0, sizeof(m_Entries));
 }
 
-void FpRegFile::Copy(void* pOut, size_t size) const
+void FpRegFile::Copy(trace::NodeFpReg* pOut) const
 {
-    assert(size == sizeof(m_Entries));
+    static_assert(sizeof(*pOut) == sizeof(m_Entries));
 
-    std::memcpy(pOut, m_Entries, size);
+    std::memcpy(pOut, m_Entries, sizeof(*pOut));
 }
 
 uint32_t FpRegFile::ReadUInt32(int regId) const

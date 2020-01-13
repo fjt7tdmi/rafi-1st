@@ -87,7 +87,7 @@ void TraceLogger::RecordState()
     if (m_Config.enableDumpFpReg)
     {
         NodeFpReg node;
-        m_pSystem->CopyFpReg(&node, sizeof(node));
+        m_pSystem->CopyFpReg(&node);
         m_pCurrentCycle->Add(node);
     }
 

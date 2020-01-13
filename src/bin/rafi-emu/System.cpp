@@ -131,9 +131,9 @@ void System::CopyIntReg(trace::NodeIntReg64* pOut) const
     m_Processor.CopyIntReg(pOut);
 }
 
-void System::CopyFpReg(void* pOut, size_t size) const
+void System::CopyFpReg(trace::NodeFpReg* pOut) const
 {
-    m_Processor.CopyFpReg(pOut, size);
+    m_Processor.CopyFpReg(pOut);
 }
 
 void System::CopyOpEvent(trace::NodeOpEvent* pOut) const
