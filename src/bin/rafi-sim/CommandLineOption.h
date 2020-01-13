@@ -27,6 +27,8 @@ class CommandLineOption
 public:
     CommandLineOption(int argc, char** argv);
 
+    const trace::LoggerConfig& GetLoggerConfig() const;
+
     std::string GetLoadPath() const;
     std::string GetVcdPath() const;
 
@@ -38,6 +40,7 @@ public:
 private:
     static const int DefaultRamSize = 64 * 1024;
 
+    trace::LoggerConfig m_LoggerConfig;
     std::string m_LoadPath;
     std::string m_VcdPath;
 

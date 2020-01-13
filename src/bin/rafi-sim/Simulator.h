@@ -45,6 +45,7 @@ private:
     VerilatedVcdC* m_pTfp;
     VCore* m_pCore;
     System* m_pSystem;
+    trace::Logger* m_pLogger;
 
     int m_Cycle{0};
 };

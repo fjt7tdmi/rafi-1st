@@ -32,6 +32,10 @@ System::System(VCore* pCore, size_t ramSize)
     m_Bus.RegisterMemory(&m_Ram, AddrRam, m_Ram.GetCapacity());
 }
 
+System::~System()
+{    
+}
+
 void System::LoadFileToMemory(const char* path)
 {
     m_Bus.LoadFileToMemory(path, AddrRam);
@@ -90,6 +94,69 @@ void System::UpdateSignal()
         m_pCore->ready = 0;
         m_pCore->rdata = 0;
     }
+}
+
+uint32_t System::GetHostIoValue() const
+{
+    // TODO: implement
+    RAFI_NOT_IMPLEMENTED;
+}
+
+uint64_t System::GetPc() const
+{
+    // TODO: implement
+    RAFI_NOT_IMPLEMENTED;
+}
+
+size_t System::GetMemoryAccessEventCount() const
+{
+    // MemoryEvent is not supported
+    return 0;
+}
+
+bool System::IsOpEventExist() const
+{
+    // TODO: implement
+    RAFI_NOT_IMPLEMENTED;
+}
+
+bool System::IsTrapEventExist() const
+{
+    // TrapEvent is not supported
+    return 0;
+}
+
+void System::CopyIntReg(trace::NodeIntReg32* pOut) const
+{
+    // TODO: implement
+    RAFI_NOT_IMPLEMENTED;
+}
+
+void System::CopyIntReg(trace::NodeIntReg64* pOut) const
+{
+    // rafi-sim supports only RV32
+    RAFI_NOT_IMPLEMENTED;
+}
+
+void System::CopyFpReg(trace::NodeFpReg* pOut) const
+{
+    RAFI_NOT_IMPLEMENTED;
+}
+
+void System::CopyOpEvent(trace::NodeOpEvent* pOut) const
+{
+    // TODO: implement
+    RAFI_NOT_IMPLEMENTED;
+}
+
+void System::CopyTrapEvent(trace::NodeTrapEvent* pOut) const
+{
+    RAFI_NOT_IMPLEMENTED;
+}
+
+void System::CopyMemoryAccessEvent(trace::NodeMemoryEvent* pOut, int index) const
+{
+    RAFI_NOT_IMPLEMENTED;
 }
 
 }}

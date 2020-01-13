@@ -15,6 +15,7 @@
  */
 
 #include <rafi/emu.h>
+#include <rafi/trace.h>
 
 #include "Simulator.h"
 
@@ -28,6 +29,7 @@ Simulator::Simulator(const CommandLineOption& option)
     m_pTfp = new VerilatedVcdC();
     m_pCore = new VCore();
     m_pSystem = new System(m_pCore, option.GetRamSize());
+    m_pLogger = new trace::Logger(XLEN::XLEN32, option.GetLoggerConfig(), m_pSystem);
 
     m_pCore->trace(m_pTfp, 20);
     m_pTfp->open(option.GetVcdPath().c_str());
@@ -42,6 +44,7 @@ Simulator::~Simulator()
     m_pCore->final();
     m_pTfp->close();
 
+    delete m_pLogger;
     delete m_pSystem;
     delete m_pCore;
     delete m_pTfp;
@@ -67,6 +70,8 @@ void Simulator::ProcessCycle()
     m_pSystem->ProcessNegativeEdge();
     m_pTfp->dump(m_Cycle * 10 + 10);
     m_pSystem->UpdateSignal();
+
+    // TODO: call Logger API when detecting op retirement.
 
     m_Cycle++;
 }

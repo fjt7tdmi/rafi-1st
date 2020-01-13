@@ -17,22 +17,36 @@
 #pragma once
 
 #include <rafi/emu.h>
+#include <rafi/trace.h>
 
 #include "VCore.h"
 
 namespace rafi { namespace sim {
 
-class System
+class System final : public trace::ILoggerTarget
 {
 public:
     explicit System(VCore* pCore, size_t ramSize);
+    virtual ~System();
 
     void LoadFileToMemory(const char* path);
-
     void Reset();
     void ProcessPositiveEdge();
     void ProcessNegativeEdge();
     void UpdateSignal();
+
+    // ILoggerTarget
+    virtual uint32_t GetHostIoValue() const override;
+    virtual uint64_t GetPc() const override;
+    virtual size_t GetMemoryAccessEventCount() const override;
+    virtual bool IsOpEventExist() const override;
+    virtual bool IsTrapEventExist() const override;
+    virtual void CopyIntReg(trace::NodeIntReg32* pOut) const override;
+    virtual void CopyIntReg(trace::NodeIntReg64* pOut) const override;
+    virtual void CopyFpReg(trace::NodeFpReg* pOut) const override;
+    virtual void CopyOpEvent(trace::NodeOpEvent* pOut) const override;
+    virtual void CopyTrapEvent(trace::NodeTrapEvent* pOut) const override;
+    virtual void CopyMemoryAccessEvent(trace::NodeMemoryEvent* pOut, int index) const override;
 
 private:
     static const paddr_t AddrRam = 0x80000000;

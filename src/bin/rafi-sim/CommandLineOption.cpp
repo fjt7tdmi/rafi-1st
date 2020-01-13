@@ -31,6 +31,8 @@ CommandLineOption::CommandLineOption(int argc, char** argv)
     po::options_description desc("options");
     desc.add_options()
         ("cycle", po::value<int>(&m_Cycle)->default_value(0), "number of emulation cycles")
+        ("dump-path", po::value<std::string>(), "path of dump file")
+        ("enable-dump-int-reg", "output int register contents to dump file")
         ("help", "show help")
         ("host-io-addr", po::value<std::string>(), "host io address (hex)")
         ("load-path", po::value<std::string>(&m_LoadPath)->required(), "path of binary file which is loaded to memory")
@@ -62,6 +64,24 @@ CommandLineOption::CommandLineOption(int argc, char** argv)
     {
         m_HostIoAddress = strtoull(variables["host-io-addr"].as<std::string>().c_str(), 0, 16);
     }
+
+    if (variables.count("dump-path"))
+    {
+        m_LoggerConfig.enabled = true;
+        m_LoggerConfig.enableDumpIntReg = variables.count("enable-dump-int-reg") > 0;
+        m_LoggerConfig.enableDumpFpReg = false;
+        m_LoggerConfig.enableDumpHostIo = m_HostIoEnabled;
+        m_LoggerConfig.path = variables["dump-path"].as<std::string>();
+    }
+    else
+    {
+        m_LoggerConfig.enabled = false;
+    }
+}
+
+const trace::LoggerConfig& CommandLineOption::GetLoggerConfig() const
+{
+    return m_LoggerConfig;
 }
 
 std::string CommandLineOption::GetLoadPath() const
