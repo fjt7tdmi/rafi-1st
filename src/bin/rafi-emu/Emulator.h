@@ -17,10 +17,10 @@
 #pragma once
 
 #include <rafi/emu.h>
+#include <rafi/trace.h>
 
 #include "CommandLineOption.h"
 #include "System.h"
-#include "TraceLogger.h"
 #include "IEmulator.h"
 
 namespace rafi { namespace emu {
@@ -55,7 +55,7 @@ private:
 
     const CommandLineOption& m_Option;
     System m_System;
-    TraceLogger m_Logger;
+    trace::Logger m_Logger;
 
     int m_Cycle{0};
 };

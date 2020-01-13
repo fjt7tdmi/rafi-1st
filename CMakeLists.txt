@@ -244,6 +244,7 @@ add_library(librafi_trace
     include/rafi/trace/ITraceReader.h
     include/rafi/trace/ITraceWriter.h
     include/rafi/trace/ILoggerTarget.h
+    include/rafi/trace/Logger.h
     include/rafi/trace/LoggerConfig.h
     include/rafi/trace/TraceBinaryMemoryReader.h
     include/rafi/trace/TraceBinaryMemoryWriter.h
@@ -263,6 +264,7 @@ add_library(librafi_trace
     src/lib/trace/GdbTrace.cpp
     src/lib/trace/GdbTrace.h
     src/lib/trace/GdbTraceReader.cpp
+    src/lib/trace/Logger.cpp
     src/lib/trace/TextCycle.cpp
     src/lib/trace/TextCycle.h
     src/lib/trace/TextTrace.cpp
@@ -437,8 +439,6 @@ add_executable(rafi-emu
     src/bin/rafi-emu/Socket.h
     src/bin/rafi-emu/System.cpp
     src/bin/rafi-emu/System.h
-    src/bin/rafi-emu/TraceLogger.cpp
-    src/bin/rafi-emu/TraceLogger.h
 )
 
 include_directories(rafi-emu include)

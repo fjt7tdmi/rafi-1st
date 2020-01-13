@@ -18,30 +18,26 @@
 
 #include <cstdio>
 
-#include <rafi/trace.h>
+#include <rafi/trace/ILoggerTarget.h>
+#include <rafi/trace/LoggerConfig.h>
 
-#include "System.h"
+namespace rafi { namespace trace {
 
-namespace rafi { namespace emu {
+class LoggerImpl;
 
-class TraceLogger final
+class Logger final
 {
 public:
-    TraceLogger(XLEN xlen, const trace::LoggerConfig& config, const trace::ILoggerTarget* pSystem);
-    ~TraceLogger();
+    Logger(XLEN xlen, const trace::LoggerConfig& config, const trace::ILoggerTarget* pSystem);
+    ~Logger();
 
-    void BeginCycle(int cycle, vaddr_t pc);
+    void BeginCycle(int cycle, uint64_t pc);
     void RecordState();
     void RecordEvent();
     void EndCycle();
 
 private:
-    XLEN m_XLEN;
-    const trace::LoggerConfig& m_Config;
-    const trace::ILoggerTarget* m_pLoggerTarget {nullptr};
-
-    trace::ITraceWriter* m_pTraceWriter {nullptr};
-    trace::BinaryCycleLogger* m_pCurrentCycle {nullptr};
+    LoggerImpl* m_pImpl;
 };
 
 }}
