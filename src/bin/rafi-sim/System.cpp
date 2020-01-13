@@ -108,7 +108,7 @@ uint64_t System::GetPc() const
     RAFI_NOT_IMPLEMENTED;
 }
 
-size_t System::GetMemoryAccessEventCount() const
+size_t System::GetMemoryEventCount() const
 {
     // MemoryEvent is not supported
     return 0;
@@ -154,7 +154,7 @@ void System::CopyTrapEvent(trace::NodeTrapEvent* pOut) const
     RAFI_NOT_IMPLEMENTED;
 }
 
-void System::CopyMemoryAccessEvent(trace::NodeMemoryEvent* pOut, int index) const
+void System::CopyMemoryEvent(trace::NodeMemoryEvent* pOut, int index) const
 {
     RAFI_NOT_IMPLEMENTED;
 }

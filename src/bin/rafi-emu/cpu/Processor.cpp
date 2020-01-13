@@ -149,7 +149,7 @@ vaddr_t Processor::GetPc() const
     return m_Csr.GetProgramCounter();
 }
 
-size_t Processor::GetMemoryAccessEventCount() const
+size_t Processor::GetMemoryEventCount() const
 {
     return m_MemAccessUnit.GetEventCount();
 }
@@ -174,7 +174,7 @@ void Processor::CopyOpEvent(trace::NodeOpEvent* pOut) const
     std::memcpy(pOut, &m_OpEvent, sizeof(*pOut));
 }
 
-void Processor::CopyMemoryAccessEvent(trace::NodeMemoryEvent* pOut, int index) const
+void Processor::CopyMemoryEvent(trace::NodeMemoryEvent* pOut, int index) const
 {
     m_MemAccessUnit.CopyEvent(pOut, index);
 }

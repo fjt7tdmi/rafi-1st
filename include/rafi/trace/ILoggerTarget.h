@@ -29,7 +29,7 @@ public:
     virtual uint32_t GetHostIoValue() const = 0;
     virtual uint64_t GetPc() const = 0;
 
-    virtual size_t GetMemoryAccessEventCount() const = 0;
+    virtual size_t GetMemoryEventCount() const = 0;
     virtual bool IsOpEventExist() const = 0;
     virtual bool IsTrapEventExist() const = 0;
 
@@ -38,7 +38,7 @@ public:
     virtual void CopyFpReg(NodeFpReg* pOut) const = 0;
     virtual void CopyOpEvent(NodeOpEvent* pOut) const = 0;
     virtual void CopyTrapEvent(NodeTrapEvent* pOut) const = 0;
-    virtual void CopyMemoryAccessEvent(NodeMemoryEvent* pOut, int index) const = 0;
+    virtual void CopyMemoryEvent(NodeMemoryEvent* pOut, int index) const = 0;
 };
 
 }}

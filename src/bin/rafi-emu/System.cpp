@@ -102,9 +102,9 @@ void System::WriteMemory(const void* pBuffer, size_t bufferSize, paddr_t addr)
     return m_Bus.Write(pBuffer, bufferSize, addr);
 }
 
-size_t System::GetMemoryAccessEventCount() const
+size_t System::GetMemoryEventCount() const
 {
-    return m_Processor.GetMemoryAccessEventCount();
+    return m_Processor.GetMemoryEventCount();
 }
 
 uint32_t System::GetHostIoValue() const
@@ -145,9 +145,9 @@ void System::CopyTrapEvent(trace::NodeTrapEvent* pOut) const
     return m_Processor.CopyTrapEvent(pOut);
 }
 
-void System::CopyMemoryAccessEvent(trace::NodeMemoryEvent* pOut, int index) const
+void System::CopyMemoryEvent(trace::NodeMemoryEvent* pOut, int index) const
 {
-    return m_Processor.CopyMemoryAccessEvent(pOut, index);
+    return m_Processor.CopyMemoryEvent(pOut, index);
 }
 
 bool System::IsOpEventExist() const

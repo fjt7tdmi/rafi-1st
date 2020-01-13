@@ -58,14 +58,14 @@ public:
 
     virtual bool IsOpEventExist() const override;
     virtual bool IsTrapEventExist() const override;
-    virtual size_t GetMemoryAccessEventCount() const override;
+    virtual size_t GetMemoryEventCount() const override;
 
     virtual void CopyIntReg(trace::NodeIntReg32* pOut) const override;
     virtual void CopyIntReg(trace::NodeIntReg64* pOut) const override;
     virtual void CopyFpReg(trace::NodeFpReg* pOut) const override;
     virtual void CopyOpEvent(trace::NodeOpEvent* pOut) const override;
     virtual void CopyTrapEvent(trace::NodeTrapEvent* pOut) const override;
-    virtual void CopyMemoryAccessEvent(trace::NodeMemoryEvent* pOut, int index) const override;
+    virtual void CopyMemoryEvent(trace::NodeMemoryEvent* pOut, int index) const override;
 
 private:
     static const paddr_t AddrRom = 0x00001000;

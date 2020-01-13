@@ -54,14 +54,14 @@ public:
 
     // for Dump
     vaddr_t GetPc() const;
-    size_t GetMemoryAccessEventCount() const;
+    size_t GetMemoryEventCount() const;
 
     void CopyIntReg(trace::NodeIntReg32* pOut) const;
     void CopyIntReg(trace::NodeIntReg64* pOut) const;
     void CopyFpReg(trace::NodeFpReg* pOut) const;
     void CopyOpEvent(trace::NodeOpEvent* pOut) const;
     void CopyTrapEvent(trace::NodeTrapEvent* pOut) const;
-    void CopyMemoryAccessEvent(trace::NodeMemoryEvent* pOut, int index) const;
+    void CopyMemoryEvent(trace::NodeMemoryEvent* pOut, int index) const;
 
     bool IsOpEventExist() const;
     bool IsTrapEventExist() const;

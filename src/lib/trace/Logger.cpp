@@ -132,10 +132,10 @@ public:
             m_pCurrentCycle->Add(node);
         }
 
-        for (int index = 0; index < m_pLoggerTarget->GetMemoryAccessEventCount(); index++)
+        for (int index = 0; index < m_pLoggerTarget->GetMemoryEventCount(); index++)
         {
             trace::NodeMemoryEvent memoryEvent;
-            m_pLoggerTarget->CopyMemoryAccessEvent(&memoryEvent, index);
+            m_pLoggerTarget->CopyMemoryEvent(&memoryEvent, index);
 
             NodeMemoryEvent node
             {
