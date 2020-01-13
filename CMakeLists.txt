@@ -458,7 +458,7 @@ add_executable(rafi-emu
     src/bin/rafi-emu/TraceLoggerConfig.h
 )
 
-include_directories(rafi-emu include src/bin/rafi-emu/include)
+include_directories(rafi-emu include)
 
 target_link_libraries(rafi-emu
     librafi_emu
@@ -500,6 +500,93 @@ target_link_libraries(rafi-emu-test
 )
 
 if (verilator_FOUND)
+    # =========================================================================
+    # rafi-sim
+    #
+    add_executable(rafi-sim
+        src/bin/rafi-sim/CommandLineOption.cpp
+        src/bin/rafi-sim/CommandLineOption.h
+        src/bin/rafi-sim/Main.cpp
+        src/bin/rafi-sim/Simulator.cpp
+        src/bin/rafi-sim/Simulator.h
+        src/bin/rafi-sim/System.cpp
+        src/bin/rafi-sim/System.h
+    )
+
+    verilate(rafi-sim
+        PREFIX VCore
+        THREADS 1
+        TRACE
+        SOURCES
+        src/hw/def/BasicTypes.sv
+        src/hw/def/Rv32Types.sv
+        src/hw/def/RvTypes.sv
+        src/hw/def/TlbTypes.sv
+        src/hw/def/ProcessorTypes.sv
+        src/hw/def/CacheTypes.sv
+        src/hw/def/MemoryTypes.sv
+        src/hw/def/OpTypes.sv
+        src/hw/def/Decoder.sv
+        src/hw/def/LoadStoreUnitTypes.sv
+        src/hw/core/DivUnit.sv
+        src/hw/core/MulUnit.sv
+        src/hw/core/BlockRam.sv
+        src/hw/core/FlipFlopCam.sv
+        src/hw/core/Tlb.sv
+        src/hw/core/TlbReplacer.sv
+        src/hw/core/ResetSequencer.sv
+        src/hw/core/FetchUnit.sv
+        src/hw/core/FetchUnitIF.sv
+        src/hw/core/ICacheInvalidater.sv
+        src/hw/core/ICacheReplacer.sv
+        src/hw/core/DCacheReplacer.sv
+        src/hw/core/LoadStoreUnitIF.sv
+        src/hw/core/LoadStoreUnit.sv
+        src/hw/core/BusAccessUnit.sv
+        src/hw/core/BusAccessUnitIF.sv
+        src/hw/core/BypassLogic.sv
+        src/hw/core/BypassLogicIF.sv
+        src/hw/core/ControlStatusRegister.sv
+        src/hw/core/ControlStatusRegisterIF.sv
+        src/hw/core/DecodeStage.sv
+        src/hw/core/DecodeStageIF.sv
+        src/hw/core/ExecuteStage.sv
+        src/hw/core/ExecuteStageIF.sv
+        src/hw/core/FetchStage.sv
+        src/hw/core/FetchStageIF.sv
+        src/hw/core/MemoryAccessStage.sv
+        src/hw/core/MemoryAccessStageIF.sv
+        src/hw/core/PipelineController.sv
+        src/hw/core/PipelineControllerIF.sv
+        src/hw/core/RegFile.sv
+        src/hw/core/RegFileIF.sv
+        src/hw/core/RegReadStage.sv
+        src/hw/core/RegReadStageIF.sv
+        src/hw/core/RegWriteStage.sv
+        src/hw/core/Core.sv
+    )
+
+    include_directories(rafi-sim include)
+
+    # disable warnings for verilator
+    if (MSVC)
+        target_compile_options(rafi-sim
+            PUBLIC /wd"4018"
+            PUBLIC /wd"4267"
+            PUBLIC /wd"4273"
+        )
+    endif()
+
+    target_link_libraries(rafi-sim
+        PRIVATE librafi_emu
+        PRIVATE librafi_fp
+        PRIVATE librafi_trace
+        PRIVATE librafi_common
+        PRIVATE ${Boost_LIBRARIES}
+        PRIVATE ${FS_LIBRARIES}
+    )
+
+
     # =========================================================================
     # rafi-vtest-core
     #
