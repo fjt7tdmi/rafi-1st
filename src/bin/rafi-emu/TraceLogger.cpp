@@ -107,20 +107,20 @@ void TraceLogger::RecordEvent()
 
     if (m_pSystem->IsOpEventExist())
     {
-        OpEvent opEvent;
+        trace::NodeOpEvent opEvent;
         m_pSystem->CopyOpEvent(&opEvent);
 
         NodeOpEvent node
         {
             opEvent.insn,
-            opEvent.privilegeLevel,
+            opEvent.priv,
         };
         m_pCurrentCycle->Add(node);
     }
 
     if (m_pSystem->IsTrapEventExist())
     {
-        TrapEvent trapEvent;
+        trace::NodeTrapEvent trapEvent;
         m_pSystem->CopyTrapEvent(&trapEvent);
 
         NodeTrapEvent node
@@ -128,7 +128,7 @@ void TraceLogger::RecordEvent()
             trapEvent.trapType,
             trapEvent.from,
             trapEvent.to,
-            trapEvent.trapCause,
+            trapEvent.cause,
             trapEvent.trapValue,
         };
 
@@ -137,16 +137,16 @@ void TraceLogger::RecordEvent()
 
     for (int index = 0; index < m_pSystem->GetMemoryAccessEventCount(); index++)
     {
-        MemoryAccessEvent memoryAccessEvent;
-        m_pSystem->CopyMemoryAccessEvent(&memoryAccessEvent, index);
+        trace::NodeMemoryEvent memoryEvent;
+        m_pSystem->CopyMemoryAccessEvent(&memoryEvent, index);
 
         NodeMemoryEvent node
         {
-            memoryAccessEvent.accessType,
-            memoryAccessEvent.size,
-            memoryAccessEvent.value,
-            memoryAccessEvent.virtualAddress,
-            memoryAccessEvent.physicalAddress,
+            memoryEvent.accessType,
+            memoryEvent.size,
+            memoryEvent.value,
+            memoryEvent.vaddr,
+            memoryEvent.paddr,
         };
         m_pCurrentCycle->Add(node);
     }

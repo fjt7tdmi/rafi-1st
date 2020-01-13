@@ -59,9 +59,9 @@ public:
     void CopyIntReg(trace::NodeIntReg32* pOut) const;
     void CopyIntReg(trace::NodeIntReg64* pOut) const;
     void CopyFpReg(void* pOut, size_t size) const;
-    void CopyOpEvent(OpEvent* pOut) const;
-    void CopyTrapEvent(TrapEvent* pOut) const;
-    void CopyMemoryAccessEvent(MemoryAccessEvent* pOut, int index) const;
+    void CopyOpEvent(trace::NodeOpEvent* pOut) const;
+    void CopyTrapEvent(trace::NodeTrapEvent* pOut) const;
+    void CopyMemoryAccessEvent(trace::NodeMemoryEvent* pOut, int index) const;
 
     bool IsOpEventExist() const;
     bool IsTrapEventExist() const;
@@ -73,8 +73,7 @@ private:
 
     void ClearOpEvent();
 
-    void SetOpEvent(vaddr_t virtualPc, PrivilegeLevel privilegeLevel);
-    void SetOpEvent(vaddr_t virtualPc, paddr_t physicalPc, uint32_t insn, PrivilegeLevel privilegeLevel);
+    void SetOpEvent(uint32_t insn, PrivilegeLevel privilegeLevel);
 
     const vaddr_t InvalidValue = 0xffffffffffffffff;
 
@@ -95,7 +94,7 @@ private:
     // for dump
     bool m_OpEventValid { false };
 
-    OpEvent m_OpEvent;
+    trace::NodeOpEvent m_OpEvent;
 };
 
 }}}

@@ -136,17 +136,17 @@ void System::CopyFpReg(void* pOut, size_t size) const
     m_Processor.CopyFpReg(pOut, size);
 }
 
-void System::CopyOpEvent(OpEvent* pOut) const
+void System::CopyOpEvent(trace::NodeOpEvent* pOut) const
 {
     return m_Processor.CopyOpEvent(pOut);
 }
 
-void System::CopyTrapEvent(TrapEvent* pOut) const
+void System::CopyTrapEvent(trace::NodeTrapEvent* pOut) const
 {
     return m_Processor.CopyTrapEvent(pOut);
 }
 
-void System::CopyMemoryAccessEvent(MemoryAccessEvent* pOut, int index) const
+void System::CopyMemoryAccessEvent(trace::NodeMemoryEvent* pOut, int index) const
 {
     return m_Processor.CopyMemoryAccessEvent(pOut, index);
 }

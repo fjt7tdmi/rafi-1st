@@ -92,8 +92,6 @@ void Processor::ProcessCycle()
         const auto interruptType = m_InterruptController.GetInterruptType();
 
         m_TrapProcessor.ProcessInterrupt(interruptType, pc);
-
-        SetOpEvent(pc, privilegeLevel);
         return;
     }
 
@@ -104,10 +102,10 @@ void Processor::ProcessCycle()
     if (fetchTrap)
     {
         m_TrapProcessor.ProcessException(fetchTrap.value());
-
-        SetOpEvent(pc, privilegeLevel);
         return;
     }
+
+    SetOpEvent(insn, privilegeLevel);
 
     // Decode
     const auto op = m_Decoder.Decode(insn);
@@ -171,17 +169,17 @@ void Processor::CopyFpReg(void* pOut, size_t size) const
     m_FpRegFile.Copy(pOut, size);
 }
 
-void Processor::CopyOpEvent(OpEvent* pOut) const
+void Processor::CopyOpEvent(trace::NodeOpEvent* pOut) const
 {
     std::memcpy(pOut, &m_OpEvent, sizeof(*pOut));
 }
 
-void Processor::CopyMemoryAccessEvent(MemoryAccessEvent* pOut, int index) const
+void Processor::CopyMemoryAccessEvent(trace::NodeMemoryEvent* pOut, int index) const
 {
     m_MemAccessUnit.CopyEvent(pOut, index);
 }
 
-void Processor::CopyTrapEvent(TrapEvent* pOut) const
+void Processor::CopyTrapEvent(trace::NodeTrapEvent* pOut) const
 {
     m_TrapProcessor.CopyTrapEvent(pOut);
 }
@@ -243,18 +241,10 @@ void Processor::ClearOpEvent()
     m_OpEventValid = false;
 }
 
-void Processor::SetOpEvent(vaddr_t virtualPc, PrivilegeLevel privilegeLevel)
+void Processor::SetOpEvent(uint32_t insn, PrivilegeLevel privilegeLevel)
 {
-    SetOpEvent(virtualPc, InvalidValue, InvalidValue, privilegeLevel);
-}
-
-void Processor::SetOpEvent(vaddr_t virtualPc, paddr_t physicalPc, uint32_t insn, PrivilegeLevel privilegeLevel)
-{
-    m_OpEvent.opId = m_OpCount;
     m_OpEvent.insn = insn;
-    m_OpEvent.privilegeLevel = privilegeLevel;
-    m_OpEvent.virtualPc = virtualPc;
-    m_OpEvent.physicalPc = physicalPc;
+    m_OpEvent.priv = privilegeLevel;
 
     m_OpEventValid = true;
 

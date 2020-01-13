@@ -149,10 +149,10 @@ bool Emulator::IsStopConditionFilledPost(EmulationStop condition)
     {
         if (m_System.IsTrapEventExist())
         {
-            TrapEvent trapEvent;
+            trace::NodeTrapEvent trapEvent;
             m_System.CopyTrapEvent(&trapEvent);
 
-            return trapEvent.trapType == TrapType::Exception && trapEvent.trapCause == static_cast<uint32_t>(ExceptionType::Breakpoint);
+            return trapEvent.trapType == TrapType::Exception && trapEvent.cause == static_cast<uint32_t>(ExceptionType::Breakpoint);
         }
     }
 
