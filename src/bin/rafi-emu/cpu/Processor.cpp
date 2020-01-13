@@ -151,11 +151,6 @@ vaddr_t Processor::GetPc() const
     return m_Csr.GetProgramCounter();
 }
 
-int Processor::GetCsrCount() const
-{
-    return m_Csr.GetRegCount();
-}
-
 size_t Processor::GetMemoryAccessEventCount() const
 {
     return m_MemAccessUnit.GetEventCount();
@@ -169,16 +164,6 @@ void Processor::CopyIntReg(trace::NodeIntReg32* pOut) const
 void Processor::CopyIntReg(trace::NodeIntReg64* pOut) const
 {
     m_IntRegFile.Copy(pOut);
-}
-
-void Processor::CopyCsr(trace::Csr32Node* pOutNodes, int nodeCount) const
-{
-    m_Csr.Copy(pOutNodes, nodeCount);
-}
-
-void Processor::CopyCsr(trace::Csr64Node* pOutNodes, int nodeCount) const
-{
-    m_Csr.Copy(pOutNodes, nodeCount);
 }
 
 void Processor::CopyFpReg(void* pOut, size_t size) const

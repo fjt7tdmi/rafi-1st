@@ -157,7 +157,7 @@ private:
 
         for (int i = 0; i < 32; i++)
         {
-            FpRegNodeUnion u;
+            FpRegUnion u;
             u.u64.value = pCycle->GetFpReg(i);
 
             printf(

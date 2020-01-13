@@ -108,37 +108,4 @@ struct NodeMemoryEvent
     uint64_t paddr;
 };
 
-// ============================================================================
-// Binary Trace v1
-
-union FpRegNodeUnion
-{
-    struct
-    {
-        uint64_t value;
-    } u64;
-    struct
-    {
-        float value;
-        uint32_t zero;
-    } f32;
-    struct
-    {
-        double value;
-    } f64;
-};
-
-struct Csr32Node
-{
-    uint32_t address;
-    uint32_t value;
-};
-
-struct Csr64Node
-{
-    uint32_t address;
-    uint32_t reserved;
-    uint64_t value;
-};
-
 }}

@@ -98,11 +98,6 @@ void System::WriteMemory(const void* pBuffer, size_t bufferSize, paddr_t addr)
     return m_Bus.Write(pBuffer, bufferSize, addr);
 }
 
-int System::GetCsrCount() const
-{
-    return m_Processor.GetCsrCount();
-}
-
 size_t System::GetRamSize() const
 {
     return m_Ram.GetCapacity();
@@ -134,16 +129,6 @@ void System::CopyIntReg(trace::NodeIntReg32* pOut) const
 void System::CopyIntReg(trace::NodeIntReg64* pOut) const
 {
     m_Processor.CopyIntReg(pOut);
-}
-
-void System::CopyCsr(trace::Csr32Node* pOutNodes, int nodeCount) const
-{
-    m_Processor.CopyCsr(pOutNodes, nodeCount);
-}
-
-void System::CopyCsr(trace::Csr64Node* pOutNodes, int nodeCount) const
-{
-    m_Processor.CopyCsr(pOutNodes, nodeCount);
 }
 
 void System::CopyFpReg(void* pOut, size_t size) const

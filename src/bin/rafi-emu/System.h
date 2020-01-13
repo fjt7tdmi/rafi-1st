@@ -58,9 +58,6 @@ public:
     vaddr_t GetPc() const;
     void CopyIntReg(trace::NodeIntReg32* pOut) const;
     void CopyIntReg(trace::NodeIntReg64* pOut) const;
-
-    void CopyCsr(trace::Csr32Node* pOutNodes, int nodeCount) const;
-    void CopyCsr(trace::Csr64Node* pOutNodes, int nodeCount) const;
     void CopyFpReg(void* pOut, size_t size) const;
     void CopyOpEvent(OpEvent* pOut) const;
     void CopyTrapEvent(TrapEvent* pOut) const;

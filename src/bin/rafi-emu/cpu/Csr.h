@@ -61,11 +61,6 @@ public:
     void WriteStatus(const xstatus_t& value);
     void WriteTime(uint64_t value);
 
-    // for Dump
-    int GetRegCount() const;
-    void Copy(trace::Csr32Node* pOutNodes, int nodeCount) const;
-    void Copy(trace::Csr64Node* pOutNodes, int nodeCount) const;
-
 private:
     static const int RegisterAddrWidth = 12;
 	static const int NumberOfRegister = 1 << RegisterAddrWidth;
