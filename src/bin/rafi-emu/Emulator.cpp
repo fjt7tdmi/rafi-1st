@@ -23,7 +23,7 @@ namespace rafi { namespace emu {
 Emulator::Emulator(CommandLineOption option)
     : m_Option(option)
     , m_System(option.GetXLEN(), option.GetPc(), option.GetRamSize())
-    , m_Logger(option.GetXLEN(), option.GetTraceLoggerConfig(), &m_System)
+    , m_Logger(option.GetXLEN(), option.GetLoggerConfig(), &m_System)
 {
     if (option.IsHostIoEnabled())
     {

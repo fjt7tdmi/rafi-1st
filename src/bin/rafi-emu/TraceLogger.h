@@ -21,14 +21,13 @@
 #include <rafi/trace.h>
 
 #include "System.h"
-#include "TraceLoggerConfig.h"
 
 namespace rafi { namespace emu {
 
 class TraceLogger final
 {
 public:
-    TraceLogger(XLEN xlen, const TraceLoggerConfig& config, const System* pSystem);
+    TraceLogger(XLEN xlen, const trace::LoggerConfig& config, const System* pSystem);
     ~TraceLogger();
 
     void BeginCycle(int cycle, vaddr_t pc);
@@ -38,7 +37,7 @@ public:
 
 private:
     XLEN m_XLEN;
-    TraceLoggerConfig m_Config;
+    trace::LoggerConfig m_Config;
     const System* m_pSystem {nullptr};
 
     trace::ITraceWriter* m_pTraceWriter {nullptr};

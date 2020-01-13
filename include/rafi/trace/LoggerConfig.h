@@ -18,11 +18,9 @@
 
 #include <string>
 
-#include <rafi/trace.h>
+namespace rafi { namespace trace {
 
-namespace rafi { namespace emu {
-
-struct TraceLoggerConfig
+struct LoggerConfig
 {
     bool enabled;
     bool enableDumpFpReg;

@@ -20,8 +20,7 @@
 #include <vector>
 
 #include <rafi/emu.h>
-
-#include "TraceLoggerConfig.h"
+#include <rafi/trace.h>
 
 namespace rafi { namespace emu {
 
@@ -47,7 +46,7 @@ public:
     bool IsGdbEnabled() const;
     bool IsHostIoEnabled() const;
 
-    const TraceLoggerConfig& GetTraceLoggerConfig() const;
+    const trace::LoggerConfig& GetLoggerConfig() const;
     const std::vector<LoadOption>& GetLoadOptions() const;
     XLEN GetXLEN() const;
 
@@ -66,7 +65,7 @@ private:
 
     uint64_t ParseHex(const std::string str);
 
-    TraceLoggerConfig m_TraceLoggerConfig;
+    trace::LoggerConfig m_LoggerConfig;
     std::vector<LoadOption> m_LoadOptions;
 
     XLEN m_XLEN {XLEN::XLEN32};

@@ -28,7 +28,7 @@ using namespace rafi::trace;
 
 namespace rafi { namespace emu {
 
-TraceLogger::TraceLogger(XLEN xlen, const TraceLoggerConfig& config, const System* pSystem)
+TraceLogger::TraceLogger(XLEN xlen, const trace::LoggerConfig& config, const System* pSystem)
     : m_XLEN(xlen)
     , m_Config(config)
     , m_pSystem(pSystem)
