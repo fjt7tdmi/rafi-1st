@@ -458,7 +458,7 @@ add_executable(rafi-emu
     src/bin/rafi-emu/TraceLoggerConfig.h
 )
 
-include_directories(rafi-emu include src/bin/rafi-emu/include)
+include_directories(rafi-emu include)
 
 target_link_libraries(rafi-emu
     librafi_emu
@@ -501,14 +501,22 @@ target_link_libraries(rafi-emu-test
 
 if (verilator_FOUND)
     # =========================================================================
-    # rafi-vtest-core
+    # rafi-sim
     #
-    add_executable(rafi-vtest-core
-        src/hw/core/CoreTest.cpp
+    add_executable(rafi-sim
+        src/bin/rafi-sim/CommandLineOption.cpp
+        src/bin/rafi-sim/CommandLineOption.h
+        src/bin/rafi-sim/Main.cpp
+        src/bin/rafi-sim/Simulator.cpp
+        src/bin/rafi-sim/Simulator.h
+        src/bin/rafi-sim/System.cpp
+        src/bin/rafi-sim/System.h
     )
-    verilate(rafi-vtest-core
+
+    verilate(rafi-sim
         PREFIX VCore
-        THREADS 2
+        THREADS 1
+        TRACE
         SOURCES
         src/hw/def/BasicTypes.sv
         src/hw/def/Rv32Types.sv
@@ -557,17 +565,26 @@ if (verilator_FOUND)
         src/hw/core/RegWriteStage.sv
         src/hw/core/Core.sv
     )
-    target_link_libraries(rafi-vtest-core
-        PRIVATE ${GoogleTest_LIBRARIES})
+
+    include_directories(rafi-sim include)
 
     # disable warnings for verilator
     if (MSVC)
-        target_compile_options(rafi-vtest-core
+        target_compile_options(rafi-sim
             PUBLIC /wd"4018"
             PUBLIC /wd"4267"
             PUBLIC /wd"4273"
         )
     endif()
+
+    target_link_libraries(rafi-sim
+        PRIVATE librafi_emu
+        PRIVATE librafi_fp
+        PRIVATE librafi_trace
+        PRIVATE librafi_common
+        PRIVATE ${Boost_LIBRARIES}
+        PRIVATE ${FS_LIBRARIES}
+    )
 
     # =========================================================================
     # rafi-vtest-timer

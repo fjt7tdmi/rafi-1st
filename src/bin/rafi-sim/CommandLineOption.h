@@ -14,17 +14,38 @@
  * limitations under the License.
  */
 
-#include <memory>
-#include <cstdio>
+#pragma once
 
-#pragma warning(push)
-#pragma warning(disable : 4389)
-#include <gtest/gtest.h>
-#pragma warning(pop)
+#include <string>
 
-#include "VCore.h"
+#include <rafi/emu.h>
 
-TEST(CoreTest, Dummy)
+namespace rafi { namespace sim {
+
+class CommandLineOption
 {
-    auto top = std::make_unique<VCore>();
-}
+public:
+    CommandLineOption(int argc, char** argv);
+
+    std::string GetLoadPath() const;
+    std::string GetVcdPath() const;
+
+    size_t GetRamSize() const;
+    int GetCycle() const;
+
+    bool IsHostIoEnabled() const;
+
+private:
+    static const int DefaultRamSize = 64 * 1024;
+
+    std::string m_LoadPath;
+    std::string m_VcdPath;
+
+    size_t m_RamSize {0};
+    int m_Cycle {0};
+
+    uint64_t m_HostIoAddress {0};
+    bool m_HostIoEnabled {false};
+};
+
+}}
