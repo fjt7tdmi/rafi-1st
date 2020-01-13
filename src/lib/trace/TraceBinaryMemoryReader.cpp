@@ -19,9 +19,75 @@
 
 #include <rafi/trace.h>
 
-#include "TraceBinaryMemoryReaderImpl.h"
+#include "BinaryCycle.h"
 
 namespace rafi { namespace trace {
+
+class TraceBinaryMemoryReaderImpl
+{
+public:
+    TraceBinaryMemoryReaderImpl(const void* buffer, size_t bufferSize)
+        : m_pBuffer(buffer)
+        , m_BufferSize(bufferSize)
+    {
+        CheckBufferSize();
+
+        m_pCycle = BinaryCycle::Parse(m_pBuffer, m_BufferSize);
+    }
+
+    ~TraceBinaryMemoryReaderImpl()
+    {
+        m_pCycle = nullptr;
+    }
+
+    const ICycle* GetCycle() const
+    {
+        return m_pCycle.get();
+    }
+
+    bool IsEnd() const
+    {
+        return m_Offset == m_BufferSize;
+    }
+
+    void Next()
+    {
+        m_Offset += m_pCycle->GetSize();
+
+        CheckOffset();
+
+        if (!IsEnd())
+        {
+            m_pCycle = BinaryCycle::Parse(reinterpret_cast<const uint8_t*>(m_pBuffer) + m_Offset, m_BufferSize - m_Offset);
+        }
+        else
+        {
+            m_pCycle = nullptr;
+        }
+    }
+
+private:
+    void CheckBufferSize() const
+    {
+        if (m_BufferSize < sizeof(NodeHeader))
+        {
+            throw TraceException("detect data corruption. (Data size is too small)");
+        }
+    }
+    
+    void CheckOffset() const
+    {
+        if (!(0 <= m_Offset && m_Offset <= m_BufferSize))
+        {
+            throw TraceException("detect data corruption. (Current offset value is out-of-range)", m_Offset);
+        }
+    }
+
+    const void* m_pBuffer{ nullptr };
+    size_t m_BufferSize{ 0 };
+    size_t m_Offset{ 0 };
+    std::unique_ptr<BinaryCycle> m_pCycle{ nullptr };
+};
 
 TraceBinaryMemoryReader::TraceBinaryMemoryReader(const void* buffer, size_t bufferSize)
 {

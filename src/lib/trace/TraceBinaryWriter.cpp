@@ -18,9 +18,41 @@
 
 #include <rafi/trace.h>
 
-#include "TraceBinaryWriterImpl.h"
-
 namespace rafi { namespace trace {
+
+class TraceBinaryWriterImpl final
+{
+public:
+    explicit TraceBinaryWriterImpl(const char* path)
+    {
+        m_File = std::fopen(path, "wb");
+        if (m_File == nullptr)
+        {
+            throw FileOpenFailureException(path);
+        }
+    }
+
+    ~TraceBinaryWriterImpl()
+    {
+        std::fclose(m_File);
+    }
+
+    void Write(void* buffer, int64_t size)
+    {
+#if INT64_MAX > SIZE_MAX
+        if (size > SIZE_MAX)
+        {
+            throw TraceException("argument 'size' overflow.");
+        }
+#endif
+
+        std::fwrite(buffer, static_cast<size_t>(size), 1, m_File);
+        std::fflush(m_File);
+    }
+
+private:
+    std::FILE* m_File;
+};
 
 TraceBinaryWriter::TraceBinaryWriter(const char* path)
 {
