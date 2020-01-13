@@ -17,6 +17,7 @@
 #pragma once
 
 #include <rafi/common.h>
+#include <rafi/trace/CycleTypes.h>
 
 namespace rafi { namespace trace {
 
@@ -26,18 +27,18 @@ public:
     virtual ~ILoggerTarget(){};
 
     virtual uint32_t GetHostIoValue() const = 0;
-    virtual vaddr_t GetPc() const = 0;
+    virtual uint64_t GetPc() const = 0;
 
     virtual size_t GetMemoryAccessEventCount() const = 0;
     virtual bool IsOpEventExist() const = 0;
     virtual bool IsTrapEventExist() const = 0;
 
-    virtual void CopyIntReg(trace::NodeIntReg32* pOut) const = 0;
-    virtual void CopyIntReg(trace::NodeIntReg64* pOut) const = 0;
-    virtual void CopyFpReg(void* pOut, size_t size) const = 0;
-    virtual void CopyOpEvent(OpEvent* pOut) const = 0;
-    virtual void CopyTrapEvent(TrapEvent* pOut) const = 0;
-    virtual void CopyMemoryAccessEvent(MemoryAccessEvent* pOut, int index) const = 0;
+    virtual void CopyIntReg(NodeIntReg32* pOut) const = 0;
+    virtual void CopyIntReg(NodeIntReg64* pOut) const = 0;
+    virtual void CopyFpReg(NodeFpReg* pOut) const = 0;
+    virtual void CopyOpEvent(NodeOpEvent* pOut) const = 0;
+    virtual void CopyTrapEvent(NodeTrapEvent* pOut) const = 0;
+    virtual void CopyMemoryAccessEvent(NodeMemoryEvent* pOut, int index) const = 0;
 };
 
 }}

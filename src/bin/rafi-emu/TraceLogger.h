@@ -27,7 +27,7 @@ namespace rafi { namespace emu {
 class TraceLogger final
 {
 public:
-    TraceLogger(XLEN xlen, const trace::LoggerConfig& config, const System* pSystem);
+    TraceLogger(XLEN xlen, const trace::LoggerConfig& config, const trace::ILoggerTarget* pSystem);
     ~TraceLogger();
 
     void BeginCycle(int cycle, vaddr_t pc);
@@ -37,8 +37,8 @@ public:
 
 private:
     XLEN m_XLEN;
-    trace::LoggerConfig m_Config;
-    const System* m_pSystem {nullptr};
+    const trace::LoggerConfig& m_Config;
+    const trace::ILoggerTarget* m_pLoggerTarget {nullptr};
 
     trace::ITraceWriter* m_pTraceWriter {nullptr};
     trace::BinaryCycleLogger* m_pCurrentCycle {nullptr};

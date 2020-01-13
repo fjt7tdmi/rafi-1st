@@ -57,6 +57,10 @@ System::System(XLEN xlen, vaddr_t pc, size_t ramSize)
     m_Clint.RegisterProcessor(&m_Processor);
 }
 
+System::~System()
+{    
+}
+
 void System::LoadFileToMemory(const char* path, paddr_t address)
 {
     m_Bus.LoadFileToMemory(path, address);
@@ -96,11 +100,6 @@ void System::ReadMemory(void* pOutBuffer, size_t bufferSize, paddr_t addr)
 void System::WriteMemory(const void* pBuffer, size_t bufferSize, paddr_t addr)
 {
     return m_Bus.Write(pBuffer, bufferSize, addr);
-}
-
-size_t System::GetRamSize() const
-{
-    return m_Ram.GetCapacity();
 }
 
 size_t System::GetMemoryAccessEventCount() const

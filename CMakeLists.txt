@@ -243,6 +243,7 @@ add_library(librafi_trace
     include/rafi/trace/ICycle.h
     include/rafi/trace/ITraceReader.h
     include/rafi/trace/ITraceWriter.h
+    include/rafi/trace/ILoggerTarget.h
     include/rafi/trace/LoggerConfig.h
     include/rafi/trace/TraceBinaryMemoryReader.h
     include/rafi/trace/TraceBinaryMemoryWriter.h

@@ -31,10 +31,11 @@
 
 namespace rafi { namespace emu {
 
-class System final
+class System final : public trace::ILoggerTarget
 {
 public:
     System(XLEN xlen, vaddr_t pc, size_t ramSize);
+    virtual ~System();
 
     // Setup
     void LoadFileToMemory(const char* path, paddr_t address);
@@ -49,24 +50,22 @@ public:
     void ReadMemory(void* pOutBuffer, size_t bufferSize, paddr_t addr);
     void WriteMemory(const void* pBuffer, size_t bufferSize, paddr_t addr);
 
-    // for Dump
-    int GetCsrCount() const;
-    size_t GetRamSize() const;
-    size_t GetMemoryAccessEventCount() const;
-    uint32_t GetHostIoValue() const;
-
-    vaddr_t GetPc() const;
-    void CopyIntReg(trace::NodeIntReg32* pOut) const;
-    void CopyIntReg(trace::NodeIntReg64* pOut) const;
-    void CopyFpReg(trace::NodeFpReg* pOut) const;
-    void CopyOpEvent(trace::NodeOpEvent* pOut) const;
-    void CopyTrapEvent(trace::NodeTrapEvent* pOut) const;
-    void CopyMemoryAccessEvent(trace::NodeMemoryEvent* pOut, int index) const;
-
-    bool IsOpEventExist() const;
-    bool IsTrapEventExist() const;
-
     void PrintStatus() const;
+
+    // ILoggerTarget
+    virtual uint32_t GetHostIoValue() const override;
+    virtual uint64_t GetPc() const;
+
+    virtual bool IsOpEventExist() const override;
+    virtual bool IsTrapEventExist() const override;
+    virtual size_t GetMemoryAccessEventCount() const override;
+
+    virtual void CopyIntReg(trace::NodeIntReg32* pOut) const override;
+    virtual void CopyIntReg(trace::NodeIntReg64* pOut) const override;
+    virtual void CopyFpReg(trace::NodeFpReg* pOut) const override;
+    virtual void CopyOpEvent(trace::NodeOpEvent* pOut) const override;
+    virtual void CopyTrapEvent(trace::NodeTrapEvent* pOut) const override;
+    virtual void CopyMemoryAccessEvent(trace::NodeMemoryEvent* pOut, int index) const override;
 
 private:
     static const paddr_t AddrRom = 0x00001000;

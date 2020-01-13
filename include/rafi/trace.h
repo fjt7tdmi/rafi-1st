@@ -26,6 +26,7 @@
 #include "trace/ITracePrinter.h"
 #include "trace/ITraceReader.h"
 #include "trace/ITraceWriter.h"
+#include "trace/ILoggerTarget.h"
 #include "trace/LoggerConfig.h"
 #include "trace/TraceBinaryMemoryReader.h"
 #include "trace/TraceBinaryMemoryWriter.h"

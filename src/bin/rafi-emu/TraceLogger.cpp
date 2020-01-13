@@ -28,10 +28,10 @@ using namespace rafi::trace;
 
 namespace rafi { namespace emu {
 
-TraceLogger::TraceLogger(XLEN xlen, const trace::LoggerConfig& config, const System* pSystem)
+TraceLogger::TraceLogger(XLEN xlen, const trace::LoggerConfig& config, const trace::ILoggerTarget* pLoggerTarget)
     : m_XLEN(xlen)
     , m_Config(config)
-    , m_pSystem(pSystem)
+    , m_pLoggerTarget(pLoggerTarget)
 {
     if (m_Config.enabled)
     {
@@ -69,13 +69,13 @@ void TraceLogger::RecordState()
         if (m_XLEN == XLEN::XLEN32)
         {
             NodeIntReg32 node;
-            m_pSystem->CopyIntReg(&node);
+            m_pLoggerTarget->CopyIntReg(&node);
             m_pCurrentCycle->Add(node);
         }
         else if (m_XLEN == XLEN::XLEN64)
         {
             NodeIntReg64 node;
-            m_pSystem->CopyIntReg(&node);
+            m_pLoggerTarget->CopyIntReg(&node);
             m_pCurrentCycle->Add(node);
         }
         else
@@ -87,13 +87,13 @@ void TraceLogger::RecordState()
     if (m_Config.enableDumpFpReg)
     {
         NodeFpReg node;
-        m_pSystem->CopyFpReg(&node);
+        m_pLoggerTarget->CopyFpReg(&node);
         m_pCurrentCycle->Add(node);
     }
 
     if (m_Config.enableDumpHostIo)
     {
-        NodeIo node = { m_pSystem->GetHostIoValue(), 0 };
+        NodeIo node = { m_pLoggerTarget->GetHostIoValue(), 0 };
         m_pCurrentCycle->Add(node);
     }
 }
@@ -105,10 +105,10 @@ void TraceLogger::RecordEvent()
         return;
     }
 
-    if (m_pSystem->IsOpEventExist())
+    if (m_pLoggerTarget->IsOpEventExist())
     {
         trace::NodeOpEvent opEvent;
-        m_pSystem->CopyOpEvent(&opEvent);
+        m_pLoggerTarget->CopyOpEvent(&opEvent);
 
         NodeOpEvent node
         {
@@ -118,10 +118,10 @@ void TraceLogger::RecordEvent()
         m_pCurrentCycle->Add(node);
     }
 
-    if (m_pSystem->IsTrapEventExist())
+    if (m_pLoggerTarget->IsTrapEventExist())
     {
         trace::NodeTrapEvent trapEvent;
-        m_pSystem->CopyTrapEvent(&trapEvent);
+        m_pLoggerTarget->CopyTrapEvent(&trapEvent);
 
         NodeTrapEvent node
         {
@@ -135,10 +135,10 @@ void TraceLogger::RecordEvent()
         m_pCurrentCycle->Add(node);
     }
 
-    for (int index = 0; index < m_pSystem->GetMemoryAccessEventCount(); index++)
+    for (int index = 0; index < m_pLoggerTarget->GetMemoryAccessEventCount(); index++)
     {
         trace::NodeMemoryEvent memoryEvent;
-        m_pSystem->CopyMemoryAccessEvent(&memoryEvent, index);
+        m_pLoggerTarget->CopyMemoryAccessEvent(&memoryEvent, index);
 
         NodeMemoryEvent node
         {
