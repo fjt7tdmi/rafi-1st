@@ -28,7 +28,7 @@ import Rv32Types::*;
 // parameter
 
 // Program Counter
-parameter InitialProgramCounter = 32'h00001000;
+parameter InitialProgramCounter = 32'h80000000;
 
 // Insn
 parameter InsnWidth = 32;
