@@ -28,7 +28,7 @@ class FpRegFile
 public:
     FpRegFile();
 
-    void Copy(void* pOut, size_t size) const;
+    void Copy(trace::NodeFpReg* pOut) const;
 
     uint32_t ReadUInt32(int regId) const;
     uint64_t ReadUInt64(int regId) const;

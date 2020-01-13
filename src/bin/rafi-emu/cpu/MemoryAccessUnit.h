@@ -53,7 +53,7 @@ public:
     void AddEvent(MemoryAccessType accessType, int size,  vaddr_t value, vaddr_t vaddr, paddr_t paddr);
     void ClearEvent();
 
-    void CopyEvent(MemoryAccessEvent* pOut, int index) const;
+    void CopyEvent(trace::NodeMemoryEvent* pOut, int index) const;
     size_t GetEventCount() const;
 
 private:
@@ -184,7 +184,7 @@ private:
 
     XLEN m_XLEN;
 
-    std::vector<MemoryAccessEvent> m_Events;
+    std::vector<trace::NodeMemoryEvent> m_Events;
 };
 
 }}}

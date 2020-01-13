@@ -243,6 +243,9 @@ add_library(librafi_trace
     include/rafi/trace/ICycle.h
     include/rafi/trace/ITraceReader.h
     include/rafi/trace/ITraceWriter.h
+    include/rafi/trace/ILoggerTarget.h
+    include/rafi/trace/Logger.h
+    include/rafi/trace/LoggerConfig.h
     include/rafi/trace/TraceBinaryMemoryReader.h
     include/rafi/trace/TraceBinaryMemoryWriter.h
     include/rafi/trace/TraceBinaryReader.h
@@ -256,42 +259,25 @@ add_library(librafi_trace
     src/lib/trace/BinaryCycle.cpp
     src/lib/trace/BinaryCycle.h
     src/lib/trace/BinaryCycleLogger.cpp
-    src/lib/trace/BinaryCycleLoggerImpl.cpp
-    src/lib/trace/BinaryCycleLoggerImpl.h
     src/lib/trace/GdbCycle.cpp
     src/lib/trace/GdbCycle.h
     src/lib/trace/GdbTrace.cpp
     src/lib/trace/GdbTrace.h
     src/lib/trace/GdbTraceReader.cpp
+    src/lib/trace/Logger.cpp
     src/lib/trace/TextCycle.cpp
     src/lib/trace/TextCycle.h
     src/lib/trace/TextTrace.cpp
     src/lib/trace/TextTrace.h
     src/lib/trace/TraceBinaryMemoryReader.cpp
-    src/lib/trace/TraceBinaryMemoryReaderImpl.cpp
-    src/lib/trace/TraceBinaryMemoryReaderImpl.h
     src/lib/trace/TraceBinaryMemoryWriter.cpp
-    src/lib/trace/TraceBinaryMemoryWriterImpl.cpp
-    src/lib/trace/TraceBinaryMemoryWriterImpl.h
     src/lib/trace/TraceBinaryReader.cpp
-    src/lib/trace/TraceBinaryReaderImpl.cpp
-    src/lib/trace/TraceBinaryReaderImpl.h
     src/lib/trace/TraceBinaryWriter.cpp
-    src/lib/trace/TraceBinaryWriterImpl.cpp
-    src/lib/trace/TraceBinaryWriterImpl.h
     src/lib/trace/TraceIndexReader.cpp
-    src/lib/trace/TraceIndexReaderImpl.cpp
-    src/lib/trace/TraceIndexReaderImpl.h
     src/lib/trace/TraceIndexWriter.cpp
-    src/lib/trace/TraceIndexWriterImpl.cpp
-    src/lib/trace/TraceIndexWriterImpl.h
     src/lib/trace/TraceJsonPrinter.cpp
-    src/lib/trace/TraceJsonPrinterImpl.cpp
-    src/lib/trace/TraceJsonPrinterImpl.h
     src/lib/trace/TracePcPrinter.cpp
     src/lib/trace/TraceTextPrinter.cpp
-    src/lib/trace/TraceTextPrinterImpl.cpp
-    src/lib/trace/TraceTextPrinterImpl.h
     src/lib/trace/TraceTextReader.cpp
 )
 
@@ -453,9 +439,6 @@ add_executable(rafi-emu
     src/bin/rafi-emu/Socket.h
     src/bin/rafi-emu/System.cpp
     src/bin/rafi-emu/System.h
-    src/bin/rafi-emu/TraceLogger.cpp
-    src/bin/rafi-emu/TraceLogger.h
-    src/bin/rafi-emu/TraceLoggerConfig.h
 )
 
 include_directories(rafi-emu include)

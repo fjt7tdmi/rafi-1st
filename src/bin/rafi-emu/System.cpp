@@ -57,6 +57,10 @@ System::System(XLEN xlen, vaddr_t pc, size_t ramSize)
     m_Clint.RegisterProcessor(&m_Processor);
 }
 
+System::~System()
+{    
+}
+
 void System::LoadFileToMemory(const char* path, paddr_t address)
 {
     m_Bus.LoadFileToMemory(path, address);
@@ -98,16 +102,6 @@ void System::WriteMemory(const void* pBuffer, size_t bufferSize, paddr_t addr)
     return m_Bus.Write(pBuffer, bufferSize, addr);
 }
 
-int System::GetCsrCount() const
-{
-    return m_Processor.GetCsrCount();
-}
-
-size_t System::GetRamSize() const
-{
-    return m_Ram.GetCapacity();
-}
-
 size_t System::GetMemoryAccessEventCount() const
 {
     return m_Processor.GetMemoryAccessEventCount();
@@ -136,32 +130,22 @@ void System::CopyIntReg(trace::NodeIntReg64* pOut) const
     m_Processor.CopyIntReg(pOut);
 }
 
-void System::CopyCsr(trace::Csr32Node* pOutNodes, int nodeCount) const
+void System::CopyFpReg(trace::NodeFpReg* pOut) const
 {
-    m_Processor.CopyCsr(pOutNodes, nodeCount);
+    m_Processor.CopyFpReg(pOut);
 }
 
-void System::CopyCsr(trace::Csr64Node* pOutNodes, int nodeCount) const
-{
-    m_Processor.CopyCsr(pOutNodes, nodeCount);
-}
-
-void System::CopyFpReg(void* pOut, size_t size) const
-{
-    m_Processor.CopyFpReg(pOut, size);
-}
-
-void System::CopyOpEvent(OpEvent* pOut) const
+void System::CopyOpEvent(trace::NodeOpEvent* pOut) const
 {
     return m_Processor.CopyOpEvent(pOut);
 }
 
-void System::CopyTrapEvent(TrapEvent* pOut) const
+void System::CopyTrapEvent(trace::NodeTrapEvent* pOut) const
 {
     return m_Processor.CopyTrapEvent(pOut);
 }
 
-void System::CopyMemoryAccessEvent(MemoryAccessEvent* pOut, int index) const
+void System::CopyMemoryAccessEvent(trace::NodeMemoryEvent* pOut, int index) const
 {
     return m_Processor.CopyMemoryAccessEvent(pOut, index);
 }

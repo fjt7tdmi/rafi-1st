@@ -23,7 +23,7 @@ namespace rafi { namespace emu {
 Emulator::Emulator(CommandLineOption option)
     : m_Option(option)
     , m_System(option.GetXLEN(), option.GetPc(), option.GetRamSize())
-    , m_Logger(option.GetXLEN(), option.GetTraceLoggerConfig(), &m_System)
+    , m_Logger(option.GetXLEN(), option.GetLoggerConfig(), &m_System)
 {
     if (option.IsHostIoEnabled())
     {
@@ -149,10 +149,10 @@ bool Emulator::IsStopConditionFilledPost(EmulationStop condition)
     {
         if (m_System.IsTrapEventExist())
         {
-            TrapEvent trapEvent;
+            trace::NodeTrapEvent trapEvent;
             m_System.CopyTrapEvent(&trapEvent);
 
-            return trapEvent.trapType == TrapType::Exception && trapEvent.trapCause == static_cast<uint32_t>(ExceptionType::Breakpoint);
+            return trapEvent.trapType == TrapType::Exception && trapEvent.cause == static_cast<uint32_t>(ExceptionType::Breakpoint);
         }
     }
 

@@ -103,7 +103,6 @@ CommandLineOption::CommandLineOption(int argc, char** argv)
         ("cycle", po::value<int>(&m_Cycle)->default_value(0), "number of emulation cycles")
         ("dump-path", po::value<std::string>(), "path of dump file")
         ("dump-skip-cycle", po::value<int>(&m_DumpSkipCycle)->default_value(0), "number of cycles to skip dump")
-        ("enable-dump-csr", "output csr contents to dump file")
         ("enable-dump-fp-reg", "output fp register contents to dump file")
         ("enable-dump-memory", "output memory contents to dump file")
         ("gdb", po::value<int>(&m_GdbPort), "enable gdb and specify tcp port")
@@ -138,18 +137,15 @@ CommandLineOption::CommandLineOption(int argc, char** argv)
 
     if (variables.count("dump-path"))
     {
-        m_TraceLoggerConfig.enabled = true;
-        m_TraceLoggerConfig.enableDumpIntReg = true;
-        m_TraceLoggerConfig.enableDumpCsr = variables.count("enable-dump-csr") > 0;
-        m_TraceLoggerConfig.enableDumpFpReg = variables.count("enable-dump-fp-reg") > 0;
-        m_TraceLoggerConfig.enableDumpCsr = variables.count("enable-memory-csr") > 0;
-        m_TraceLoggerConfig.enableDumpMemory = false;
-        m_TraceLoggerConfig.enableDumpHostIo = m_HostIoEnabled;
-        m_TraceLoggerConfig.path = variables["dump-path"].as<std::string>();
+        m_LoggerConfig.enabled = true;
+        m_LoggerConfig.enableDumpIntReg = true;
+        m_LoggerConfig.enableDumpFpReg = variables.count("enable-dump-fp-reg") > 0;
+        m_LoggerConfig.enableDumpHostIo = m_HostIoEnabled;
+        m_LoggerConfig.path = variables["dump-path"].as<std::string>();
     }
     else
     {
-        m_TraceLoggerConfig.enabled = false;
+        m_LoggerConfig.enabled = false;
     }
 
     if (variables.count("dtb-addr"))
@@ -206,9 +202,9 @@ bool CommandLineOption::IsGdbEnabled() const
     return m_GdbEnabled;
 }
 
-const TraceLoggerConfig& CommandLineOption::GetTraceLoggerConfig() const
+const trace::LoggerConfig& CommandLineOption::GetLoggerConfig() const
 {
-    return m_TraceLoggerConfig;
+    return m_LoggerConfig;
 }
 
 const std::vector<LoadOption>& CommandLineOption::GetLoadOptions() const

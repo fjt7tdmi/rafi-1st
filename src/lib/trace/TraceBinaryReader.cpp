@@ -14,11 +14,110 @@
  * limitations under the License.
  */
 
+#include <cstdlib>
+
 #include <rafi/trace.h>
 
-#include "TraceBinaryReaderImpl.h"
+#include "BinaryCycle.h"
+
+#if defined(__GNUC__)
+#include <experimental/filesystem>
+#else
+#include <filesystem>
+#endif
+
+#include <cstddef>
+#include <cstdint>
+
+#include <rafi/trace.h>
+
+#if defined(__GNUC__)
+namespace fs = std::experimental::filesystem;
+#else
+namespace fs = std::filesystem;
+#endif
 
 namespace rafi { namespace trace {
+
+class TraceBinaryReaderImpl final
+{
+public:
+    TraceBinaryReaderImpl(const char* path)
+    {
+        uintmax_t fileSize;
+
+        try
+        {
+            fileSize = fs::file_size(path);
+        }
+        catch (fs::filesystem_error&)
+        {
+            throw FileOpenFailureException(path);
+        }
+
+    #if UINTMAX_MAX > SIZE_MAX
+        if (fileSize > SIZE_MAX)
+        {
+            throw FileOpenFailureException(path);
+        }
+    #endif
+
+        if (fileSize > 0)
+        {
+            m_pBuffer = malloc(fileSize);
+            if (m_pBuffer == nullptr)
+            {
+                throw TraceException("Failed to allocate memory.\n");
+            }
+            m_BufferSize = fileSize;
+
+            auto fp = std::fopen(path, "rb");
+
+            auto n = std::fread(m_pBuffer, m_BufferSize, 1, fp);
+            if (n != 1)
+            {
+                throw TraceException("Failed to read file.\n");
+            }
+
+            std::fclose(fp);
+
+            m_pImpl = new TraceBinaryMemoryReader(m_pBuffer, m_BufferSize);
+        }
+    }
+
+    ~TraceBinaryReaderImpl()
+    {
+        if (m_pImpl != nullptr)
+        {
+            delete m_pImpl;
+        }
+        if (m_pBuffer != nullptr)
+        {
+            free(m_pBuffer);
+        }
+    }
+
+    const ICycle* GetCycle() const
+    {
+        return m_pImpl->GetCycle();
+    }
+
+    bool IsEnd() const
+    {
+        return m_pImpl == nullptr || m_pImpl->IsEnd();
+    }
+
+    void Next()
+    {
+        m_pImpl->Next();
+    }
+
+private:
+    void* m_pBuffer{ nullptr };
+    size_t m_BufferSize{ 0 };
+
+    TraceBinaryMemoryReader* m_pImpl;
+};
 
 TraceBinaryReader::TraceBinaryReader(const char* path)
 {

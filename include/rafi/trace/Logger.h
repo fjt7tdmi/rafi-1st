@@ -16,44 +16,28 @@
 
 #pragma once
 
-#include <vector>
+#include <cstdio>
 
-#include <rafi/trace.h>
-
-#include "BinaryCycle.h"
-#include "TraceBinaryReaderImpl.h"
+#include <rafi/trace/ILoggerTarget.h>
+#include <rafi/trace/LoggerConfig.h>
 
 namespace rafi { namespace trace {
 
-class TraceIndexReaderImpl final
+class LoggerImpl;
+
+class Logger final
 {
 public:
-    TraceIndexReaderImpl(const char* path);
-    ~TraceIndexReaderImpl();
+    Logger(XLEN xlen, const trace::LoggerConfig& config, const trace::ILoggerTarget* pSystem);
+    ~Logger();
 
-    const ICycle* GetCycle() const;
-
-    bool IsEnd() const;
-
-    void Next();
-    void Next(uint32_t cycle);
+    void BeginCycle(int cycle, uint64_t pc);
+    void RecordState();
+    void RecordEvent();
+    void EndCycle();
 
 private:
-    void ParseIndexFile(const char* path);
-    void UpdateTraceBinary();
-
-    struct Entry
-    {
-        std::string path;
-        uint32_t cycle;
-    };
-
-    std::vector<Entry> m_Entries;
-
-    int m_EntryIndex{ 0 }; // current index of m_Entries
-    uint32_t m_Cycle{ 0 };
-
-    TraceBinaryReaderImpl* m_pTraceBinary{ nullptr };
+    LoggerImpl* m_pImpl;
 };
 
 }}

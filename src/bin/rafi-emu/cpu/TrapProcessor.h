@@ -40,7 +40,7 @@ public:
 
     // for Dump
     void ClearEvent();
-    void CopyTrapEvent(TrapEvent* pOut) const;
+    void CopyTrapEvent(trace::NodeTrapEvent* pOut) const;
     bool IsTrapEventExist() const;
 
 private:
@@ -49,7 +49,7 @@ private:
     XLEN m_XLEN;
     Csr* m_pCsr;
 
-    TrapEvent m_TrapEvent;
+    trace::NodeTrapEvent m_TrapEvent;
     bool m_TrapEventValid { false };
 };
 

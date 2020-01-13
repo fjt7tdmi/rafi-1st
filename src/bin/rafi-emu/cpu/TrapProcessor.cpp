@@ -117,7 +117,7 @@ void TrapProcessor::ClearEvent()
     std::memset(&m_TrapEvent, 0, sizeof(m_TrapEvent));
 }
 
-void TrapProcessor::CopyTrapEvent(TrapEvent* pOut) const
+void TrapProcessor::CopyTrapEvent(trace::NodeTrapEvent* pOut) const
 {
     std::memcpy(pOut, &m_TrapEvent, sizeof(*pOut));
 }
@@ -225,7 +225,7 @@ void TrapProcessor::ProcessTrapEnter(bool isInterrupt, uint32_t exceptionCode, u
     m_TrapEvent.trapType = isInterrupt ? TrapType::Interrupt : TrapType::Exception;
     m_TrapEvent.from = m_pCsr->GetPrivilegeLevel();
     m_TrapEvent.to = nextPrivilegeLevel;
-    m_TrapEvent.trapCause = exceptionCode;
+    m_TrapEvent.cause = exceptionCode;
     m_TrapEvent.trapValue = trapValue;
 }
 

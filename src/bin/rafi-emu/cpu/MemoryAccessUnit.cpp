@@ -166,7 +166,7 @@ void MemoryAccessUnit::ClearEvent()
     m_Events.clear();
 }
 
-void MemoryAccessUnit::CopyEvent(MemoryAccessEvent* pOut, int index) const
+void MemoryAccessUnit::CopyEvent(trace::NodeMemoryEvent* pOut, int index) const
 {
     *pOut = m_Events[index];
 }

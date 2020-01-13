@@ -832,31 +832,4 @@ void Csr::PrintRegisterUnimplementedMessage(csr_addr_t addr) const
     printf("Detect unimplemented CSR access (addr=0x%03x).\n", static_cast<int>(addr));
 }
 
-int Csr::GetRegCount() const
-{
-    return sizeof(DumpAddresses) / sizeof(DumpAddresses[0]);
-}
-
-void Csr::Copy(trace::Csr32Node* pOutNodes, int nodeCount) const
-{
-    assert(nodeCount == GetRegCount());
-
-    for (int i = 0; i < nodeCount; i++)
-    {
-        pOutNodes[i].address = static_cast<uint32_t>(DumpAddresses[i]);
-        pOutNodes[i].value = ReadUInt32(DumpAddresses[i]);
-    }
-}
-
-void Csr::Copy(trace::Csr64Node* pOutNodes, int nodeCount) const
-{
-    assert(nodeCount == GetRegCount());
-
-    for (int i = 0; i < nodeCount; i++)
-    {
-        pOutNodes[i].address = static_cast<uint32_t>(DumpAddresses[i]);
-        pOutNodes[i].value = ReadUInt64(DumpAddresses[i]);
-    }
-}
-
 }}}
