@@ -88,10 +88,10 @@ Then, run riscv-tests or linux.
 
 ```
 # Run riscv-tests
-./script/run_riscv_tests.sh
+./script/run_emu_riscv_tests.sh
 
 # Boot linux (it will halt while running /init because of my bug :P)
-./script/run_linux.sh
+./script/run_emu_linux.sh
 ```
 
 ## Run HDL simulation by verilator
