@@ -23,7 +23,7 @@ from functools import reduce
 from operator import or_
 
 BinaryDirPath = "./third_party/rafi-prebuilt-binary/riscv-tests/isa"
-TraceDirPath = "./work/riscv-tests/trace"
+WorkDirPath = "./work/riscv-tests"
 Timeout = 30
 
 #
@@ -40,22 +40,16 @@ def ReadConfig(json_path, name_filter, build_type):
 
         return (runnable, skipped, unmatched)
 
-def GetCheckIoPath(build_type):
+def GetBinPath(build_type, filename):
     if os.name == "nt":
-        return f"./build_{build_type}/{build_type}/rafi-check-io.exe"
+        return f"./build_{build_type}/{build_type}/{filename}.exe"
     else:
-        return f"./build_{build_type}/rafi-check-io"
-
-def GetEmulatorPath(build_type):
-    if os.name == "nt":
-        return f"./build_{build_type}/{build_type}/rafi-emu.exe"
-    else:
-        return f"./build_{build_type}/rafi-emu"
+        return f"./build_{build_type}/{filename}"
 
 def InitializeDirectory(path):
     os.makedirs(path, exist_ok=True)
-    for filename in os.listdir(f"{TraceDirPath}"):
-        os.remove(f"{TraceDirPath}/{filename}")
+    for filename in os.listdir(f"{WorkDirPath}"):
+        os.remove(f"{WorkDirPath}/{filename}")
 
 def PrintCommand(msg, cmd):
     print(f"{msg} {cmd[0]}")
@@ -67,16 +61,16 @@ def PrintCommand(msg, cmd):
             print(', '.join(args))
 
 def VerifyTraces(paths, build_type):
-    cmd = [GetCheckIoPath(build_type)]
+    cmd = [GetBinPath(build_type, "rafi-check-io")]
     cmd.extend(paths)
     PrintCommand("Run", cmd)
     return subprocess.run(cmd).returncode
 
 def RunEmulator(config):
     binary_path = f"{BinaryDirPath}/{config['name']}.bin"
-    trace_path = f"{TraceDirPath}/{config['name']}"
+    trace_path = f"{WorkDirPath}/{config['name']}"
     cmd = [
-        GetEmulatorPath(config['build_type']),
+        GetBinPath(config['build_type'], "rafi-emu"),
         "--cycle", str(config['cycle']),
         "--load", f"{binary_path}:0x80000000",
         "--enable-dump-fp-reg",
@@ -92,19 +86,42 @@ def RunEmulator(config):
     if result.returncode != 0:
         return False # Emulation Failure
 
-def RunTests(configs, build_type):
+def RunSimulator(config):
+    load_path = f"{BinaryDirPath}/{config['name']}.bin"
+    vcd_path = f"{WorkDirPath}/{config['name']}.vcd"
+    cmd = [
+        GetBinPath(config['build_type'], "rafi-sim"),
+        "--cycle", str(config['cycle']),
+        "--load-path", load_path,
+        "--vcd-path", vcd_path,
+        "--host-io-addr", str(config['host-io-addr']),
+    ]
+
+    PrintCommand("Run", cmd)
+
+    result = subprocess.run(cmd)
+    if result.returncode != 0:
+        return False # Emulation Failure
+
+
+def RunTests(configs, build_type, use_simulator):
     for config in configs:
         config['build_type'] = build_type
 
     with multiprocessing.Pool(multiprocessing.cpu_count()) as p:
         # use map_async() to avoid problem with Ctrl-C
         # https://stackoverflow.com/questions/1408356/keyboard-interrupts-with-pythons-multiprocessing-pool
-        p.map_async(RunEmulator, configs).get(Timeout)
+        if use_simulator:
+            p.map_async(RunSimulator, configs).get(Timeout)
+        else:
+            p.map_async(RunEmulator, configs).get(Timeout)
 
-    trace_paths = list(map(lambda config: f"{TraceDirPath}/{config['name']}.tidx", configs))
-    exit_code = VerifyTraces(trace_paths, build_type)
-
-    return exit_code
+    if use_simulator:
+        return 0
+    else:
+        trace_paths = list(map(lambda config: f"{WorkDirPath}/{config['name']}.tidx", configs))
+        exit_code = VerifyTraces(trace_paths, build_type)
+        return exit_code
 
 #
 # Entry point
@@ -115,6 +132,7 @@ if __name__ == '__main__':
     parser.add_option("-f", dest="filter", default="*", help="Filter test by name.")
     parser.add_option("-i", dest="input_path", default=None, help="Input test list json path.")
     parser.add_option("-l", dest="list_tests", action="store_true", default=False, help="List test names.")
+    parser.add_option("--sim", dest="use_simulator", action="store_true", default=False, help="Use rafi-sim instead of rafi-emu.")
 
     (options, args) = parser.parse_args()
 
@@ -132,11 +150,11 @@ if __name__ == '__main__':
         exit(0)
 
     print("-------------------------------------------------------------")
-    print(f"Initialize trace directory ({TraceDirPath})")
-    InitializeDirectory(TraceDirPath)
+    print(f"Initialize trace directory ({WorkDirPath})")
+    InitializeDirectory(WorkDirPath)
 
     print("Run test on emulator:")
-    exit_code = RunTests(runnable, build_type)
+    exit_code = RunTests(runnable, build_type, options.use_simulator)
 
     if len(skipped) > 0:
         print("Skipped tests:")
