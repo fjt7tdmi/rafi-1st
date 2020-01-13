@@ -22,13 +22,13 @@
 
 namespace rafi { namespace trace {
 
-class BinaryCycleLoggerImpl;
+class BinaryCycleBuilderImpl;
 
-class BinaryCycleLogger final
+class BinaryCycleBuilder final
 {
 public:
-    BinaryCycleLogger(uint32_t cycle, const XLEN& xlen, uint64_t pc);
-    ~BinaryCycleLogger();
+    BinaryCycleBuilder(uint32_t cycle, const XLEN& xlen, uint64_t pc);
+    ~BinaryCycleBuilder();
 
     void Add(const NodeIntReg32& value);
     void Add(const NodeIntReg64& value);
@@ -47,7 +47,7 @@ public:
     size_t GetDataSize() const;
 
 private:
-    BinaryCycleLoggerImpl* m_pImpl;
+    BinaryCycleBuilderImpl* m_pImpl;
 };
 
 }}

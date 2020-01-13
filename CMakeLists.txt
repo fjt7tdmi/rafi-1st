@@ -236,7 +236,7 @@ include_directories(librafi_fp include ${Softfloat_INCLUDE_DIRS})
 #
 add_library(librafi_trace
     include/rafi/trace.h
-    include/rafi/trace/BinaryCycleLogger.h
+    include/rafi/trace/BinaryCycleBuilder.h
     include/rafi/trace/CycleTypes.h
     include/rafi/trace/Exception.h
     include/rafi/trace/GdbTraceReader.h
@@ -258,7 +258,7 @@ add_library(librafi_trace
     include/rafi/trace/TraceTextReader.h
     src/lib/trace/BinaryCycle.cpp
     src/lib/trace/BinaryCycle.h
-    src/lib/trace/BinaryCycleLogger.cpp
+    src/lib/trace/BinaryCycleBuilder.cpp
     src/lib/trace/GdbCycle.cpp
     src/lib/trace/GdbCycle.h
     src/lib/trace/GdbTrace.cpp

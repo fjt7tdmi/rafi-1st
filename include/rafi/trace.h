@@ -18,7 +18,7 @@
 
 #include <rafi/common.h>
 
-#include "trace/BinaryCycleLogger.h"
+#include "trace/BinaryCycleBuilder.h"
 #include "trace/CycleTypes.h"
 #include "trace/Exception.h"
 #include "trace/GdbTraceReader.h"

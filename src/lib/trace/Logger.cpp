@@ -51,7 +51,7 @@ public:
             return;
         }
 
-        m_pCurrentCycle = new BinaryCycleLogger(cycle, m_XLEN, pc);
+        m_pCurrentCycle = new BinaryCycleBuilder(cycle, m_XLEN, pc);
     }
 
     void RecordState()
@@ -170,7 +170,7 @@ private:
     const trace::ILoggerTarget* m_pLoggerTarget {nullptr};
 
     trace::ITraceWriter* m_pTraceWriter {nullptr};
-    trace::BinaryCycleLogger* m_pCurrentCycle {nullptr};
+    trace::BinaryCycleBuilder* m_pCurrentCycle {nullptr};
 };
 
 Logger::Logger(XLEN xlen, const trace::LoggerConfig& config, const trace::ILoggerTarget* pSystem)

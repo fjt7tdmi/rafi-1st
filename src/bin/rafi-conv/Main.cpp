@@ -36,7 +36,7 @@ void Convert(const char* inPath, const char* outPathBase)
             const auto xlen = reader->GetCycle()->GetXLEN();
             const auto pc = reader->GetCycle()->GetPc();
 
-            trace::BinaryCycleLogger cycleLogger(cycle, xlen, pc);
+            trace::BinaryCycleBuilder cycleBuilder(cycle, xlen, pc);
 
             if (reader->GetCycle()->IsIntRegExist())
             {
@@ -47,7 +47,7 @@ void Convert(const char* inPath, const char* outPathBase)
                     {
                         node.regs[i] = static_cast<uint32_t>(reader->GetCycle()->GetIntReg(i));
                     }
-                    cycleLogger.Add(node);
+                    cycleBuilder.Add(node);
                 }
                 else if (xlen == XLEN::XLEN64)
                 {
@@ -56,7 +56,7 @@ void Convert(const char* inPath, const char* outPathBase)
                     {
                         node.regs[i] = reader->GetCycle()->GetIntReg(i);
                     }
-                    cycleLogger.Add(node);
+                    cycleBuilder.Add(node);
                 }
                 else
                 {
@@ -64,9 +64,9 @@ void Convert(const char* inPath, const char* outPathBase)
                 }
             }
 
-            cycleLogger.Break();
+            cycleBuilder.Break();
 
-            writer->Write(cycleLogger.GetData(), static_cast<int64_t>(cycleLogger.GetDataSize()));
+            writer->Write(cycleBuilder.GetData(), static_cast<int64_t>(cycleBuilder.GetDataSize()));
 
             reader->Next();
         }

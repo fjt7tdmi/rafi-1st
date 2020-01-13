@@ -24,10 +24,10 @@ namespace {
     size_t DefaultBufferSize = 4096;
 }
 
-class BinaryCycleLoggerImpl final
+class BinaryCycleBuilderImpl final
 {
 public:
-    BinaryCycleLoggerImpl(uint32_t cycle, const XLEN& xlen, uint64_t pc)
+    BinaryCycleBuilderImpl(uint32_t cycle, const XLEN& xlen, uint64_t pc)
     {
         m_pBuffer = malloc(DefaultBufferSize);
         m_BufferSize = DefaultBufferSize;
@@ -36,7 +36,7 @@ public:
         Add(node);
     }
 
-    ~BinaryCycleLoggerImpl()
+    ~BinaryCycleBuilderImpl()
     {
         free(m_pBuffer);
     }
@@ -103,12 +103,12 @@ private:
     {
         if (m_DataSize + sizeof(NodeHeader) + nodeSize > m_BufferSize)
         {
-            throw TraceException("Buffer overflow @ BinaryCycleLoggerImpl.\n");
+            throw TraceException("Buffer overflow @ BinaryCycleBuilderImpl.\n");
         }
 
         if (nodeSize > UINT32_MAX)
         {
-            throw TraceException("Node size is too large @ BinaryCycleLoggerImpl.\n");
+            throw TraceException("Node size is too large @ BinaryCycleBuilderImpl.\n");
         }
 
         NodeHeader header{ nodeId, 0, static_cast<uint32_t>(nodeSize) };
@@ -128,62 +128,62 @@ private:
     size_t m_DataSize{ 0 };
 };
 
-BinaryCycleLogger::BinaryCycleLogger(uint32_t cycle, const XLEN& xlen, uint64_t pc)
+BinaryCycleBuilder::BinaryCycleBuilder(uint32_t cycle, const XLEN& xlen, uint64_t pc)
 {
-    m_pImpl = new BinaryCycleLoggerImpl(cycle, xlen, pc);
+    m_pImpl = new BinaryCycleBuilderImpl(cycle, xlen, pc);
 }
 
-BinaryCycleLogger::~BinaryCycleLogger()
+BinaryCycleBuilder::~BinaryCycleBuilder()
 {
     delete m_pImpl;
 }
 
-void BinaryCycleLogger::Add(const NodeIntReg32& value)
+void BinaryCycleBuilder::Add(const NodeIntReg32& value)
 {
     m_pImpl->Add(value);
 }
 
-void BinaryCycleLogger::Add(const NodeIntReg64& value)
+void BinaryCycleBuilder::Add(const NodeIntReg64& value)
 {
     m_pImpl->Add(value);
 }
 
-void BinaryCycleLogger::Add(const NodeFpReg& value)
+void BinaryCycleBuilder::Add(const NodeFpReg& value)
 {
     m_pImpl->Add(value);
 }
 
-void BinaryCycleLogger::Add(const NodeIo& value)
+void BinaryCycleBuilder::Add(const NodeIo& value)
 {
     m_pImpl->Add(value);
 }
 
-void BinaryCycleLogger::Add(const NodeOpEvent& value)
+void BinaryCycleBuilder::Add(const NodeOpEvent& value)
 {
     m_pImpl->Add(value);
 }
 
-void BinaryCycleLogger::Add(const NodeTrapEvent& value)
+void BinaryCycleBuilder::Add(const NodeTrapEvent& value)
 {
     m_pImpl->Add(value);
 }
 
-void BinaryCycleLogger::Add(const NodeMemoryEvent& value)
+void BinaryCycleBuilder::Add(const NodeMemoryEvent& value)
 {
     m_pImpl->Add(value);
 }
 
-void BinaryCycleLogger::Break()
+void BinaryCycleBuilder::Break()
 {
     m_pImpl->Break();
 }
 
-void* BinaryCycleLogger::GetData()
+void* BinaryCycleBuilder::GetData()
 {
     return m_pImpl->GetData();
 }
 
-size_t BinaryCycleLogger::GetDataSize() const
+size_t BinaryCycleBuilder::GetDataSize() const
 {
     return m_pImpl->GetDataSize();
 }
