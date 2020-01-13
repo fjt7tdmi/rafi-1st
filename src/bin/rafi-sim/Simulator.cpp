@@ -23,6 +23,8 @@ namespace rafi { namespace sim {
 Simulator::Simulator(const CommandLineOption& option)
     : m_Option(option)
 {
+    Verilated::traceEverOn(true);
+
     m_pTfp = new VerilatedVcdC();
     m_pCore = new VCore();
     m_pSystem = new System(m_pCore, option.GetRamSize());
