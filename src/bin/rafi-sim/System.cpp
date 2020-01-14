@@ -18,6 +18,9 @@
 
 #include "System.h"
 
+#include "VCore_Core.h"
+#include "VCore_RegWriteStage.h"
+
 namespace rafi { namespace sim {
 
 namespace {
@@ -34,6 +37,11 @@ System::System(VCore* pCore, size_t ramSize)
 
 System::~System()
 {    
+}
+
+void System::SetHostIoAddr(paddr_t hostIoAddr)
+{
+    m_HostIoAddr = hostIoAddr;
 }
 
 void System::LoadFileToMemory(const char* path)
@@ -96,16 +104,22 @@ void System::UpdateSignal()
     }
 }
 
+bool System::IsOpRetired()
+{
+    return m_pCore->Core->m_RegWriteStage->valid;
+}
+
 uint32_t System::GetHostIoValue() const
 {
-    // TODO: implement
-    RAFI_NOT_IMPLEMENTED;
+    uint32_t value;
+    m_Ram.Read(&value, sizeof(value), m_HostIoAddr - AddrRam);
+
+    return value;
 }
 
 uint64_t System::GetPc() const
 {
-    // TODO: implement
-    RAFI_NOT_IMPLEMENTED;
+    return m_pCore->Core->m_RegWriteStage->debugPc;
 }
 
 size_t System::GetMemoryEventCount() const

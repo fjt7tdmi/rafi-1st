@@ -29,11 +29,15 @@ public:
     explicit System(VCore* pCore, size_t ramSize);
     virtual ~System();
 
+    void SetHostIoAddr(paddr_t hostIoAddr);
     void LoadFileToMemory(const char* path);
     void Reset();
+    
     void ProcessPositiveEdge();
     void ProcessNegativeEdge();
     void UpdateSignal();
+
+    bool IsOpRetired();
 
     // ILoggerTarget
     virtual uint32_t GetHostIoValue() const override;
@@ -50,6 +54,8 @@ public:
 
 private:
     static const paddr_t AddrRam = 0x80000000;
+
+    paddr_t m_HostIoAddr;
 
     VCore* m_pCore;
 
