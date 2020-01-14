@@ -10,13 +10,13 @@ This repository includes C++ emulator and SystemVerilog HDL implementation.
 
 |Feature      |C++ Emulator|SystemVerilog|
 |-------------|------------|-------------|
-|RV32I        |Done        |WIP          |
-|RV32M        |Done        |-            |
+|RV32I        |Done        |Done         |
+|RV32M        |Done        |Done         |
 |RV32A        |Done        |-            |
 |RV32F        |Done        |-            |
 |RV32D        |Done        |-            |
 |RV32C        |Done        |-            |
-|RV32 priv.   |Done        |-            |
+|RV32 priv.   |Done        |WIP          |
 |RV64I        |Done        |-            |
 |RV64M        |Done        |-            |
 |RV64A        |Done        |-            |
@@ -42,10 +42,10 @@ Install the following programs manually.
 * MSYS2
 * Visual Studio 2019
 * Boost (>= 1.65)
-* CMake (>= 3.8)
+* CMake (>= 3.16)
 * Ninja
 * Python (>= 3.6)
-* Verilator
+* Verilator (>= 4.024)
 
 #### Ubuntu 18.04
 ```
@@ -53,11 +53,13 @@ apt-get install \
     libboost-filesystem1.65.1 libboost-program-options1.65.1 libboost1.65-dev \
     cmake \
     ninja-build \
-    python \
-    verilator
+    python
 ```
 
-### Build emulator
+* Verilator (>= 4.024)
+  * Manual build and install are required.
+
+### Build
 ```
 # Build googletest in git submodule
 ./script/build_gtest.sh
@@ -69,12 +71,17 @@ apt-get install \
 ./script/build_release.sh
 ```
 
-## Run unit test of emulator
+### Run unit test
 ```
 ./script/run_emu_test.sh
 ```
 
-## How to run riscv-tests and linux on emulator
+### Run HDL verification by verilator
+```
+./script/run_vtest.sh
+```
+
+### Run riscv-tests and linux
 
 First, it's necessary to checkout prebuilt binaries.
 However, the prebuilt binaries repository is private because of a license issue now (Jan 2020).
@@ -86,6 +93,8 @@ Sorry!
 
 Then, run riscv-tests or linux.
 
+#### On C++ emulator
+
 ```
 # Run riscv-tests
 ./script/run_emu_riscv_tests.sh
@@ -94,5 +103,11 @@ Then, run riscv-tests or linux.
 ./script/run_emu_linux.sh
 ```
 
-## Run HDL simulation by verilator
-WIP
+#### HDL emulation
+
+```
+# Run riscv-tests
+./script/run_sim_riscv_tests.sh
+```
+
+HDL implementation does not support booting linux now.
