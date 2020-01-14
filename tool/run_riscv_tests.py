@@ -87,14 +87,17 @@ def RunEmulator(config):
         return False # Emulation Failure
 
 def RunSimulator(config):
+    dump_path = f"{WorkDirPath}/{config['name']}"
     load_path = f"{BinaryDirPath}/{config['name']}.bin"
     vcd_path = f"{WorkDirPath}/{config['name']}.vcd"
     cmd = [
         GetBinPath(config['build_type'], "rafi-sim"),
         "--cycle", str(config['cycle']),
+        "--dump-path", dump_path,
         "--load-path", load_path,
         "--vcd-path", vcd_path,
         "--host-io-addr", str(config['host-io-addr']),
+        "--enable-dump-int-reg",
     ]
 
     PrintCommand("Run", cmd)

@@ -35,6 +35,7 @@ public:
     size_t GetRamSize() const;
     int GetCycle() const;
 
+    uint64_t GetHostIoAddr() const;
     bool IsHostIoEnabled() const;
 
 private:
@@ -47,7 +48,7 @@ private:
     size_t m_RamSize {0};
     int m_Cycle {0};
 
-    uint64_t m_HostIoAddress {0};
+    uint64_t m_HostIoAddr {0};
     bool m_HostIoEnabled {false};
 };
 

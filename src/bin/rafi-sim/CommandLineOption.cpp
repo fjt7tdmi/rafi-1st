@@ -62,7 +62,7 @@ CommandLineOption::CommandLineOption(int argc, char** argv)
 
     if (variables.count("host-io-addr"))
     {
-        m_HostIoAddress = strtoull(variables["host-io-addr"].as<std::string>().c_str(), 0, 16);
+        m_HostIoAddr = strtoull(variables["host-io-addr"].as<std::string>().c_str(), 0, 16);
     }
 
     if (variables.count("dump-path"))
@@ -102,6 +102,11 @@ int CommandLineOption::GetCycle() const
 size_t CommandLineOption::GetRamSize() const
 {
     return m_RamSize;
+}
+
+uint64_t CommandLineOption::GetHostIoAddr() const
+{
+    return m_HostIoAddr;
 }
 
 bool CommandLineOption::IsHostIoEnabled() const

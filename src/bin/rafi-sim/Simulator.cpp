@@ -34,8 +34,10 @@ Simulator::Simulator(const CommandLineOption& option)
     m_pCore->trace(m_pTfp, 20);
     m_pTfp->open(option.GetVcdPath().c_str());
 
+    m_pSystem->SetHostIoAddr(option.GetHostIoAddr());
     m_pSystem->Reset();
     m_pSystem->LoadFileToMemory(option.GetLoadPath().c_str());
+
     m_pTfp->dump(0);
 }
 
@@ -71,9 +73,16 @@ void Simulator::ProcessCycle()
     m_pTfp->dump(m_Cycle * 10 + 10);
     m_pSystem->UpdateSignal();
 
-    // TODO: call Logger API when detecting op retirement.
-
     m_Cycle++;
+
+    if (m_pSystem->IsOpRetired())
+    {
+        const auto pc = m_pSystem->GetPc();
+
+        m_pLogger->BeginCycle(m_Cycle, pc);
+        m_pLogger->RecordState();
+        m_pLogger->EndCycle();
+    }
 }
 
 }}

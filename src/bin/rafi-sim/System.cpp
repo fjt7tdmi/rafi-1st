@@ -18,6 +18,10 @@
 
 #include "System.h"
 
+#include "VCore_Core.h"
+#include "VCore_RegFile.h"
+#include "VCore_RegWriteStage.h"
+
 namespace rafi { namespace sim {
 
 namespace {
@@ -34,6 +38,11 @@ System::System(VCore* pCore, size_t ramSize)
 
 System::~System()
 {    
+}
+
+void System::SetHostIoAddr(paddr_t hostIoAddr)
+{
+    m_HostIoAddr = hostIoAddr;
 }
 
 void System::LoadFileToMemory(const char* path)
@@ -96,16 +105,22 @@ void System::UpdateSignal()
     }
 }
 
+bool System::IsOpRetired() const
+{
+    return m_pCore->Core->m_RegWriteStage->valid;
+}
+
 uint32_t System::GetHostIoValue() const
 {
-    // TODO: implement
-    RAFI_NOT_IMPLEMENTED;
+    uint32_t value;
+    m_Ram.Read(&value, sizeof(value), m_HostIoAddr - AddrRam);
+
+    return value;
 }
 
 uint64_t System::GetPc() const
 {
-    // TODO: implement
-    RAFI_NOT_IMPLEMENTED;
+    return m_pCore->Core->m_RegWriteStage->debugPc;
 }
 
 size_t System::GetMemoryEventCount() const
@@ -116,8 +131,7 @@ size_t System::GetMemoryEventCount() const
 
 bool System::IsOpEventExist() const
 {
-    // TODO: implement
-    RAFI_NOT_IMPLEMENTED;
+    return IsOpRetired();
 }
 
 bool System::IsTrapEventExist() const
@@ -128,8 +142,10 @@ bool System::IsTrapEventExist() const
 
 void System::CopyIntReg(trace::NodeIntReg32* pOut) const
 {
-    // TODO: implement
-    RAFI_NOT_IMPLEMENTED;
+    for (int i = 0; i < 32; i++)
+    {
+        pOut->regs[i] = static_cast<uint32_t>(m_pCore->Core->m_RegFile->body[i]);
+    }
 }
 
 void System::CopyIntReg(trace::NodeIntReg64* pOut) const
@@ -145,8 +161,8 @@ void System::CopyFpReg(trace::NodeFpReg* pOut) const
 
 void System::CopyOpEvent(trace::NodeOpEvent* pOut) const
 {
-    // TODO: implement
-    RAFI_NOT_IMPLEMENTED;
+    pOut->insn = m_pCore->Core->m_RegWriteStage->debugInsn;
+    pOut->priv = PrivilegeLevel::Machine;
 }
 
 void System::CopyTrapEvent(trace::NodeTrapEvent* pOut) const
