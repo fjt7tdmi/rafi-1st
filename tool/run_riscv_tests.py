@@ -119,12 +119,9 @@ def RunTests(configs, build_type, use_simulator):
         else:
             p.map_async(RunEmulator, configs).get(Timeout)
 
-    if use_simulator:
-        return 0
-    else:
-        trace_paths = list(map(lambda config: f"{WorkDirPath}/{config['name']}.tidx", configs))
-        exit_code = VerifyTraces(trace_paths, build_type)
-        return exit_code
+    trace_paths = list(map(lambda config: f"{WorkDirPath}/{config['name']}.tidx", configs))
+    exit_code = VerifyTraces(trace_paths, build_type)
+    return exit_code
 
 #
 # Entry point
