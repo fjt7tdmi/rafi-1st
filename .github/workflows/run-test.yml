@@ -25,11 +25,13 @@ jobs:
       run: ./script/build_gtest.sh
     - name: build_release
       run: ./script/build_release.sh
-    - name: run rafi-emu-test
+    - name: run rafi-emu unit test
       run: ./script/run_emu_test.sh Release
-    - name: run riscv-tests on emu
+    - name: run riscv-tests on rafi-emu
       run: ./script/run_emu_riscv_tests.sh
     - name: run linux on emu
       run: ./script/run_emu_linux.sh
-    - name: run verilator test
+    - name: run rafi-sim unit test (SystemVerilog verification by verilator)
       run: ./script/run_vtest.sh Release
+    - name: run riscv-tests on rafi-sim
+      run: ./script/run_sim_riscv_tests.sh
