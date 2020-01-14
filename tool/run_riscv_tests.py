@@ -97,6 +97,7 @@ def RunSimulator(config):
         "--load-path", load_path,
         "--vcd-path", vcd_path,
         "--host-io-addr", str(config['host-io-addr']),
+        "--enable-dump-int-reg",
     ]
 
     PrintCommand("Run", cmd)

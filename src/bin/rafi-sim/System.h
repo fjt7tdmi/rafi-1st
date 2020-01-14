@@ -32,12 +32,12 @@ public:
     void SetHostIoAddr(paddr_t hostIoAddr);
     void LoadFileToMemory(const char* path);
     void Reset();
-    
+
     void ProcessPositiveEdge();
     void ProcessNegativeEdge();
     void UpdateSignal();
 
-    bool IsOpRetired();
+    bool IsOpRetired() const;
 
     // ILoggerTarget
     virtual uint32_t GetHostIoValue() const override;
