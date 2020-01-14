@@ -189,6 +189,9 @@ module BusAccessUnit (
                     nextDcValue[i] = (_dcache_word_index_t'(i) == dcWordIndex && rdataValid) ? rdata : dcValue[i];
                 end
             end
+            State_DCacheWrite: begin
+                nextDcValue = core.dcWriteValue;
+            end
             default: begin
                 nextDcValue = '0;
             end
@@ -204,6 +207,9 @@ module BusAccessUnit (
                 for (int i = 0; i < ICacheWordCount; i++) begin
                     nextIcValue[i] = (_icache_word_index_t'(i) == icWordIndex && rdataValid) ? rdata : icValue[i];
                 end
+            end
+            State_ICacheWrite: begin
+                nextIcValue = core.icWriteValue;
             end
             default: begin
                 nextIcValue = '0;
