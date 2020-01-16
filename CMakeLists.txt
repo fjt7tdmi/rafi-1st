@@ -511,8 +511,8 @@ if (verilator_FOUND)
         src/hw/def/OpTypes.sv
         src/hw/def/Decoder.sv
         src/hw/def/LoadStoreUnitTypes.sv
-        src/hw/core/DivUnit.sv
-        src/hw/core/MulUnit.sv
+        src/hw/muldiv/DivUnit.sv
+        src/hw/muldiv/MulUnit.sv
         src/hw/core/BlockRam.sv
         src/hw/core/FlipFlopCam.sv
         src/hw/core/Tlb.sv

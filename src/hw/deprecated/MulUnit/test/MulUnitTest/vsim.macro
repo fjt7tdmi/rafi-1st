@@ -1,5 +1,0 @@
-radix -hex
-
-add wave -r -position end sim:/MulUnitTest/*
-
-run -all
