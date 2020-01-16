@@ -26,6 +26,7 @@ function run_test() {
 }
 
 run_test rafi-vtest-timer
+run_test rafi-vtest-mul
 
 popd
 

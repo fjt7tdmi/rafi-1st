@@ -511,8 +511,8 @@ if (verilator_FOUND)
         src/hw/def/OpTypes.sv
         src/hw/def/Decoder.sv
         src/hw/def/LoadStoreUnitTypes.sv
-        src/hw/muldiv/DivUnit.sv
-        src/hw/muldiv/MulUnit.sv
+        src/hw/div/DivUnit.sv
+        src/hw/mul/MulUnit.sv
         src/hw/core/BlockRam.sv
         src/hw/core/FlipFlopCam.sv
         src/hw/core/Tlb.sv
@@ -568,6 +568,33 @@ if (verilator_FOUND)
         PRIVATE ${Boost_LIBRARIES}
         PRIVATE ${FS_LIBRARIES}
     )
+
+    # =========================================================================
+    # rafi-vtest-mul
+    #
+    add_executable(rafi-vtest-mul
+        src/hw/mul/MulUnitTest.cpp
+    )
+    verilate(rafi-vtest-mul
+        PREFIX VMulUnit
+        THREADS 1
+        TRACE
+        SOURCES
+        src/hw/def/BasicTypes.sv
+        src/hw/def/RvTypes.sv
+        src/hw/def/Rv32Types.sv
+        src/hw/mul/MulUnit.sv
+    )
+    target_link_libraries(rafi-vtest-mul
+        PRIVATE ${GoogleTest_LIBRARIES}
+    )
+
+    # disable warnings for verilator
+    if (MSVC)
+        target_compile_options(rafi-vtest-mul
+            PUBLIC /wd"4267"
+        )
+    endif()
 
     # =========================================================================
     # rafi-vtest-timer
