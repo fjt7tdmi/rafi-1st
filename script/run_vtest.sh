@@ -25,8 +25,12 @@ function run_test() {
     fi
 }
 
-run_test rafi-vtest-timer
+# DivUnitTest fails now.
+# TODO: fix DivUnit
+# run_test rafi-vtest-div
+
 run_test rafi-vtest-mul
+run_test rafi-vtest-timer
 
 popd
 
