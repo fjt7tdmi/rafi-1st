@@ -74,8 +74,6 @@ add_library(librafi_common
     include/rafi/common/RvTypes.h
     include/rafi/common/Util.h
     src/lib/common/Decoder.cpp
-    src/lib/common/DecoderImpl.cpp
-    src/lib/common/DecoderImpl.h
     src/lib/common/OpApi.cpp
     src/lib/common/RvApi.cpp
 )
