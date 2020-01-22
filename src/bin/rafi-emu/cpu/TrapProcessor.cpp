@@ -81,7 +81,7 @@ void TrapProcessor::ProcessTrapReturn(PrivilegeLevel level)
         status.SetMember<xstatus_t::MIE>(previousInterruptEnable);
 
         m_pCsr->WriteUInt64(csr_addr_t::mstatus, status);
-        m_pCsr->SetProgramCounter(pc);
+        m_pCsr->SetPc(pc);
         break;
     case PrivilegeLevel::Supervisor:
         status = xstatus_t(m_pCsr->ReadUInt64(csr_addr_t::sstatus));
@@ -94,7 +94,7 @@ void TrapProcessor::ProcessTrapReturn(PrivilegeLevel level)
         status.SetMember<xstatus_t::SIE>(previousInterruptEnable);
 
         m_pCsr->WriteUInt64(csr_addr_t::sstatus, status);
-        m_pCsr->SetProgramCounter(pc);
+        m_pCsr->SetPc(pc);
         break;
     default:
         RAFI_EMU_NOT_IMPLEMENTED;
@@ -197,11 +197,11 @@ void TrapProcessor::ProcessTrapEnter(bool isInterrupt, uint32_t exceptionCode, u
 
     if (isInterrupt && mode == static_cast<int32_t>(xtvec_t::Mode::Vectored))
     {
-        m_pCsr->SetProgramCounter(base + exceptionCode * 4);
+        m_pCsr->SetPc(base + exceptionCode * 4);
     }
     else
     {
-        m_pCsr->SetProgramCounter(base);
+        m_pCsr->SetPc(base);
     }
 
     // for Dump

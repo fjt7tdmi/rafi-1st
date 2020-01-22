@@ -36,8 +36,8 @@ public:
     void ProcessCycle();
 
     // Special register access
-    vaddr_t GetProgramCounter() const;
-    void SetProgramCounter(vaddr_t value);
+    vaddr_t GetPc() const;
+    void SetPc(vaddr_t value);
 
     PrivilegeLevel GetPriv() const;
     void SetPriv(PrivilegeLevel level);
@@ -110,9 +110,9 @@ private:
     uint64_t m_SupervisorScratch {0};
     uint64_t m_UserScratch {0};
 
-    vaddr_t m_MachineExceptionProgramCounter {0};
-    vaddr_t m_SupervisorExceptionProgramCounter {0};
-    vaddr_t m_UserExceptionProgramCounter {0};
+    vaddr_t m_MachineExceptionPc {0};
+    vaddr_t m_SupervisorExceptionPc {0};
+    vaddr_t m_UserExceptionPc {0};
 
     uint64_t m_MachineCause {0};
     uint64_t m_SupervisorCause {0};
@@ -135,7 +135,7 @@ private:
     uint64_t m_InstructionRetiredCounter {0};
 
     // Special registers
-    vaddr_t m_ProgramCounter {0};
+    vaddr_t m_Pc {0};
     PrivilegeLevel m_Priv {PrivilegeLevel::Machine};
 };
 

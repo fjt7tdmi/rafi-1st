@@ -118,7 +118,7 @@ const csr_addr_t DumpAddresses[] = {
 
 Csr::Csr(XLEN xlen, vaddr_t initialPc)
     : m_XLEN(xlen)
-    , m_ProgramCounter(initialPc)
+    , m_Pc(initialPc)
 {
     m_ISA.SetMember<misa_t::I>(1)
          .SetMember<misa_t::M>(1)
@@ -146,14 +146,14 @@ Csr::Csr(XLEN xlen, vaddr_t initialPc)
     // m_Status.SetMember<xstatus_t::UXL>(static_cast<uint32_t>(m_XLEN));
 }
 
-vaddr_t Csr::GetProgramCounter() const
+vaddr_t Csr::GetPc() const
 {
-    return m_ProgramCounter;
+    return m_Pc;
 }
 
-void Csr::SetProgramCounter(vaddr_t value)
+void Csr::SetPc(vaddr_t value)
 {
-    m_ProgramCounter = value;
+    m_Pc = value;
 }
 
 PrivilegeLevel Csr::GetPriv() const
@@ -406,7 +406,7 @@ uint64_t Csr::ReadMachineModeRegister(csr_addr_t addr) const
     case csr_addr_t::mscratch:
         return m_MachineScratch;
     case csr_addr_t::mepc:
-        return m_MachineExceptionProgramCounter;
+        return m_MachineExceptionPc;
     case csr_addr_t::mcause:
         return m_MachineCause;
     case csr_addr_t::mtval:
@@ -490,7 +490,7 @@ uint64_t Csr::ReadSupervisorModeRegister(csr_addr_t addr) const
     case csr_addr_t::sscratch:
         return m_SupervisorScratch;
     case csr_addr_t::sepc:
-        return m_SupervisorExceptionProgramCounter;
+        return m_SupervisorExceptionPc;
     case csr_addr_t::scause:
         return m_SupervisorCause;
     case csr_addr_t::stval:
@@ -524,7 +524,7 @@ uint64_t Csr::ReadUserModeRegister(csr_addr_t addr) const
     case csr_addr_t::uscratch:
         return m_UserScratch;
     case csr_addr_t::uepc:
-        return m_UserExceptionProgramCounter;
+        return m_UserExceptionPc;
     case csr_addr_t::ucause:
         return m_UserCause;
     case csr_addr_t::utval:
@@ -612,7 +612,7 @@ void Csr::WriteMachineModeRegister(csr_addr_t addr, uint64_t value)
         m_MachineScratch = value;
         return;
     case csr_addr_t::mepc:
-        m_MachineExceptionProgramCounter = value;
+        m_MachineExceptionPc = value;
         return;
     case csr_addr_t::mcause:
         m_MachineCause = value;
@@ -697,7 +697,7 @@ void Csr::WriteSupervisorModeRegister(csr_addr_t addr, uint64_t value)
         m_SupervisorScratch = value;
         return;
     case csr_addr_t::sepc:
-        m_SupervisorExceptionProgramCounter = value;
+        m_SupervisorExceptionPc = value;
         return;
     case csr_addr_t::scause:
         m_SupervisorCause = value;
@@ -743,7 +743,7 @@ void Csr::WriteUserModeRegister(csr_addr_t addr, uint64_t value)
         m_UserScratch = value;
         return;
     case csr_addr_t::uepc:
-        m_UserExceptionProgramCounter = value;
+        m_UserExceptionPc = value;
         return;
     case csr_addr_t::ucause:
         m_UserCause = value;
