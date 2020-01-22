@@ -147,12 +147,14 @@ bool Emulator::IsStopConditionFilledPost(EmulationStop condition)
 {
     if (condition & EmulationStop_Breakpoint)
     {
-        if (m_System.IsTrapEventExist())
+        for (const auto event: m_System.GetEventList())
         {
-            trace::NodeTrapEvent trapEvent;
-            m_System.CopyTrapEvent(&trapEvent);
+            if (std::holds_alternative<trace::TrapEvent>(event))
+            {
+                const auto trapEvent = std::get<trace::TrapEvent>(event);
 
-            return trapEvent.trapType == TrapType::Exception && trapEvent.cause == static_cast<uint32_t>(ExceptionType::Breakpoint);
+                return trapEvent.trapType == TrapType::Exception && trapEvent.cause == static_cast<uint32_t>(ExceptionType::Breakpoint);
+            }
         }
     }
 

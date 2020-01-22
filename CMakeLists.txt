@@ -236,6 +236,7 @@ add_library(librafi_trace
     include/rafi/trace.h
     include/rafi/trace/BinaryCycleBuilder.h
     include/rafi/trace/CycleTypes.h
+    include/rafi/trace/EventTypes.h
     include/rafi/trace/Exception.h
     include/rafi/trace/GdbTraceReader.h
     include/rafi/trace/ICycle.h

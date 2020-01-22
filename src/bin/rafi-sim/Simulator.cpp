@@ -81,7 +81,10 @@ void Simulator::ProcessCycle()
 
         m_pLogger->BeginCycle(m_Cycle, pc);
         m_pLogger->RecordState();
+        m_pLogger->RecordEvent();
         m_pLogger->EndCycle();
+
+        m_pSystem->ClearEventList();
     }
 }
 

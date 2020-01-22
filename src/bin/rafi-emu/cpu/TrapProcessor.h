@@ -28,9 +28,10 @@ namespace rafi { namespace emu { namespace cpu {
 class TrapProcessor
 {
 public:
-    explicit TrapProcessor(XLEN xlen, Csr* pCsr)
+    explicit TrapProcessor(XLEN xlen, Csr* pCsr, trace::EventList* pEventList)
         : m_XLEN(xlen)
         , m_pCsr(pCsr)
+        , m_pEventList(pEventList)
 	{
 	}
 
@@ -38,16 +39,12 @@ public:
     void ProcessInterrupt(InterruptType type, vaddr_t pc);
     void ProcessTrapReturn(PrivilegeLevel level);
 
-    // for Dump
-    void ClearEvent();
-    void CopyTrapEvent(trace::NodeTrapEvent* pOut) const;
-    bool IsTrapEventExist() const;
-
 private:
     void ProcessTrapEnter(bool isInterrupt, uint32_t exceptionCode, uint64_t trapValue, vaddr_t pc, PrivilegeLevel nextPrivilegeLevel);
 
     XLEN m_XLEN;
     Csr* m_pCsr;
+    trace::EventList* m_pEventList;
 
     trace::NodeTrapEvent m_TrapEvent;
     bool m_TrapEventValid { false };

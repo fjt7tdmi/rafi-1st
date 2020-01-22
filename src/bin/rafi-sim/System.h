@@ -37,27 +37,26 @@ public:
     void ProcessNegativeEdge();
     void UpdateSignal();
 
+    void ClearEventList();
+
     bool IsOpRetired() const;
 
     // ILoggerTarget
     virtual uint32_t GetHostIoValue() const override;
     virtual uint64_t GetPc() const override;
-    virtual size_t GetMemoryEventCount() const override;
-    virtual bool IsOpEventExist() const override;
-    virtual bool IsTrapEventExist() const override;
     virtual void CopyIntReg(trace::NodeIntReg32* pOut) const override;
     virtual void CopyIntReg(trace::NodeIntReg64* pOut) const override;
     virtual void CopyFpReg(trace::NodeFpReg* pOut) const override;
-    virtual void CopyOpEvent(trace::NodeOpEvent* pOut) const override;
-    virtual void CopyTrapEvent(trace::NodeTrapEvent* pOut) const override;
-    virtual void CopyMemoryEvent(trace::NodeMemoryEvent* pOut, int index) const override;
+
+    virtual const trace::EventList& GetEventList() const override;
 
 private:
     static const paddr_t AddrRam = 0x80000000;
 
+    VCore* m_pCore;
     paddr_t m_HostIoAddr;
 
-    VCore* m_pCore;
+    trace::EventList m_EventList;
 
     emu::Bus m_Bus;
     emu::Ram m_Ram;

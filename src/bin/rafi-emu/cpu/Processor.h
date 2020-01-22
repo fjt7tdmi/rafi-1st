@@ -34,7 +34,7 @@ class Processor
 {
 public:
     // Setup
-    Processor(XLEN xlen, Bus* pBus, vaddr_t initialPc);
+    Processor(XLEN xlen, Bus* pBus, trace::EventList* pEventList, vaddr_t initialPc);
 
     void SetIntReg(int regId, uint32_t regValue);
 
@@ -54,28 +54,19 @@ public:
 
     // for Dump
     vaddr_t GetPc() const;
-    size_t GetMemoryEventCount() const;
 
     void CopyIntReg(trace::NodeIntReg32* pOut) const;
     void CopyIntReg(trace::NodeIntReg64* pOut) const;
     void CopyFpReg(trace::NodeFpReg* pOut) const;
-    void CopyOpEvent(trace::NodeOpEvent* pOut) const;
-    void CopyTrapEvent(trace::NodeTrapEvent* pOut) const;
-    void CopyMemoryEvent(trace::NodeMemoryEvent* pOut, int index) const;
-
-    bool IsOpEventExist() const;
-    bool IsTrapEventExist() const;
 
     void PrintStatus() const;
 
 private:
     std::optional<Trap> Fetch(uint32_t* pOutInsn, vaddr_t pc);
 
-    void ClearOpEvent();
-
-    void SetOpEvent(uint32_t insn, PrivilegeLevel privilegeLevel);
-
     const vaddr_t InvalidValue = 0xffffffffffffffff;
+
+    trace::EventList* m_pEventList;
 
     AtomicManager m_AtomicManager;
     Csr m_Csr;
@@ -90,11 +81,6 @@ private:
     Executor m_Executor;
 
     uint32_t m_OpCount { 0 };
-
-    // for dump
-    bool m_OpEventValid { false };
-
-    trace::NodeOpEvent m_OpEvent;
 };
 
 }}}

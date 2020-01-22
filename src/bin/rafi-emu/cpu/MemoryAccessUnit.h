@@ -31,7 +31,7 @@ class MemoryAccessUnit
 public:
     explicit MemoryAccessUnit(XLEN xlen);
 
-    void Initialize(Bus* pBus, Csr* pCsr);
+    void Initialize(Bus* pBus, Csr* pCsr, trace::EventList* pEventList);
 
     uint8_t LoadUInt8(vaddr_t addr);
     uint16_t LoadUInt16(vaddr_t addr);
@@ -49,14 +49,9 @@ public:
     std::optional<Trap> CheckTrap(MemoryAccessType accessType, vaddr_t pc, vaddr_t addr) const;
     std::optional<Trap> Translate(paddr_t* pOutAddr, MemoryAccessType accessType, vaddr_t addr, vaddr_t pc = 0);
 
-    // for Dump
-    void AddEvent(MemoryAccessType accessType, int size,  vaddr_t value, vaddr_t vaddr, paddr_t paddr);
-    void ClearEvent();
-
-    void CopyEvent(trace::NodeMemoryEvent* pOut, int index) const;
-    size_t GetEventCount() const;
-
 private:
+    void AddEvent(MemoryAccessType accessType, int size,  vaddr_t value, vaddr_t vaddr, paddr_t paddr);
+
     PrivilegeLevel GetEffectivePrivilegeLevel(MemoryAccessType accessType) const;
 
     AddressTranslationMode GetAddresssTranslationMode(MemoryAccessType accessType) const;
@@ -181,10 +176,9 @@ private:
 
     Bus* m_pBus{ nullptr };
     Csr* m_pCsr{ nullptr };
+    trace::EventList* m_pEventList{ nullptr };
 
     XLEN m_XLEN;
-
-    std::vector<trace::NodeMemoryEvent> m_Events;
 };
 
 }}}
