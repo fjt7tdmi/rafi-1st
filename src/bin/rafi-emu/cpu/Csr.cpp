@@ -156,14 +156,14 @@ void Csr::SetProgramCounter(vaddr_t value)
     m_ProgramCounter = value;
 }
 
-PrivilegeLevel Csr::GetPrivilegeLevel() const
+PrivilegeLevel Csr::GetPriv() const
 {
-    return m_PrivilegeLevel;
+    return m_Priv;
 }
 
-void Csr::SetPrivilegeLevel(PrivilegeLevel level)
+void Csr::SetPriv(PrivilegeLevel level)
 {
-    m_PrivilegeLevel = level;
+    m_Priv = level;
 }
 
 void Csr::ProcessCycle()
@@ -178,7 +178,7 @@ std::optional<Trap> Csr::CheckTrap(csr_addr_t addr, bool write, vaddr_t pc, uint
     const int regId = static_cast<int>(addr);
     RAFI_EMU_CHECK_RANGE(0, regId, NumberOfRegister);
 
-    if (IsSupervisorModeRegister(addr) && m_PrivilegeLevel == PrivilegeLevel::User)
+    if (IsSupervisorModeRegister(addr) && m_Priv == PrivilegeLevel::User)
     {
         return MakeIllegalInstructionException(pc, insn);
     }
@@ -186,7 +186,7 @@ std::optional<Trap> Csr::CheckTrap(csr_addr_t addr, bool write, vaddr_t pc, uint
     {
         return MakeIllegalInstructionException(pc, insn);
     }
-    if (IsMachineModeRegister(addr) && (m_PrivilegeLevel == PrivilegeLevel::User || m_PrivilegeLevel == PrivilegeLevel::Supervisor))
+    if (IsMachineModeRegister(addr) && (m_Priv == PrivilegeLevel::User || m_Priv == PrivilegeLevel::Supervisor))
     {
         return MakeIllegalInstructionException(pc, insn);
     }
@@ -197,7 +197,7 @@ std::optional<Trap> Csr::CheckTrap(csr_addr_t addr, bool write, vaddr_t pc, uint
         return MakeIllegalInstructionException(pc, insn);
     }
 
-    if (addr == csr_addr_t::satp && m_PrivilegeLevel == PrivilegeLevel::Supervisor && m_Status.GetMember<xstatus_t::TVM>())
+    if (addr == csr_addr_t::satp && m_Priv == PrivilegeLevel::Supervisor && m_Status.GetMember<xstatus_t::TVM>())
     {
         return MakeIllegalInstructionException(pc, insn);
     }
@@ -212,7 +212,7 @@ std::optional<Trap> Csr::CheckTrap(csr_addr_t addr, bool write, vaddr_t pc, uint
 
         const auto mask = 1 << index;
 
-        switch (m_PrivilegeLevel)
+        switch (m_Priv)
         {
         case PrivilegeLevel::Supervisor:
             if (!(m_MachineCounterEnable & mask))

@@ -39,8 +39,8 @@ public:
     vaddr_t GetProgramCounter() const;
     void SetProgramCounter(vaddr_t value);
 
-    PrivilegeLevel GetPrivilegeLevel() const;
-    void SetPrivilegeLevel(PrivilegeLevel level);
+    PrivilegeLevel GetPriv() const;
+    void SetPriv(PrivilegeLevel level);
 
     // Register access
     uint32_t ReadUInt32(csr_addr_t addr) const;
@@ -136,7 +136,7 @@ private:
 
     // Special registers
     vaddr_t m_ProgramCounter {0};
-    PrivilegeLevel m_PrivilegeLevel {PrivilegeLevel::Machine};
+    PrivilegeLevel m_Priv {PrivilegeLevel::Machine};
 };
 
 }}}

@@ -78,7 +78,7 @@ void Processor::ProcessCycle()
 {
     m_Csr.ProcessCycle();
 
-    const auto privilegeLevel = m_Csr.GetPrivilegeLevel();
+    const auto priv = m_Csr.GetPriv();
     const auto pc = m_Csr.GetProgramCounter();
 
     // Check interrupt
@@ -103,7 +103,7 @@ void Processor::ProcessCycle()
     }
 
     // Set OpEvent
-    m_pEventList->emplace_back(trace::OpEvent { insn, privilegeLevel });
+    m_pEventList->emplace_back(trace::OpEvent { insn, priv });
 
     // Decode
     const auto op = m_Decoder.Decode(insn);

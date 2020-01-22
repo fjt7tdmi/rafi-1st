@@ -412,7 +412,7 @@ std::optional<Trap> Executor::PreCheckTrap_CsrImm(const Op& op, vaddr_t pc, uint
 
 std::optional<Trap> Executor::PreCheckTrap_Wfi(vaddr_t pc, uint32_t insn) const
 {
-    const auto priv = m_pCsr->GetPrivilegeLevel();
+    const auto priv = m_pCsr->GetPriv();
     const auto status = m_pCsr->ReadStatus();
 
     if (priv == PrivilegeLevel::User || (priv == PrivilegeLevel::Supervisor && status.GetMember<xstatus_t::TW>()))
@@ -427,7 +427,7 @@ std::optional<Trap> Executor::PreCheckTrap_Wfi(vaddr_t pc, uint32_t insn) const
 
 std::optional<Trap> Executor::PreCheckTrap_Fence(vaddr_t pc, uint32_t insn) const
 {
-    const auto priv = m_pCsr->GetPrivilegeLevel();
+    const auto priv = m_pCsr->GetPriv();
     const auto status = m_pCsr->ReadStatus();
 
     if (priv == PrivilegeLevel::User || (priv == PrivilegeLevel::Supervisor && status.GetMember<xstatus_t::TVM>()))
@@ -442,7 +442,7 @@ std::optional<Trap> Executor::PreCheckTrap_Fence(vaddr_t pc, uint32_t insn) cons
 
 std::optional<Trap> Executor::PreCheckTrap_Priv(const Op& op, vaddr_t pc, uint32_t insn) const
 {
-    const auto priv = m_pCsr->GetPrivilegeLevel();
+    const auto priv = m_pCsr->GetPriv();
     const auto status = m_pCsr->ReadStatus();
 
     if (op.opCode == OpCode::mret &&
@@ -684,9 +684,7 @@ std::optional<Trap> Executor::PreCheckTrapRV64C_SWSP(const Op& op, vaddr_t pc) c
 // PostCheckTrap
 std::optional<Trap> Executor::PostCheckTrapForEcall(vaddr_t pc) const
 {
-    const auto privilegeLevel = m_pCsr->GetPrivilegeLevel();
-
-    switch (privilegeLevel)
+    switch (m_pCsr->GetPriv())
     {
     case PrivilegeLevel::Machine:
         return MakeEnvironmentCallFromMachineException(pc);

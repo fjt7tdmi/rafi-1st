@@ -172,7 +172,7 @@ PrivilegeLevel MemoryAccessUnit::GetEffectivePrivilegeLevel(MemoryAccessType acc
     }
     else
     {
-        return m_pCsr->GetPrivilegeLevel();
+        return m_pCsr->GetPriv();
     }
 }
 
