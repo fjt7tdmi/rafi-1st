@@ -102,50 +102,41 @@ public:
             return;
         }
 
-        if (m_pLoggerTarget->IsOpEventExist())
+        for (const auto event: m_pLoggerTarget->GetEventList())
         {
-            trace::NodeOpEvent opEvent;
-            m_pLoggerTarget->CopyOpEvent(&opEvent);
-
-            NodeOpEvent node
+            if (std::holds_alternative<trace::OpEvent>(event))
             {
-                opEvent.insn,
-                opEvent.priv,
-            };
-            m_pCurrentCycle->Add(node);
-        }
+                const auto opEvent = std::get<trace::OpEvent>(event);
 
-        if (m_pLoggerTarget->IsTrapEventExist())
-        {
-            trace::NodeTrapEvent trapEvent;
-            m_pLoggerTarget->CopyTrapEvent(&trapEvent);
-
-            NodeTrapEvent node
+                m_pCurrentCycle->Add(NodeOpEvent {
+                    opEvent.insn,
+                    opEvent.priv,
+                });
+            }
+            if (std::holds_alternative<trace::TrapEvent>(event))
             {
-                trapEvent.trapType,
-                trapEvent.from,
-                trapEvent.to,
-                trapEvent.cause,
-                trapEvent.trapValue,
-            };
+                const auto trapEvent = std::get<trace::TrapEvent>(event);
 
-            m_pCurrentCycle->Add(node);
-        }
-
-        for (int index = 0; index < m_pLoggerTarget->GetMemoryEventCount(); index++)
-        {
-            trace::NodeMemoryEvent memoryEvent;
-            m_pLoggerTarget->CopyMemoryEvent(&memoryEvent, index);
-
-            NodeMemoryEvent node
+                m_pCurrentCycle->Add(NodeTrapEvent {
+                    trapEvent.trapType,
+                    trapEvent.from,
+                    trapEvent.to,
+                    trapEvent.cause,
+                    trapEvent.trapValue,
+                });
+            }
+            if (std::holds_alternative<trace::MemoryEvent>(event))
             {
-                memoryEvent.accessType,
-                memoryEvent.size,
-                memoryEvent.value,
-                memoryEvent.vaddr,
-                memoryEvent.paddr,
-            };
-            m_pCurrentCycle->Add(node);
+                const auto memoryEvent = std::get<trace::MemoryEvent>(event);
+
+                m_pCurrentCycle->Add(NodeMemoryEvent {
+                    memoryEvent.accessType,
+                    memoryEvent.size,
+                    memoryEvent.value,
+                    memoryEvent.vaddr,
+                    memoryEvent.paddr,
+                });
+            }
         }
     }
 

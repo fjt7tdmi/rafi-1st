@@ -79,6 +79,14 @@ void System::ProcessNegativeEdge()
 {
     m_pCore->clk = 0;
     m_pCore->eval();
+
+    if (IsOpRetired())
+    {
+        m_EventList.emplace_back(trace::OpEvent {
+            m_pCore->Core->m_RegWriteStage->debugInsn,
+            PrivilegeLevel::Machine,
+        });
+    }
 }
 
 void System::UpdateSignal()
@@ -105,6 +113,11 @@ void System::UpdateSignal()
     }
 }
 
+void System::ClearEventList()
+{
+    m_EventList.clear();
+}
+
 bool System::IsOpRetired() const
 {
     return m_pCore->Core->m_RegWriteStage->valid;
@@ -121,23 +134,6 @@ uint32_t System::GetHostIoValue() const
 uint64_t System::GetPc() const
 {
     return m_pCore->Core->m_RegWriteStage->debugPc;
-}
-
-size_t System::GetMemoryEventCount() const
-{
-    // MemoryEvent is not supported
-    return 0;
-}
-
-bool System::IsOpEventExist() const
-{
-    return IsOpRetired();
-}
-
-bool System::IsTrapEventExist() const
-{
-    // TrapEvent is not supported
-    return 0;
 }
 
 void System::CopyIntReg(trace::NodeIntReg32* pOut) const
@@ -159,20 +155,9 @@ void System::CopyFpReg(trace::NodeFpReg* pOut) const
     RAFI_NOT_IMPLEMENTED;
 }
 
-void System::CopyOpEvent(trace::NodeOpEvent* pOut) const
+const trace::EventList& System::GetEventList() const
 {
-    pOut->insn = m_pCore->Core->m_RegWriteStage->debugInsn;
-    pOut->priv = PrivilegeLevel::Machine;
-}
-
-void System::CopyTrapEvent(trace::NodeTrapEvent* pOut) const
-{
-    RAFI_NOT_IMPLEMENTED;
-}
-
-void System::CopyMemoryEvent(trace::NodeMemoryEvent* pOut, int index) const
-{
-    RAFI_NOT_IMPLEMENTED;
+    return m_EventList;
 }
 
 }}

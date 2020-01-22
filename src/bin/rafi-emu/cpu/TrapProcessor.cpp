@@ -110,22 +110,6 @@ void TrapProcessor::ProcessTrapReturn(PrivilegeLevel level)
 
     m_pCsr->SetPrivilegeLevel(nextPrivilegeLevel);
 }
-void TrapProcessor::ClearEvent()
-{
-    m_TrapEventValid = false;
-
-    std::memset(&m_TrapEvent, 0, sizeof(m_TrapEvent));
-}
-
-void TrapProcessor::CopyTrapEvent(trace::NodeTrapEvent* pOut) const
-{
-    std::memcpy(pOut, &m_TrapEvent, sizeof(*pOut));
-}
-
-bool TrapProcessor::IsTrapEventExist() const
-{
-    return m_TrapEventValid;
-}
 
 void TrapProcessor::ProcessTrapEnter(bool isInterrupt, uint32_t exceptionCode, uint64_t trapValue, vaddr_t pc, PrivilegeLevel nextPrivilegeLevel)
 {
@@ -221,12 +205,13 @@ void TrapProcessor::ProcessTrapEnter(bool isInterrupt, uint32_t exceptionCode, u
     }
 
     // for Dump
-    m_TrapEventValid = true;
-    m_TrapEvent.trapType = isInterrupt ? TrapType::Interrupt : TrapType::Exception;
-    m_TrapEvent.from = m_pCsr->GetPrivilegeLevel();
-    m_TrapEvent.to = nextPrivilegeLevel;
-    m_TrapEvent.cause = exceptionCode;
-    m_TrapEvent.trapValue = trapValue;
+    m_pEventList->emplace_back(trace::TrapEvent{
+        isInterrupt ? TrapType::Interrupt : TrapType::Exception,
+        m_pCsr->GetPrivilegeLevel(),    // from
+        nextPrivilegeLevel,             // to
+        exceptionCode,                  // cause
+        trapValue,                      // trapValue
+    });
 }
 
 }}}

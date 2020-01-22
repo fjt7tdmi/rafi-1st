@@ -16,25 +16,38 @@
 
 #pragma once
 
+#include <variant>
+#include <vector>
+
 #include <rafi/common.h>
-#include <rafi/trace/CycleTypes.h>
-#include <rafi/trace/EventTypes.h>
 
 namespace rafi { namespace trace {
 
-class ILoggerTarget
+struct OpEvent
 {
-public:
-    virtual ~ILoggerTarget(){};
-
-    virtual uint32_t GetHostIoValue() const = 0;
-    virtual uint64_t GetPc() const = 0;
-
-    virtual void CopyIntReg(NodeIntReg32* pOut) const = 0;
-    virtual void CopyIntReg(NodeIntReg64* pOut) const = 0;
-    virtual void CopyFpReg(NodeFpReg* pOut) const = 0;
-
-    virtual const EventList& GetEventList() const = 0;
+    uint32_t insn;
+    PrivilegeLevel priv;
 };
+
+struct TrapEvent
+{
+    TrapType trapType;
+    PrivilegeLevel from;
+    PrivilegeLevel to;
+    uint32_t cause;
+    uint64_t trapValue;
+};
+
+struct MemoryEvent
+{
+    MemoryAccessType accessType;
+    uint32_t size;
+    uint64_t value;
+    uint64_t vaddr;
+    uint64_t paddr;
+};
+
+using Event = std::variant<OpEvent, TrapEvent, MemoryEvent>;
+using EventList = std::vector<Event>;
 
 }}

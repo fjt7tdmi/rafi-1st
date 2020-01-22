@@ -26,13 +26,13 @@ namespace rafi { namespace emu { namespace cpu {
 MemoryAccessUnit::MemoryAccessUnit(XLEN xlen)
     : m_XLEN(xlen)
 {
-    m_Events.clear();
 }
 
-void MemoryAccessUnit::Initialize(Bus* pBus, Csr* pCsr)
+void MemoryAccessUnit::Initialize(Bus* pBus, Csr* pCsr, trace::EventList* pEventList)
 {
     m_pBus = pBus;
     m_pCsr = pCsr;
+    m_pEventList = pEventList;
 }
 
 uint8_t MemoryAccessUnit::LoadUInt8(vaddr_t addr)
@@ -158,22 +158,7 @@ std::optional<Trap> MemoryAccessUnit::CheckTrap(MemoryAccessType accessType, vad
 
 void MemoryAccessUnit::AddEvent(MemoryAccessType accessType, int size, uint64_t value, vaddr_t vaddr, paddr_t paddr)
 {
-    m_Events.push_back({ accessType, static_cast<uint32_t>(size), value, vaddr, paddr });
-}
-
-void MemoryAccessUnit::ClearEvent()
-{
-    m_Events.clear();
-}
-
-void MemoryAccessUnit::CopyEvent(trace::NodeMemoryEvent* pOut, int index) const
-{
-    *pOut = m_Events[index];
-}
-
-size_t MemoryAccessUnit::GetEventCount() const
-{
-    return m_Events.size();
+    m_pEventList->emplace_back(trace::MemoryEvent{ accessType, static_cast<uint32_t>(size), value, vaddr, paddr });
 }
 
 PrivilegeLevel MemoryAccessUnit::GetEffectivePrivilegeLevel(MemoryAccessType accessType) const

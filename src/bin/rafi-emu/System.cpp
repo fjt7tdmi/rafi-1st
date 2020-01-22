@@ -21,7 +21,8 @@
 namespace rafi { namespace emu {
 
 System::System(XLEN xlen, vaddr_t pc, size_t ramSize)
-    : m_Bus()
+    : m_EventList()
+    , m_Bus()
     , m_Ram(ramSize)
     , m_Clint()
     , m_Plic()
@@ -29,7 +30,7 @@ System::System(XLEN xlen, vaddr_t pc, size_t ramSize)
     , m_Timer()
     , m_ExternalInterruptSource(&m_Plic)
     , m_TimerInterruptSource(&m_Clint)
-    , m_Processor(xlen, &m_Bus, pc)
+    , m_Processor(xlen, &m_Bus, &m_EventList, pc)
 {
     m_Bus.RegisterMemory(&m_Ram, AddrRam, m_Ram.GetCapacity());
     m_Bus.RegisterMemory(&m_Rom, AddrRom, m_Rom.GetCapacity());
@@ -79,6 +80,8 @@ void System::SetHostIoAddress(vaddr_t address)
 
 void System::ProcessCycle()
 {
+    m_EventList.clear();
+
     m_Clint.ProcessCycle();
     m_Uart16550.ProcessCycle();
     m_Uart.ProcessCycle();
@@ -100,11 +103,6 @@ void System::ReadMemory(void* pOutBuffer, size_t bufferSize, paddr_t addr)
 void System::WriteMemory(const void* pBuffer, size_t bufferSize, paddr_t addr)
 {
     return m_Bus.Write(pBuffer, bufferSize, addr);
-}
-
-size_t System::GetMemoryEventCount() const
-{
-    return m_Processor.GetMemoryEventCount();
 }
 
 uint32_t System::GetHostIoValue() const
@@ -135,29 +133,9 @@ void System::CopyFpReg(trace::NodeFpReg* pOut) const
     m_Processor.CopyFpReg(pOut);
 }
 
-void System::CopyOpEvent(trace::NodeOpEvent* pOut) const
+const trace::EventList& System::GetEventList() const
 {
-    return m_Processor.CopyOpEvent(pOut);
-}
-
-void System::CopyTrapEvent(trace::NodeTrapEvent* pOut) const
-{
-    return m_Processor.CopyTrapEvent(pOut);
-}
-
-void System::CopyMemoryEvent(trace::NodeMemoryEvent* pOut, int index) const
-{
-    return m_Processor.CopyMemoryEvent(pOut, index);
-}
-
-bool System::IsOpEventExist() const
-{
-    return m_Processor.IsOpEventExist();
-}
-
-bool System::IsTrapEventExist() const
-{
-    return m_Processor.IsTrapEventExist();
+    return m_EventList;
 }
 
 void System::PrintStatus() const

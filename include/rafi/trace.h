@@ -20,6 +20,7 @@
 
 #include "trace/BinaryCycleBuilder.h"
 #include "trace/CycleTypes.h"
+#include "trace/EventTypes.h"
 #include "trace/Exception.h"
 #include "trace/GdbTraceReader.h"
 #include "trace/ICycle.h"
