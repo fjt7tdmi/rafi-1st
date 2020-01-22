@@ -66,9 +66,22 @@ int main(int argc, char** argv)
 {
     rafi::dump::CommandLineOption option(argc, argv);
 
-    auto filter = rafi::dump::MakeFilter(option.GetFilterDescription());
+    try
+    {
+        auto filter = rafi::dump::MakeFilter(option.GetFilterDescription());
 
-    PrintTrace(option, filter.get());
+        PrintTrace(option, filter.get());
+    }
+    catch (rafi::trace::TraceException e)
+    {
+        e.PrintMessage();
+        std::exit(1);
+    }
+    catch (rafi::FileOpenFailureException e)
+    {
+        e.PrintMessage();
+        std::exit(1);
+    }
 
     return 0;
 }
