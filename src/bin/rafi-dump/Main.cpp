@@ -31,10 +31,27 @@
 
 namespace rafi { namespace dump {
 
+XLEN GetXLEN(const std::string& path)
+{
+    if (path.find("rv32") != path.npos)
+    {
+        return XLEN::XLEN32;
+    }
+    else if (path.find("rv64") != path.npos)
+    {
+        return XLEN::XLEN64;
+    }
+    else
+    {
+        std::cout << "Failed to determine XLEN from path." << std::endl;
+        std::exit(1);
+    }
+}
+
 void PrintTrace(const CommandLineOption& option, IFilter* filter)
 {
     auto reader = rafi::MakeTraceReader(option.GetPath());
-    auto printer = rafi::MakeTracePrinter(option.GetPrinterType());
+    auto printer = rafi::MakeTracePrinter(option.GetPrinterType(), GetXLEN(option.GetPath()));
 
     const int begin = option.GetCycleBegin();
     const int end = std::min(option.GetCycleBegin() + option.GetCycleCount(), option.GetCycleEnd());
@@ -66,9 +83,22 @@ int main(int argc, char** argv)
 {
     rafi::dump::CommandLineOption option(argc, argv);
 
-    auto filter = rafi::dump::MakeFilter(option.GetFilterDescription());
+    try
+    {
+        auto filter = rafi::dump::MakeFilter(option.GetFilterDescription());
 
-    PrintTrace(option, filter.get());
+        PrintTrace(option, filter.get());
+    }
+    catch (rafi::trace::TraceException e)
+    {
+        e.PrintMessage();
+        std::exit(1);
+    }
+    catch (rafi::FileOpenFailureException e)
+    {
+        e.PrintMessage();
+        std::exit(1);
+    }
 
     return 0;
 }
