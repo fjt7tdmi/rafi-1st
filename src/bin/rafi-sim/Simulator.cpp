@@ -54,8 +54,20 @@ Simulator::~Simulator()
 
 void Simulator::Process(int cycle)
 {
+    int retiredOpsAfterHostIoWritten = 0;
+
     for (int i = 0; i < cycle; i++)
     {
+        // Terminate the simulation slightly after host-io becomes non-zero
+        if (m_pSystem->GetHostIoValue() != 0 && m_pSystem->IsOpRetired())
+        {
+            retiredOpsAfterHostIoWritten++;
+        }
+        if (retiredOpsAfterHostIoWritten >= 2)
+        {
+            break;
+        }
+
         ProcessCycle();
     }
 }
