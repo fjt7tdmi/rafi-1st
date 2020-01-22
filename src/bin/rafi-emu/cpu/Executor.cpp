@@ -412,7 +412,7 @@ std::optional<Trap> Executor::PreCheckTrap_CsrImm(const Op& op, vaddr_t pc, uint
 
 std::optional<Trap> Executor::PreCheckTrap_Wfi(vaddr_t pc, uint32_t insn) const
 {
-    const auto priv = m_pCsr->GetPrivilegeLevel();
+    const auto priv = m_pCsr->GetPriv();
     const auto status = m_pCsr->ReadStatus();
 
     if (priv == PrivilegeLevel::User || (priv == PrivilegeLevel::Supervisor && status.GetMember<xstatus_t::TW>()))
@@ -427,7 +427,7 @@ std::optional<Trap> Executor::PreCheckTrap_Wfi(vaddr_t pc, uint32_t insn) const
 
 std::optional<Trap> Executor::PreCheckTrap_Fence(vaddr_t pc, uint32_t insn) const
 {
-    const auto priv = m_pCsr->GetPrivilegeLevel();
+    const auto priv = m_pCsr->GetPriv();
     const auto status = m_pCsr->ReadStatus();
 
     if (priv == PrivilegeLevel::User || (priv == PrivilegeLevel::Supervisor && status.GetMember<xstatus_t::TVM>()))
@@ -442,7 +442,7 @@ std::optional<Trap> Executor::PreCheckTrap_Fence(vaddr_t pc, uint32_t insn) cons
 
 std::optional<Trap> Executor::PreCheckTrap_Priv(const Op& op, vaddr_t pc, uint32_t insn) const
 {
-    const auto priv = m_pCsr->GetPrivilegeLevel();
+    const auto priv = m_pCsr->GetPriv();
     const auto status = m_pCsr->ReadStatus();
 
     if (op.opCode == OpCode::mret &&
@@ -684,9 +684,7 @@ std::optional<Trap> Executor::PreCheckTrapRV64C_SWSP(const Op& op, vaddr_t pc) c
 // PostCheckTrap
 std::optional<Trap> Executor::PostCheckTrapForEcall(vaddr_t pc) const
 {
-    const auto privilegeLevel = m_pCsr->GetPrivilegeLevel();
-
-    switch (privilegeLevel)
+    switch (m_pCsr->GetPriv())
     {
     case PrivilegeLevel::Machine:
         return MakeEnvironmentCallFromMachineException(pc);
@@ -1562,7 +1560,7 @@ void Executor::ProcessRV32I_Jal(const Op& op, vaddr_t pc)
     const auto& operand = std::get<OperandJ>(op.operand);
 
     m_pIntRegFile->WriteInt32(operand.rd, pc + 4);
-    m_pCsr->SetProgramCounter(pc + operand.imm);
+    m_pCsr->SetPc(pc + operand.imm);
 }
 
 void Executor::ProcessRV32I_Jalr(const Op& op, vaddr_t pc)
@@ -1573,7 +1571,7 @@ void Executor::ProcessRV32I_Jalr(const Op& op, vaddr_t pc)
     const auto address = (~0x1) & (src + operand.imm);
 
     m_pIntRegFile->WriteInt32(operand.rd, pc + 4);
-    m_pCsr->SetProgramCounter(address);
+    m_pCsr->SetPc(address);
 }
 
 void Executor::ProcessRV32I_Branch(const Op& op, vaddr_t pc)
@@ -1614,7 +1612,7 @@ void Executor::ProcessRV32I_Branch(const Op& op, vaddr_t pc)
 
     if (jump)
     {
-        m_pCsr->SetProgramCounter(pc + operand.imm);
+        m_pCsr->SetPc(pc + operand.imm);
 
         if (operand.imm < 0)
         {
@@ -1917,7 +1915,7 @@ void Executor::ProcessRV64I_Jal(const Op& op, vaddr_t pc)
     const auto& operand = std::get<OperandJ>(op.operand);
 
     m_pIntRegFile->WriteInt64(operand.rd, pc + 4);
-    m_pCsr->SetProgramCounter(pc + operand.imm);
+    m_pCsr->SetPc(pc + operand.imm);
 }
 
 void Executor::ProcessRV64I_Jalr(const Op& op, vaddr_t pc)
@@ -1928,7 +1926,7 @@ void Executor::ProcessRV64I_Jalr(const Op& op, vaddr_t pc)
     const auto address = (~0x1) & (src + operand.imm);
 
     m_pIntRegFile->WriteInt64(operand.rd, pc + 4);
-    m_pCsr->SetProgramCounter(address);
+    m_pCsr->SetPc(address);
 }
 
 void Executor::ProcessRV64I_Branch(const Op& op, vaddr_t pc)
@@ -1969,7 +1967,7 @@ void Executor::ProcessRV64I_Branch(const Op& op, vaddr_t pc)
 
     if (jump)
     {
-        m_pCsr->SetProgramCounter(pc + operand.imm);
+        m_pCsr->SetPc(pc + operand.imm);
 
         if (operand.imm < 0)
         {
@@ -2401,7 +2399,7 @@ void Executor::ProcessRV32C_Branch(const Op& op, vaddr_t pc)
 
     if (cond)
     {
-        m_pCsr->SetProgramCounter(pc + operand.imm);
+        m_pCsr->SetPc(pc + operand.imm);
 
         if (operand.imm < 0)
         {
@@ -2528,7 +2526,7 @@ void Executor::ProcessRV32C_J(const Op& op, vaddr_t pc)
 {
     const auto& operand = std::get<OperandCJ>(op.operand);
 
-    m_pCsr->SetProgramCounter(pc + operand.imm);
+    m_pCsr->SetPc(pc + operand.imm);
 
     if (operand.imm < 0)
     {
@@ -2540,7 +2538,7 @@ void Executor::ProcessRV32C_JAL(const Op& op, vaddr_t pc)
 {
     const auto& operand = std::get<OperandCJ>(op.operand);
 
-    m_pCsr->SetProgramCounter(pc + operand.imm);
+    m_pCsr->SetPc(pc + operand.imm);
 
     WriteLinkRegister32(pc + 2);
 
@@ -2557,7 +2555,7 @@ void Executor::ProcessRV32C_JR(const Op& op, vaddr_t pc)
     const auto src = m_pIntRegFile->ReadUInt32(operand.rs1);
     const auto address = (~0x1) & src;
 
-    m_pCsr->SetProgramCounter(address);
+    m_pCsr->SetPc(address);
 
     if (static_cast<uint64_t>(address) < static_cast<uint64_t>(pc))
     {
@@ -2572,7 +2570,7 @@ void Executor::ProcessRV32C_JALR(const Op& op, vaddr_t pc)
     const auto src = m_pIntRegFile->ReadUInt32(operand.rs1);
     const auto address = (~0x1) & src;
 
-    m_pCsr->SetProgramCounter(address);
+    m_pCsr->SetPc(address);
     WriteLinkRegister32(pc + 2);
 
     if (static_cast<uint64_t>(address) < static_cast<uint64_t>(pc))
@@ -2737,7 +2735,7 @@ void Executor::ProcessRV64C_Branch(const Op& op, vaddr_t pc)
 
     if (cond)
     {
-        m_pCsr->SetProgramCounter(pc + operand.imm);
+        m_pCsr->SetPc(pc + operand.imm);
 
         if (operand.imm < 0)
         {
@@ -2816,7 +2814,7 @@ void Executor::ProcessRV64C_J(const Op& op, vaddr_t pc)
 {
     const auto& operand = std::get<OperandCJ>(op.operand);
 
-    m_pCsr->SetProgramCounter(pc + operand.imm);
+    m_pCsr->SetPc(pc + operand.imm);
 
     if (operand.imm < 0)
     {
@@ -2831,7 +2829,7 @@ void Executor::ProcessRV64C_JR(const Op& op, vaddr_t pc)
     const auto src = m_pIntRegFile->ReadUInt64(operand.rs1);
     const auto address = (~0x1) & src;
 
-    m_pCsr->SetProgramCounter(address);
+    m_pCsr->SetPc(address);
 
     if (static_cast<uint64_t>(address) < static_cast<uint64_t>(pc))
     {
@@ -2846,7 +2844,7 @@ void Executor::ProcessRV64C_JALR(const Op& op, vaddr_t pc)
     const auto src = m_pIntRegFile->ReadUInt64(operand.rs1);
     const auto address = (~0x1) & src;
 
-    m_pCsr->SetProgramCounter(address);
+    m_pCsr->SetPc(address);
     WriteLinkRegister64(pc + 2);
 
     if (static_cast<uint64_t>(address) < static_cast<uint64_t>(pc))

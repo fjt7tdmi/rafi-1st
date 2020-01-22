@@ -40,7 +40,7 @@ public:
     void ProcessTrapReturn(PrivilegeLevel level);
 
 private:
-    void ProcessTrapEnter(bool isInterrupt, uint32_t exceptionCode, uint64_t trapValue, vaddr_t pc, PrivilegeLevel nextPrivilegeLevel);
+    void ProcessTrapEnter(bool isInterrupt, uint32_t exceptionCode, uint64_t trapValue, vaddr_t pc, PrivilegeLevel nextPriv);
 
     XLEN m_XLEN;
     Csr* m_pCsr;

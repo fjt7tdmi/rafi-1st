@@ -70,7 +70,7 @@ void InterruptController::Update()
     m_IsRequested = false;
 
     // Check xIE
-    switch (m_pCsr->GetPrivilegeLevel())
+    switch (m_pCsr->GetPriv())
     {
     case PrivilegeLevel::Machine:
         if (!status.GetMember<xstatus_t::MIE>())

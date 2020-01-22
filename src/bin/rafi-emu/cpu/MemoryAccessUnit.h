@@ -85,13 +85,13 @@ private:
     template <typename EntryType>
     std::optional<Trap> CheckTrapForLeafEntry(const EntryType& entry, MemoryAccessType accessType, vaddr_t pc, vaddr_t addr) const
     {
-        const auto privilegeLevel = GetEffectivePrivilegeLevel(accessType);
+        const auto priv = GetEffectivePrivilegeLevel(accessType);
 
         const auto status = m_pCsr->ReadStatus();
         const bool sum = status.GetMember<xstatus_t::SUM>();
         const bool mxr = status.GetMember<xstatus_t::MXR>();
 
-        switch (privilegeLevel)
+        switch (priv)
         {
         case PrivilegeLevel::Supervisor:
             if (!sum && entry.template GetMember<typename EntryType::U>())

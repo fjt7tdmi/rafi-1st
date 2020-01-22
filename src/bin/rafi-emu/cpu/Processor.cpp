@@ -78,8 +78,8 @@ void Processor::ProcessCycle()
 {
     m_Csr.ProcessCycle();
 
-    const auto privilegeLevel = m_Csr.GetPrivilegeLevel();
-    const auto pc = m_Csr.GetProgramCounter();
+    const auto priv = m_Csr.GetPriv();
+    const auto pc = m_Csr.GetPc();
 
     // Check interrupt
     m_InterruptController.Update();
@@ -103,7 +103,7 @@ void Processor::ProcessCycle()
     }
 
     // Set OpEvent
-    m_pEventList->emplace_back(trace::OpEvent { insn, privilegeLevel });
+    m_pEventList->emplace_back(trace::OpEvent { insn, priv });
 
     // Decode
     const auto op = m_Decoder.Decode(insn);
@@ -125,11 +125,11 @@ void Processor::ProcessCycle()
 
     if (m_Decoder.IsCompressedInstruction(insn))
     {
-        m_Csr.SetProgramCounter(pc + 2);
+        m_Csr.SetPc(pc + 2);
     }
     else
     {
-        m_Csr.SetProgramCounter(pc + 4);
+        m_Csr.SetPc(pc + 4);
     }
 
     m_Executor.ProcessOp(op, pc);
@@ -144,7 +144,7 @@ void Processor::ProcessCycle()
 
 vaddr_t Processor::GetPc() const
 {
-    return m_Csr.GetProgramCounter();
+    return m_Csr.GetPc();
 }
 
 void Processor::CopyIntReg(trace::NodeIntReg32* pOut) const
@@ -201,7 +201,7 @@ std::optional<Trap> Processor::Fetch(uint32_t* pOutInsn, vaddr_t pc)
 void Processor::PrintStatus() const
 {
     printf("    OpCount: %d (0x%x)\n", m_OpCount, m_OpCount);
-    printf("    PC:      0x%016" PRIx64 "\n", m_Csr.GetProgramCounter());
+    printf("    PC:      0x%016" PRIx64 "\n", m_Csr.GetPc());
 }
 
 }}}
