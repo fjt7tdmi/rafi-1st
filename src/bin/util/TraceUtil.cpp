@@ -50,8 +50,8 @@ std::unique_ptr<trace::ITracePrinter> MakeTracePrinter(PrinterType printerType)
             return std::make_unique<trace::TraceTextPrinter>();
         case PrinterType::Json:
             return std::make_unique<trace::TraceJsonPrinter>();
-        case PrinterType::Pc:
-            return std::make_unique<trace::TracePcPrinter>();
+        case PrinterType::Short:
+            return std::make_unique<trace::TraceShortPrinter>();
         default:
             RAFI_NOT_IMPLEMENTED;
     }

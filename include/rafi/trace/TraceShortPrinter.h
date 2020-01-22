@@ -22,18 +22,18 @@
 
 namespace rafi { namespace trace {
 
-class TracePcPrinterImpl;
+class TraceShortPrinterImpl;
 
-class TracePcPrinter : public ITracePrinter
+class TraceShortPrinter : public ITracePrinter
 {
 public:
-    TracePcPrinter();
-    virtual ~TracePcPrinter();
+    TraceShortPrinter();
+    virtual ~TraceShortPrinter();
 
     virtual void Print(const ICycle* cycle) override;
 
 private:
-    TracePcPrinterImpl* m_pImpl;
+    TraceShortPrinterImpl* m_pImpl;
 };
 
 }}

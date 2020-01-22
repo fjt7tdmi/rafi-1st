@@ -21,15 +21,15 @@
 
 namespace rafi { namespace trace {
 
-    TracePcPrinter::TracePcPrinter()
+    TraceShortPrinter::TraceShortPrinter()
     {
     }
     
-    TracePcPrinter::~TracePcPrinter()
+    TraceShortPrinter::~TraceShortPrinter()
     {
     }
 
-    void TracePcPrinter::Print(const trace::ICycle* pCycle)
+    void TraceShortPrinter::Print(const trace::ICycle* pCycle)
     {
         printf("0x%016" PRIx64 "\n", pCycle->GetPc());
     }

@@ -67,17 +67,17 @@ CommandLineOption::CommandLineOption(int argc, char** argv)
         std::exit(0);
     }
 
-    if (mode == "" || mode == "text")
+    if (mode.empty() || mode == "short")
     {
-        m_PrinterType = PrinterType::Text;
+        m_PrinterType = PrinterType::Short;
     }
     else if (mode == "json")
     {
         m_PrinterType = PrinterType::Json;
     }
-    else if (mode == "pc")
+    else if (mode == "text")
     {
-        m_PrinterType = PrinterType::Pc;
+        m_PrinterType = PrinterType::Text;
     }
     else
     {
