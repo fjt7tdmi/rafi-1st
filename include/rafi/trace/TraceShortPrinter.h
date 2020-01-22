@@ -27,7 +27,7 @@ class TraceShortPrinterImpl;
 class TraceShortPrinter : public ITracePrinter
 {
 public:
-    TraceShortPrinter();
+    TraceShortPrinter(XLEN xlen);
     virtual ~TraceShortPrinter();
 
     virtual void Print(const ICycle* cycle) override;

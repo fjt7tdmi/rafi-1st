@@ -31,10 +31,27 @@
 
 namespace rafi { namespace dump {
 
+XLEN GetXLEN(const std::string& path)
+{
+    if (path.find("rv32") != path.npos)
+    {
+        return XLEN::XLEN32;
+    }
+    else if (path.find("rv64") != path.npos)
+    {
+        return XLEN::XLEN64;
+    }
+    else
+    {
+        std::cout << "Failed to determine XLEN from path." << std::endl;
+        std::exit(1);
+    }
+}
+
 void PrintTrace(const CommandLineOption& option, IFilter* filter)
 {
     auto reader = rafi::MakeTraceReader(option.GetPath());
-    auto printer = rafi::MakeTracePrinter(option.GetPrinterType());
+    auto printer = rafi::MakeTracePrinter(option.GetPrinterType(), GetXLEN(option.GetPath()));
 
     const int begin = option.GetCycleBegin();
     const int end = std::min(option.GetCycleBegin() + option.GetCycleCount(), option.GetCycleEnd());

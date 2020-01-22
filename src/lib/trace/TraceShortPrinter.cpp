@@ -21,17 +21,50 @@
 
 namespace rafi { namespace trace {
 
-    TraceShortPrinter::TraceShortPrinter()
-    {
-    }
-    
-    TraceShortPrinter::~TraceShortPrinter()
-    {
+class TraceShortPrinterImpl
+{
+public:
+    TraceShortPrinterImpl(XLEN xlen)
+        : m_Decoder(xlen)
+    {        
     }
 
-    void TraceShortPrinter::Print(const trace::ICycle* pCycle)
+    void Print(const trace::ICycle* pCycle)
     {
-        printf("0x%016" PRIx64 "\n", pCycle->GetPc());
+        char op[64];
+
+        if (pCycle->GetOpEventCount() > 0)
+        {
+            rafi::trace::NodeOpEvent opEvent;
+            pCycle->CopyOpEvent(&opEvent, 0);
+            
+            SNPrintOp(op, sizeof(op), m_Decoder.Decode(opEvent.insn));
+        }
+        else
+        {
+            op[0] = '\0';
+        }
+
+        printf("%016" PRIx64 ":\t%s\n", pCycle->GetPc(), op);
     }
+
+private:
+    rafi::Decoder m_Decoder;
+};
+
+TraceShortPrinter::TraceShortPrinter(XLEN xlen)
+{
+    m_pImpl = new TraceShortPrinterImpl(xlen);
+}
+
+TraceShortPrinter::~TraceShortPrinter()
+{
+    delete m_pImpl;
+}
+
+void TraceShortPrinter::Print(const trace::ICycle* pCycle)
+{
+    m_pImpl->Print(pCycle);
+}
 
 }}
