@@ -35,6 +35,32 @@ namespace mp = boost::multiprecision;
 
 namespace rafi { namespace emu { namespace cpu {
 
+namespace {
+
+bool IsRV32(OpClass opClass)
+{
+    return
+        opClass == OpClass::RV32I ||
+        opClass == OpClass::RV32M ||
+        opClass == OpClass::RV32A ||
+        opClass == OpClass::RV32F ||
+        opClass == OpClass::RV32D ||
+        opClass == OpClass::RV32C;
+}
+
+bool IsRV64(OpClass opClass)
+{
+    return
+        opClass == OpClass::RV64I ||
+        opClass == OpClass::RV64M ||
+        opClass == OpClass::RV64A ||
+        opClass == OpClass::RV64F ||
+        opClass == OpClass::RV64D ||
+        opClass == OpClass::RV64C;
+}
+
+}
+
 std::optional<Trap> Executor::PreCheckTrap(const Op& op, vaddr_t pc, uint32_t insn) const
 {
     switch (op.opClass)
