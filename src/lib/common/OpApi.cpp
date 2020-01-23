@@ -61,20 +61,6 @@ const char* IntRegNames[32] = {
 
 }
 
-const char* GetString(const OpClass& opClass)
-{
-#define GET_OP_NAME_CASE(arg) case OpClass::arg: return #arg
-    switch (opClass)
-    {
-        GET_OP_NAME_CASE(RV32I);
-        GET_OP_NAME_CASE(RV32A);
-        GET_OP_NAME_CASE(RV32M);
-    default:
-        return "unknown";
-    }
-#undef GET_OP_NAME_CASE
-}
-
 const char* GetString(const OpCode& opCode)
 {
 #define GET_OP_NAME_CASE(arg) case OpCode::arg: return #arg

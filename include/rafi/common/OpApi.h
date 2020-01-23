@@ -20,7 +20,6 @@
 
 namespace rafi {
 
-const char* GetString(const OpClass& op);
 const char* GetString(const OpCode& op);
 
 bool IsRV32(OpClass opClass);
