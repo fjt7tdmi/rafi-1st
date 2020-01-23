@@ -115,19 +115,19 @@ void BinaryCycle::CopyIo(NodeIo* pOutState) const
     std::memcpy(pOutState, m_pNodeIo, sizeof(NodeIo));
 }
 
-void BinaryCycle::CopyOpEvent(NodeOpEvent* pOutEvent, size_t index) const
+void BinaryCycle::CopyOpEvent(OpEvent* pOutEvent, size_t index) const
 {
-    std::memcpy(pOutEvent, m_OpEvents[index], sizeof(NodeOpEvent));
+    std::memcpy(pOutEvent, m_OpEvents[index], sizeof(OpEvent));
 }
 
-void BinaryCycle::CopyMemoryEvent(NodeMemoryEvent* pOutEvent, size_t index) const
+void BinaryCycle::CopyMemoryEvent(MemoryEvent* pOutEvent, size_t index) const
 {
-    std::memcpy(pOutEvent, m_MemoryEvents[index], sizeof(NodeMemoryEvent));
+    std::memcpy(pOutEvent, m_MemoryEvents[index], sizeof(MemoryEvent));
 }
 
-void BinaryCycle::CopyTrapEvent(NodeTrapEvent* pOutEvent, size_t index) const
+void BinaryCycle::CopyTrapEvent(TrapEvent* pOutEvent, size_t index) const
 {
-    std::memcpy(pOutEvent, m_TrapEvents[index], sizeof(NodeTrapEvent));
+    std::memcpy(pOutEvent, m_TrapEvents[index], sizeof(TrapEvent));
 }
 
 size_t BinaryCycle::GetSize() const
@@ -183,13 +183,13 @@ size_t BinaryCycle::ParseNode(const void* buffer, size_t bufferSize)
         m_pNodeIo = reinterpret_cast<const NodeIo*>(&pHeader[1]);
         break;
     case NodeId_MA:
-        m_MemoryEvents.push_back(reinterpret_cast<const NodeMemoryEvent*>(&pHeader[1]));
+        m_MemoryEvents.push_back(reinterpret_cast<const MemoryEvent*>(&pHeader[1]));
         break;
     case NodeId_OP:
-        m_OpEvents.push_back(reinterpret_cast<const NodeOpEvent*>(&pHeader[1]));
+        m_OpEvents.push_back(reinterpret_cast<const OpEvent*>(&pHeader[1]));
         break;
     case NodeId_TR:
-        m_TrapEvents.push_back(reinterpret_cast<const NodeTrapEvent*>(&pHeader[1]));
+        m_TrapEvents.push_back(reinterpret_cast<const TrapEvent*>(&pHeader[1]));
         break;
     default:
         throw TraceException("Unknown node id\n");

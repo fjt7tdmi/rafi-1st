@@ -158,21 +158,21 @@ void GdbCycle::CopyIo(NodeIo* pOutState) const
     RAFI_NOT_IMPLEMENTED;
 }
 
-void GdbCycle::CopyOpEvent(NodeOpEvent* pOutEvent, size_t index) const
+void GdbCycle::CopyOpEvent(OpEvent* pOutEvent, size_t index) const
 {
     (void)pOutEvent;
     (void)index;
     RAFI_NOT_IMPLEMENTED;
 }
 
-void GdbCycle::CopyMemoryEvent(NodeMemoryEvent* pOutEvent, size_t index) const
+void GdbCycle::CopyMemoryEvent(MemoryEvent* pOutEvent, size_t index) const
 {
     (void)pOutEvent;
     (void)index;
     RAFI_NOT_IMPLEMENTED;
 }
 
-void GdbCycle::CopyTrapEvent(NodeTrapEvent* pOutEvent, size_t index) const
+void GdbCycle::CopyTrapEvent(TrapEvent* pOutEvent, size_t index) const
 {
     (void)pOutEvent;
     (void)index;

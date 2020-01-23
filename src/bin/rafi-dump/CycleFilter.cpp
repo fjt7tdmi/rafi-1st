@@ -56,7 +56,7 @@ bool MemoryAccessFilter::Apply(const trace::ICycle* pCycle) const
 
     for (int i = 0; i < count; i++)
     {
-        trace::NodeMemoryEvent e;
+        trace::MemoryEvent e;
         pCycle->CopyMemoryEvent(&e, i);
 
         const auto address = m_IsPhysical ? e.paddr : e.vaddr;

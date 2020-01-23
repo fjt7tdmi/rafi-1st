@@ -19,6 +19,7 @@
 #include <rafi/common.h>
 
 #include "CycleTypes.h"
+#include "EventTypes.h"
 
 namespace rafi { namespace trace {
 
@@ -34,9 +35,9 @@ public:
     void Add(const NodeIntReg64& value);
     void Add(const NodeFpReg& value);
     void Add(const NodeIo& value);
-    void Add(const NodeOpEvent& value);
-    void Add(const NodeTrapEvent& value);
-    void Add(const NodeMemoryEvent& value);
+    void Add(const OpEvent& value);
+    void Add(const TrapEvent& value);
+    void Add(const MemoryEvent& value);
 
     void Break();
 

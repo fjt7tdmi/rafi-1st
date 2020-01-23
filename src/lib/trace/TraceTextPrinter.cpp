@@ -139,7 +139,7 @@ private:
     {
         for (int i = 0; i < pCycle->GetOpEventCount(); i++)
         {
-            trace::NodeOpEvent e;
+            trace::OpEvent e;
             pCycle->CopyOpEvent(&e, i);
 
             printf("OP %" PRIx32 " %s\n", e.insn, GetString(e.priv));
@@ -150,7 +150,7 @@ private:
     {
         for (int i = 0; i < pCycle->GetMemoryEventCount(); i++)
         {
-            trace::NodeMemoryEvent e;
+            trace::MemoryEvent e;
             pCycle->CopyMemoryEvent(&e, i);
 
             printf("MA %s %" PRIx32 " %" PRIx64 " %" PRIx64 " %" PRIx64 "\n",
@@ -162,7 +162,7 @@ private:
     {
         for (int i = 0; i < pCycle->GetTrapEventCount(); i++)
         {
-            trace::NodeTrapEvent e;
+            trace::TrapEvent e;
             pCycle->CopyTrapEvent(&e, i);
 
             printf("TRAP %s %s %s %" PRIx32 " %" PRIx64 "\n",

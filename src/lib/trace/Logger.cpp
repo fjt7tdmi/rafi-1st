@@ -92,7 +92,7 @@ public:
         {
             NodeIo node = { m_pLoggerTarget->GetHostIoValue(), 0 };
             m_pCurrentCycle->Add(node);
-        }        
+        }
     }
 
     void RecordEvent()
@@ -106,36 +106,15 @@ public:
         {
             if (std::holds_alternative<trace::OpEvent>(event))
             {
-                const auto opEvent = std::get<trace::OpEvent>(event);
-
-                m_pCurrentCycle->Add(NodeOpEvent {
-                    opEvent.insn,
-                    opEvent.priv,
-                });
+                m_pCurrentCycle->Add(std::get<trace::OpEvent>(event));
             }
             if (std::holds_alternative<trace::TrapEvent>(event))
             {
-                const auto trapEvent = std::get<trace::TrapEvent>(event);
-
-                m_pCurrentCycle->Add(NodeTrapEvent {
-                    trapEvent.trapType,
-                    trapEvent.from,
-                    trapEvent.to,
-                    trapEvent.cause,
-                    trapEvent.trapValue,
-                });
+                m_pCurrentCycle->Add(std::get<trace::TrapEvent>(event));
             }
             if (std::holds_alternative<trace::MemoryEvent>(event))
             {
-                const auto memoryEvent = std::get<trace::MemoryEvent>(event);
-
-                m_pCurrentCycle->Add(NodeMemoryEvent {
-                    memoryEvent.accessType,
-                    memoryEvent.size,
-                    memoryEvent.value,
-                    memoryEvent.vaddr,
-                    memoryEvent.paddr,
-                });
+                m_pCurrentCycle->Add(std::get<trace::MemoryEvent>(event));
             }
         }
     }

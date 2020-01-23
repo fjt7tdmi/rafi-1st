@@ -50,9 +50,9 @@ public:
     virtual uint64_t GetFpReg(size_t index) const override;
 
     virtual void CopyIo(NodeIo* pOutState) const override;
-    virtual void CopyOpEvent(NodeOpEvent* pOutEvent, size_t index) const override;
-    virtual void CopyMemoryEvent(NodeMemoryEvent* pOutEvent, size_t index) const override;
-    virtual void CopyTrapEvent(NodeTrapEvent* pOutEvent, size_t index) const override;
+    virtual void CopyOpEvent(OpEvent* pOutEvent, size_t index) const override;
+    virtual void CopyMemoryEvent(MemoryEvent* pOutEvent, size_t index) const override;
+    virtual void CopyTrapEvent(TrapEvent* pOutEvent, size_t index) const override;
 
 private:
     uint32_t m_CycleCount{ 0 };

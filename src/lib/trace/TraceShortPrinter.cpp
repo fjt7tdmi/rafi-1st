@@ -26,7 +26,7 @@ class TraceShortPrinterImpl
 public:
     TraceShortPrinterImpl(XLEN xlen)
         : m_Decoder(xlen)
-    {        
+    {
     }
 
     void Print(const trace::ICycle* pCycle)
@@ -35,9 +35,9 @@ public:
 
         if (pCycle->GetOpEventCount() > 0)
         {
-            rafi::trace::NodeOpEvent opEvent;
+            rafi::trace::OpEvent opEvent;
             pCycle->CopyOpEvent(&opEvent, 0);
-            
+
             SNPrintOp(op, sizeof(op), m_Decoder.Decode(opEvent.insn));
         }
         else

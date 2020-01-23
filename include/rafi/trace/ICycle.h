@@ -46,9 +46,9 @@ public:
     virtual uint64_t GetFpReg(size_t index) const = 0;
 
     virtual void CopyIo(NodeIo* pOutState) const = 0;
-    virtual void CopyOpEvent(NodeOpEvent* pOutEvent, size_t index) const = 0;
-    virtual void CopyMemoryEvent(NodeMemoryEvent* pOutEvent, size_t index) const = 0;
-    virtual void CopyTrapEvent(NodeTrapEvent* pOutEvent, size_t index) const = 0;
+    virtual void CopyOpEvent(OpEvent* pOutEvent, size_t index) const = 0;
+    virtual void CopyMemoryEvent(MemoryEvent* pOutEvent, size_t index) const = 0;
+    virtual void CopyTrapEvent(TrapEvent* pOutEvent, size_t index) const = 0;
 };
 
 }}

@@ -103,10 +103,13 @@ void TrapProcessor::ProcessTrapReturn(PrivilegeLevel level)
     const auto nextPriv = static_cast<PrivilegeLevel>(previousLevel);
 
     // for Dump
-    m_TrapEventValid = true;
-    m_TrapEvent.trapType = TrapType::Return;
-    m_TrapEvent.from = m_pCsr->GetPriv();
-    m_TrapEvent.to = nextPriv;
+    m_pEventList->emplace_back(trace::TrapEvent{
+        TrapType::Return,
+        m_pCsr->GetPriv(),  // from
+        nextPriv,           // to
+        0,                  // cause
+        0,                  // trapValue
+    });
 
     m_pCsr->SetPriv(nextPriv);
 }
@@ -117,7 +120,7 @@ void TrapProcessor::ProcessTrapEnter(bool isInterrupt, uint32_t exceptionCode, u
 
     m_pCsr->SetPriv(nextPriv);
 
-    uint64_t cause;    
+    uint64_t cause;
     switch (m_XLEN)
     {
     case XLEN::XLEN32:
