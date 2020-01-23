@@ -84,28 +84,4 @@ struct NodeIo
     uint32_t reserved;
 };
 
-struct NodeOpEvent
-{
-    uint32_t insn;
-    PrivilegeLevel priv;
-};
-
-struct NodeTrapEvent
-{
-    TrapType trapType;
-    PrivilegeLevel from;
-    PrivilegeLevel to;
-    uint32_t cause;
-    uint64_t trapValue;
-};
-
-struct NodeMemoryEvent
-{
-    MemoryAccessType accessType;
-    uint32_t size;
-    uint64_t value;
-    uint64_t vaddr;
-    uint64_t paddr;
-};
-
 }}

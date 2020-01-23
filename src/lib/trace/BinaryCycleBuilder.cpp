@@ -61,17 +61,17 @@ public:
         AddData(NodeId_IO, &node, sizeof(node));
     }
 
-    void Add(const NodeOpEvent& node)
+    void Add(const OpEvent& node)
     {
         AddData(NodeId_OP, &node, sizeof(node));
     }
 
-    void Add(const NodeTrapEvent& node)
+    void Add(const TrapEvent& node)
     {
         AddData(NodeId_TR, &node, sizeof(node));
     }
 
-    void Add(const NodeMemoryEvent& node)
+    void Add(const MemoryEvent& node)
     {
         AddData(NodeId_MA, &node, sizeof(node));
     }
@@ -158,17 +158,17 @@ void BinaryCycleBuilder::Add(const NodeIo& value)
     m_pImpl->Add(value);
 }
 
-void BinaryCycleBuilder::Add(const NodeOpEvent& value)
+void BinaryCycleBuilder::Add(const OpEvent& value)
 {
     m_pImpl->Add(value);
 }
 
-void BinaryCycleBuilder::Add(const NodeTrapEvent& value)
+void BinaryCycleBuilder::Add(const TrapEvent& value)
 {
     m_pImpl->Add(value);
 }
 
-void BinaryCycleBuilder::Add(const NodeMemoryEvent& value)
+void BinaryCycleBuilder::Add(const MemoryEvent& value)
 {
     m_pImpl->Add(value);
 }

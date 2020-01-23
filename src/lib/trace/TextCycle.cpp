@@ -159,21 +159,21 @@ void TextCycle::CopyIo(NodeIo* pOutNode) const
     RAFI_NOT_IMPLEMENTED;
 }
 
-void TextCycle::CopyOpEvent(NodeOpEvent* pOutNode, size_t index) const
+void TextCycle::CopyOpEvent(OpEvent* pOutNode, size_t index) const
 {
     (void)pOutNode;
     (void)index;
     RAFI_NOT_IMPLEMENTED;
 }
 
-void TextCycle::CopyMemoryEvent(NodeMemoryEvent* pOutNode, size_t index) const
+void TextCycle::CopyMemoryEvent(MemoryEvent* pOutNode, size_t index) const
 {
     (void)pOutNode;
     (void)index;
     RAFI_NOT_IMPLEMENTED;
 }
 
-void TextCycle::CopyTrapEvent(NodeTrapEvent* pOutNode, size_t index) const
+void TextCycle::CopyTrapEvent(TrapEvent* pOutNode, size_t index) const
 {
     (void)pOutNode;
     (void)index;

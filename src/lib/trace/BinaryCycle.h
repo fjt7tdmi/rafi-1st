@@ -47,9 +47,9 @@ public:
     virtual uint64_t GetFpReg(size_t index) const override;
 
     virtual void CopyIo(NodeIo* pOutState) const override;
-    virtual void CopyOpEvent(NodeOpEvent* pOutEvent, size_t index) const override;
-    virtual void CopyMemoryEvent(NodeMemoryEvent* pOutEvent, size_t index) const override;
-    virtual void CopyTrapEvent(NodeTrapEvent* pOutEvent, size_t index) const override;
+    virtual void CopyOpEvent(OpEvent* pOutEvent, size_t index) const override;
+    virtual void CopyMemoryEvent(MemoryEvent* pOutEvent, size_t index) const override;
+    virtual void CopyTrapEvent(TrapEvent* pOutEvent, size_t index) const override;
 
     size_t GetSize() const;
 
@@ -66,9 +66,9 @@ private:
     const NodeFpReg* m_pNodeFpReg{ nullptr };
     const NodeIo* m_pNodeIo{ nullptr };
 
-    std::vector<const NodeOpEvent*> m_OpEvents;
-    std::vector<const NodeMemoryEvent*> m_MemoryEvents;
-    std::vector<const NodeTrapEvent*> m_TrapEvents;
+    std::vector<const OpEvent*> m_OpEvents;
+    std::vector<const MemoryEvent*> m_MemoryEvents;
+    std::vector<const TrapEvent*> m_TrapEvents;
 
     bool m_Break{ false };
 };

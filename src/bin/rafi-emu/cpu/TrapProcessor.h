@@ -45,9 +45,6 @@ private:
     XLEN m_XLEN;
     Csr* m_pCsr;
     trace::EventList* m_pEventList;
-
-    trace::NodeTrapEvent m_TrapEvent;
-    bool m_TrapEventValid { false };
 };
 
 }}}

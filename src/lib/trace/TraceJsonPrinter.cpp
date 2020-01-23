@@ -197,7 +197,7 @@ private:
 
         for (int i = 0; i < pCycle->GetOpEventCount(); i++)
         {
-            NodeOpEvent e;
+            OpEvent e;
             pCycle->CopyOpEvent(&e, i);
 
             auto op = decoder.Decode(e.insn);
@@ -221,7 +221,7 @@ private:
     {
         for (int i = 0; i < pCycle->GetMemoryEventCount(); i++)
         {
-            trace::NodeMemoryEvent e;
+            trace::MemoryEvent e;
             pCycle->CopyMemoryEvent(&e, i);
 
             printf(
@@ -245,7 +245,7 @@ private:
     {
         for (int i = 0; i < pCycle->GetTrapEventCount(); i++)
         {
-            trace::NodeTrapEvent e;
+            trace::TrapEvent e;
             pCycle->CopyTrapEvent(&e, i);
 
             printf(
