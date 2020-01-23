@@ -16,7 +16,9 @@
 
 #include <cstdio>
 #include <cinttypes>
+#include <string>
 
+#include <rafi/op.h>
 #include <rafi/trace.h>
 
 namespace rafi { namespace trace {
@@ -31,25 +33,30 @@ public:
 
     void Print(const trace::ICycle* pCycle)
     {
-        char op[64];
+        std::string opStr;
 
         if (pCycle->GetOpEventCount() > 0)
         {
             rafi::trace::OpEvent opEvent;
             pCycle->CopyOpEvent(&opEvent, 0);
 
-            SNPrintOp(op, sizeof(op), m_Decoder.Decode(opEvent.insn));
-        }
-        else
-        {
-            op[0] = '\0';
+            auto op = m_Decoder.Decode(opEvent.insn);
+            
+            if (op)
+            {
+                opStr = op->ToString();
+            }
+            else
+            {
+                opStr = "UNKNOWN";
+            }
         }
 
-        printf("%016" PRIx64 ":\t%s\n", pCycle->GetPc(), op);
+        printf("%016" PRIx64 ":\t%s\n", pCycle->GetPc(), opStr.c_str());
     }
 
 private:
-    rafi::Decoder m_Decoder;
+    rafi::OpDecoder m_Decoder;
 };
 
 TraceShortPrinter::TraceShortPrinter(XLEN xlen)

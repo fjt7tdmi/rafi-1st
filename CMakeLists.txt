@@ -66,15 +66,14 @@ add_library(librafi_common
     include/rafi/common/BitField.h
     include/rafi/common/Decoder.h
     include/rafi/common/Macro.h
-    include/rafi/common/OpApi.h
-    include/rafi/common/OpTypes.h
+    include/rafi/common/OpDeprecated.h
     include/rafi/common/RvApi.h
     include/rafi/common/RvCsr.h
     include/rafi/common/RvPageTable.h
     include/rafi/common/RvTypes.h
     include/rafi/common/Util.h
     src/lib/common/Decoder.cpp
-    src/lib/common/OpApi.cpp
+    src/lib/common/OpDeprecated.cpp
     src/lib/common/RvApi.cpp
 )
 
@@ -233,7 +232,11 @@ include_directories(librafi_fp include ${Softfloat_INCLUDE_DIRS})
 # librafi_trace
 #
 add_library(librafi_trace
+    include/rafi/op.h
     include/rafi/trace.h
+    include/rafi/op/OpCommon.h
+    include/rafi/op/OpDecoder.h
+    include/rafi/op/RV32I.h
     include/rafi/trace/BinaryCycleBuilder.h
     include/rafi/trace/CycleTypes.h
     include/rafi/trace/EventTypes.h
@@ -255,6 +258,8 @@ add_library(librafi_trace
     include/rafi/trace/TraceShortPrinter.h
     include/rafi/trace/TraceTextPrinter.h
     include/rafi/trace/TraceTextReader.h
+    src/lib/op/OpDecoder.cpp
+    src/lib/op/RV32I.cpp
     src/lib/trace/BinaryCycle.cpp
     src/lib/trace/BinaryCycle.h
     src/lib/trace/BinaryCycleBuilder.cpp

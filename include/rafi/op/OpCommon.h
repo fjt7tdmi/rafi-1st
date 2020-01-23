@@ -16,29 +16,16 @@
 
 #pragma once
 
-#include <cstdint>
 #include <string>
-
-#include "OpDeprecated.h"
+#include <rafi/op.h>
 
 namespace rafi {
 
-class DecoderImpl;
-
-class Decoder final
+class IOp
 {
 public:
-    explicit Decoder(XLEN xlen);
-    ~Decoder();
-
-    Op Decode(uint16_t insn) const;
-    Op Decode(uint32_t insn) const;
-
-    bool IsCompressedInstruction(uint16_t insn) const;
-    bool IsCompressedInstruction(uint32_t insn) const;
-
-private:
-    DecoderImpl* m_pImpl;
+    virtual ~IOp() = default;
+    virtual std::string ToString() const = 0;
 };
 
 }

@@ -61,20 +61,6 @@ const char* IntRegNames[32] = {
 
 }
 
-const char* GetString(const OpClass& opClass)
-{
-#define GET_OP_NAME_CASE(arg) case OpClass::arg: return #arg
-    switch (opClass)
-    {
-        GET_OP_NAME_CASE(RV32I);
-        GET_OP_NAME_CASE(RV32A);
-        GET_OP_NAME_CASE(RV32M);
-    default:
-        return "unknown";
-    }
-#undef GET_OP_NAME_CASE
-}
-
 const char* GetString(const OpCode& opCode)
 {
 #define GET_OP_NAME_CASE(arg) case OpCode::arg: return #arg
@@ -267,28 +253,6 @@ const char* GetString(const OpCode& opCode)
         return "unknown";
     }
 #undef GET_OP_NAME_CASE
-}
-
-bool IsRV32(OpClass opClass)
-{
-    return
-        opClass == OpClass::RV32I ||
-        opClass == OpClass::RV32M ||
-        opClass == OpClass::RV32A ||
-        opClass == OpClass::RV32F ||
-        opClass == OpClass::RV32D ||
-        opClass == OpClass::RV32C;
-}
-
-bool IsRV64(OpClass opClass)
-{
-    return
-        opClass == OpClass::RV64I ||
-        opClass == OpClass::RV64M ||
-        opClass == OpClass::RV64A ||
-        opClass == OpClass::RV64F ||
-        opClass == OpClass::RV64D ||
-        opClass == OpClass::RV64C;
 }
 
 class SNPrintOpVisitor
