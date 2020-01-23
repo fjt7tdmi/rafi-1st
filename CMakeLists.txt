@@ -66,15 +66,14 @@ add_library(librafi_common
     include/rafi/common/BitField.h
     include/rafi/common/Decoder.h
     include/rafi/common/Macro.h
-    include/rafi/common/OpApi.h
-    include/rafi/common/OpTypes.h
+    include/rafi/common/OpDeprecated.h
     include/rafi/common/RvApi.h
     include/rafi/common/RvCsr.h
     include/rafi/common/RvPageTable.h
     include/rafi/common/RvTypes.h
     include/rafi/common/Util.h
     src/lib/common/Decoder.cpp
-    src/lib/common/OpApi.cpp
+    src/lib/common/OpDeprecated.cpp
     src/lib/common/RvApi.cpp
 )
 

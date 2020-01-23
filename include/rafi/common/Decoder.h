@@ -19,7 +19,7 @@
 #include <cstdint>
 #include <string>
 
-#include "OpTypes.h"
+#include "OpDeprecated.h"
 
 namespace rafi {
 
