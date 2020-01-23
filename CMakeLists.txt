@@ -284,6 +284,7 @@ add_library(librafi_trace
 #
 add_library(librafi_emu
     include/rafi/emu.h
+    include/rafi/op.h
     include/rafi/emu/BasicTypes.h
     include/rafi/emu/Bus.h
     include/rafi/emu/IInterruptSource.h
@@ -292,9 +293,14 @@ add_library(librafi_emu
     include/rafi/emu/Macro.h
     include/rafi/emu/Rom.h
     include/rafi/emu/Ram.h
+    include/rafi/op/OpCommon.h
+    include/rafi/op/OpDecoder.h
+    include/rafi/op/RV32I.h
     src/lib/emu/Bus.cpp
     src/lib/emu/Ram.cpp
     src/lib/emu/Rom.cpp
+    src/lib/op/OpDecoder.cpp
+    src/lib/op/RV32I.cpp
 )
 
 # =========================================================================
@@ -309,6 +315,7 @@ add_executable(rafi-check-io
 include_directories(rafi-check-io include)
 
 target_link_libraries(rafi-check-io
+    librafi_emu
     librafi_trace
     librafi_common
     ${Boost_LIBRARIES}
@@ -327,6 +334,7 @@ add_executable(rafi-conv
 include_directories(rafi-conv include)
 
 target_link_libraries(rafi-conv
+    librafi_emu
     librafi_trace
     librafi_common
     ${Boost_LIBRARIES}
@@ -349,6 +357,7 @@ add_executable(rafi-diff
 include_directories(rafi-diff include)
 
 target_link_libraries(rafi-diff
+    librafi_emu
     librafi_trace
     librafi_common
     ${Boost_LIBRARIES}
@@ -371,6 +380,7 @@ add_executable(rafi-dump
 include_directories(rafi-dump include)
 
 target_link_libraries(rafi-dump
+    librafi_emu
     librafi_trace
     librafi_common
     ${Boost_LIBRARIES}

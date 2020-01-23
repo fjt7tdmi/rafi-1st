@@ -16,20 +16,16 @@
 
 #pragma once
 
-#include "RvCsr.h"
-#include "RvTypes.h"
+#include <string>
+#include <rafi/op.h>
 
 namespace rafi {
 
-const char* GetString(MemoryAccessType accessType);
-const char* GetString(PrivilegeLevel level);
-const char* GetString(TrapType trapType);
-const char* GetString(ExceptionType exceptionType);
-const char* GetString(InterruptType interruptType);
-const char* GetString(csr_addr_t addr);
-const char* GetString(csr_addr_t addr, const char* defaultValue);
-
-const char* GetIntRegName(int index);
-const char* GetFpRegName(int index);
+class IOp
+{
+public:
+    virtual ~IOp() = default;
+    virtual std::string ToString() const = 0;
+};
 
 }

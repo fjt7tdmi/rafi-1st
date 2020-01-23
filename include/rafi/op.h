@@ -16,20 +16,6 @@
 
 #pragma once
 
-#include "RvCsr.h"
-#include "RvTypes.h"
-
-namespace rafi {
-
-const char* GetString(MemoryAccessType accessType);
-const char* GetString(PrivilegeLevel level);
-const char* GetString(TrapType trapType);
-const char* GetString(ExceptionType exceptionType);
-const char* GetString(InterruptType interruptType);
-const char* GetString(csr_addr_t addr);
-const char* GetString(csr_addr_t addr, const char* defaultValue);
-
-const char* GetIntRegName(int index);
-const char* GetFpRegName(int index);
-
-}
+#include "op/OpCommon.h"
+#include "op/OpDecoder.h"
+#include "op/RV32I.h"

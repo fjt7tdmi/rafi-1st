@@ -16,20 +16,26 @@
 
 #pragma once
 
-#include "RvCsr.h"
-#include "RvTypes.h"
+#include <memory>
+
+#include <rafi/common.h>
+
+#include "OpCommon.h"
 
 namespace rafi {
 
-const char* GetString(MemoryAccessType accessType);
-const char* GetString(PrivilegeLevel level);
-const char* GetString(TrapType trapType);
-const char* GetString(ExceptionType exceptionType);
-const char* GetString(InterruptType interruptType);
-const char* GetString(csr_addr_t addr);
-const char* GetString(csr_addr_t addr, const char* defaultValue);
+class OpDecoderImpl;
 
-const char* GetIntRegName(int index);
-const char* GetFpRegName(int index);
+class OpDecoder final
+{
+public:
+    explicit OpDecoder(XLEN xlen);
+    ~OpDecoder();
+
+    std::unique_ptr<IOp> Decode(uint32_t insn) const;
+
+private:
+    OpDecoderImpl* m_pImpl;
+};
 
 }
