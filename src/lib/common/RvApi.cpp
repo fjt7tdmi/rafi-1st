@@ -247,4 +247,23 @@ const char* GetFpRegName(int index)
     return FpRegNames[index];
 }
 
+const char* GetRoundingModeName(int rm)
+{
+    switch (rm)
+    {
+        case 0b000:
+            return "rne";
+        case 0b001:
+            return "rtz";
+        case 0b010:
+            return "rdn";
+        case 0b011:
+            return "rup";
+        case 0b100:
+            return "rmm";
+        default:
+            return nullptr;
+    }
+}
+
 }

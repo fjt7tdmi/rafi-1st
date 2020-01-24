@@ -117,7 +117,8 @@ private:
         const auto shamt = static_cast<int>(Pick(insn, 20, 5));
 
         const auto immU = Pick(insn, 12, 20);
-        const auto immI = Pick(insn, 20, 12);
+        const auto immI = SignExtend(12,
+            Pick(insn, 20, 12));
         const auto immB = SignExtend(13,
             Pick(insn, 31, 1) << 12 |
             Pick(insn, 25, 6) << 5 |
@@ -484,8 +485,149 @@ private:
 
     IOp* DecodeRV32F(uint32_t insn) const
     {
-        (void)insn;
-        return nullptr;
+        const auto opcode = Pick(insn, 0, 7);
+        const auto funct3 = Pick(insn, 12, 3);
+        const auto funct7 = Pick(insn, 25, 7);
+        const auto funct2 = Pick(insn, 25, 2);
+        const auto rd = Pick(insn, 7, 5);
+        const auto rs1 = Pick(insn, 15, 5);
+        const auto rs2 = Pick(insn, 20, 5);
+        const auto rs3 = Pick(insn, 27, 5);
+        const auto rm = Pick(insn, 12, 3);
+
+        const auto immI = SignExtend(12,
+            Pick(insn, 20, 12));
+        const auto immS = SignExtend(12,
+            Pick(insn, 25, 7) << 5 |
+            Pick(insn, 7, 5));
+
+        switch (opcode)
+        {
+        case 0b0000111:
+            switch (funct3)
+            {
+            case 0b010:
+                return new rv32f::FLW(rd, rs1, immI);
+            default:
+                return nullptr;
+            }
+        case 0b0100111:
+            switch (funct3)
+            {
+            case 0b010:
+                return new rv32f::FSW(rd, rs1, immS);
+            default:
+                return nullptr;
+            }
+        case 0b1000011:
+            return new rv32f::FMADD_S(rd, rs1, rs2, rs3, rm);
+        case 0b1000111:
+            return new rv32f::FMSUB_S(rd, rs1, rs2, rs3, rm);
+        case 0b1001011:
+            return new rv32f::FNMSUB_S(rd, rs1, rs2, rs3, rm);
+        case 0b1001111:
+            return new rv32f::FNMADD_S(rd, rs1, rs2, rs3, rm);
+        case 0b1010011:
+            switch (funct7)
+            {
+            case 0b0000000:
+                return new rv32f::FADD_S(rd, rs1, rs2, rm);
+            case 0b0000100:
+                return new rv32f::FSUB_S(rd, rs1, rs2, rm);
+            case 0b0001000:
+                return new rv32f::FMUL_S(rd, rs1, rs2, rm);
+            case 0b0001100:
+                return new rv32f::FDIV_S(rd, rs1, rs2, rm);
+            case 0b0101100:
+                switch (rs2)
+                {
+                case 0b00000:
+                    return new rv32f::FSQRT_S(rd, rs1, rm);
+                default:
+                    return nullptr;
+                }
+            case 0b0010000:
+                switch (funct3)
+                {
+                case 0b000:
+                    return new rv32f::FSGNJ_S(rd, rs1, rs2);
+                case 0b001:
+                    return new rv32f::FSGNJN_S(rd, rs1, rs2);
+                case 0b010:
+                    return new rv32f::FSGNJX_S(rd, rs1, rs2);
+                default:
+                    return nullptr;
+                }
+            case 0b0010100:
+                switch (funct3)
+                {
+                case 0b000:
+                    return new rv32f::FMIN_S(rd, rs1, rs2);
+                case 0b001:
+                    return new rv32f::FMAX_S(rd, rs1, rs2);
+                default:
+                    return nullptr;
+                }
+            case 0b1100000:
+                switch (rs2)
+                {
+                case 0b00000:
+                    return new rv32f::FCVT_W_S(rd, rs1, rs2);
+                case 0b00001:
+                    return new rv32f::FCVT_WU_S(rd, rs1, rs2);
+                default:
+                    return nullptr;
+                }
+            case 0b1110000:
+                if (rs2 == 0b00000 && funct3 == 0b000)
+                {
+                    return new rv32f::FMV_X_W(rd, rs1);
+                }
+                else if (rs2 == 0b00000 && funct3 == 0b001)
+                {
+                    return new rv32f::FCLASS_S(rd, rs1);
+                }
+                else
+                {
+                    return nullptr;
+                }
+            case 0b1010000:
+                switch (funct3)
+                {
+                case 0b000:
+                    return new rv32f::FLE_S(rd, rs1, rs2);
+                case 0b001:
+                    return new rv32f::FLT_S(rd, rs1, rs2);
+                case 0b010:
+                    return new rv32f::FEQ_S(rd, rs1, rs2);
+                default:
+                    return nullptr;
+                }
+            case 0b1101000:
+                switch (rs2)
+                {
+                case 0b00000:
+                    return new rv32f::FCVT_S_W(rd, rs1, rs2);
+                case 0b00001:
+                    return new rv32f::FCVT_S_WU(rd, rs1, rs2);
+                default:
+                    return nullptr;
+                }
+            case 0b1111000:
+                if (rs2 == 0b00000 && funct3 == 0b000)
+                {
+                    return new rv32f::FMV_W_X(rd, rs1);
+                }
+                else
+                {
+                    return nullptr;
+                }
+            default:
+                return nullptr;
+            }
+        default:
+            return nullptr;
+        }
     }
 
     IOp* DecodeRV32D(uint32_t insn) const
