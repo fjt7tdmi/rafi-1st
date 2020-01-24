@@ -424,8 +424,62 @@ private:
 
     IOp* DecodeRV32A(uint32_t insn) const
     {
-        (void)insn;
-        return nullptr;
+        const auto funct5 = Pick(insn, 27, 5);
+        const auto aq = static_cast<bool>(Pick(insn, 26));
+        const auto rl = static_cast<bool>(Pick(insn, 25));
+
+        const auto rd = static_cast<int>(Pick(insn, 7, 5));
+        const auto rs1 = static_cast<int>(Pick(insn, 15, 5));
+        const auto rs2 = static_cast<int>(Pick(insn, 20, 5));
+
+        if (funct5 == 0b00010 && rs2 == 0b00000)
+        {
+            return new rv32a::LR_W(rd, rs1, aq, rl);
+        }
+        else if (funct5 == 0b00011)
+        {
+            return new rv32a::SC_W(rd, rs1, rs2, aq, rl);
+        }
+        else if (funct5 == 0b00001)
+        {
+            return new rv32a::AMOSWAP_W(rd, rs1, rs2, aq, rl);
+        }
+        else if (funct5 == 0b00000)
+        {
+            return new rv32a::AMOADD_W(rd, rs1, rs2, aq, rl);
+        }
+        else if (funct5 == 0b00100)
+        {
+            return new rv32a::AMOXOR_W(rd, rs1, rs2, aq, rl);
+        }
+        else if (funct5 == 0b01100)
+        {
+            return new rv32a::AMOAND_W(rd, rs1, rs2, aq, rl);
+        }
+        else if (funct5 == 0b01000)
+        {
+            return new rv32a::AMOOR_W(rd, rs1, rs2, aq, rl);
+        }
+        else if (funct5 == 0b10000)
+        {
+            return new rv32a::AMOMIN_W(rd, rs1, rs2, aq, rl);
+        }
+        else if (funct5 == 0b10100)
+        {
+            return new rv32a::AMOMAX_W(rd, rs1, rs2, aq, rl);
+        }
+        else if (funct5 == 0b11000)
+        {
+            return new rv32a::AMOMINU_W(rd, rs1, rs2, aq, rl);
+        }
+        else if (funct5 == 0b11100)
+        {
+            return new rv32a::AMOMAXU_W(rd, rs1, rs2, aq, rl);
+        }
+        else
+        {
+            return nullptr;
+        }
     }
 
     IOp* DecodeRV32F(uint32_t insn) const
