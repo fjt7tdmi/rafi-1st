@@ -19,3 +19,4 @@
 #include "op/OpCommon.h"
 #include "op/OpDecoder.h"
 #include "op/RV32I.h"
+#include "op/RV32M.h"
