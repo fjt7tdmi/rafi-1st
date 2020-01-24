@@ -237,6 +237,7 @@ add_library(librafi_trace
     include/rafi/op/OpCommon.h
     include/rafi/op/OpDecoder.h
     include/rafi/op/RV32I.h
+    include/rafi/op/RV32M.h
     include/rafi/trace/BinaryCycleBuilder.h
     include/rafi/trace/CycleTypes.h
     include/rafi/trace/EventTypes.h
@@ -260,6 +261,7 @@ add_library(librafi_trace
     include/rafi/trace/TraceTextReader.h
     src/lib/op/OpDecoder.cpp
     src/lib/op/RV32I.cpp
+    src/lib/op/RV32M.cpp
     src/lib/trace/BinaryCycle.cpp
     src/lib/trace/BinaryCycle.h
     src/lib/trace/BinaryCycleBuilder.cpp

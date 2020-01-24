@@ -39,12 +39,70 @@ public:
 
     IOp* Decode(uint32_t insn) const
     {
-        // TODO: impl RV32MADC
         // TODO: impl RV64IMADC
-        return DecodeRV32I(insn);
+        switch (m_XLEN)
+        {
+        case XLEN::XLEN32:
+            return DecodeRV32(insn);
+        case XLEN::XLEN64:
+            return nullptr;
+        default:
+            RAFI_NOT_IMPLEMENTED;
+        }
+    }
+
+    bool IsCompressedInstruction(uint32_t insn) const
+    {
+        return (insn & 0b11) != 0b11;
     }
 
 private:
+    IOp* DecodeRV32(uint32_t insn) const
+    {
+        const auto opcode = Pick(insn, 0, 7);
+        const auto funct3 = Pick(insn, 12, 3);
+        const auto funct7 = Pick(insn, 25, 7);
+        const auto funct2 = Pick(insn, 25, 2);
+
+        if (IsCompressedInstruction(insn))
+        {
+            return DecodeRV32C(static_cast<uint16_t>(insn));
+        }
+        else if (opcode == 0b0110011 && funct7 == 0b0000001)
+        {
+            return DecodeRV32M(insn);
+        }
+        else if (opcode == 0b0101111 && funct3 == 0b010)
+        {
+            return DecodeRV32A(insn);
+        }
+        else if ((opcode == 0b0000111 && funct3 == 0b010) ||
+                (opcode == 0b0100111 && funct3 == 0b010) ||
+                (opcode == 0b1000011 && funct2 == 0b00) ||
+                (opcode == 0b1000111 && funct2 == 0b00) ||
+                (opcode == 0b1001011 && funct2 == 0b00) ||
+                (opcode == 0b1001111 && funct2 == 0b00) ||
+                (opcode == 0b1010011 && funct2 == 0b00 && !(funct7 == 0b0100000)))
+        {
+            return DecodeRV32F(insn);
+        }
+        else if ((opcode == 0b0000111 && funct3 == 0b011) ||
+                (opcode == 0b0100111 && funct3 == 0b011) ||
+                (opcode == 0b1000011 && funct2 == 0b01) ||
+                (opcode == 0b1000111 && funct2 == 0b01) ||
+                (opcode == 0b1001011 && funct2 == 0b01) ||
+                (opcode == 0b1001111 && funct2 == 0b01) ||
+                (opcode == 0b1010011 && funct2 == 0b01) ||
+                (opcode == 0b1010011 && funct7 == 0b0100000))
+        {
+            return DecodeRV32D(insn);
+        }
+        else
+        {
+            return DecodeRV32I(insn);
+        }
+    }
+
     IOp* DecodeRV32I(uint32_t insn) const
     {
         const auto opcode = Pick(insn, 0, 7);
@@ -334,6 +392,58 @@ private:
         default:
             return nullptr;
         }
+    }
+
+    IOp* DecodeRV32M(uint32_t insn) const
+    {
+        const auto funct3 = Pick(insn, 12, 3);
+        const auto rd = static_cast<int>(Pick(insn, 7, 5));
+        const auto rs1 = static_cast<int>(Pick(insn, 15, 5));
+        const auto rs2 = static_cast<int>(Pick(insn, 20, 5));
+
+        switch (funct3)
+        {
+        case 0b000:
+            return new rv32m::MUL(rd, rs1, rs2);
+        case 0b001:
+            return new rv32m::MULH(rd, rs1, rs2);
+        case 0b010:
+            return new rv32m::MULHSU(rd, rs1, rs2);
+        case 0b011:
+            return new rv32m::MULHU(rd, rs1, rs2);
+        case 0b100:
+            return new rv32m::DIV(rd, rs1, rs2);
+        case 0b101:
+            return new rv32m::DIVU(rd, rs1, rs2);
+        case 0b110:
+            return new rv32m::REM(rd, rs1, rs2);
+        default:
+            return new rv32m::REMU(rd, rs1, rs2);
+        }
+    }
+
+    IOp* DecodeRV32A(uint32_t insn) const
+    {
+        (void)insn;
+        return nullptr;
+    }
+
+    IOp* DecodeRV32F(uint32_t insn) const
+    {
+        (void)insn;
+        return nullptr;
+    }
+
+    IOp* DecodeRV32D(uint32_t insn) const
+    {
+        (void)insn;
+        return nullptr;
+    }
+
+    IOp* DecodeRV32C(uint32_t insn) const
+    {
+        (void)insn;
+        return nullptr;
     }
 
 private:
