@@ -632,8 +632,152 @@ private:
 
     IOp* DecodeRV32D(uint32_t insn) const
     {
-        (void)insn;
-        return nullptr;
+        const auto opcode = Pick(insn, 0, 7);
+        const auto funct3 = Pick(insn, 12, 3);
+        const auto funct7 = Pick(insn, 25, 7);
+        const auto funct2 = Pick(insn, 25, 2);
+        const auto rd = Pick(insn, 7, 5);
+        const auto rs1 = Pick(insn, 15, 5);
+        const auto rs2 = Pick(insn, 20, 5);
+        const auto rs3 = Pick(insn, 27, 5);
+        const auto rm = Pick(insn, 12, 3);
+
+        const auto immI = SignExtend(12,
+            Pick(insn, 20, 12));
+        const auto immS = SignExtend(12,
+            Pick(insn, 25, 7) << 5 |
+            Pick(insn, 7, 5));
+
+        switch (opcode)
+        {
+        case 0b0000111:
+            switch (funct3)
+            {
+            case 0b011:
+                return new rv32d::FLD(rd, rs1, immI);
+            default:
+                return nullptr;
+            }
+        case 0b0100111:
+            switch (funct3)
+            {
+            case 0b011:
+                return new rv32d::FSD(rd, rs1, immS);
+            default:
+                return nullptr;
+            }
+        case 0b1000011:
+            return new rv32d::FMADD_D(rd, rs1, rs2, rs3, rm);
+        case 0b1000111:
+            return new rv32d::FMSUB_D(rd, rs1, rs2, rs3, rm);
+        case 0b1001011:
+            return new rv32d::FNMSUB_D(rd, rs1, rs2, rs3, rm);
+        case 0b1001111:
+            return new rv32d::FNMADD_D(rd, rs1, rs2, rs3, rm);
+        case 0b1010011:
+            switch (funct7)
+            {
+            case 0b0000001:
+                return new rv32d::FADD_D(rd, rs1, rs2, rm);
+            case 0b0000101:
+                return new rv32d::FSUB_D(rd, rs1, rs2, rm);
+            case 0b0001001:
+                return new rv32d::FMUL_D(rd, rs1, rs2, rm);
+            case 0b0001101:
+                return new rv32d::FDIV_D(rd, rs1, rs2, rm);
+            case 0b0101101:
+                switch (rs2)
+                {
+                case 0b00000:
+                    return new rv32d::FSQRT_D(rd, rs1, rm);
+                default:
+                    return nullptr;
+                }
+            case 0b0010001:
+                switch (funct3)
+                {
+                case 0b000:
+                    return new rv32d::FSGNJ_D(rd, rs1, rs2);
+                case 0b001:
+                    return new rv32d::FSGNJN_D(rd, rs1, rs2);
+                case 0b010:
+                    return new rv32d::FSGNJX_D(rd, rs1, rs2);
+                default:
+                    return nullptr;
+                }
+            case 0b0010101:
+                switch (funct3)
+                {
+                case 0b000:
+                    return new rv32d::FMIN_D(rd, rs1, rs2);
+                case 0b001:
+                    return new rv32d::FMAX_D(rd, rs1, rs2);
+                default:
+                    return nullptr;
+                }
+            case 0b0100000:
+                switch (rs2)
+                {
+                case 0b00001:
+                    return new rv32d::FCVT_S_D(rd, rs1, rs2);
+                default:
+                    return nullptr;
+                }
+            case 0b0100001:
+                switch (rs2)
+                {
+                case 0b00000:
+                    return new rv32d::FCVT_D_S(rd, rs1, rs2);
+                default:
+                    return nullptr;
+                }
+            case 0b1010001:
+                switch (funct3)
+                {
+                case 0b000:
+                    return new rv32d::FLE_D(rd, rs1, rs2);
+                case 0b001:
+                    return new rv32d::FLT_D(rd, rs1, rs2);
+                case 0b010:
+                    return new rv32d::FEQ_D(rd, rs1, rs2);
+                default:
+                    return nullptr;
+                }
+            case 0b1110001:
+                if (rs2 == 0b00000 && funct3 == 0b001)
+                {
+                    return new rv32d::FCLASS_D(rd, rs1);
+                }
+                else
+                {
+                    return nullptr;
+                }
+            case 0b1100001:
+                switch (rs2)
+                {
+                case 0b00000:
+                    return new rv32d::FCVT_W_D(rd, rs1, rs2);
+                case 0b00001:
+                    return new rv32d::FCVT_WU_D(rd, rs1, rs2);
+                default:
+                    return nullptr;
+                }
+            case 0b1101001:
+                switch (rs2)
+                {
+                case 0b00000:
+                    return new rv32d::FCVT_D_W(rd, rs1, rs2);
+                case 0b00001:
+                    return new rv32d::FCVT_D_WU(rd, rs1, rs2);
+                default:
+                    return nullptr;
+                }
+            default:
+                return nullptr;
+            }
+        default:
+            return nullptr;
+        }
     }
 
     IOp* DecodeRV32C(uint32_t insn) const
