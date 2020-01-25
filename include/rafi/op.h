@@ -22,3 +22,4 @@
 #include "op/RV32M.h"
 #include "op/RV32A.h"
 #include "op/RV32F.h"
+#include "op/RV32D.h"
