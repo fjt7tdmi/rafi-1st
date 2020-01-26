@@ -780,10 +780,320 @@ private:
         }
     }
 
-    IOp* DecodeRV32C(uint32_t insn) const
+    IOp* DecodeRV32C(uint16_t insn) const
     {
-        (void)insn;
-        return nullptr;
+        const auto opcode = Pick(insn, 0, 2);
+
+        switch (opcode)
+        {
+        case 0b00:
+            return DecodeRV32C_Quadrant0(insn);
+        case 0b01:
+            return DecodeRV32C_Quadrant1(insn);
+        case 0b10:
+            return DecodeRV32C_Quadrant2(insn);
+        default:
+            return nullptr;
+        }
+    }
+
+    IOp* DecodeRV32C_Quadrant0(uint16_t insn) const
+    {
+        const auto funct3 = Pick(insn, 13, 3);
+
+        const auto rd = Pick(insn, 2, 3) + 8;
+        const auto rs1 = Pick(insn, 7, 3) + 8;
+        const auto rs2 = Pick(insn, 2, 3) + 8;
+
+        const auto uimm4 = ZeroExtend(7,
+            Pick(insn, 10, 3) << 3 |
+            Pick(insn, 6) << 2 |
+            Pick(insn, 5) << 6);
+        const auto uimm8 = ZeroExtend(8,
+            Pick(insn, 10, 3) << 3 |
+            Pick(insn, 5, 2) << 6);
+
+        if (funct3 == 0b000 && Pick(insn, 5, 8) != 0)
+        {
+            const auto imm = ZeroExtend(10,
+                Pick(insn, 11, 2) << 4 |
+                Pick(insn, 7, 4) << 6 |
+                Pick(insn, 6) << 2 |
+                Pick(insn, 5) << 3);
+            
+            // C.ADDI4SPN
+            return new rv32i::ADDI(2, 2, imm);
+        }
+        else if (funct3 == 0b001)
+        {
+            // C.FLD
+            return new rv32d::FLD(rd, rs1, uimm8);
+        }
+        else if (funct3 == 0b010)
+        {
+            // C.LW
+            return new rv32i::LW(rd, rs1, uimm4);
+        }
+        else if (funct3 == 0b011)
+        {
+            // C.FLW
+            return new rv32f::FLW(rd, rs1, uimm4);
+        }
+        else if (funct3 == 0b101)
+        {
+            // C.FSD
+            return new rv32d::FSD(rd, rs1, uimm8);
+        }
+        else if (funct3 == 0b110)
+        {
+            // C.SW
+            return new rv32i::SW(rd, rs1, uimm4);
+        }
+        else if (funct3 == 0b111)
+        {
+            // C.FSW
+            return new rv32f::FSW(rd, rs1, uimm4);
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+
+    IOp* DecodeRV32C_Quadrant1(uint16_t insn) const
+    {
+        const auto funct4 = Pick(insn, 12, 4);
+        const auto funct3 = Pick(insn, 13, 3);
+        const auto funct2_rs1 = Pick(insn, 10, 2);
+        const auto funct2_rs2 = Pick(insn, 5, 2);
+
+        const auto rd = Pick(insn, 7, 5);
+        const auto rs1 = Pick(insn, 7, 5);
+        const auto rd_alu = Pick(insn, 7, 3) + 8;
+        const auto rs1_alu = Pick(insn, 7, 3) + 8;
+        const auto rs2_alu = Pick(insn, 2, 3) + 8;
+
+        const auto imm = SignExtend(6,
+            Pick(insn, 12, 1) << 5 |
+            Pick(insn, 2, 5));
+        const auto uimm = SignExtend(6,
+            Pick(insn, 12, 1) << 5 |
+            Pick(insn, 2, 5));
+        const auto imm_j = SignExtend(12,
+            Pick(insn, 12, 1) << 11 |
+            Pick(insn, 11, 1) << 4 |
+            Pick(insn, 9, 2) << 8 |
+            Pick(insn, 8, 1) << 10 |
+            Pick(insn, 7, 1) << 6 |
+            Pick(insn, 6, 1) << 7 |
+            Pick(insn, 3, 3) << 1 |
+            Pick(insn, 2, 1) << 5);
+        const auto imm_addi16sp = SignExtend(10,
+            Pick(insn, 12) << 9 |
+            Pick(insn, 6) << 4 |
+            Pick(insn, 5) << 6 |
+            Pick(insn, 3, 2) << 7 |
+            Pick(insn, 2) << 5);
+        const auto imm_lui = SignExtend(18,
+            Pick(insn, 12) << 17 |
+            Pick(insn, 2, 5) << 12);
+        const auto imm_b = SignExtend(9,
+            Pick(insn, 12, 1) << 8 |
+            Pick(insn, 10, 2) << 3 |
+            Pick(insn, 5, 2) << 6 |
+            Pick(insn, 3, 2) << 1 |
+            Pick(insn, 2, 1) << 5);
+
+        if (funct3 == 0b000 && rd == 0)
+        {            
+            return new rv32c::NOP();
+        }
+        else if (funct3 == 0b000)
+        {
+            // C.ADDI
+            return new rv32i::ADDI(rd, rs1, imm);
+        }
+        else if (funct3 == 0b001)
+        {
+            // C.JAL
+            return new rv32i::JAL(1, imm_j);
+        }
+        else if (funct3 == 0b010 && rd != 0)
+        {
+            // C.LI
+            return new rv32i::ADDI(rd, 0, imm);
+        }
+        else if (funct3 == 0b011 && rd == 2)
+        {
+            // C.ADDI16SP
+            return new rv32i::ADDI(2, 2, imm_addi16sp);
+        }
+        else if (funct3 == 0b011 && rd != 0 && rd != 2)
+        {
+            // C.LUI
+            return new rv32i::LUI(rd, imm_lui);
+        }
+        else if (funct3 == 0b100 && funct2_rs1 == 0b00 && uimm != 0)
+        {
+            // C.SRLI
+            return new rv32i::SRLI(rd_alu, rs1_alu, uimm);
+        }
+        else if (funct3 == 0b100 && funct2_rs1 == 0b00 && uimm == 0)
+        {
+            // C.SRLI64
+            return new rv32c::NOP();
+        }
+        else if (funct3 == 0b100 && funct2_rs1 == 0b01 && uimm != 0)
+        {
+            // C.SRAI
+            return new rv32i::SRAI(rd_alu, rs1_alu, uimm);
+        }
+        else if (funct3 == 0b100 && funct2_rs1 == 0b01 && uimm == 0)
+        {
+            // C.SRAI64
+            return new rv32c::NOP();
+        }
+        else if (funct3 == 0b100 && funct2_rs1 == 0b10)
+        {
+            // C.ANDI
+            return new rv32i::ANDI(rd_alu, rs1_alu, imm);
+        }
+        else if (funct4 == 0b1000 && funct2_rs1 == 0b11 && funct2_rs2 == 0b00)
+        {
+            // C.SUB
+            return new rv32i::SUB(rd_alu, rs1_alu, rs2_alu);
+        }
+        else if (funct4 == 0b1000 && funct2_rs1 == 0b11 && funct2_rs2 == 0b01)
+        {
+            // C.XOR
+            return new rv32i::XOR(rd_alu, rs1_alu, rs2_alu);
+        }
+        else if (funct4 == 0b1000 && funct2_rs1 == 0b11 && funct2_rs2 == 0b10)
+        {
+            // C.OR
+            return new rv32i::OR(rd_alu, rs1_alu, rs2_alu);
+        }
+        else if (funct4 == 0b1000 && funct2_rs1 == 0b11 && funct2_rs2 == 0b11)
+        {
+            // C.AND
+            return new rv32i::AND(rd_alu, rs1_alu, rs2_alu);
+        }
+        else if (funct3 == 0b101)
+        {
+            // C.J
+            return new rv32i::JAL(0, imm_j);
+        }
+        else if (funct3 == 0b110)
+        {
+            // C.BEQZ
+            return new rv32i::BEQ(rs1_alu, 0, imm_b);
+        }
+        else if (funct3 == 0b111)
+        {
+            // C.BNEZ
+            return new rv32i::BNE(rs1_alu, 0, imm_b);
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+
+    IOp* DecodeRV32C_Quadrant2(uint16_t insn) const
+    {
+        const auto funct4 = Pick(insn, 12, 4);
+        const auto funct3 = Pick(insn, 13, 3);
+        const auto rd = Pick(insn, 7, 5);
+        const auto rs1 = Pick(insn, 7, 5);
+        const auto rs2 = Pick(insn, 2, 5);
+
+        const auto shamt = ZeroExtend(6,
+            Pick(insn, 12, 1) << 5 |
+            Pick(insn, 2, 5));
+        const auto uimm_load4 = ZeroExtend(8,
+            Pick(insn, 12) << 5 |
+            Pick(insn, 4, 3) << 2 |
+            Pick(insn, 2, 2) << 6);
+        const auto uimm_load8 = ZeroExtend(9,
+            Pick(insn, 12) << 5 |
+            Pick(insn, 5, 2) << 3 |
+            Pick(insn, 2, 3) << 6);
+        const auto uimm_store4 = ZeroExtend(8,
+            Pick(insn, 9, 4) << 2 |
+            Pick(insn, 7, 2) << 6);
+        const auto uimm_store8 = ZeroExtend(9,
+            Pick(insn, 10, 3) << 3 |
+            Pick(insn, 7, 3) << 6);
+
+        if (funct3 == 0b000 && shamt != 0)
+        {
+            // C.SLLI
+            return new rv32i::SLLI(rd, rs1, shamt);
+        }
+        else if (funct3 == 0b000 && shamt == 0)
+        {
+            // C.SLLI64
+            return new rv32c::NOP();
+        }
+        else if (funct3 == 0b001)
+        {
+            // C.FLDSP
+            return new rv32d::FLD(rd, 2, uimm_load8);
+        }
+        else if (funct3 == 0b010 && rd != 0)
+        {
+            // C.LWSP
+            return new rv32i::LW(rd, 2, uimm_load4);
+        }
+        else if (funct3 == 0b011)
+        {
+            // C.FLWSP
+            return new rv32f::FLW(rd, 2, uimm_load4);
+        }
+        else if (funct4 == 0b1000 && rs1 != 0 && rs2 == 0)
+        {
+            // C.JR
+            return new rv32i::JALR(0, rs1, 0);
+        }
+        else if (funct4 == 0b1000 && rd != 0 && rs2 != 0)
+        {
+            // C.MV
+            return new rv32i::ADD(rd, 0, rs2);
+        }
+        else if (funct4 == 0b1001 && rd == 0 && rs2 == 0)
+        {
+            // C.EBREAK
+            return new rv32i::EBREAK();
+        }
+        else if (funct4 == 0b1001 && rs1 != 0 && rs2 == 0)
+        {
+            // C.JALR
+            return new rv32i::JALR(1, rs1, 0);
+        }
+        else if (funct4 == 0b1001 && rd != 0 && rs2 != 0)
+        {
+            // C.ADD
+            return new rv32i::ADD(rd, rs1, rs2);
+        }
+        else if (funct3 == 0b101)
+        {
+            // C.FSDSP
+            return new rv32d::FSD(2, rs2, uimm_store8);
+        }
+        else if (funct3 == 0b110)
+        {
+            // C.SWSP
+            return new rv32i::SW(2, rs2, uimm_store4);
+        }
+        else if (funct3 == 0b111)
+        {
+            // C.FSWSP
+            return new rv32f::FSW(2, rs2, uimm_store4);
+        }
+        else
+        {
+            return nullptr;
+        }
     }
 
 private:
