@@ -1,7 +1,0 @@
-radix -hex
-
-add wave -r -position end sim:/SystemTestWithLoad/m_Sdram/body
-add wave -r -position end sim:/SystemTestWithLoad/m_Top/*
-add wave -r -position end sim:/SystemTestWithLoad/m_Top/m_UartInput/*
-
-run -all
