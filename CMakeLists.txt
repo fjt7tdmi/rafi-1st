@@ -611,6 +611,33 @@ if (verilator_FOUND)
     endif()
 
     # =========================================================================
+    # rafi-vtest-mul
+    #
+    add_executable(rafi-vtest-div
+        src/hw/div/DivUnitTest.cpp
+    )
+    verilate(rafi-vtest-div
+        PREFIX VDivUnit
+        THREADS 1
+        TRACE
+        SOURCES
+        src/hw/def/BasicTypes.sv
+        src/hw/def/RvTypes.sv
+        src/hw/def/Rv32Types.sv
+        src/hw/div/DivUnit.sv
+    )
+    target_link_libraries(rafi-vtest-div
+        PRIVATE ${GoogleTest_LIBRARIES}
+    )
+
+    # disable warnings for verilator
+    if (MSVC)
+        target_compile_options(rafi-vtest-div
+            PUBLIC /wd"4267"
+        )
+    endif()
+
+    # =========================================================================
     # rafi-vtest-timer
     #
     add_executable(rafi-vtest-timer
