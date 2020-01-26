@@ -17,7 +17,7 @@
 #include <cstring>
 #include <rafi/op.h>
 
-namespace rafi { namespace rv32i {
+namespace rafi { namespace op32 {
 
 LUI::LUI(int rd, uint32_t imm)
     : m_Rd(rd)

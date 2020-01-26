@@ -17,7 +17,7 @@
 #include <cstring>
 #include <rafi/op.h>
 
-namespace rafi { namespace rv32c {
+namespace rafi { namespace op32 {
 
 NOP::NOP()
 {    

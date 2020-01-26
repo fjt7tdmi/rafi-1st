@@ -17,7 +17,7 @@
 #include <cstring>
 #include <rafi/op.h>
 
-namespace rafi { namespace rv32a {
+namespace rafi { namespace op32 {
 
 LR_W::LR_W(int rd, int rs1, bool aq, bool rl)
     : m_Rd(rd)

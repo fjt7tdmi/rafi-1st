@@ -18,7 +18,7 @@
 
 #include <rafi/op/OpCommon.h>
 
-namespace rafi { namespace rv32c {
+namespace rafi { namespace op32 {
 
 class NOP final : public IOp
 {

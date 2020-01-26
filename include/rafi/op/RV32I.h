@@ -18,7 +18,7 @@
 
 #include <rafi/op/OpCommon.h>
 
-namespace rafi { namespace rv32i {
+namespace rafi { namespace op32 {
 
 class LUI final : public IOp
 {

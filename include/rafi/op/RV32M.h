@@ -18,7 +18,7 @@
 
 #include <rafi/op/OpCommon.h>
 
-namespace rafi { namespace rv32m {
+namespace rafi { namespace op32 {
 
 class MUL final : public IOp
 {
