@@ -16,7 +16,7 @@
 
 #include <rafi/op.h>
 
-namespace rafi { namespace rv32d {
+namespace rafi { namespace op32 {
 
 FLD::FLD(int rd, int rs1, uint32_t imm)
     : m_Rd(rd)

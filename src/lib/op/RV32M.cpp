@@ -17,7 +17,7 @@
 #include <cstring>
 #include <rafi/op.h>
 
-namespace rafi { namespace rv32m {
+namespace rafi { namespace op32 {
 
 MUL::MUL(int rd, int rs1, int rs2)
     : m_Rd(rd)

@@ -131,11 +131,11 @@ private:
         switch (opcode)
         {
         case 0b0110111:
-            return new rv32i::LUI(rd, immU);
+            return new op32::LUI(rd, immU);
         case 0b0010111:
-            return new rv32i::AUIPC(rd, immU);
+            return new op32::AUIPC(rd, immU);
         case 0b1101111:
-            return new rv32i::JAL(rd, SignExtend(20,
+            return new op32::JAL(rd, SignExtend(20,
                 Pick(insn, 31, 1) << 20 |
                 Pick(insn, 21, 10) << 1 |
                 Pick(insn, 20, 1) << 11 |
@@ -143,7 +143,7 @@ private:
         case 0b1100111:
             if (funct3 == 0)
             {
-                return new rv32i::JALR(rd, rs1, immI);
+                return new op32::JALR(rd, rs1, immI);
             }
             else
             {
@@ -152,27 +152,27 @@ private:
         case 0b1100011:
             if (funct3 == 0)
             {
-                return new rv32i::BEQ(rs1, rs2, immB);
+                return new op32::BEQ(rs1, rs2, immB);
             }
             else if (funct3 == 1)
             {
-                return new rv32i::BNE(rs1, rs2, immB);
+                return new op32::BNE(rs1, rs2, immB);
             }
             else if (funct3 == 4)
             {
-                return new rv32i::BLT(rs1, rs2, immB);
+                return new op32::BLT(rs1, rs2, immB);
             }
             else if (funct3 == 5)
             {
-                return new rv32i::BGE(rs1, rs2, immB);
+                return new op32::BGE(rs1, rs2, immB);
             }
             else if (funct3 == 6)
             {
-                return new rv32i::BLTU(rs1, rs2, immB);
+                return new op32::BLTU(rs1, rs2, immB);
             }
             else if (funct3 == 7)
             {
-                return new rv32i::BGEU(rs1, rs2, immB);
+                return new op32::BGEU(rs1, rs2, immB);
             }
             else
             {
@@ -181,23 +181,23 @@ private:
         case 0b0000011:
             if (funct3 == 0)
             {
-                return new rv32i::LB(rd, rs1, immI);
+                return new op32::LB(rd, rs1, immI);
             }
             else if (funct3 == 1)
             {
-                return new rv32i::LH(rd, rs1, immI);
+                return new op32::LH(rd, rs1, immI);
             }
             else if (funct3 == 2)
             {
-                return new rv32i::LW(rd, rs1, immI);
+                return new op32::LW(rd, rs1, immI);
             }
             else if (funct3 == 4)
             {
-                return new rv32i::LBU(rd, rs1, immI);
+                return new op32::LBU(rd, rs1, immI);
             }
             else if (funct3 == 5)
             {
-                return new rv32i::LHU(rd, rs1, immI);
+                return new op32::LHU(rd, rs1, immI);
             }
             else
             {
@@ -206,15 +206,15 @@ private:
         case 0b0100011:
             if (funct3 == 0)
             {
-                return new rv32i::SB(rs1, rs2, immI);
+                return new op32::SB(rs1, rs2, immI);
             }
             else if (funct3 == 1)
             {
-                return new rv32i::SH(rs1, rs2, immI);
+                return new op32::SH(rs1, rs2, immI);
             }
             else if (funct3 == 2)
             {
-                return new rv32i::SW(rs1, rs2, immI);
+                return new op32::SW(rs1, rs2, immI);
             }
             else
             {
@@ -223,39 +223,39 @@ private:
         case 0b0010011:
             if (funct3 == 0)
             {
-                return new rv32i::ADDI(rd, rs1, immI);
+                return new op32::ADDI(rd, rs1, immI);
             }
             else if (funct3 == 2)
             {
-                return new rv32i::SLTI(rd, rs1, immI);
+                return new op32::SLTI(rd, rs1, immI);
             }
             else if (funct3 == 3)
             {
-                return new rv32i::SLTIU(rd, rs1, immI);
+                return new op32::SLTIU(rd, rs1, immI);
             }
             else if (funct3 == 4)
             {
-                return new rv32i::XORI(rd, rs1, immI);
+                return new op32::XORI(rd, rs1, immI);
             }
             else if (funct3 == 6)
             {
-                return new rv32i::ORI(rd, rs1, immI);
+                return new op32::ORI(rd, rs1, immI);
             }
             else if (funct3 == 7)
             {
-                return new rv32i::ANDI(rd, rs1, immI);
+                return new op32::ANDI(rd, rs1, immI);
             }
             else if (funct3 == 1 && funct7 == 0b0000000)
             {
-                return new rv32i::SLLI(rd, rs1, shamt);
+                return new op32::SLLI(rd, rs1, shamt);
             }
             else if (funct3 == 5 && funct7 == 0b0000000)
             {
-                return new rv32i::SRLI(rd, rs1, shamt);
+                return new op32::SRLI(rd, rs1, shamt);
             }
             else if (funct3 == 5 && funct7 == 0b0100000)
             {
-                return new rv32i::SRAI(rd, rs1, shamt);
+                return new op32::SRAI(rd, rs1, shamt);
             }
             else
             {
@@ -266,35 +266,35 @@ private:
             {
                 if (funct3 == 0)
                 {
-                    return new rv32i::ADD(rd, rs1, rs2);
+                    return new op32::ADD(rd, rs1, rs2);
                 }
                 else if (funct3 == 1)
                 {
-                    return new rv32i::SLL(rd, rs1, rs2);
+                    return new op32::SLL(rd, rs1, rs2);
                 }
                 else if (funct3 == 2)
                 {
-                    return new rv32i::SLT(rd, rs1, rs2);
+                    return new op32::SLT(rd, rs1, rs2);
                 }
                 else if (funct3 == 3)
                 {
-                    return new rv32i::SLTU(rd, rs1, rs2);
+                    return new op32::SLTU(rd, rs1, rs2);
                 }
                 else if (funct3 == 4)
                 {
-                    return new rv32i::XOR(rd, rs1, rs2);
+                    return new op32::XOR(rd, rs1, rs2);
                 }
                 else if (funct3 == 5)
                 {
-                    return new rv32i::SRL(rd, rs1, rs2);
+                    return new op32::SRL(rd, rs1, rs2);
                 }
                 else if (funct3 == 6)
                 {
-                    return new rv32i::OR(rd, rs1, rs2);
+                    return new op32::OR(rd, rs1, rs2);
                 }
                 else if (funct3 == 7)
                 {
-                    return new rv32i::AND(rd, rs1, rs2);
+                    return new op32::AND(rd, rs1, rs2);
                 }
                 else
                 {
@@ -305,11 +305,11 @@ private:
             {
                 if (funct3 == 0)
                 {
-                    return new rv32i::SUB(rd, rs1, rs2);
+                    return new op32::SUB(rd, rs1, rs2);
                 }
                 else if (funct3 == 5)
                 {
-                    return new rv32i::SRA(rd, rs1, rs2);
+                    return new op32::SRA(rd, rs1, rs2);
                 }
                 else
                 {
@@ -327,11 +327,11 @@ private:
                 const auto pred = Pick(insn, 24, 4);
                 const auto succ = Pick(insn, 20, 4);
 
-                return new rv32i::FENCE(rd, rs1, fm, pred, succ);
+                return new op32::FENCE(rd, rs1, fm, pred, succ);
             }
             else if (funct3 == 1 && rd == 0 && rs1 == 0 && funct12 == 0)
             {
-                return new rv32i::FENCE_I(rd, rs1, immI);
+                return new op32::FENCE_I(rd, rs1, immI);
             }
             else
             {
@@ -340,51 +340,51 @@ private:
         case 0b1110011:
             if (funct3 == 0 && rd == 0 && funct7 == 0b0001001)
             {
-                return new rv32i::SFENCE_VMA(rs1, rs2);
+                return new op32::SFENCE_VMA(rs1, rs2);
             }
             else if (funct3 == 0 && rd == 0 && rs1 == 0)
             {
                 switch (funct12)
                 {
                 case 0b000000000000:
-                    return new rv32i::ECALL();
+                    return new op32::ECALL();
                 case 0b000000000001:
-                    return new rv32i::EBREAK();
+                    return new op32::EBREAK();
                 case 0b000000000010:
-                    return new rv32i::URET();
+                    return new op32::URET();
                 case 0b000100000010:
-                    return new rv32i::SRET();
+                    return new op32::SRET();
                 case 0b000100000101:
-                    return new rv32i::WFI();
+                    return new op32::WFI();
                 case 0b001100000010:
-                    return new rv32i::MRET();
+                    return new op32::MRET();
                 default:
                     return nullptr;
                 }
             }
             else if (funct3 == 1)
             {
-                return new rv32i::CSRRW(csr, rd, rs1);
+                return new op32::CSRRW(csr, rd, rs1);
             }
             else if (funct3 == 2)
             {
-                return new rv32i::CSRRS(csr, rd, rs1);
+                return new op32::CSRRS(csr, rd, rs1);
             }
             else if (funct3 == 3)
             {
-                return new rv32i::CSRRC(csr, rd, rs1);
+                return new op32::CSRRC(csr, rd, rs1);
             }
             else if (funct3 == 5)
             {
-                return new rv32i::CSRRWI(csr, rd, rs1);
+                return new op32::CSRRWI(csr, rd, rs1);
             }
             else if (funct3 == 6)
             {
-                return new rv32i::CSRRSI(csr, rd, rs1);
+                return new op32::CSRRSI(csr, rd, rs1);
             }
             else if (funct3 == 7)
             {
-                return new rv32i::CSRRCI(csr, rd, rs1);
+                return new op32::CSRRCI(csr, rd, rs1);
             }
             else
             {
@@ -405,21 +405,21 @@ private:
         switch (funct3)
         {
         case 0b000:
-            return new rv32m::MUL(rd, rs1, rs2);
+            return new op32::MUL(rd, rs1, rs2);
         case 0b001:
-            return new rv32m::MULH(rd, rs1, rs2);
+            return new op32::MULH(rd, rs1, rs2);
         case 0b010:
-            return new rv32m::MULHSU(rd, rs1, rs2);
+            return new op32::MULHSU(rd, rs1, rs2);
         case 0b011:
-            return new rv32m::MULHU(rd, rs1, rs2);
+            return new op32::MULHU(rd, rs1, rs2);
         case 0b100:
-            return new rv32m::DIV(rd, rs1, rs2);
+            return new op32::DIV(rd, rs1, rs2);
         case 0b101:
-            return new rv32m::DIVU(rd, rs1, rs2);
+            return new op32::DIVU(rd, rs1, rs2);
         case 0b110:
-            return new rv32m::REM(rd, rs1, rs2);
+            return new op32::REM(rd, rs1, rs2);
         default:
-            return new rv32m::REMU(rd, rs1, rs2);
+            return new op32::REMU(rd, rs1, rs2);
         }
     }
 
@@ -435,47 +435,47 @@ private:
 
         if (funct5 == 0b00010 && rs2 == 0b00000)
         {
-            return new rv32a::LR_W(rd, rs1, aq, rl);
+            return new op32::LR_W(rd, rs1, aq, rl);
         }
         else if (funct5 == 0b00011)
         {
-            return new rv32a::SC_W(rd, rs1, rs2, aq, rl);
+            return new op32::SC_W(rd, rs1, rs2, aq, rl);
         }
         else if (funct5 == 0b00001)
         {
-            return new rv32a::AMOSWAP_W(rd, rs1, rs2, aq, rl);
+            return new op32::AMOSWAP_W(rd, rs1, rs2, aq, rl);
         }
         else if (funct5 == 0b00000)
         {
-            return new rv32a::AMOADD_W(rd, rs1, rs2, aq, rl);
+            return new op32::AMOADD_W(rd, rs1, rs2, aq, rl);
         }
         else if (funct5 == 0b00100)
         {
-            return new rv32a::AMOXOR_W(rd, rs1, rs2, aq, rl);
+            return new op32::AMOXOR_W(rd, rs1, rs2, aq, rl);
         }
         else if (funct5 == 0b01100)
         {
-            return new rv32a::AMOAND_W(rd, rs1, rs2, aq, rl);
+            return new op32::AMOAND_W(rd, rs1, rs2, aq, rl);
         }
         else if (funct5 == 0b01000)
         {
-            return new rv32a::AMOOR_W(rd, rs1, rs2, aq, rl);
+            return new op32::AMOOR_W(rd, rs1, rs2, aq, rl);
         }
         else if (funct5 == 0b10000)
         {
-            return new rv32a::AMOMIN_W(rd, rs1, rs2, aq, rl);
+            return new op32::AMOMIN_W(rd, rs1, rs2, aq, rl);
         }
         else if (funct5 == 0b10100)
         {
-            return new rv32a::AMOMAX_W(rd, rs1, rs2, aq, rl);
+            return new op32::AMOMAX_W(rd, rs1, rs2, aq, rl);
         }
         else if (funct5 == 0b11000)
         {
-            return new rv32a::AMOMINU_W(rd, rs1, rs2, aq, rl);
+            return new op32::AMOMINU_W(rd, rs1, rs2, aq, rl);
         }
         else if (funct5 == 0b11100)
         {
-            return new rv32a::AMOMAXU_W(rd, rs1, rs2, aq, rl);
+            return new op32::AMOMAXU_W(rd, rs1, rs2, aq, rl);
         }
         else
         {
@@ -507,7 +507,7 @@ private:
             switch (funct3)
             {
             case 0b010:
-                return new rv32f::FLW(rd, rs1, immI);
+                return new op32::FLW(rd, rs1, immI);
             default:
                 return nullptr;
             }
@@ -515,34 +515,34 @@ private:
             switch (funct3)
             {
             case 0b010:
-                return new rv32f::FSW(rd, rs1, immS);
+                return new op32::FSW(rd, rs1, immS);
             default:
                 return nullptr;
             }
         case 0b1000011:
-            return new rv32f::FMADD_S(rd, rs1, rs2, rs3, rm);
+            return new op32::FMADD_S(rd, rs1, rs2, rs3, rm);
         case 0b1000111:
-            return new rv32f::FMSUB_S(rd, rs1, rs2, rs3, rm);
+            return new op32::FMSUB_S(rd, rs1, rs2, rs3, rm);
         case 0b1001011:
-            return new rv32f::FNMSUB_S(rd, rs1, rs2, rs3, rm);
+            return new op32::FNMSUB_S(rd, rs1, rs2, rs3, rm);
         case 0b1001111:
-            return new rv32f::FNMADD_S(rd, rs1, rs2, rs3, rm);
+            return new op32::FNMADD_S(rd, rs1, rs2, rs3, rm);
         case 0b1010011:
             switch (funct7)
             {
             case 0b0000000:
-                return new rv32f::FADD_S(rd, rs1, rs2, rm);
+                return new op32::FADD_S(rd, rs1, rs2, rm);
             case 0b0000100:
-                return new rv32f::FSUB_S(rd, rs1, rs2, rm);
+                return new op32::FSUB_S(rd, rs1, rs2, rm);
             case 0b0001000:
-                return new rv32f::FMUL_S(rd, rs1, rs2, rm);
+                return new op32::FMUL_S(rd, rs1, rs2, rm);
             case 0b0001100:
-                return new rv32f::FDIV_S(rd, rs1, rs2, rm);
+                return new op32::FDIV_S(rd, rs1, rs2, rm);
             case 0b0101100:
                 switch (rs2)
                 {
                 case 0b00000:
-                    return new rv32f::FSQRT_S(rd, rs1, rm);
+                    return new op32::FSQRT_S(rd, rs1, rm);
                 default:
                     return nullptr;
                 }
@@ -550,11 +550,11 @@ private:
                 switch (funct3)
                 {
                 case 0b000:
-                    return new rv32f::FSGNJ_S(rd, rs1, rs2);
+                    return new op32::FSGNJ_S(rd, rs1, rs2);
                 case 0b001:
-                    return new rv32f::FSGNJN_S(rd, rs1, rs2);
+                    return new op32::FSGNJN_S(rd, rs1, rs2);
                 case 0b010:
-                    return new rv32f::FSGNJX_S(rd, rs1, rs2);
+                    return new op32::FSGNJX_S(rd, rs1, rs2);
                 default:
                     return nullptr;
                 }
@@ -562,9 +562,9 @@ private:
                 switch (funct3)
                 {
                 case 0b000:
-                    return new rv32f::FMIN_S(rd, rs1, rs2);
+                    return new op32::FMIN_S(rd, rs1, rs2);
                 case 0b001:
-                    return new rv32f::FMAX_S(rd, rs1, rs2);
+                    return new op32::FMAX_S(rd, rs1, rs2);
                 default:
                     return nullptr;
                 }
@@ -572,20 +572,20 @@ private:
                 switch (rs2)
                 {
                 case 0b00000:
-                    return new rv32f::FCVT_W_S(rd, rs1, rs2);
+                    return new op32::FCVT_W_S(rd, rs1, rs2);
                 case 0b00001:
-                    return new rv32f::FCVT_WU_S(rd, rs1, rs2);
+                    return new op32::FCVT_WU_S(rd, rs1, rs2);
                 default:
                     return nullptr;
                 }
             case 0b1110000:
                 if (rs2 == 0b00000 && funct3 == 0b000)
                 {
-                    return new rv32f::FMV_X_W(rd, rs1);
+                    return new op32::FMV_X_W(rd, rs1);
                 }
                 else if (rs2 == 0b00000 && funct3 == 0b001)
                 {
-                    return new rv32f::FCLASS_S(rd, rs1);
+                    return new op32::FCLASS_S(rd, rs1);
                 }
                 else
                 {
@@ -595,11 +595,11 @@ private:
                 switch (funct3)
                 {
                 case 0b000:
-                    return new rv32f::FLE_S(rd, rs1, rs2);
+                    return new op32::FLE_S(rd, rs1, rs2);
                 case 0b001:
-                    return new rv32f::FLT_S(rd, rs1, rs2);
+                    return new op32::FLT_S(rd, rs1, rs2);
                 case 0b010:
-                    return new rv32f::FEQ_S(rd, rs1, rs2);
+                    return new op32::FEQ_S(rd, rs1, rs2);
                 default:
                     return nullptr;
                 }
@@ -607,16 +607,16 @@ private:
                 switch (rs2)
                 {
                 case 0b00000:
-                    return new rv32f::FCVT_S_W(rd, rs1, rs2);
+                    return new op32::FCVT_S_W(rd, rs1, rs2);
                 case 0b00001:
-                    return new rv32f::FCVT_S_WU(rd, rs1, rs2);
+                    return new op32::FCVT_S_WU(rd, rs1, rs2);
                 default:
                     return nullptr;
                 }
             case 0b1111000:
                 if (rs2 == 0b00000 && funct3 == 0b000)
                 {
-                    return new rv32f::FMV_W_X(rd, rs1);
+                    return new op32::FMV_W_X(rd, rs1);
                 }
                 else
                 {
@@ -654,7 +654,7 @@ private:
             switch (funct3)
             {
             case 0b011:
-                return new rv32d::FLD(rd, rs1, immI);
+                return new op32::FLD(rd, rs1, immI);
             default:
                 return nullptr;
             }
@@ -662,34 +662,34 @@ private:
             switch (funct3)
             {
             case 0b011:
-                return new rv32d::FSD(rd, rs1, immS);
+                return new op32::FSD(rd, rs1, immS);
             default:
                 return nullptr;
             }
         case 0b1000011:
-            return new rv32d::FMADD_D(rd, rs1, rs2, rs3, rm);
+            return new op32::FMADD_D(rd, rs1, rs2, rs3, rm);
         case 0b1000111:
-            return new rv32d::FMSUB_D(rd, rs1, rs2, rs3, rm);
+            return new op32::FMSUB_D(rd, rs1, rs2, rs3, rm);
         case 0b1001011:
-            return new rv32d::FNMSUB_D(rd, rs1, rs2, rs3, rm);
+            return new op32::FNMSUB_D(rd, rs1, rs2, rs3, rm);
         case 0b1001111:
-            return new rv32d::FNMADD_D(rd, rs1, rs2, rs3, rm);
+            return new op32::FNMADD_D(rd, rs1, rs2, rs3, rm);
         case 0b1010011:
             switch (funct7)
             {
             case 0b0000001:
-                return new rv32d::FADD_D(rd, rs1, rs2, rm);
+                return new op32::FADD_D(rd, rs1, rs2, rm);
             case 0b0000101:
-                return new rv32d::FSUB_D(rd, rs1, rs2, rm);
+                return new op32::FSUB_D(rd, rs1, rs2, rm);
             case 0b0001001:
-                return new rv32d::FMUL_D(rd, rs1, rs2, rm);
+                return new op32::FMUL_D(rd, rs1, rs2, rm);
             case 0b0001101:
-                return new rv32d::FDIV_D(rd, rs1, rs2, rm);
+                return new op32::FDIV_D(rd, rs1, rs2, rm);
             case 0b0101101:
                 switch (rs2)
                 {
                 case 0b00000:
-                    return new rv32d::FSQRT_D(rd, rs1, rm);
+                    return new op32::FSQRT_D(rd, rs1, rm);
                 default:
                     return nullptr;
                 }
@@ -697,11 +697,11 @@ private:
                 switch (funct3)
                 {
                 case 0b000:
-                    return new rv32d::FSGNJ_D(rd, rs1, rs2);
+                    return new op32::FSGNJ_D(rd, rs1, rs2);
                 case 0b001:
-                    return new rv32d::FSGNJN_D(rd, rs1, rs2);
+                    return new op32::FSGNJN_D(rd, rs1, rs2);
                 case 0b010:
-                    return new rv32d::FSGNJX_D(rd, rs1, rs2);
+                    return new op32::FSGNJX_D(rd, rs1, rs2);
                 default:
                     return nullptr;
                 }
@@ -709,9 +709,9 @@ private:
                 switch (funct3)
                 {
                 case 0b000:
-                    return new rv32d::FMIN_D(rd, rs1, rs2);
+                    return new op32::FMIN_D(rd, rs1, rs2);
                 case 0b001:
-                    return new rv32d::FMAX_D(rd, rs1, rs2);
+                    return new op32::FMAX_D(rd, rs1, rs2);
                 default:
                     return nullptr;
                 }
@@ -719,7 +719,7 @@ private:
                 switch (rs2)
                 {
                 case 0b00001:
-                    return new rv32d::FCVT_S_D(rd, rs1, rs2);
+                    return new op32::FCVT_S_D(rd, rs1, rs2);
                 default:
                     return nullptr;
                 }
@@ -727,7 +727,7 @@ private:
                 switch (rs2)
                 {
                 case 0b00000:
-                    return new rv32d::FCVT_D_S(rd, rs1, rs2);
+                    return new op32::FCVT_D_S(rd, rs1, rs2);
                 default:
                     return nullptr;
                 }
@@ -735,18 +735,18 @@ private:
                 switch (funct3)
                 {
                 case 0b000:
-                    return new rv32d::FLE_D(rd, rs1, rs2);
+                    return new op32::FLE_D(rd, rs1, rs2);
                 case 0b001:
-                    return new rv32d::FLT_D(rd, rs1, rs2);
+                    return new op32::FLT_D(rd, rs1, rs2);
                 case 0b010:
-                    return new rv32d::FEQ_D(rd, rs1, rs2);
+                    return new op32::FEQ_D(rd, rs1, rs2);
                 default:
                     return nullptr;
                 }
             case 0b1110001:
                 if (rs2 == 0b00000 && funct3 == 0b001)
                 {
-                    return new rv32d::FCLASS_D(rd, rs1);
+                    return new op32::FCLASS_D(rd, rs1);
                 }
                 else
                 {
@@ -756,9 +756,9 @@ private:
                 switch (rs2)
                 {
                 case 0b00000:
-                    return new rv32d::FCVT_W_D(rd, rs1, rs2);
+                    return new op32::FCVT_W_D(rd, rs1, rs2);
                 case 0b00001:
-                    return new rv32d::FCVT_WU_D(rd, rs1, rs2);
+                    return new op32::FCVT_WU_D(rd, rs1, rs2);
                 default:
                     return nullptr;
                 }
@@ -766,9 +766,9 @@ private:
                 switch (rs2)
                 {
                 case 0b00000:
-                    return new rv32d::FCVT_D_W(rd, rs1, rs2);
+                    return new op32::FCVT_D_W(rd, rs1, rs2);
                 case 0b00001:
-                    return new rv32d::FCVT_D_WU(rd, rs1, rs2);
+                    return new op32::FCVT_D_WU(rd, rs1, rs2);
                 default:
                     return nullptr;
                 }
@@ -780,10 +780,320 @@ private:
         }
     }
 
-    IOp* DecodeRV32C(uint32_t insn) const
+    IOp* DecodeRV32C(uint16_t insn) const
     {
-        (void)insn;
-        return nullptr;
+        const auto opcode = Pick(insn, 0, 2);
+
+        switch (opcode)
+        {
+        case 0b00:
+            return DecodeRV32C_Quadrant0(insn);
+        case 0b01:
+            return DecodeRV32C_Quadrant1(insn);
+        case 0b10:
+            return DecodeRV32C_Quadrant2(insn);
+        default:
+            return nullptr;
+        }
+    }
+
+    IOp* DecodeRV32C_Quadrant0(uint16_t insn) const
+    {
+        const auto funct3 = Pick(insn, 13, 3);
+
+        const auto rd = Pick(insn, 2, 3) + 8;
+        const auto rs1 = Pick(insn, 7, 3) + 8;
+        const auto rs2 = Pick(insn, 2, 3) + 8;
+
+        const auto uimm4 = ZeroExtend(7,
+            Pick(insn, 10, 3) << 3 |
+            Pick(insn, 6) << 2 |
+            Pick(insn, 5) << 6);
+        const auto uimm8 = ZeroExtend(8,
+            Pick(insn, 10, 3) << 3 |
+            Pick(insn, 5, 2) << 6);
+
+        if (funct3 == 0b000 && Pick(insn, 5, 8) != 0)
+        {
+            const auto imm = ZeroExtend(10,
+                Pick(insn, 11, 2) << 4 |
+                Pick(insn, 7, 4) << 6 |
+                Pick(insn, 6) << 2 |
+                Pick(insn, 5) << 3);
+            
+            // C.ADDI4SPN
+            return new op32::ADDI(2, 2, imm);
+        }
+        else if (funct3 == 0b001)
+        {
+            // C.FLD
+            return new op32::FLD(rd, rs1, uimm8);
+        }
+        else if (funct3 == 0b010)
+        {
+            // C.LW
+            return new op32::LW(rd, rs1, uimm4);
+        }
+        else if (funct3 == 0b011)
+        {
+            // C.FLW
+            return new op32::FLW(rd, rs1, uimm4);
+        }
+        else if (funct3 == 0b101)
+        {
+            // C.FSD
+            return new op32::FSD(rd, rs1, uimm8);
+        }
+        else if (funct3 == 0b110)
+        {
+            // C.SW
+            return new op32::SW(rd, rs1, uimm4);
+        }
+        else if (funct3 == 0b111)
+        {
+            // C.FSW
+            return new op32::FSW(rd, rs1, uimm4);
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+
+    IOp* DecodeRV32C_Quadrant1(uint16_t insn) const
+    {
+        const auto funct4 = Pick(insn, 12, 4);
+        const auto funct3 = Pick(insn, 13, 3);
+        const auto funct2_rs1 = Pick(insn, 10, 2);
+        const auto funct2_rs2 = Pick(insn, 5, 2);
+
+        const auto rd = Pick(insn, 7, 5);
+        const auto rs1 = Pick(insn, 7, 5);
+        const auto rd_alu = Pick(insn, 7, 3) + 8;
+        const auto rs1_alu = Pick(insn, 7, 3) + 8;
+        const auto rs2_alu = Pick(insn, 2, 3) + 8;
+
+        const auto imm = SignExtend(6,
+            Pick(insn, 12, 1) << 5 |
+            Pick(insn, 2, 5));
+        const auto uimm = SignExtend(6,
+            Pick(insn, 12, 1) << 5 |
+            Pick(insn, 2, 5));
+        const auto imm_j = SignExtend(12,
+            Pick(insn, 12, 1) << 11 |
+            Pick(insn, 11, 1) << 4 |
+            Pick(insn, 9, 2) << 8 |
+            Pick(insn, 8, 1) << 10 |
+            Pick(insn, 7, 1) << 6 |
+            Pick(insn, 6, 1) << 7 |
+            Pick(insn, 3, 3) << 1 |
+            Pick(insn, 2, 1) << 5);
+        const auto imm_addi16sp = SignExtend(10,
+            Pick(insn, 12) << 9 |
+            Pick(insn, 6) << 4 |
+            Pick(insn, 5) << 6 |
+            Pick(insn, 3, 2) << 7 |
+            Pick(insn, 2) << 5);
+        const auto imm_lui = SignExtend(18,
+            Pick(insn, 12) << 17 |
+            Pick(insn, 2, 5) << 12);
+        const auto imm_b = SignExtend(9,
+            Pick(insn, 12, 1) << 8 |
+            Pick(insn, 10, 2) << 3 |
+            Pick(insn, 5, 2) << 6 |
+            Pick(insn, 3, 2) << 1 |
+            Pick(insn, 2, 1) << 5);
+
+        if (funct3 == 0b000 && rd == 0)
+        {            
+            return new op32::NOP();
+        }
+        else if (funct3 == 0b000)
+        {
+            // C.ADDI
+            return new op32::ADDI(rd, rs1, imm);
+        }
+        else if (funct3 == 0b001)
+        {
+            // C.JAL
+            return new op32::JAL(1, imm_j);
+        }
+        else if (funct3 == 0b010 && rd != 0)
+        {
+            // C.LI
+            return new op32::ADDI(rd, 0, imm);
+        }
+        else if (funct3 == 0b011 && rd == 2)
+        {
+            // C.ADDI16SP
+            return new op32::ADDI(2, 2, imm_addi16sp);
+        }
+        else if (funct3 == 0b011 && rd != 0 && rd != 2)
+        {
+            // C.LUI
+            return new op32::LUI(rd, imm_lui);
+        }
+        else if (funct3 == 0b100 && funct2_rs1 == 0b00 && uimm != 0)
+        {
+            // C.SRLI
+            return new op32::SRLI(rd_alu, rs1_alu, uimm);
+        }
+        else if (funct3 == 0b100 && funct2_rs1 == 0b00 && uimm == 0)
+        {
+            // C.SRLI64
+            return new op32::NOP();
+        }
+        else if (funct3 == 0b100 && funct2_rs1 == 0b01 && uimm != 0)
+        {
+            // C.SRAI
+            return new op32::SRAI(rd_alu, rs1_alu, uimm);
+        }
+        else if (funct3 == 0b100 && funct2_rs1 == 0b01 && uimm == 0)
+        {
+            // C.SRAI64
+            return new op32::NOP();
+        }
+        else if (funct3 == 0b100 && funct2_rs1 == 0b10)
+        {
+            // C.ANDI
+            return new op32::ANDI(rd_alu, rs1_alu, imm);
+        }
+        else if (funct4 == 0b1000 && funct2_rs1 == 0b11 && funct2_rs2 == 0b00)
+        {
+            // C.SUB
+            return new op32::SUB(rd_alu, rs1_alu, rs2_alu);
+        }
+        else if (funct4 == 0b1000 && funct2_rs1 == 0b11 && funct2_rs2 == 0b01)
+        {
+            // C.XOR
+            return new op32::XOR(rd_alu, rs1_alu, rs2_alu);
+        }
+        else if (funct4 == 0b1000 && funct2_rs1 == 0b11 && funct2_rs2 == 0b10)
+        {
+            // C.OR
+            return new op32::OR(rd_alu, rs1_alu, rs2_alu);
+        }
+        else if (funct4 == 0b1000 && funct2_rs1 == 0b11 && funct2_rs2 == 0b11)
+        {
+            // C.AND
+            return new op32::AND(rd_alu, rs1_alu, rs2_alu);
+        }
+        else if (funct3 == 0b101)
+        {
+            // C.J
+            return new op32::JAL(0, imm_j);
+        }
+        else if (funct3 == 0b110)
+        {
+            // C.BEQZ
+            return new op32::BEQ(rs1_alu, 0, imm_b);
+        }
+        else if (funct3 == 0b111)
+        {
+            // C.BNEZ
+            return new op32::BNE(rs1_alu, 0, imm_b);
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+
+    IOp* DecodeRV32C_Quadrant2(uint16_t insn) const
+    {
+        const auto funct4 = Pick(insn, 12, 4);
+        const auto funct3 = Pick(insn, 13, 3);
+        const auto rd = Pick(insn, 7, 5);
+        const auto rs1 = Pick(insn, 7, 5);
+        const auto rs2 = Pick(insn, 2, 5);
+
+        const auto shamt = ZeroExtend(6,
+            Pick(insn, 12, 1) << 5 |
+            Pick(insn, 2, 5));
+        const auto uimm_load4 = ZeroExtend(8,
+            Pick(insn, 12) << 5 |
+            Pick(insn, 4, 3) << 2 |
+            Pick(insn, 2, 2) << 6);
+        const auto uimm_load8 = ZeroExtend(9,
+            Pick(insn, 12) << 5 |
+            Pick(insn, 5, 2) << 3 |
+            Pick(insn, 2, 3) << 6);
+        const auto uimm_store4 = ZeroExtend(8,
+            Pick(insn, 9, 4) << 2 |
+            Pick(insn, 7, 2) << 6);
+        const auto uimm_store8 = ZeroExtend(9,
+            Pick(insn, 10, 3) << 3 |
+            Pick(insn, 7, 3) << 6);
+
+        if (funct3 == 0b000 && shamt != 0)
+        {
+            // C.SLLI
+            return new op32::SLLI(rd, rs1, shamt);
+        }
+        else if (funct3 == 0b000 && shamt == 0)
+        {
+            // C.SLLI64
+            return new op32::NOP();
+        }
+        else if (funct3 == 0b001)
+        {
+            // C.FLDSP
+            return new op32::FLD(rd, 2, uimm_load8);
+        }
+        else if (funct3 == 0b010 && rd != 0)
+        {
+            // C.LWSP
+            return new op32::LW(rd, 2, uimm_load4);
+        }
+        else if (funct3 == 0b011)
+        {
+            // C.FLWSP
+            return new op32::FLW(rd, 2, uimm_load4);
+        }
+        else if (funct4 == 0b1000 && rs1 != 0 && rs2 == 0)
+        {
+            // C.JR
+            return new op32::JALR(0, rs1, 0);
+        }
+        else if (funct4 == 0b1000 && rd != 0 && rs2 != 0)
+        {
+            // C.MV
+            return new op32::ADD(rd, 0, rs2);
+        }
+        else if (funct4 == 0b1001 && rd == 0 && rs2 == 0)
+        {
+            // C.EBREAK
+            return new op32::EBREAK();
+        }
+        else if (funct4 == 0b1001 && rs1 != 0 && rs2 == 0)
+        {
+            // C.JALR
+            return new op32::JALR(1, rs1, 0);
+        }
+        else if (funct4 == 0b1001 && rd != 0 && rs2 != 0)
+        {
+            // C.ADD
+            return new op32::ADD(rd, rs1, rs2);
+        }
+        else if (funct3 == 0b101)
+        {
+            // C.FSDSP
+            return new op32::FSD(2, rs2, uimm_store8);
+        }
+        else if (funct3 == 0b110)
+        {
+            // C.SWSP
+            return new op32::SW(2, rs2, uimm_store4);
+        }
+        else if (funct3 == 0b111)
+        {
+            // C.FSWSP
+            return new op32::FSW(2, rs2, uimm_store4);
+        }
+        else
+        {
+            return nullptr;
+        }
     }
 
 private:

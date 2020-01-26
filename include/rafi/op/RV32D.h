@@ -18,7 +18,7 @@
 
 #include <rafi/op/OpCommon.h>
 
-namespace rafi { namespace rv32d {
+namespace rafi { namespace op32 {
 
 class FLD final : public IOp
 {
