@@ -24,3 +24,4 @@
 #include "op/RV32F.h"
 #include "op/RV32D.h"
 #include "op/RV32C.h"
+#include "op/RV64I.h"

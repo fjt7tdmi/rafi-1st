@@ -45,7 +45,7 @@ public:
         case XLEN::XLEN32:
             return DecodeRV32(insn);
         case XLEN::XLEN64:
-            return nullptr;
+            return DecodeRV64(insn);
         default:
             RAFI_NOT_IMPLEMENTED;
         }
@@ -100,6 +100,54 @@ private:
         else
         {
             return DecodeRV32I(insn);
+        }
+    }
+
+    IOp* DecodeRV64(uint32_t insn) const
+    {
+        const auto opcode = Pick(insn, 0, 7);
+        const auto funct3 = Pick(insn, 12, 3);
+        const auto funct7 = Pick(insn, 25, 7);
+        const auto funct2 = Pick(insn, 25, 2);
+
+        if (IsCompressedInstruction(insn))
+        {
+            return DecodeRV64C(static_cast<uint16_t>(insn));
+        }
+        else if ((opcode == 0b0110011 && funct7 == 0b0000001) ||
+                (opcode == 0b0111011 && funct7 == 0b0000001))
+        {
+            return DecodeRV64M(insn);
+        }
+        else if ((opcode == 0b0101111 && funct3 == 0b010) ||
+                (opcode == 0b0101111 && funct3 == 0b011))
+        {
+            return DecodeRV64A(insn);
+        }
+        else if ((opcode == 0b0000111 && funct3 == 0b010) ||
+                (opcode == 0b0100111 && funct3 == 0b010) ||
+                (opcode == 0b1000011 && funct2 == 0b00) ||
+                (opcode == 0b1000111 && funct2 == 0b00) ||
+                (opcode == 0b1001011 && funct2 == 0b00) ||
+                (opcode == 0b1001111 && funct2 == 0b00) ||
+                (opcode == 0b1010011 && funct2 == 0b00 && !(funct7 == 0b0100000)))
+        {
+            return DecodeRV64F(insn);
+        }
+        else if ((opcode == 0b0000111 && funct3 == 0b011) ||
+                (opcode == 0b0100111 && funct3 == 0b011) ||
+                (opcode == 0b1000011 && funct2 == 0b01) ||
+                (opcode == 0b1000111 && funct2 == 0b01) ||
+                (opcode == 0b1001011 && funct2 == 0b01) ||
+                (opcode == 0b1001111 && funct2 == 0b01) ||
+                (opcode == 0b1010011 && funct2 == 0b01) ||
+                (opcode == 0b1010011 && funct7 == 0b0100000))
+        {
+            return DecodeRV64D(insn);
+        }
+        else
+        {
+            return DecodeRV64I(insn);
         }
     }
 
@@ -1094,6 +1142,343 @@ private:
         {
             return nullptr;
         }
+    }
+
+    IOp* DecodeRV64I(uint32_t insn) const
+    {
+        const auto opcode = Pick(insn, 0, 7);
+        const auto funct3 = Pick(insn, 12, 3);
+        const auto funct7 = Pick(insn, 25, 7);
+        const auto funct6 = Pick(insn, 26, 6);
+        const auto funct12 = Pick(insn, 20, 12);
+        const auto csr = Pick(insn, 20, 12);
+
+        const auto rd = static_cast<int>(Pick(insn, 7, 5));
+        const auto rs1 = static_cast<int>(Pick(insn, 15, 5));
+        const auto rs2 = static_cast<int>(Pick(insn, 20, 5));
+        const auto shamt5 = static_cast<int>(Pick(insn, 20, 5));
+        const auto shamt6 = static_cast<int>(Pick(insn, 20, 6));
+
+        const auto immU = Pick(insn, 12, 20);
+        const auto immI = SignExtend(12,
+            Pick(insn, 20, 12));
+        const auto immB = SignExtend(13,
+            Pick(insn, 31, 1) << 12 |
+            Pick(insn, 25, 6) << 5 |
+            Pick(insn, 8, 4) << 1 |
+            Pick(insn, 7, 1) << 11);
+        const auto immS = SignExtend(12,
+            Pick(insn, 25, 7) << 5 |
+            Pick(insn, 7, 5));
+
+        switch (opcode)
+        {
+        case 0b0110111:
+            return new op64::LUI(rd, immU);
+        case 0b0010111:
+            return new op64::AUIPC(rd, immU);
+        case 0b1101111:
+            return new op64::JAL(rd, SignExtend(20,
+                Pick(insn, 31, 1) << 20 |
+                Pick(insn, 21, 10) << 1 |
+                Pick(insn, 20, 1) << 11 |
+                Pick(insn, 12, 8) << 12));
+        case 0b1100111:
+            switch (funct3)
+            {
+            case 0:
+                return new op64::JALR(rd, rs1, immI);
+            default:
+                return nullptr;
+            }
+        case 0b1100011:
+            switch (funct3)
+            {
+            case 0:
+                return new op64::BEQ(rs1, rs2, immB);
+            case 1:
+                return new op64::BNE(rs1, rs2, immB);
+            case 4:
+                return new op64::BLT(rs1, rs2, immB);
+            case 5:
+                return new op64::BGE(rs1, rs2, immB);
+            case 6:
+                return new op64::BLTU(rs1, rs2, immB);
+            case 7:
+                return new op64::BGEU(rs1, rs2, immB);
+            default:
+                return nullptr;
+            }
+        case 0b0000011:
+            switch (funct3)
+            {
+            case 0:
+                return new op64::LB(rd, rs1, immI);
+            case 1:
+                return new op64::LH(rd, rs1, immI);
+            case 2:
+                return new op64::LW(rd, rs1, immI);
+            case 3:
+                return new op64::LD(rd, rs1, immI);
+            case 4:
+                return new op64::LBU(rd, rs1, immI);
+            case 5:
+                return new op64::LHU(rd, rs1, immI);
+            case 6:
+                return new op64::LWU(rd, rs1, immI);
+            default:
+                return nullptr;
+            }
+        case 0b0100011:
+            switch (funct3)
+            {
+            case 0:
+                return new op64::SB(rs1, rs2, immI);
+            case 1:
+                return new op64::SH(rs1, rs2, immI);
+            case 2:
+                return new op64::SW(rs1, rs2, immI);
+            case 3:
+                return new op64::SD(rs1, rs2, immI);
+            default:
+                return nullptr;
+            }
+        case 0b0010011:
+            if (funct3 == 0)
+            {
+                return new op64::ADDI(rd, rs1, immI);
+            }
+            else if (funct3 == 2)
+            {
+                return new op64::SLTI(rd, rs1, immI);
+            }
+            else if (funct3 == 3)
+            {
+                return new op64::SLTIU(rd, rs1, immI);
+            }
+            else if (funct3 == 4)
+            {
+                return new op64::XORI(rd, rs1, immI);
+            }
+            else if (funct3 == 6)
+            {
+                return new op64::ORI(rd, rs1, immI);
+            }
+            else if (funct3 == 7)
+            {
+                return new op64::ANDI(rd, rs1, immI);
+            }
+            else if (funct3 == 1 && funct6 == 0b000000)
+            {
+                return new op64::SLLI(rd, rs1, shamt6);
+            }
+            else if (funct3 == 5 && funct6 == 0b000000)
+            {
+                return new op64::SRLI(rd, rs1, shamt6);
+            }
+            else if (funct3 == 5 && funct6 == 0b010000)
+            {
+                return new op64::SRAI(rd, rs1, shamt6);
+            }
+            else
+            {
+                return nullptr;
+            }
+        case 0b0011011:
+            if (funct3 == 0)
+            {
+                return new op64::ADDIW(rd, rs1, immI);
+            }
+            else if (funct3 == 1 && funct7 == 0b0000000)
+            {
+                return new op64::SLLI(rd, rs1, shamt5);
+            }
+            else if (funct3 == 5 && funct7 == 0b0000000)
+            {
+                return new op64::SRLI(rd, rs1, shamt5);
+            }
+            else if (funct3 == 5 && funct7 == 0b0100000)
+            {
+                return new op64::SRAI(rd, rs1, shamt5);
+            }
+            else
+            {
+                return nullptr;
+            }
+         case 0b0110011:
+            if (funct7 == 0b0000000)
+            {
+                switch (funct3)
+                {
+                case 0:
+                    return new op64::ADD(rd, rs1, rs2);
+                case 1:
+                    return new op64::SLL(rd, rs1, rs2);
+                case 2:
+                    return new op64::SLT(rd, rs1, rs2);
+                case 3:
+                    return new op64::SLTU(rd, rs1, rs2);
+                case 4:
+                    return new op64::XOR(rd, rs1, rs2);
+                case 5:
+                    return new op64::SRL(rd, rs1, rs2);
+                case 6:
+                    return new op64::OR(rd, rs1, rs2);
+                case 7:
+                    return new op64::AND(rd, rs1, rs2);
+                default:
+                    return nullptr;
+                }
+            }
+            else if (funct7 == 0b0100000)
+            {
+                switch (funct3)
+                {
+                case 0:
+                    return new op64::SUB(rd, rs1, rs2);
+                case 5:
+                    return new op64::SRA(rd, rs1, rs2);
+                default:
+                    return nullptr;
+                }
+            }
+            else
+            {
+                return nullptr;
+            }
+        case 0b0111011:
+            if (funct7 == 0b0000000)
+            {
+                switch (funct3)
+                {
+                case 0:
+                    return new op64::ADDW(rd, rs1, rs2);
+                case 1:
+                    return new op64::SLLW(rd, rs1, rs2);
+                case 5:
+                    return new op64::SRLW(rd, rs1, rs2);
+                default:
+                    return nullptr;
+                }
+            }
+            else if (funct7 == 0b0100000)
+            {
+                switch (funct3)
+                {
+                case 0:
+                    return new op64::SUBW(rd, rs1, rs2);
+                case 5:
+                    return new op64::SRAW(rd, rs1, rs2);
+                default:
+                    return nullptr;
+                }
+            }
+            else
+            {
+                return nullptr;
+            }        case 0b0001111:
+            if (funct3 == 0 && rd == 0 && rs1 == 0 && Pick(insn, 28, 4) == 0)
+            {
+                const auto fm = Pick(insn, 28, 4);
+                const auto pred = Pick(insn, 24, 4);
+                const auto succ = Pick(insn, 20, 4);
+
+                return new op64::FENCE(rd, rs1, fm, pred, succ);
+            }
+            else if (funct3 == 1 && rd == 0 && rs1 == 0 && funct12 == 0)
+            {
+                return new op64::FENCE_I(rd, rs1, immI);
+            }
+            else
+            {
+                return nullptr;
+            }
+        case 0b1110011:
+            if (funct3 == 0 && rd == 0 && funct7 == 0b0001001)
+            {
+                return new op64::SFENCE_VMA(rs1, rs2);
+            }
+            else if (funct3 == 0 && rd == 0 && rs1 == 0)
+            {
+                switch (funct12)
+                {
+                case 0b000000000000:
+                    return new op64::ECALL();
+                case 0b000000000001:
+                    return new op64::EBREAK();
+                case 0b000000000010:
+                    return new op64::URET();
+                case 0b000100000010:
+                    return new op64::SRET();
+                case 0b000100000101:
+                    return new op64::WFI();
+                case 0b001100000010:
+                    return new op64::MRET();
+                default:
+                    return nullptr;
+                }
+            }
+            else if (funct3 == 1)
+            {
+                return new op64::CSRRW(csr, rd, rs1);
+            }
+            else if (funct3 == 2)
+            {
+                return new op64::CSRRS(csr, rd, rs1);
+            }
+            else if (funct3 == 3)
+            {
+                return new op64::CSRRC(csr, rd, rs1);
+            }
+            else if (funct3 == 5)
+            {
+                return new op64::CSRRWI(csr, rd, rs1);
+            }
+            else if (funct3 == 6)
+            {
+                return new op64::CSRRSI(csr, rd, rs1);
+            }
+            else if (funct3 == 7)
+            {
+                return new op64::CSRRCI(csr, rd, rs1);
+            }
+            else
+            {
+                return nullptr;
+            }
+        default:
+            return nullptr;
+        }
+    }
+
+    IOp* DecodeRV64M(uint32_t insn) const
+    {
+        (void)insn;
+        return nullptr;
+    }
+
+    IOp* DecodeRV64A(uint32_t insn) const
+    {
+        (void)insn;
+        return nullptr;
+    }
+
+    IOp* DecodeRV64F(uint32_t insn) const
+    {
+        (void)insn;
+        return nullptr;
+    }
+
+    IOp* DecodeRV64D(uint32_t insn) const
+    {
+        (void)insn;
+        return nullptr;
+    }
+
+    IOp* DecodeRV64C(uint32_t insn) const
+    {
+        (void)insn;
+        return nullptr;
     }
 
 private:
