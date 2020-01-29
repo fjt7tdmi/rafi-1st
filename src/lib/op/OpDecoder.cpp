@@ -1453,8 +1453,53 @@ private:
 
     IOp* DecodeRV64M(uint32_t insn) const
     {
-        (void)insn;
-        return nullptr;
+        const auto opcode = Pick(insn, 0, 7);
+        const auto funct3 = Pick(insn, 12, 3);
+        const auto rd = static_cast<int>(Pick(insn, 7, 5));
+        const auto rs1 = static_cast<int>(Pick(insn, 15, 5));
+        const auto rs2 = static_cast<int>(Pick(insn, 20, 5));
+
+        switch (opcode)
+        {
+        case 0b0110011:
+            switch (funct3)
+            {
+            case 0b000:
+                return new op64::MUL(rd, rs1, rs2);
+            case 0b001:
+                return new op64::MULH(rd, rs1, rs2);
+            case 0b010:
+                return new op64::MULHSU(rd, rs1, rs2);
+            case 0b011:
+                return new op64::MULHU(rd, rs1, rs2);
+            case 0b100:
+                return new op64::DIV(rd, rs1, rs2);
+            case 0b101:
+                return new op64::DIVU(rd, rs1, rs2);
+            case 0b110:
+                return new op64::REM(rd, rs1, rs2);
+            default:
+                return new op64::REMU(rd, rs1, rs2);
+            }
+        case 0b0111011:
+            switch (funct3)
+            {
+            case 0b000:
+                return new op64::MULW(rd, rs1, rs2);
+            case 0b100:
+                return new op64::DIVW(rd, rs1, rs2);
+            case 0b101:
+                return new op64::DIVUW(rd, rs1, rs2);
+            case 0b110:
+                return new op64::REMW(rd, rs1, rs2);
+            case 0b111:
+                return new op64::REMUW(rd, rs1, rs2);
+            default:
+                return nullptr;
+            }        
+        default:
+            return nullptr;
+        }
     }
 
     IOp* DecodeRV64A(uint32_t insn) const
