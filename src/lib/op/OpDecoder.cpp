@@ -1504,8 +1504,118 @@ private:
 
     IOp* DecodeRV64A(uint32_t insn) const
     {
-        (void)insn;
-        return nullptr;
+        const auto funct5 = Pick(insn, 27, 5);
+        const auto funct3 = Pick(insn, 12, 3);
+        const auto aq = static_cast<bool>(Pick(insn, 26));
+        const auto rl = static_cast<bool>(Pick(insn, 25));
+
+        const auto rd = static_cast<int>(Pick(insn, 7, 5));
+        const auto rs1 = static_cast<int>(Pick(insn, 15, 5));
+        const auto rs2 = static_cast<int>(Pick(insn, 20, 5));
+
+        switch (funct3)
+        {
+        case 0b010:
+            if (funct5 == 0b00010 && rs2 == 0b00000)
+            {
+                return new op64::LR_W(rd, rs1, aq, rl);
+            }
+            else if (funct5 == 0b00011)
+            {
+                return new op64::SC_W(rd, rs1, rs2, aq, rl);
+            }
+            else if (funct5 == 0b00001)
+            {
+                return new op64::AMOSWAP_W(rd, rs1, rs2, aq, rl);
+            }
+            else if (funct5 == 0b00000)
+            {
+                return new op64::AMOADD_W(rd, rs1, rs2, aq, rl);
+            }
+            else if (funct5 == 0b00100)
+            {
+                return new op64::AMOXOR_W(rd, rs1, rs2, aq, rl);
+            }
+            else if (funct5 == 0b01100)
+            {
+                return new op64::AMOAND_W(rd, rs1, rs2, aq, rl);
+            }
+            else if (funct5 == 0b01000)
+            {
+                return new op64::AMOOR_W(rd, rs1, rs2, aq, rl);
+            }
+            else if (funct5 == 0b10000)
+            {
+                return new op64::AMOMIN_W(rd, rs1, rs2, aq, rl);
+            }
+            else if (funct5 == 0b10100)
+            {
+                return new op64::AMOMAX_W(rd, rs1, rs2, aq, rl);
+            }
+            else if (funct5 == 0b11000)
+            {
+                return new op64::AMOMINU_W(rd, rs1, rs2, aq, rl);
+            }
+            else if (funct5 == 0b11100)
+            {
+                return new op64::AMOMAXU_W(rd, rs1, rs2, aq, rl);
+            }
+            else
+            {
+                return nullptr;
+            }
+        case 0b011:
+            if (funct5 == 0b00010 && rs2 == 0b00000)
+            {
+                return new op64::LR_D(rd, rs1, aq, rl);
+            }
+            else if (funct5 == 0b00011)
+            {
+                return new op64::SC_D(rd, rs1, rs2, aq, rl);
+            }
+            else if (funct5 == 0b00001)
+            {
+                return new op64::AMOSWAP_D(rd, rs1, rs2, aq, rl);
+            }
+            else if (funct5 == 0b00000)
+            {
+                return new op64::AMOADD_D(rd, rs1, rs2, aq, rl);
+            }
+            else if (funct5 == 0b00100)
+            {
+                return new op64::AMOXOR_D(rd, rs1, rs2, aq, rl);
+            }
+            else if (funct5 == 0b01100)
+            {
+                return new op64::AMOAND_D(rd, rs1, rs2, aq, rl);
+            }
+            else if (funct5 == 0b01000)
+            {
+                return new op64::AMOOR_D(rd, rs1, rs2, aq, rl);
+            }
+            else if (funct5 == 0b10000)
+            {
+                return new op64::AMOMIN_D(rd, rs1, rs2, aq, rl);
+            }
+            else if (funct5 == 0b10100)
+            {
+                return new op64::AMOMAX_D(rd, rs1, rs2, aq, rl);
+            }
+            else if (funct5 == 0b11000)
+            {
+                return new op64::AMOMINU_D(rd, rs1, rs2, aq, rl);
+            }
+            else if (funct5 == 0b11100)
+            {
+                return new op64::AMOMAXU_D(rd, rs1, rs2, aq, rl);
+            }
+            else
+            {
+                return nullptr;
+            }
+        default:
+            return nullptr;
+        }
     }
 
     IOp* DecodeRV64F(uint32_t insn) const
