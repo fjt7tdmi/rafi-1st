@@ -1775,8 +1775,173 @@ private:
 
     IOp* DecodeRV64D(uint32_t insn) const
     {
-        (void)insn;
-        return nullptr;
+        const auto opcode = Pick(insn, 0, 7);
+        const auto funct3 = Pick(insn, 12, 3);
+        const auto funct7 = Pick(insn, 25, 7);
+        const auto funct2 = Pick(insn, 25, 2);
+        const auto rd = Pick(insn, 7, 5);
+        const auto rs1 = Pick(insn, 15, 5);
+        const auto rs2 = Pick(insn, 20, 5);
+        const auto rs3 = Pick(insn, 27, 5);
+        const auto rm = Pick(insn, 12, 3);
+
+        const auto immI = SignExtend(12,
+            Pick(insn, 20, 12));
+        const auto immS = SignExtend(12,
+            Pick(insn, 25, 7) << 5 |
+            Pick(insn, 7, 5));
+
+        switch (opcode)
+        {
+        case 0b0000111:
+            switch (funct3)
+            {
+            case 0b011:
+                return new op64::FLD(rd, rs1, immI);
+            default:
+                return nullptr;
+            }
+        case 0b0100111:
+            switch (funct3)
+            {
+            case 0b011:
+                return new op64::FSD(rd, rs1, immS);
+            default:
+                return nullptr;
+            }
+        case 0b1000011:
+            return new op64::FMADD_D(rd, rs1, rs2, rs3, rm);
+        case 0b1000111:
+            return new op64::FMSUB_D(rd, rs1, rs2, rs3, rm);
+        case 0b1001011:
+            return new op64::FNMSUB_D(rd, rs1, rs2, rs3, rm);
+        case 0b1001111:
+            return new op64::FNMADD_D(rd, rs1, rs2, rs3, rm);
+        case 0b1010011:
+            switch (funct7)
+            {
+            case 0b0000001:
+                return new op64::FADD_D(rd, rs1, rs2, rm);
+            case 0b0000101:
+                return new op64::FSUB_D(rd, rs1, rs2, rm);
+            case 0b0001001:
+                return new op64::FMUL_D(rd, rs1, rs2, rm);
+            case 0b0001101:
+                return new op64::FDIV_D(rd, rs1, rs2, rm);
+            case 0b0101101:
+                switch (rs2)
+                {
+                case 0b00000:
+                    return new op64::FSQRT_D(rd, rs1, rm);
+                default:
+                    return nullptr;
+                }
+            case 0b0010001:
+                switch (funct3)
+                {
+                case 0b000:
+                    return new op64::FSGNJ_D(rd, rs1, rs2);
+                case 0b001:
+                    return new op64::FSGNJN_D(rd, rs1, rs2);
+                case 0b010:
+                    return new op64::FSGNJX_D(rd, rs1, rs2);
+                default:
+                    return nullptr;
+                }
+            case 0b0010101:
+                switch (funct3)
+                {
+                case 0b000:
+                    return new op64::FMIN_D(rd, rs1, rs2);
+                case 0b001:
+                    return new op64::FMAX_D(rd, rs1, rs2);
+                default:
+                    return nullptr;
+                }
+            case 0b0100000:
+                switch (rs2)
+                {
+                case 0b00001:
+                    return new op64::FCVT_S_D(rd, rs1, rs2);
+                default:
+                    return nullptr;
+                }
+            case 0b0100001:
+                switch (rs2)
+                {
+                case 0b00000:
+                    return new op64::FCVT_D_S(rd, rs1, rs2);
+                default:
+                    return nullptr;
+                }
+            case 0b1010001:
+                switch (funct3)
+                {
+                case 0b000:
+                    return new op64::FLE_D(rd, rs1, rs2);
+                case 0b001:
+                    return new op64::FLT_D(rd, rs1, rs2);
+                case 0b010:
+                    return new op64::FEQ_D(rd, rs1, rs2);
+                default:
+                    return nullptr;
+                }
+            case 0b1110001:
+                if (rs2 == 0b00000 && rm == 0b000)
+                {
+                    return new op64::FMV_X_D(rd, rs1);
+                }
+                else if (rs2 == 0b00000 && funct3 == 0b001)
+                {
+                    return new op64::FCLASS_D(rd, rs1);
+                }
+                else
+                {
+                    return nullptr;
+                }
+            case 0b1100001:
+                switch (rs2)
+                {
+                case 0b00000:
+                    return new op64::FCVT_W_D(rd, rs1, rs2);
+                case 0b00001:
+                    return new op64::FCVT_WU_D(rd, rs1, rs2);
+                case 0b00010:
+                    return new op64::FCVT_L_D(rd, rs1, rs2);
+                case 0b00011:
+                    return new op64::FCVT_LU_D(rd, rs1, rs2);
+                default:
+                    return nullptr;
+                }
+            case 0b1101001:
+                switch (rs2)
+                {
+                case 0b00000:
+                    return new op64::FCVT_D_W(rd, rs1, rs2);
+                case 0b00001:
+                    return new op64::FCVT_D_WU(rd, rs1, rs2);
+                case 0b00010:
+                    return new op64::FCVT_D_L(rd, rs1, rs2);
+                case 0b00011:
+                    return new op64::FCVT_D_LU(rd, rs1, rs2);
+                default:
+                    return nullptr;
+                }
+            case 0b1111001:
+                if (rs2 == 0b00000 && rm == 0b000)
+                {
+                    return new op64::FMV_D_X(rd, rs1);
+                }
+                else
+                {
+                    return nullptr;
+                }
+            default:
+                return nullptr;
+            }
+        default:
+            return nullptr;
+        }
     }
 
     IOp* DecodeRV64C(uint32_t insn) const
