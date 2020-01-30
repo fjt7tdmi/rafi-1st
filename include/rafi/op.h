@@ -28,3 +28,4 @@
 #include "op/RV64M.h"
 #include "op/RV64A.h"
 #include "op/RV64F.h"
+#include "op/RV64D.h"

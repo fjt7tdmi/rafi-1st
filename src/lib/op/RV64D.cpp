@@ -18,17 +18,17 @@
 
 namespace rafi { namespace op64 {
 
-FLW::FLW(int rd, int rs1, uint32_t imm)
+FLD::FLD(int rd, int rs1, uint32_t imm)
     : m_Rd(rd)
     , m_Rs1(rs1)
     , m_Imm(imm)
 {
 }
 
-std::string FLW::ToString() const
+std::string FLD::ToString() const
 {
     char s[80];
-    std::sprintf(s, "flw %s,%d(%s)",
+    std::sprintf(s, "fld %s,%d(%s)",
         GetFpRegName(m_Rd),
         m_Imm,
         GetIntRegName(m_Rs1));
@@ -38,17 +38,17 @@ std::string FLW::ToString() const
 
 // ============================================================================
 
-FSW::FSW(int rs1, int rs2, uint32_t imm)
+FSD::FSD(int rs1, int rs2, uint32_t imm)
     : m_Rs1(rs1)
     , m_Rs2(rs2)
     , m_Imm(imm)
 {
 }
 
-std::string FSW::ToString() const
+std::string FSD::ToString() const
 {
     char s[80];
-    std::sprintf(s, "fsw %s,%d(%s)",
+    std::sprintf(s, "fsd %s,%d(%s)",
         GetFpRegName(m_Rs2),
         m_Imm,
         GetIntRegName(m_Rs1));
@@ -58,7 +58,7 @@ std::string FSW::ToString() const
 
 // ============================================================================
 
-FMADD_S::FMADD_S(int rd, int rs1, int rs2, int rs3, int rm)
+FMADD_D::FMADD_D(int rd, int rs1, int rs2, int rs3, int rm)
     : m_Rd(rd)
     , m_Rs1(rs1)
     , m_Rs2(rs2)
@@ -67,14 +67,14 @@ FMADD_S::FMADD_S(int rd, int rs1, int rs2, int rs3, int rm)
 {
 }
 
-std::string FMADD_S::ToString() const
+std::string FMADD_D::ToString() const
 {
     char s[80];
 
     const auto rm = GetRoundingModeName(m_Rm);
     if (rm)
     {
-        std::sprintf(s, "fmadd.s %s,%s,%s,%s,%s",
+        std::sprintf(s, "fmadd.d %s,%s,%s,%s,%s",
             GetFpRegName(m_Rd),
             GetFpRegName(m_Rs1),
             GetFpRegName(m_Rs2),
@@ -83,7 +83,7 @@ std::string FMADD_S::ToString() const
     }
     else
     {
-        std::sprintf(s, "fmadd.s %s,%s,%s,%s",
+        std::sprintf(s, "fmadd.d %s,%s,%s,%s",
             GetFpRegName(m_Rd),
             GetFpRegName(m_Rs1),
             GetFpRegName(m_Rs2),
@@ -95,7 +95,7 @@ std::string FMADD_S::ToString() const
 
 // ============================================================================
 
-FMSUB_S::FMSUB_S(int rd, int rs1, int rs2, int rs3, int rm)
+FMSUB_D::FMSUB_D(int rd, int rs1, int rs2, int rs3, int rm)
     : m_Rd(rd)
     , m_Rs1(rs1)
     , m_Rs2(rs2)
@@ -104,14 +104,14 @@ FMSUB_S::FMSUB_S(int rd, int rs1, int rs2, int rs3, int rm)
 {
 }
 
-std::string FMSUB_S::ToString() const
+std::string FMSUB_D::ToString() const
 {
     char s[80];
 
     const auto rm = GetRoundingModeName(m_Rm);
     if (rm)
     {
-        std::sprintf(s, "fmsub.s %s,%s,%s,%s,%s",
+        std::sprintf(s, "fmsub.d %s,%s,%s,%s,%s",
             GetFpRegName(m_Rd),
             GetFpRegName(m_Rs1),
             GetFpRegName(m_Rs2),
@@ -120,7 +120,7 @@ std::string FMSUB_S::ToString() const
     }
     else
     {
-        std::sprintf(s, "fmsub.s %s,%s,%s,%s",
+        std::sprintf(s, "fmsub.d %s,%s,%s,%s",
             GetFpRegName(m_Rd),
             GetFpRegName(m_Rs1),
             GetFpRegName(m_Rs2),
@@ -132,7 +132,7 @@ std::string FMSUB_S::ToString() const
 
 // ============================================================================
 
-FNMADD_S::FNMADD_S(int rd, int rs1, int rs2, int rs3, int rm)
+FNMADD_D::FNMADD_D(int rd, int rs1, int rs2, int rs3, int rm)
     : m_Rd(rd)
     , m_Rs1(rs1)
     , m_Rs2(rs2)
@@ -141,14 +141,14 @@ FNMADD_S::FNMADD_S(int rd, int rs1, int rs2, int rs3, int rm)
 {
 }
 
-std::string FNMADD_S::ToString() const
+std::string FNMADD_D::ToString() const
 {
     char s[80];
 
     const auto rm = GetRoundingModeName(m_Rm);
     if (rm)
     {
-        std::sprintf(s, "fnmadd.s %s,%s,%s,%s,%s",
+        std::sprintf(s, "fnmadd.d %s,%s,%s,%s,%s",
             GetFpRegName(m_Rd),
             GetFpRegName(m_Rs1),
             GetFpRegName(m_Rs2),
@@ -157,7 +157,7 @@ std::string FNMADD_S::ToString() const
     }
     else
     {
-        std::sprintf(s, "fnmadd.s %s,%s,%s,%s",
+        std::sprintf(s, "fnmadd.d %s,%s,%s,%s",
             GetFpRegName(m_Rd),
             GetFpRegName(m_Rs1),
             GetFpRegName(m_Rs2),
@@ -169,7 +169,7 @@ std::string FNMADD_S::ToString() const
 
 // ============================================================================
 
-FNMSUB_S::FNMSUB_S(int rd, int rs1, int rs2, int rs3, int rm)
+FNMSUB_D::FNMSUB_D(int rd, int rs1, int rs2, int rs3, int rm)
     : m_Rd(rd)
     , m_Rs1(rs1)
     , m_Rs2(rs2)
@@ -178,14 +178,14 @@ FNMSUB_S::FNMSUB_S(int rd, int rs1, int rs2, int rs3, int rm)
 {
 }
 
-std::string FNMSUB_S::ToString() const
+std::string FNMSUB_D::ToString() const
 {
     char s[80];
 
     const auto rm = GetRoundingModeName(m_Rm);
     if (rm)
     {
-        std::sprintf(s, "fnmsub.s %s,%s,%s,%s,%s",
+        std::sprintf(s, "fnmsub.d %s,%s,%s,%s,%s",
             GetFpRegName(m_Rd),
             GetFpRegName(m_Rs1),
             GetFpRegName(m_Rs2),
@@ -194,7 +194,7 @@ std::string FNMSUB_S::ToString() const
     }
     else
     {
-        std::sprintf(s, "fnmsub.s %s,%s,%s,%s",
+        std::sprintf(s, "fnmsub.d %s,%s,%s,%s",
             GetFpRegName(m_Rd),
             GetFpRegName(m_Rs1),
             GetFpRegName(m_Rs2),
@@ -206,7 +206,7 @@ std::string FNMSUB_S::ToString() const
 
 // ============================================================================
 
-FADD_S::FADD_S(int rd, int rs1, int rs2, int rm)
+FADD_D::FADD_D(int rd, int rs1, int rs2, int rm)
     : m_Rd(rd)
     , m_Rs1(rs1)
     , m_Rs2(rs2)
@@ -214,14 +214,14 @@ FADD_S::FADD_S(int rd, int rs1, int rs2, int rm)
 {
 }
 
-std::string FADD_S::ToString() const
+std::string FADD_D::ToString() const
 {
     char s[80];
 
     const auto rm = GetRoundingModeName(m_Rm);
     if (rm)
     {
-        std::sprintf(s, "fadd.s %s,%s,%s,%s",
+        std::sprintf(s, "fadd.d %s,%s,%s,%s",
             GetFpRegName(m_Rd),
             GetFpRegName(m_Rs1),
             GetFpRegName(m_Rs2),
@@ -229,7 +229,7 @@ std::string FADD_S::ToString() const
     }
     else
     {
-        std::sprintf(s, "fadd.s %s,%s,%s",
+        std::sprintf(s, "fadd.d %s,%s,%s",
             GetFpRegName(m_Rd),
             GetFpRegName(m_Rs1),
             GetFpRegName(m_Rs2));
@@ -240,7 +240,7 @@ std::string FADD_S::ToString() const
 
 // ============================================================================
 
-FSUB_S::FSUB_S(int rd, int rs1, int rs2, int rm)
+FSUB_D::FSUB_D(int rd, int rs1, int rs2, int rm)
     : m_Rd(rd)
     , m_Rs1(rs1)
     , m_Rs2(rs2)
@@ -248,14 +248,14 @@ FSUB_S::FSUB_S(int rd, int rs1, int rs2, int rm)
 {
 }
 
-std::string FSUB_S::ToString() const
+std::string FSUB_D::ToString() const
 {
     char s[80];
 
     const auto rm = GetRoundingModeName(m_Rm);
     if (rm)
     {
-        std::sprintf(s, "fsub.s %s,%s,%s,%s",
+        std::sprintf(s, "fsub.d %s,%s,%s,%s",
             GetFpRegName(m_Rd),
             GetFpRegName(m_Rs1),
             GetFpRegName(m_Rs2),
@@ -263,7 +263,7 @@ std::string FSUB_S::ToString() const
     }
     else
     {
-        std::sprintf(s, "fsub.s %s,%s,%s",
+        std::sprintf(s, "fsub.d %s,%s,%s",
             GetFpRegName(m_Rd),
             GetFpRegName(m_Rs1),
             GetFpRegName(m_Rs2));
@@ -274,7 +274,7 @@ std::string FSUB_S::ToString() const
 
 // ============================================================================
 
-FMUL_S::FMUL_S(int rd, int rs1, int rs2, int rm)
+FMUL_D::FMUL_D(int rd, int rs1, int rs2, int rm)
     : m_Rd(rd)
     , m_Rs1(rs1)
     , m_Rs2(rs2)
@@ -282,14 +282,14 @@ FMUL_S::FMUL_S(int rd, int rs1, int rs2, int rm)
 {
 }
 
-std::string FMUL_S::ToString() const
+std::string FMUL_D::ToString() const
 {
     char s[80];
 
     const auto rm = GetRoundingModeName(m_Rm);
     if (rm)
     {
-        std::sprintf(s, "fmul.s %s,%s,%s,%s",
+        std::sprintf(s, "fmul.d %s,%s,%s,%s",
             GetFpRegName(m_Rd),
             GetFpRegName(m_Rs1),
             GetFpRegName(m_Rs2),
@@ -297,7 +297,7 @@ std::string FMUL_S::ToString() const
     }
     else
     {
-        std::sprintf(s, "fmul.s %s,%s,%s",
+        std::sprintf(s, "fmul.d %s,%s,%s",
             GetFpRegName(m_Rd),
             GetFpRegName(m_Rs1),
             GetFpRegName(m_Rs2));
@@ -308,7 +308,7 @@ std::string FMUL_S::ToString() const
 
 // ============================================================================
 
-FDIV_S::FDIV_S(int rd, int rs1, int rs2, int rm)
+FDIV_D::FDIV_D(int rd, int rs1, int rs2, int rm)
     : m_Rd(rd)
     , m_Rs1(rs1)
     , m_Rs2(rs2)
@@ -316,14 +316,14 @@ FDIV_S::FDIV_S(int rd, int rs1, int rs2, int rm)
 {
 }
 
-std::string FDIV_S::ToString() const
+std::string FDIV_D::ToString() const
 {
     char s[80];
 
     const auto rm = GetRoundingModeName(m_Rm);
     if (rm)
     {
-        std::sprintf(s, "fdiv.s %s,%s,%s,%s",
+        std::sprintf(s, "fdiv.d %s,%s,%s,%s",
             GetFpRegName(m_Rd),
             GetFpRegName(m_Rs1),
             GetFpRegName(m_Rs2),
@@ -331,7 +331,7 @@ std::string FDIV_S::ToString() const
     }
     else
     {
-        std::sprintf(s, "fdiv.s %s,%s,%s",
+        std::sprintf(s, "fdiv.d %s,%s,%s",
             GetFpRegName(m_Rd),
             GetFpRegName(m_Rs1),
             GetFpRegName(m_Rs2));
@@ -342,28 +342,28 @@ std::string FDIV_S::ToString() const
 
 // ============================================================================
 
-FSQRT_S::FSQRT_S(int rd, int rs1, int rm)
+FSQRT_D::FSQRT_D(int rd, int rs1, int rm)
     : m_Rd(rd)
     , m_Rs1(rs1)
     , m_Rm(rm)
 {
 }
 
-std::string FSQRT_S::ToString() const
+std::string FSQRT_D::ToString() const
 {
     char s[80];
 
     const auto rm = GetRoundingModeName(m_Rm);
     if (rm)
     {
-        std::sprintf(s, "fsqrt.s %s,%s,%s",
+        std::sprintf(s, "fsqrt.d %s,%s,%s",
             GetFpRegName(m_Rd),
             GetFpRegName(m_Rs1),
             rm);
     }
     else
     {
-        std::sprintf(s, "fsqrt.s %s,%s",
+        std::sprintf(s, "fsqrt.d %s,%s",
             GetFpRegName(m_Rd),
             GetFpRegName(m_Rs1));
     }
@@ -373,17 +373,17 @@ std::string FSQRT_S::ToString() const
 
 // ============================================================================
 
-FSGNJ_S::FSGNJ_S(int rd, int rs1, int rs2)
+FSGNJ_D::FSGNJ_D(int rd, int rs1, int rs2)
     : m_Rd(rd)
     , m_Rs1(rs1)
     , m_Rs2(rs2)
 {
 }
 
-std::string FSGNJ_S::ToString() const
+std::string FSGNJ_D::ToString() const
 {
     char s[80];
-    std::sprintf(s, "fsgnj.s %s,%s,%s",
+    std::sprintf(s, "fsgnj.d %s,%s,%s",
         GetFpRegName(m_Rd),
         GetFpRegName(m_Rs1),
         GetFpRegName(m_Rs2));
@@ -393,17 +393,17 @@ std::string FSGNJ_S::ToString() const
 
 // ============================================================================
 
-FSGNJN_S::FSGNJN_S(int rd, int rs1, int rs2)
+FSGNJN_D::FSGNJN_D(int rd, int rs1, int rs2)
     : m_Rd(rd)
     , m_Rs1(rs1)
     , m_Rs2(rs2)
 {
 }
 
-std::string FSGNJN_S::ToString() const
+std::string FSGNJN_D::ToString() const
 {
     char s[80];
-    std::sprintf(s, "fsgnjn.s %s,%s,%s",
+    std::sprintf(s, "fsgnjn.d %s,%s,%s",
         GetFpRegName(m_Rd),
         GetFpRegName(m_Rs1),
         GetFpRegName(m_Rs2));
@@ -413,17 +413,17 @@ std::string FSGNJN_S::ToString() const
 
 // ============================================================================
 
-FSGNJX_S::FSGNJX_S(int rd, int rs1, int rs2)
+FSGNJX_D::FSGNJX_D(int rd, int rs1, int rs2)
     : m_Rd(rd)
     , m_Rs1(rs1)
     , m_Rs2(rs2)
 {
 }
 
-std::string FSGNJX_S::ToString() const
+std::string FSGNJX_D::ToString() const
 {
     char s[80];
-    std::sprintf(s, "fsgnjx.s %s,%s,%s",
+    std::sprintf(s, "fsgnjx.d %s,%s,%s",
         GetFpRegName(m_Rd),
         GetFpRegName(m_Rs1),
         GetFpRegName(m_Rs2));
@@ -433,17 +433,17 @@ std::string FSGNJX_S::ToString() const
 
 // ============================================================================
 
-FMIN_S::FMIN_S(int rd, int rs1, int rs2)
+FMIN_D::FMIN_D(int rd, int rs1, int rs2)
     : m_Rd(rd)
     , m_Rs1(rs1)
     , m_Rs2(rs2)
 {
 }
 
-std::string FMIN_S::ToString() const
+std::string FMIN_D::ToString() const
 {
     char s[80];
-    std::sprintf(s, "fmin.s %s,%s,%s",
+    std::sprintf(s, "fmin.d %s,%s,%s",
         GetFpRegName(m_Rd),
         GetFpRegName(m_Rs1),
         GetFpRegName(m_Rs2));
@@ -453,17 +453,17 @@ std::string FMIN_S::ToString() const
 
 // ============================================================================
 
-FMAX_S::FMAX_S(int rd, int rs1, int rs2)
+FMAX_D::FMAX_D(int rd, int rs1, int rs2)
     : m_Rd(rd)
     , m_Rs1(rs1)
     , m_Rs2(rs2)
 {
 }
 
-std::string FMAX_S::ToString() const
+std::string FMAX_D::ToString() const
 {
     char s[80];
-    std::sprintf(s, "fmax.s %s,%s,%s",
+    std::sprintf(s, "fmax.d %s,%s,%s",
         GetFpRegName(m_Rd),
         GetFpRegName(m_Rs1),
         GetFpRegName(m_Rs2));
@@ -473,29 +473,29 @@ std::string FMAX_S::ToString() const
 
 // ============================================================================
 
-FCVT_W_S::FCVT_W_S(int rd, int rs1, int rm)
+FCVT_S_D::FCVT_S_D(int rd, int rs1, int rm)
     : m_Rd(rd)
     , m_Rs1(rs1)
     , m_Rm(rm)
 {
 }
 
-std::string FCVT_W_S::ToString() const
+std::string FCVT_S_D::ToString() const
 {
     char s[80];
 
     const auto rm = GetRoundingModeName(m_Rm);
     if (rm)
     {
-        std::sprintf(s, "fcvt.w.s %s,%s,%s",
-            GetIntRegName(m_Rd),
+        std::sprintf(s, "fcvt.s.d %s,%s,%s",
+            GetFpRegName(m_Rd),
             GetFpRegName(m_Rs1),
             rm);
     }
     else
     {
-        std::sprintf(s, "fcvt.w.s %s,%s",
-            GetIntRegName(m_Rd),
+        std::sprintf(s, "fcvt.s.d %s,%s",
+            GetFpRegName(m_Rd),
             GetFpRegName(m_Rs1));
     }
 
@@ -504,28 +504,28 @@ std::string FCVT_W_S::ToString() const
 
 // ============================================================================
 
-FCVT_WU_S::FCVT_WU_S(int rd, int rs1, int rm)
+FCVT_D_S::FCVT_D_S(int rd, int rs1, int rm)
     : m_Rd(rd)
     , m_Rs1(rs1)
     , m_Rm(rm)
 {
 }
 
-std::string FCVT_WU_S::ToString() const
+std::string FCVT_D_S::ToString() const
 {
     char s[80];
 
     const auto rm = GetRoundingModeName(m_Rm);
     if (rm)
     {
-        std::sprintf(s, "fcvt.wu.s %s,%s",
-            GetIntRegName(m_Rd),
+        std::sprintf(s, "fcvt.d.s %s,%s",
+            GetFpRegName(m_Rd),
             GetFpRegName(m_Rs1));
     }
     else
     {
-        std::sprintf(s, "fcvt.wu.s %s,%s,%s",
-            GetIntRegName(m_Rd),
+        std::sprintf(s, "fcvt.d.s %s,%s,%s",
+            GetFpRegName(m_Rd),
             GetFpRegName(m_Rs1),
             rm);
     }
@@ -535,16 +535,76 @@ std::string FCVT_WU_S::ToString() const
 
 // ============================================================================
 
-FMV_X_W::FMV_X_W(int rd, int rs1)
+FEQ_D::FEQ_D(int rd, int rs1, int rs2)
+    : m_Rd(rd)
+    , m_Rs1(rs1)
+    , m_Rs2(rs2)
+{
+}
+
+std::string FEQ_D::ToString() const
+{
+    char s[80];
+    std::sprintf(s, "feq.d %s,%s,%s",
+        GetIntRegName(m_Rd),
+        GetFpRegName(m_Rs1),
+        GetFpRegName(m_Rs2));
+
+    return std::string(s);
+}
+
+// ============================================================================
+
+FLT_D::FLT_D(int rd, int rs1, int rs2)
+    : m_Rd(rd)
+    , m_Rs1(rs1)
+    , m_Rs2(rs2)
+{
+}
+
+std::string FLT_D::ToString() const
+{
+    char s[80];
+    std::sprintf(s, "flt.d %s,%s,%s",
+        GetIntRegName(m_Rd),
+        GetFpRegName(m_Rs1),
+        GetFpRegName(m_Rs2));
+
+    return std::string(s);
+}
+
+// ============================================================================
+
+FLE_D::FLE_D(int rd, int rs1, int rs2)
+    : m_Rd(rd)
+    , m_Rs1(rs1)
+    , m_Rs2(rs2)
+{
+}
+
+std::string FLE_D::ToString() const
+{
+    char s[80];
+    std::sprintf(s, "fle.d %s,%s,%s",
+        GetIntRegName(m_Rd),
+        GetFpRegName(m_Rs1),
+        GetFpRegName(m_Rs2));
+
+    return std::string(s);
+}
+
+// ============================================================================
+
+FCLASS_D::FCLASS_D(int rd, int rs1)
     : m_Rd(rd)
     , m_Rs1(rs1)
 {
 }
 
-std::string FMV_X_W::ToString() const
+std::string FCLASS_D::ToString() const
 {
     char s[80];
-    std::sprintf(s, "fmv.x.w %s,%s",
+    std::sprintf(s, "fclass.d %s,%s",
         GetIntRegName(m_Rd),
         GetFpRegName(m_Rs1));
 
@@ -553,76 +613,202 @@ std::string FMV_X_W::ToString() const
 
 // ============================================================================
 
-FEQ_S::FEQ_S(int rd, int rs1, int rs2)
+FCVT_W_D::FCVT_W_D(int rd, int rs1, int rm)
     : m_Rd(rd)
     , m_Rs1(rs1)
-    , m_Rs2(rs2)
+    , m_Rm(rm)
 {
 }
 
-std::string FEQ_S::ToString() const
+std::string FCVT_W_D::ToString() const
 {
     char s[80];
-    std::sprintf(s, "feq.s %s,%s,%s",
-        GetIntRegName(m_Rd),
-        GetFpRegName(m_Rs1),
-        GetFpRegName(m_Rs2));
+
+    const auto rm = GetRoundingModeName(m_Rm);
+    if (rm)
+    {
+        std::sprintf(s, "fcvt.w.d %s,%s,%s",
+            GetIntRegName(m_Rd),
+            GetFpRegName(m_Rs1),
+            rm);
+    }
+    else
+    {
+        std::sprintf(s, "fcvt.w.d %s,%s",
+            GetIntRegName(m_Rd),
+            GetFpRegName(m_Rs1));
+    }
 
     return std::string(s);
 }
 
 // ============================================================================
 
-FLT_S::FLT_S(int rd, int rs1, int rs2)
+FCVT_WU_D::FCVT_WU_D(int rd, int rs1, int rm)
     : m_Rd(rd)
     , m_Rs1(rs1)
-    , m_Rs2(rs2)
+    , m_Rm(rm)
 {
 }
 
-std::string FLT_S::ToString() const
+std::string FCVT_WU_D::ToString() const
 {
     char s[80];
-    std::sprintf(s, "flt.s %s,%s,%s",
-        GetIntRegName(m_Rd),
-        GetFpRegName(m_Rs1),
-        GetFpRegName(m_Rs2));
+
+    const auto rm = GetRoundingModeName(m_Rm);
+    if (rm)
+    {
+        std::sprintf(s, "fcvt.wu.d %s,%s,%s",
+            GetIntRegName(m_Rd),
+            GetFpRegName(m_Rs1),
+            rm);
+    }
+    else
+    {
+        std::sprintf(s, "fcvt.wu.d %s,%s",
+            GetIntRegName(m_Rd),
+            GetFpRegName(m_Rs1));
+    }
 
     return std::string(s);
 }
 
 // ============================================================================
 
-FLE_S::FLE_S(int rd, int rs1, int rs2)
+FCVT_D_W::FCVT_D_W(int rd, int rs1, int rm)
     : m_Rd(rd)
     , m_Rs1(rs1)
-    , m_Rs2(rs2)
+    , m_Rm(rm)
 {
 }
 
-std::string FLE_S::ToString() const
+std::string FCVT_D_W::ToString() const
 {
     char s[80];
-    std::sprintf(s, "fle.s %s,%s,%s",
-        GetIntRegName(m_Rd),
-        GetFpRegName(m_Rs1),
-        GetFpRegName(m_Rs2));
+
+    const auto rm = GetRoundingModeName(m_Rm);
+    if (rm)
+    {
+        std::sprintf(s, "fcvt.d.w %s,%s",
+            GetFpRegName(m_Rd),
+            GetIntRegName(m_Rs1));
+    }
+    else
+    {
+        std::sprintf(s, "fcvt.d.w %s,%s,%s",
+            GetFpRegName(m_Rd),
+            GetIntRegName(m_Rs1),
+            rm);
+    }
 
     return std::string(s);
 }
 
 // ============================================================================
 
-FCLASS_S::FCLASS_S(int rd, int rs1)
+FCVT_D_WU::FCVT_D_WU(int rd, int rs1, int rm)
+    : m_Rd(rd)
+    , m_Rs1(rs1)
+    , m_Rm(rm)
+{
+}
+
+std::string FCVT_D_WU::ToString() const
+{
+    char s[80];
+
+    const auto rm = GetRoundingModeName(m_Rm);
+    if (rm)
+    {
+        std::sprintf(s, "fcvt.d.wu %s,%s",
+            GetFpRegName(m_Rd),
+            GetIntRegName(m_Rs1));
+    }
+    else
+    {
+        std::sprintf(s, "fcvt.d.wu %s,%s,%s",
+            GetFpRegName(m_Rd),
+            GetIntRegName(m_Rs1),
+            rm);
+    }
+
+    return std::string(s);
+}
+
+// ============================================================================
+
+FCVT_L_D::FCVT_L_D(int rd, int rs1, int rm)
+    : m_Rd(rd)
+    , m_Rs1(rs1)
+    , m_Rm(rm)
+{
+}
+
+std::string FCVT_L_D::ToString() const
+{
+    char s[80];
+
+    const auto rm = GetRoundingModeName(m_Rm);
+    if (rm)
+    {
+        std::sprintf(s, "fcvt.l.d %s,%s,%s",
+            GetIntRegName(m_Rd),
+            GetFpRegName(m_Rs1),
+            rm);
+    }
+    else
+    {
+        std::sprintf(s, "fcvt.l.d %s,%s",
+            GetIntRegName(m_Rd),
+            GetFpRegName(m_Rs1));
+    }
+
+    return std::string(s);
+}
+
+// ============================================================================
+
+FCVT_LU_D::FCVT_LU_D(int rd, int rs1, int rm)
+    : m_Rd(rd)
+    , m_Rs1(rs1)
+    , m_Rm(rm)
+{
+}
+
+std::string FCVT_LU_D::ToString() const
+{
+    char s[80];
+
+    const auto rm = GetRoundingModeName(m_Rm);
+    if (rm)
+    {
+        std::sprintf(s, "fcvt.lu.d %s,%s,%s",
+            GetIntRegName(m_Rd),
+            GetFpRegName(m_Rs1),
+            rm);
+    }
+    else
+    {
+        std::sprintf(s, "fcvt.lu.d %s,%s",
+            GetIntRegName(m_Rd),
+            GetFpRegName(m_Rs1));
+    }
+
+    return std::string(s);
+}
+
+// ============================================================================
+
+FMV_X_D::FMV_X_D(int rd, int rs1)
     : m_Rd(rd)
     , m_Rs1(rs1)
 {
 }
 
-std::string FCLASS_S::ToString() const
+std::string FMV_X_D::ToString() const
 {
     char s[80];
-    std::sprintf(s, "fclass.s %s,%s",
+    std::sprintf(s, "fmv.x.d %s,%s",
         GetIntRegName(m_Rd),
         GetFpRegName(m_Rs1));
 
@@ -631,58 +817,27 @@ std::string FCLASS_S::ToString() const
 
 // ============================================================================
 
-FCVT_S_W::FCVT_S_W(int rd, int rs1, int rm)
+FCVT_D_L::FCVT_D_L(int rd, int rs1, int rm)
     : m_Rd(rd)
     , m_Rs1(rs1)
     , m_Rm(rm)
 {
 }
 
-std::string FCVT_S_W::ToString() const
+std::string FCVT_D_L::ToString() const
 {
     char s[80];
 
     const auto rm = GetRoundingModeName(m_Rm);
     if (rm)
     {
-        std::sprintf(s, "fcvt.s.w %s,%s,%s",
-            GetFpRegName(m_Rd),
-            GetIntRegName(m_Rs1),
-            rm);
-    }
-    else
-    {
-        std::sprintf(s, "fcvt.s.w %s,%s",
-            GetFpRegName(m_Rd),
-            GetIntRegName(m_Rs1));
-    }
-
-    return std::string(s);
-}
-
-// ============================================================================
-
-FCVT_S_WU::FCVT_S_WU(int rd, int rs1, int rm)
-    : m_Rd(rd)
-    , m_Rs1(rs1)
-    , m_Rm(rm)
-{
-}
-
-std::string FCVT_S_WU::ToString() const
-{
-    char s[80];
-
-    const auto rm = GetRoundingModeName(m_Rm);
-    if (rm)
-    {
-        std::sprintf(s, "fcvt.s.wu %s,%s",
+        std::sprintf(s, "fcvt.d.l %s,%s",
             GetFpRegName(m_Rd),
             GetIntRegName(m_Rs1));
     }
     else
     {
-        std::sprintf(s, "fcvt.s.wu %s,%s,%s",
+        std::sprintf(s, "fcvt.d.l %s,%s,%s",
             GetFpRegName(m_Rd),
             GetIntRegName(m_Rs1),
             rm);
@@ -693,142 +848,49 @@ std::string FCVT_S_WU::ToString() const
 
 // ============================================================================
 
-FMV_W_X::FMV_W_X(int rd, int rs1)
+FCVT_D_LU::FCVT_D_LU(int rd, int rs1, int rm)
+    : m_Rd(rd)
+    , m_Rs1(rs1)
+    , m_Rm(rm)
+{
+}
+
+std::string FCVT_D_LU::ToString() const
+{
+    char s[80];
+
+    const auto rm = GetRoundingModeName(m_Rm);
+    if (rm)
+    {
+        std::sprintf(s, "fcvt.d.lu %s,%s",
+            GetFpRegName(m_Rd),
+            GetIntRegName(m_Rs1));
+    }
+    else
+    {
+        std::sprintf(s, "fcvt.d.wu %s,%s,%s",
+            GetFpRegName(m_Rd),
+            GetIntRegName(m_Rs1),
+            rm);
+    }
+
+    return std::string(s);
+}
+
+// ============================================================================
+
+FMV_D_X::FMV_D_X(int rd, int rs1)
     : m_Rd(rd)
     , m_Rs1(rs1)
 {
 }
 
-std::string FMV_W_X::ToString() const
+std::string FMV_D_X::ToString() const
 {
     char s[80];
-    std::sprintf(s, "fmv.w.x %s,%s",
+    std::sprintf(s, "fmv.d.x %s,%s",
         GetFpRegName(m_Rd),
         GetIntRegName(m_Rs1));
-
-    return std::string(s);
-}
-
-// ============================================================================
-
-FCVT_L_S::FCVT_L_S(int rd, int rs1, int rm)
-    : m_Rd(rd)
-    , m_Rs1(rs1)
-    , m_Rm(rm)
-{
-}
-
-std::string FCVT_L_S::ToString() const
-{
-    char s[80];
-
-    const auto rm = GetRoundingModeName(m_Rm);
-    if (rm)
-    {
-        std::sprintf(s, "fcvt.l.s %s,%s,%s",
-            GetIntRegName(m_Rd),
-            GetFpRegName(m_Rs1),
-            rm);
-    }
-    else
-    {
-        std::sprintf(s, "fcvt.l.s %s,%s",
-            GetIntRegName(m_Rd),
-            GetFpRegName(m_Rs1));
-    }
-
-    return std::string(s);
-}
-
-// ============================================================================
-
-FCVT_LU_S::FCVT_LU_S(int rd, int rs1, int rm)
-    : m_Rd(rd)
-    , m_Rs1(rs1)
-    , m_Rm(rm)
-{
-}
-
-std::string FCVT_LU_S::ToString() const
-{
-    char s[80];
-
-    const auto rm = GetRoundingModeName(m_Rm);
-    if (rm)
-    {
-        std::sprintf(s, "fcvt.lu.s %s,%s",
-            GetIntRegName(m_Rd),
-            GetFpRegName(m_Rs1));
-    }
-    else
-    {
-        std::sprintf(s, "fcvt.lu.s %s,%s,%s",
-            GetIntRegName(m_Rd),
-            GetFpRegName(m_Rs1),
-            rm);
-    }
-
-    return std::string(s);
-}
-
-// ============================================================================
-
-FCVT_S_L::FCVT_S_L(int rd, int rs1, int rm)
-    : m_Rd(rd)
-    , m_Rs1(rs1)
-    , m_Rm(rm)
-{
-}
-
-std::string FCVT_S_L::ToString() const
-{
-    char s[80];
-
-    const auto rm = GetRoundingModeName(m_Rm);
-    if (rm)
-    {
-        std::sprintf(s, "fcvt.s.l %s,%s,%s",
-            GetFpRegName(m_Rd),
-            GetIntRegName(m_Rs1),
-            rm);
-    }
-    else
-    {
-        std::sprintf(s, "fcvt.s.l %s,%s",
-            GetFpRegName(m_Rd),
-            GetIntRegName(m_Rs1));
-    }
-
-    return std::string(s);
-}
-
-// ============================================================================
-
-FCVT_S_LU::FCVT_S_LU(int rd, int rs1, int rm)
-    : m_Rd(rd)
-    , m_Rs1(rs1)
-    , m_Rm(rm)
-{
-}
-
-std::string FCVT_S_LU::ToString() const
-{
-    char s[80];
-
-    const auto rm = GetRoundingModeName(m_Rm);
-    if (rm)
-    {
-        std::sprintf(s, "fcvt.s.lu %s,%s",
-            GetFpRegName(m_Rd),
-            GetIntRegName(m_Rs1));
-    }
-    else
-    {
-        std::sprintf(s, "fcvt.s.lu %s,%s,%s",
-            GetFpRegName(m_Rd),
-            GetIntRegName(m_Rs1),
-            rm);
-    }
 
     return std::string(s);
 }
