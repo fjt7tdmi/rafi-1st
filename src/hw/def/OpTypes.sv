@@ -20,6 +20,12 @@ import BasicTypes::*;
 import RvTypes::*;
 import Rv32Types::*;
 
+typedef enum logic
+{
+    RegType_Int = 1'h0,
+    RegType_Fp  = 1'h1
+} RegType;
+
 typedef enum logic [3:0]
 {
     AluCommand_Add      = 4'b0000,
@@ -140,6 +146,9 @@ typedef struct packed
     ResultType resultType;
     TrapOpType trapOpType;
     Privilege trapReturnPrivilege;
+    RegType srcRegType1;
+    RegType srcRegType2;
+    RegType dstRegType;
     word_t imm;
     logic isAtomic;
     logic isBranch;

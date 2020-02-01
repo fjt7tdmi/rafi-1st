@@ -20,10 +20,43 @@ import Rv32Types::*;
 
 import ProcessorTypes::*;
 
-interface RegFileIF; 
+interface IntRegFileIF; 
     word_t readValue1;
     word_t readValue2;
     word_t writeValue;
+    reg_addr_t readAddr1;
+    reg_addr_t readAddr2;
+    reg_addr_t writeAddr;
+    logic writeEnable;
+
+    modport RegFile(
+        output readValue1,
+        output readValue2,
+        input writeValue,
+        input readAddr1,
+        input readAddr2,
+        input writeAddr,
+        input writeEnable
+    );
+
+    modport RegReadStage(
+        input readValue1,
+        input readValue2,
+        output readAddr1,
+        output readAddr2
+    );
+
+    modport RegWriteStage(
+        output writeValue,
+        output writeAddr,
+        output writeEnable        
+    );
+endinterface
+
+interface FpRegFileIF; 
+    uint64_t readValue1;
+    uint64_t readValue2;
+    uint64_t writeValue;
     reg_addr_t readAddr1;
     reg_addr_t readAddr2;
     reg_addr_t writeAddr;

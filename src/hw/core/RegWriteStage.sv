@@ -24,7 +24,8 @@ import ProcessorTypes::*;
 module RegWriteStage(
     MemoryAccessStageIF.NextStage prevStage,
     ControlStatusRegisterIF.RegWriteStage csr,
-    RegFileIF.RegWriteStage regFile,
+    IntRegFileIF.RegWriteStage intRegFile,
+    FpRegFileIF.RegWriteStage fpRegFile,
     input   logic clk,
     input   logic rst
 );
@@ -54,8 +55,12 @@ module RegWriteStage(
         csr.trapReturn = commit && prevStage.trapReturn;
         csr.trapReturnPrivilege = op.trapReturnPrivilege;
 
-        regFile.writeEnable = commit && op.regWriteEnable;
-        regFile.writeAddr = prevStage.dstRegAddr;
-        regFile.writeValue = prevStage.dstRegValue;
+        intRegFile.writeEnable = commit && op.regWriteEnable && op.dstRegType == RegType_Int;
+        intRegFile.writeAddr = prevStage.dstRegAddr;
+        intRegFile.writeValue = prevStage.dstIntRegValue;
+
+        fpRegFile.writeEnable = commit && op.regWriteEnable && op.dstRegType == RegType_Fp;
+        fpRegFile.writeAddr = prevStage.dstRegAddr;
+        fpRegFile.writeValue = prevStage.dstFpRegValue;
     end
 endmodule

@@ -28,7 +28,8 @@ module MemoryAccessStage(
     LoadStoreUnitIF.MemoryAccessStage loadStoreUnit,
     FetchUnitIF.MemoryAccessStage fetchUnit,
     PipelineControllerIF.MemoryAccessStage ctrl,
-    BypassLogicIF.MemoryAccessStage bypass,
+    IntBypassLogicIF.MemoryAccessStage intBypass,
+    FpBypassLogicIF.MemoryAccessStage fpBypass,
     input logic clk,
     input logic rst
 );
@@ -39,7 +40,8 @@ module MemoryAccessStage(
     uint64_t nextOpCommitCount;
     logic valid;
     Op op;
-    word_t dstRegValue;
+    word_t dstIntRegValue;
+    uint64_t dstFpRegValue;
     TrapInfo trapInfo;
 
     always_comb begin
@@ -48,9 +50,10 @@ module MemoryAccessStage(
     end
 
     always_comb begin
-        dstRegValue = (op.regWriteSrcType == RegWriteSrcType_Memory) ?
+        dstIntRegValue = (op.regWriteSrcType == RegWriteSrcType_Memory) ?
             loadStoreUnit.result :
-            prevStage.dstRegValue;
+            prevStage.dstIntRegValue;
+        dstFpRegValue = prevStage.dstFpRegValue;
         nextOpCommitCount = valid ? r_OpCommitCount + 1 : r_OpCommitCount;
     end
 
@@ -124,9 +127,13 @@ module MemoryAccessStage(
     end
 
     always_comb begin
-        bypass.loadWriteAddr = prevStage.dstRegAddr;
-        bypass.loadWriteValue = dstRegValue;
-        bypass.loadWriteEnable = valid && op.regWriteEnable && (op.isLoad || op.isAtomic) && !ctrl.maStallReq;
+        intBypass.loadWriteAddr = prevStage.dstRegAddr;
+        intBypass.loadWriteValue = dstIntRegValue;
+        intBypass.loadWriteEnable = valid && op.regWriteEnable && op.dstRegType == RegType_Int && (op.isLoad || op.isAtomic) && !ctrl.maStallReq;
+
+        fpBypass.loadWriteAddr = prevStage.dstRegAddr;
+        fpBypass.loadWriteValue = dstFpRegValue;
+        fpBypass.loadWriteEnable = valid && op.regWriteEnable && op.dstRegType == RegType_Fp && (op.isLoad || op.isAtomic) && !ctrl.maStallReq;
     end
 
     always_ff @(posedge clk) begin
@@ -137,7 +144,8 @@ module MemoryAccessStage(
             nextStage.csrAddr <= '0;
             nextStage.dstCsrValue <= '0;
             nextStage.dstRegAddr <= '0;
-            nextStage.dstRegValue <= '0;
+            nextStage.dstIntRegValue <= '0;
+            nextStage.dstFpRegValue <= '0;
             nextStage.branchTaken <= '0;
             nextStage.branchTarget <= '0;
             nextStage.trapInfo <= '0;
@@ -151,7 +159,8 @@ module MemoryAccessStage(
             nextStage.csrAddr <= prevStage.csrAddr;
             nextStage.dstCsrValue <= prevStage.dstCsrValue;
             nextStage.dstRegAddr <= prevStage.dstRegAddr;
-            nextStage.dstRegValue <= dstRegValue;
+            nextStage.dstIntRegValue <= dstIntRegValue;
+            nextStage.dstFpRegValue <= dstFpRegValue;
             nextStage.branchTaken <= prevStage.branchTaken;
             nextStage.branchTarget <= prevStage.branchTarget;
             nextStage.trapInfo <= trapInfo;
