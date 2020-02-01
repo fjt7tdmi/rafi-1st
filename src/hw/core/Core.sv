@@ -48,7 +48,9 @@ module Core (
     MemoryAccessStageIF m_MemoryAccessStageIF();
     PipelineControllerIF m_PipelineControllerIF();
     IntRegFileIF m_IntRegFileIF();
-    BypassLogicIF m_BypassLogicIF();
+    FpRegFileIF m_FpRegFileIF();
+    IntBypassLogicIF m_IntBypassLogicIF();
+    FpBypassLogicIF m_FpBypassLogicIF();
     LoadStoreUnitIF m_LoadStoreUnitIF();
     ControlStatusRegisterIF m_ControlStatusRegisterIF();
     FetchUnitIF m_FetchUnitIF();
@@ -83,6 +85,7 @@ module Core (
         .ctrl(m_PipelineControllerIF.RegReadStage),
         .csr(m_ControlStatusRegisterIF.RegReadStage),
         .intRegFile(m_IntRegFileIF.RegReadStage),
+        .fpRegFile(m_FpRegFileIF.RegReadStage),
         .clk,
         .rst(rstInternal)
     );
@@ -91,7 +94,8 @@ module Core (
         .nextStage(m_ExecuteStageIF.ThisStage),
         .ctrl(m_PipelineControllerIF.ExecuteStage),
         .csr(m_ControlStatusRegisterIF.ExecuteStage),
-        .bypass(m_BypassLogicIF.ExecuteStage),
+        .intBypass(m_IntBypassLogicIF.ExecuteStage),
+        .fpBypass(m_FpBypassLogicIF.ExecuteStage),
         .clk,
         .rst(rstInternal)
     );
@@ -101,7 +105,8 @@ module Core (
         .loadStoreUnit(m_LoadStoreUnitIF.MemoryAccessStage),
         .fetchUnit(m_FetchUnitIF.MemoryAccessStage),
         .ctrl(m_PipelineControllerIF.MemoryAccessStage),
-        .bypass(m_BypassLogicIF.MemoryAccessStage),
+        .intBypass(m_IntBypassLogicIF.MemoryAccessStage),
+        .fpBypass(m_FpBypassLogicIF.MemoryAccessStage),
         .clk,
         .rst(rstInternal)
     );
@@ -109,6 +114,7 @@ module Core (
         .prevStage(m_MemoryAccessStageIF.NextStage),
         .csr(m_ControlStatusRegisterIF.RegWriteStage),
         .intRegFile(m_IntRegFileIF.RegWriteStage),
+        .fpRegFile(m_FpRegFileIF.RegWriteStage),
         .clk,
         .rst(rstInternal)
     );
@@ -118,8 +124,19 @@ module Core (
         .clk,
         .rst(rstInternal)
     );
-    BypassLogic m_BypassLogic(
-        .bus(m_BypassLogicIF.BypassLogic),
+    FpRegFile m_FpRegFile(
+        .bus(m_FpRegFileIF.RegFile),
+        .clk,
+        .rst(rstInternal)
+    );
+    IntBypassLogic m_IntBypassLogic(
+        .bus(m_IntBypassLogicIF.BypassLogic),
+        .ctrl(m_PipelineControllerIF.BypassLogic),
+        .clk,
+        .rst(rstInternal)
+    );
+    FpBypassLogic m_FpBypassLogic(
+        .bus(m_FpBypassLogicIF.BypassLogic),
         .ctrl(m_PipelineControllerIF.BypassLogic),
         .clk,
         .rst(rstInternal)

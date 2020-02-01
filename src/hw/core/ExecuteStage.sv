@@ -136,7 +136,8 @@ module ExecuteStage(
     ExecuteStageIF.ThisStage nextStage,
     PipelineControllerIF.ExecuteStage ctrl,
     ControlStatusRegisterIF.ExecuteStage csr,
-    BypassLogicIF.ExecuteStage bypass,
+    IntBypassLogicIF.ExecuteStage intBypass,
+    FpBypassLogicIF.ExecuteStage fpBypass,
     input logic clk,
     input logic rst
 );
@@ -148,9 +149,13 @@ module ExecuteStage(
 
     logic doneMulDiv;
 
-    word_t srcRegValue1;
-    word_t srcRegValue2;
-    word_t dstRegValue;
+    word_t srcIntRegValue1;
+    word_t srcIntRegValue2;
+    word_t dstIntRegValue;
+
+    uint64_t srcFpRegValue1;
+    uint64_t srcFpRegValue2;
+    uint64_t dstFpRegValue;
 
     word_t result;
     word_t resultAlu;
@@ -169,8 +174,8 @@ module ExecuteStage(
         .done(doneMulDiv),
         .result(resultMulDiv),
         .mulDivType(op.mulDivType),
-        .src1(srcRegValue1),
-        .src2(srcRegValue2),
+        .src1(srcIntRegValue1),
+        .src2(srcIntRegValue2),
         .enable(enableMulDiv),
         .stall(ctrl.exStall),
         .flush(ctrl.flush),
@@ -189,14 +194,17 @@ module ExecuteStage(
 
     // src
     always_comb begin
-        srcRegValue1 = bypass.hit1 ? bypass.readValue1 : prevStage.srcRegValue1;
-        srcRegValue2 = bypass.hit2 ? bypass.readValue2 : prevStage.srcRegValue2;
+        srcIntRegValue1 = intBypass.hit1 ? intBypass.readValue1 : prevStage.srcIntRegValue1;
+        srcIntRegValue2 = intBypass.hit2 ? intBypass.readValue2 : prevStage.srcIntRegValue2;
+
+        srcFpRegValue1 = fpBypass.hit1 ? fpBypass.readValue1 : prevStage.srcFpRegValue1;
+        srcFpRegValue2 = fpBypass.hit2 ? fpBypass.readValue2 : prevStage.srcFpRegValue2;
 
         // aluSrc1
         unique case (op.aluSrcType1)
         AluSrcType1_Zero: aluSrc1 = '0;
         AluSrcType1_Pc: aluSrc1 = prevStage.pc;
-        AluSrcType1_Reg: aluSrc1 = srcRegValue1;
+        AluSrcType1_Reg: aluSrc1 = srcIntRegValue1;
         AluSrcType1_Csr: aluSrc1 = prevStage.srcCsrValue;
         default: aluSrc1 = 'x;
         endcase
@@ -205,7 +213,7 @@ module ExecuteStage(
         unique case (op.aluSrcType2)
         AluSrcType2_Zero: aluSrc2 = '0;
         AluSrcType2_Imm: aluSrc2 = op.imm;
-        AluSrcType2_Reg: aluSrc2 = srcRegValue2;
+        AluSrcType2_Reg: aluSrc2 = srcIntRegValue2;
         AluSrcType2_Csr: aluSrc2 = prevStage.srcCsrValue;
         default: aluSrc2 = 'x;
         endcase
@@ -221,16 +229,19 @@ module ExecuteStage(
         default:            result = 'x;
         endcase
 
-        branchTaken = op.isBranch && BranchComparator(op.branchType, srcRegValue1, srcRegValue2);
+        branchTaken = op.isBranch && BranchComparator(op.branchType, srcIntRegValue1, srcIntRegValue2);
         branchTarget = result;
 
-        // dstRegValue
+        // dstIntRegValue
         unique case (op.regWriteSrcType)
-        RegWriteSrcType_Result: dstRegValue = result;
-        RegWriteSrcType_NextPc: dstRegValue = prevStage.pc + InsnSize;
-        RegWriteSrcType_Csr:    dstRegValue = prevStage.srcCsrValue;
-        default: dstRegValue = '0;
+        RegWriteSrcType_Result: dstIntRegValue = result;
+        RegWriteSrcType_NextPc: dstIntRegValue = prevStage.pc + InsnSize;
+        RegWriteSrcType_Csr:    dstIntRegValue = prevStage.srcCsrValue;
+        default: dstIntRegValue = '0;
         endcase
+
+        // dstFpRegValue
+        dstFpRegValue = '0;
     end
 
     always_comb begin
@@ -238,11 +249,11 @@ module ExecuteStage(
     end
 
     always_comb begin
-        bypass.readAddr1 = prevStage.srcRegAddr1;
-        bypass.readAddr2 = prevStage.srcRegAddr2;
-        bypass.writeAddr = prevStage.dstRegAddr;
-        bypass.writeValue = dstRegValue;
-        bypass.writeEnable = valid && op.regWriteEnable && !op.isLoad;
+        intBypass.readAddr1 = prevStage.srcRegAddr1;
+        intBypass.readAddr2 = prevStage.srcRegAddr2;
+        intBypass.writeAddr = prevStage.dstRegAddr;
+        intBypass.writeValue = dstIntRegValue;
+        intBypass.writeEnable = valid && op.regWriteEnable && !op.isLoad;
     end
 
     always_comb begin
@@ -284,7 +295,8 @@ module ExecuteStage(
             nextStage.csrAddr <= '0;
             nextStage.dstCsrValue <= '0;
             nextStage.dstRegAddr <= '0;
-            nextStage.dstRegValue <= '0;
+            nextStage.dstIntRegValue <= '0;
+            nextStage.dstFpRegValue <= '0;
             nextStage.memAddr <= '0;
             nextStage.storeRegValue <= '0;
             nextStage.branchTaken <= '0;
@@ -300,7 +312,8 @@ module ExecuteStage(
             nextStage.csrAddr <= nextStage.csrAddr;
             nextStage.dstCsrValue <= nextStage.dstCsrValue;
             nextStage.dstRegAddr <= nextStage.dstRegAddr;
-            nextStage.dstRegValue <= nextStage.dstRegValue;
+            nextStage.dstIntRegValue <= nextStage.dstIntRegValue;
+            nextStage.dstFpRegValue <= nextStage.dstFpRegValue;
             nextStage.memAddr <= nextStage.memAddr;
             nextStage.storeRegValue <= nextStage.storeRegValue;
             nextStage.branchTaken <= nextStage.branchTaken;
@@ -316,7 +329,8 @@ module ExecuteStage(
             nextStage.csrAddr <= '0;
             nextStage.dstCsrValue <= '0;
             nextStage.dstRegAddr <= '0;
-            nextStage.dstRegValue <= '0;
+            nextStage.dstIntRegValue <= '0;
+            nextStage.dstFpRegValue <= '0;
             nextStage.memAddr <= '0;
             nextStage.storeRegValue <= '0;
             nextStage.branchTaken <= '0;
@@ -332,9 +346,10 @@ module ExecuteStage(
             nextStage.csrAddr <= prevStage.csrAddr;
             nextStage.dstCsrValue <= result;
             nextStage.dstRegAddr <= prevStage.dstRegAddr;
-            nextStage.dstRegValue <= dstRegValue;
+            nextStage.dstIntRegValue <= dstIntRegValue;
+            nextStage.dstFpRegValue <= dstFpRegValue;
             nextStage.memAddr <= result;
-            nextStage.storeRegValue <= srcRegValue2;
+            nextStage.storeRegValue <= srcIntRegValue2;
             nextStage.branchTaken <= branchTaken;
             nextStage.branchTarget <= branchTarget;
             nextStage.trapInfo <= trapInfo;

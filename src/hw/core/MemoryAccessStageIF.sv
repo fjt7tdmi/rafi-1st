@@ -29,7 +29,8 @@ interface MemoryAccessStageIF;
     csr_addr_t csrAddr;
     word_t dstCsrValue;
     reg_addr_t dstRegAddr;
-    word_t dstRegValue;
+    word_t dstIntRegValue;
+    uint64_t dstFpRegValue;
 
     logic branchTaken;
     addr_t branchTarget;
@@ -47,7 +48,8 @@ interface MemoryAccessStageIF;
         csrAddr,
         dstCsrValue,
         dstRegAddr,
-        dstRegValue,
+        dstIntRegValue,
+        dstFpRegValue,
         branchTaken,
         branchTarget,
         trapInfo,
@@ -63,7 +65,8 @@ interface MemoryAccessStageIF;
         csrAddr,
         dstCsrValue,
         dstRegAddr,
-        dstRegValue,
+        dstIntRegValue,
+        dstFpRegValue,
         branchTaken,
         branchTarget,
         trapInfo,

@@ -25,6 +25,7 @@ module RegWriteStage(
     MemoryAccessStageIF.NextStage prevStage,
     ControlStatusRegisterIF.RegWriteStage csr,
     IntRegFileIF.RegWriteStage intRegFile,
+    FpRegFileIF.RegWriteStage fpRegFile,
     input   logic clk,
     input   logic rst
 );
@@ -54,8 +55,12 @@ module RegWriteStage(
         csr.trapReturn = commit && prevStage.trapReturn;
         csr.trapReturnPrivilege = op.trapReturnPrivilege;
 
-        intRegFile.writeEnable = commit && op.regWriteEnable;
+        intRegFile.writeEnable = commit && op.regWriteEnable && op.dstRegType == RegType_Int;
         intRegFile.writeAddr = prevStage.dstRegAddr;
-        intRegFile.writeValue = prevStage.dstRegValue;
+        intRegFile.writeValue = prevStage.dstIntRegValue;
+
+        fpRegFile.writeEnable = commit && op.regWriteEnable && op.dstRegType == RegType_Fp;
+        fpRegFile.writeAddr = prevStage.dstRegAddr;
+        fpRegFile.writeValue = prevStage.dstFpRegValue;
     end
 endmodule

@@ -20,6 +20,7 @@
 
 #include "VCore_Core.h"
 #include "VCore_IntRegFile.h"
+#include "VCore_FpRegFile.h"
 #include "VCore_RegWriteStage.h"
 
 namespace rafi { namespace sim {
@@ -152,7 +153,10 @@ void System::CopyIntReg(trace::NodeIntReg64* pOut) const
 
 void System::CopyFpReg(trace::NodeFpReg* pOut) const
 {
-    RAFI_NOT_IMPLEMENTED;
+    for (int i = 0; i < 32; i++)
+    {
+        pOut->regs[i].u64.value = m_pCore->Core->m_FpRegFile->body[i];
+    }
 }
 
 const trace::EventList& System::GetEventList() const

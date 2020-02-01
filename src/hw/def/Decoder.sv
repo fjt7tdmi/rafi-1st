@@ -144,6 +144,9 @@ function automatic Op DecodeRV32I(insn_t insn);
     op.resultType = ResultType_Alu;
     op.trapOpType = TrapOpType_Ecall;
     op.trapReturnPrivilege = Privilege_User;
+    op.srcRegType1 = RegType_Int;
+    op.srcRegType2 = RegType_Int;
+    op.dstRegType = RegType_Int;
     op.imm = '0;
     op.isAtomic = 0;
     op.isBranch = 0;
@@ -396,6 +399,9 @@ function automatic Op DecodeRV32M(insn_t insn);
     op.resultType = ResultType_MulDiv;
     op.trapOpType = TrapOpType_Ebreak;          // unused
     op.trapReturnPrivilege = Privilege_User;    // unused
+    op.srcRegType1 = RegType_Int;
+    op.srcRegType2 = RegType_Int;
+    op.dstRegType = RegType_Int;
     op.imm = '0;
     op.isAtomic = 0;
     op.isBranch = 0;
@@ -443,6 +449,9 @@ function automatic Op DecodeRV32A(insn_t insn);
     op.resultType = ResultType_Alu;             // unused
     op.trapOpType = TrapOpType_Ebreak;          // unused
     op.trapReturnPrivilege = Privilege_User;    // unused
+    op.srcRegType1 = RegType_Int;
+    op.srcRegType2 = RegType_Int;
+    op.dstRegType = RegType_Int;
     op.imm = '0;
     op.isAtomic = 1;
     op.isBranch = 0;

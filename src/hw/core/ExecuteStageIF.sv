@@ -29,7 +29,8 @@ interface ExecuteStageIF;
     csr_addr_t csrAddr;
     word_t dstCsrValue;
     reg_addr_t dstRegAddr;
-    word_t dstRegValue;
+    word_t dstIntRegValue;
+    uint64_t dstFpRegValue;
 
     addr_t memAddr;
     word_t storeRegValue;
@@ -50,7 +51,8 @@ interface ExecuteStageIF;
         csrAddr,
         dstCsrValue,
         dstRegAddr,
-        dstRegValue,
+        dstIntRegValue,
+        dstFpRegValue,
         memAddr,
         storeRegValue,
         branchTaken,
@@ -68,7 +70,8 @@ interface ExecuteStageIF;
         csrAddr,
         dstCsrValue,
         dstRegAddr,
-        dstRegValue,
+        dstIntRegValue,
+        dstFpRegValue,
         memAddr,
         storeRegValue,
         branchTaken,

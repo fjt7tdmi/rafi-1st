@@ -31,8 +31,10 @@ interface RegReadStageIF;
     reg_addr_t srcRegAddr1;
     reg_addr_t srcRegAddr2;
     reg_addr_t dstRegAddr;
-    word_t srcRegValue1;
-    word_t srcRegValue2;
+    word_t srcIntRegValue1;
+    word_t srcIntRegValue2;
+    uint64_t srcFpRegValue1;
+    uint64_t srcFpRegValue2;
     TrapInfo trapInfo;
 
     modport ThisStage(
@@ -45,8 +47,10 @@ interface RegReadStageIF;
         srcCsrValue,
         srcRegAddr1,
         srcRegAddr2,
-        srcRegValue1,
-        srcRegValue2,
+        srcIntRegValue1,
+        srcIntRegValue2,
+        srcFpRegValue1,
+        srcFpRegValue2,
         dstRegAddr,
         trapInfo
     );
@@ -61,8 +65,10 @@ interface RegReadStageIF;
         srcCsrValue,
         srcRegAddr1,
         srcRegAddr2,
-        srcRegValue1,
-        srcRegValue2,
+        srcIntRegValue1,
+        srcIntRegValue2,
+        srcFpRegValue1,
+        srcFpRegValue2,
         dstRegAddr,
         trapInfo        
     );

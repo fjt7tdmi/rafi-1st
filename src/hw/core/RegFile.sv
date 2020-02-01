@@ -45,3 +45,29 @@ module IntRegFile(
         end
     end
 endmodule
+
+module FpRegFile(
+    FpRegFileIF.RegFile bus,
+    input logic clk,
+    input logic rst
+);
+    uint64_t body[RegFileSize] /* verilator public */;
+
+    always_comb begin
+        bus.readValue1 = body[bus.readAddr1];
+        bus.readValue2 = body[bus.readAddr2];
+    end
+
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            for (int i = 0; i < RegFileSize; i++) begin
+                body[i] <= 0;
+            end
+        end
+        else begin
+            if (bus.writeEnable) begin
+                body[bus.writeAddr] <= bus.writeValue;
+            end
+        end
+    end
+endmodule
