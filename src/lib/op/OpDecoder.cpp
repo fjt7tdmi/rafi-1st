@@ -1944,10 +1944,330 @@ private:
         }
     }
 
-    IOp* DecodeRV64C(uint32_t insn) const
+    IOp* DecodeRV64C(uint16_t insn) const
     {
-        (void)insn;
-        return nullptr;
+        const auto opcode = Pick(insn, 0, 2);
+
+        switch (opcode)
+        {
+        case 0b00:
+            return DecodeRV64C_Quadrant0(insn);
+        case 0b01:
+            return DecodeRV64C_Quadrant1(insn);
+        case 0b10:
+            return DecodeRV64C_Quadrant2(insn);
+        default:
+            return nullptr;
+        }
+    }
+
+    IOp* DecodeRV64C_Quadrant0(uint16_t insn) const
+    {
+        const auto funct3 = Pick(insn, 13, 3);
+
+        const auto rd = Pick(insn, 2, 3) + 8;
+        const auto rs1 = Pick(insn, 7, 3) + 8;
+        const auto rs2 = Pick(insn, 2, 3) + 8;
+
+        const auto uimm4 = ZeroExtend(7,
+            Pick(insn, 10, 3) << 3 |
+            Pick(insn, 6) << 2 |
+            Pick(insn, 5) << 6);
+        const auto uimm8 = ZeroExtend(8,
+            Pick(insn, 10, 3) << 3 |
+            Pick(insn, 5, 2) << 6);
+
+        if (funct3 == 0b000 && Pick(insn, 5, 8) != 0)
+        {
+            const auto imm = ZeroExtend(10,
+                Pick(insn, 11, 2) << 4 |
+                Pick(insn, 7, 4) << 6 |
+                Pick(insn, 6) << 2 |
+                Pick(insn, 5) << 3);
+            
+            // C.ADDI4SPN
+            return new op64::ADDI(2, 2, imm);
+        }
+        else if (funct3 == 0b001)
+        {
+            // C.FLD
+            return new op64::FLD(rd, rs1, uimm8);
+        }
+        else if (funct3 == 0b010)
+        {
+            // C.LW
+            return new op64::LW(rd, rs1, uimm4);
+        }
+        else if (funct3 == 0b011)
+        {
+            // C.LD
+            return new op64::LD(rd, rs1, uimm8);
+        }
+        else if (funct3 == 0b101)
+        {
+            // C.FSD
+            return new op64::FSD(rd, rs1, uimm8);
+        }
+        else if (funct3 == 0b110)
+        {
+            // C.SW
+            return new op64::SW(rd, rs1, uimm4);
+        }
+        else if (funct3 == 0b111)
+        {
+            // C.SD
+            return new op64::SD(rd, rs1, uimm8);
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+
+    IOp* DecodeRV64C_Quadrant1(uint16_t insn) const
+    {
+        const auto funct4 = Pick(insn, 12, 4);
+        const auto funct3 = Pick(insn, 13, 3);
+        const auto funct2_rs1 = Pick(insn, 10, 2);
+        const auto funct2_rs2 = Pick(insn, 5, 2);
+
+        const auto rd = Pick(insn, 7, 5);
+        const auto rs1 = Pick(insn, 7, 5);
+        const auto rd_alu = Pick(insn, 7, 3) + 8;
+        const auto rs1_alu = Pick(insn, 7, 3) + 8;
+        const auto rs2_alu = Pick(insn, 2, 3) + 8;
+
+        const auto imm = SignExtend(6,
+            Pick(insn, 12, 1) << 5 |
+            Pick(insn, 2, 5));
+        const auto uimm = SignExtend(6,
+            Pick(insn, 12, 1) << 5 |
+            Pick(insn, 2, 5));
+        const auto imm_j = SignExtend(12,
+            Pick(insn, 12, 1) << 11 |
+            Pick(insn, 11, 1) << 4 |
+            Pick(insn, 9, 2) << 8 |
+            Pick(insn, 8, 1) << 10 |
+            Pick(insn, 7, 1) << 6 |
+            Pick(insn, 6, 1) << 7 |
+            Pick(insn, 3, 3) << 1 |
+            Pick(insn, 2, 1) << 5);
+        const auto imm_addi16sp = SignExtend(10,
+            Pick(insn, 12) << 9 |
+            Pick(insn, 6) << 4 |
+            Pick(insn, 5) << 6 |
+            Pick(insn, 3, 2) << 7 |
+            Pick(insn, 2) << 5);
+        const auto imm_lui = SignExtend(18,
+            Pick(insn, 12) << 17 |
+            Pick(insn, 2, 5) << 12);
+        const auto imm_b = SignExtend(9,
+            Pick(insn, 12, 1) << 8 |
+            Pick(insn, 10, 2) << 3 |
+            Pick(insn, 5, 2) << 6 |
+            Pick(insn, 3, 2) << 1 |
+            Pick(insn, 2, 1) << 5);
+
+        if (funct3 == 0b000 && rd == 0)
+        {            
+            return new op64::NOP();
+        }
+        else if (funct3 == 0b000)
+        {
+            // C.ADDI
+            return new op64::ADDI(rd, rs1, imm);
+        }
+        else if (funct3 == 0b001)
+        {
+            // C.ADDIW
+            return new op64::ADDIW(rd, rs1, imm);
+        }
+        else if (funct3 == 0b010 && rd != 0)
+        {
+            // C.LI
+            return new op64::ADDI(rd, 0, imm);
+        }
+        else if (funct3 == 0b011 && rd == 2)
+        {
+            // C.ADDI16SP
+            return new op64::ADDI(2, 2, imm_addi16sp);
+        }
+        else if (funct3 == 0b011 && rd != 0 && rd != 2)
+        {
+            // C.LUI
+            return new op64::LUI(rd, imm_lui);
+        }
+        else if (funct3 == 0b100 && funct2_rs1 == 0b00 && uimm != 0)
+        {
+            // C.SRLI
+            return new op64::SRLI(rd_alu, rs1_alu, uimm);
+        }
+        else if (funct3 == 0b100 && funct2_rs1 == 0b00 && uimm == 0)
+        {
+            // C.SRLI64
+            return new op64::SRLI(rd_alu, rs1_alu, 64);
+        }
+        else if (funct3 == 0b100 && funct2_rs1 == 0b01 && uimm != 0)
+        {
+            // C.SRAI
+            return new op64::SRAI(rd_alu, rs1_alu, uimm);
+        }
+        else if (funct3 == 0b100 && funct2_rs1 == 0b01 && uimm == 0)
+        {
+            // C.SRAI64
+            return new op64::SRAI(rd_alu, rs1_alu, 64);
+        }
+        else if (funct3 == 0b100 && funct2_rs1 == 0b10)
+        {
+            // C.ANDI
+            return new op64::ANDI(rd_alu, rs1_alu, imm);
+        }
+        else if (funct4 == 0b1000 && funct2_rs1 == 0b11 && funct2_rs2 == 0b00)
+        {
+            // C.SUB
+            return new op64::SUB(rd_alu, rs1_alu, rs2_alu);
+        }
+        else if (funct4 == 0b1000 && funct2_rs1 == 0b11 && funct2_rs2 == 0b01)
+        {
+            // C.XOR
+            return new op64::XOR(rd_alu, rs1_alu, rs2_alu);
+        }
+        else if (funct4 == 0b1000 && funct2_rs1 == 0b11 && funct2_rs2 == 0b10)
+        {
+            // C.OR
+            return new op64::OR(rd_alu, rs1_alu, rs2_alu);
+        }
+        else if (funct4 == 0b1000 && funct2_rs1 == 0b11 && funct2_rs2 == 0b11)
+        {
+            // C.AND
+            return new op64::AND(rd_alu, rs1_alu, rs2_alu);
+        }
+        else if (funct4 == 0b1001 && funct2_rs1 == 0b11 && funct2_rs2 == 0b00)
+        {
+            // C.SUBW
+            return new op64::SUBW(rd_alu, rs1_alu, rs2_alu);
+        }
+        else if (funct4 == 0b1001 && funct2_rs1 == 0b11 && funct2_rs2 == 0b01)
+        {
+            // C.ADDW
+            return new op64::ADDW(rd_alu, rs1_alu, rs2_alu);
+        }
+        else if (funct3 == 0b101)
+        {
+            // C.J
+            return new op64::JAL(0, imm_j);
+        }
+        else if (funct3 == 0b110)
+        {
+            // C.BEQZ
+            return new op64::BEQ(rs1_alu, 0, imm_b);
+        }
+        else if (funct3 == 0b111)
+        {
+            // C.BNEZ
+            return new op64::BNE(rs1_alu, 0, imm_b);
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+
+    IOp* DecodeRV64C_Quadrant2(uint16_t insn) const
+    {
+        const auto funct4 = Pick(insn, 12, 4);
+        const auto funct3 = Pick(insn, 13, 3);
+        const auto rd = Pick(insn, 7, 5);
+        const auto rs1 = Pick(insn, 7, 5);
+        const auto rs2 = Pick(insn, 2, 5);
+
+        const auto shamt = ZeroExtend(6,
+            Pick(insn, 12, 1) << 5 |
+            Pick(insn, 2, 5));
+        const auto uimm_load4 = ZeroExtend(8,
+            Pick(insn, 12) << 5 |
+            Pick(insn, 4, 3) << 2 |
+            Pick(insn, 2, 2) << 6);
+        const auto uimm_load8 = ZeroExtend(9,
+            Pick(insn, 12) << 5 |
+            Pick(insn, 5, 2) << 3 |
+            Pick(insn, 2, 3) << 6);
+        const auto uimm_store4 = ZeroExtend(8,
+            Pick(insn, 9, 4) << 2 |
+            Pick(insn, 7, 2) << 6);
+        const auto uimm_store8 = ZeroExtend(9,
+            Pick(insn, 10, 3) << 3 |
+            Pick(insn, 7, 3) << 6);
+
+        if (funct3 == 0b000 && shamt != 0)
+        {
+            // C.SLLI
+            return new op64::SLLI(rd, rs1, shamt);
+        }
+        else if (funct3 == 0b000 && shamt == 0)
+        {
+            // C.SLLI64
+            return new op64::SLLI(rd, rs1, 64);
+        }
+        else if (funct3 == 0b001)
+        {
+            // C.FLDSP
+            return new op64::FLD(rd, 2, uimm_load8);
+        }
+        else if (funct3 == 0b010 && rd != 0)
+        {
+            // C.LWSP
+            return new op64::LW(rd, 2, uimm_load4);
+        }
+        else if (funct3 == 0b011)
+        {
+            // C.LDSP
+            return new op64::LD(rd, 2, uimm_load8);
+        }
+        else if (funct4 == 0b1000 && rs1 != 0 && rs2 == 0)
+        {
+            // C.JR
+            return new op64::JALR(0, rs1, 0);
+        }
+        else if (funct4 == 0b1000 && rd != 0 && rs2 != 0)
+        {
+            // C.MV
+            return new op64::ADD(rd, 0, rs2);
+        }
+        else if (funct4 == 0b1001 && rd == 0 && rs2 == 0)
+        {
+            // C.EBREAK
+            return new op64::EBREAK();
+        }
+        else if (funct4 == 0b1001 && rs1 != 0 && rs2 == 0)
+        {
+            // C.JALR
+            return new op64::JALR(1, rs1, 0);
+        }
+        else if (funct4 == 0b1001 && rd != 0 && rs2 != 0)
+        {
+            // C.ADD
+            return new op64::ADD(rd, rs1, rs2);
+        }
+        else if (funct3 == 0b101)
+        {
+            // C.FSDSP
+            return new op64::FSD(2, rs2, uimm_store8);
+        }
+        else if (funct3 == 0b110)
+        {
+            // C.SWSP
+            return new op64::SW(2, rs2, uimm_store4);
+        }
+        else if (funct3 == 0b111)
+        {
+            // C.SDSP
+            return new op64::SD(2, rs2, uimm_store8);
+        }
+        else
+        {
+            return nullptr;
+        }
     }
 
 private:
