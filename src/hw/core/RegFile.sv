@@ -20,8 +20,8 @@ import Rv32Types::*;
 
 import ProcessorTypes::*;
 
-module RegFile(
-    RegFileIF.RegFile bus,
+module IntRegFile(
+    IntRegFileIF.RegFile bus,
     input logic clk,
     input logic rst
 );

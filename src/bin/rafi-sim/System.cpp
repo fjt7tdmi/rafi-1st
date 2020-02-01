@@ -19,7 +19,7 @@
 #include "System.h"
 
 #include "VCore_Core.h"
-#include "VCore_RegFile.h"
+#include "VCore_IntRegFile.h"
 #include "VCore_RegWriteStage.h"
 
 namespace rafi { namespace sim {
@@ -140,7 +140,7 @@ void System::CopyIntReg(trace::NodeIntReg32* pOut) const
 {
     for (int i = 0; i < 32; i++)
     {
-        pOut->regs[i] = static_cast<uint32_t>(m_pCore->Core->m_RegFile->body[i]);
+        pOut->regs[i] = static_cast<uint32_t>(m_pCore->Core->m_IntRegFile->body[i]);
     }
 }
 

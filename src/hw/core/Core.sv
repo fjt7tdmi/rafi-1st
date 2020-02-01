@@ -47,7 +47,7 @@ module Core (
     ExecuteStageIF m_ExecuteStageIF();
     MemoryAccessStageIF m_MemoryAccessStageIF();
     PipelineControllerIF m_PipelineControllerIF();
-    RegFileIF m_RegFileIF();
+    IntRegFileIF m_IntRegFileIF();
     BypassLogicIF m_BypassLogicIF();
     LoadStoreUnitIF m_LoadStoreUnitIF();
     ControlStatusRegisterIF m_ControlStatusRegisterIF();
@@ -82,7 +82,7 @@ module Core (
         .nextStage(m_RegReadStageIF.ThisStage),
         .ctrl(m_PipelineControllerIF.RegReadStage),
         .csr(m_ControlStatusRegisterIF.RegReadStage),
-        .regFile(m_RegFileIF.RegReadStage),
+        .intRegFile(m_IntRegFileIF.RegReadStage),
         .clk,
         .rst(rstInternal)
     );
@@ -108,13 +108,13 @@ module Core (
     RegWriteStage m_RegWriteStage(
         .prevStage(m_MemoryAccessStageIF.NextStage),
         .csr(m_ControlStatusRegisterIF.RegWriteStage),
-        .regFile(m_RegFileIF.RegWriteStage),
+        .intRegFile(m_IntRegFileIF.RegWriteStage),
         .clk,
         .rst(rstInternal)
     );
 
-    RegFile m_RegFile(
-        .bus(m_RegFileIF.RegFile),
+    IntRegFile m_IntRegFile(
+        .bus(m_IntRegFileIF.RegFile),
         .clk,
         .rst(rstInternal)
     );

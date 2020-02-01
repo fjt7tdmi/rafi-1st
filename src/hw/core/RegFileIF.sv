@@ -20,7 +20,7 @@ import Rv32Types::*;
 
 import ProcessorTypes::*;
 
-interface RegFileIF; 
+interface IntRegFileIF; 
     word_t readValue1;
     word_t readValue2;
     word_t writeValue;

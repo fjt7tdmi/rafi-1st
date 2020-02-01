@@ -26,14 +26,14 @@ module RegReadStage(
     RegReadStageIF.ThisStage nextStage,
     PipelineControllerIF.RegReadStage ctrl,
     ControlStatusRegisterIF.RegReadStage csr,
-    RegFileIF.RegReadStage regFile,
+    IntRegFileIF.RegReadStage intRegFile,
     input   logic clk,
     input   logic rst
 );
 
     always_comb begin
-        regFile.readAddr1 = prevStage.srcRegAddr1;
-        regFile.readAddr2 = prevStage.srcRegAddr2;
+        intRegFile.readAddr1 = prevStage.srcRegAddr1;
+        intRegFile.readAddr2 = prevStage.srcRegAddr2;
         csr.readAddr = prevStage.csrAddr;
         csr.readEnable = prevStage.op.csrReadEnable;
         csr.readOpId = prevStage.opId;
@@ -78,8 +78,8 @@ module RegReadStage(
             nextStage.srcRegAddr1 <= prevStage.srcRegAddr1;
             nextStage.srcRegAddr2 <= prevStage.srcRegAddr2;
             nextStage.dstRegAddr <= prevStage.dstRegAddr;
-            nextStage.srcRegValue1 <= regFile.readValue1;
-            nextStage.srcRegValue2 <= regFile.readValue2;
+            nextStage.srcRegValue1 <= intRegFile.readValue1;
+            nextStage.srcRegValue2 <= intRegFile.readValue2;
 
             if (!prevStage.trapInfo.valid && csr.readIllegal) begin
                 nextStage.trapInfo.valid <= 1;
