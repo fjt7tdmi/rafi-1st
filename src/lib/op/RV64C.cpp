@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-#pragma once
+#include <cstring>
+#include <rafi/op.h>
 
-#include "op/OpCommon.h"
-#include "op/OpDecoder.h"
-#include "op/RV32I.h"
-#include "op/RV32M.h"
-#include "op/RV32A.h"
-#include "op/RV32F.h"
-#include "op/RV32D.h"
-#include "op/RV32C.h"
-#include "op/RV64I.h"
-#include "op/RV64M.h"
-#include "op/RV64A.h"
-#include "op/RV64F.h"
-#include "op/RV64D.h"
-#include "op/RV64C.h"
+namespace rafi { namespace op64 {
+
+NOP::NOP()
+{    
+}
+
+std::string NOP::ToString() const
+{
+    char s[80];
+    std::sprintf(s, "nop");
+
+    return std::string(s);
+}
+
+
+}}
