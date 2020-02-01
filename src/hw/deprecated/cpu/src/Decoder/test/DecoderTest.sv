@@ -27,7 +27,7 @@ task automatic assert_addi(insn_t insn, word_t imm);
     assert(op.aluCommand == AluCommand_Add);
     assert(op.aluSrcType1 == AluSrcType1_Reg);
     assert(op.aluSrcType2 == AluSrcType2_Imm);
-    assert(op.regWriteSrcType == RegWriteSrcType_Result);
+    assert(op.intRegWriteSrcType == IntRegWriteSrcType_Result);
     assert(op.imm == imm);
     assert(op.isBranch == 0);
     assert(op.isLoad == 0);
@@ -41,7 +41,7 @@ task automatic assert_add(insn_t insn);
     assert(op.aluCommand == AluCommand_Add)
     assert(op.aluSrcType1 == AluSrcType1_Reg);
     assert(op.aluSrcType2 == AluSrcType2_Reg);
-    assert(op.regWriteSrcType == RegWriteSrcType_Result);
+    assert(op.intRegWriteSrcType == IntRegWriteSrcType_Result);
     assert(op.isBranch == 0);
     assert(op.isLoad == 0);
     assert(op.isStore == 0);

@@ -91,6 +91,14 @@ typedef enum logic [1:0]
     FenceType_Vma       = 2'b10
 } FenceType;
 
+typedef enum logic [1:0]
+{
+    FpUnitCommand_Move  = 2'h0,
+    FpUnitCommand_Sgnj  = 2'h1,
+    FpUnitCommand_Sgnjn = 2'h2,
+    FpUnitCommand_Sgnjx = 2'h3
+} FpUnitCommand;
+
 typedef enum logic [2:0]
 {
     LoadStoreType_Byte              = 3'b000,
@@ -114,17 +122,18 @@ typedef enum logic [2:0]
 
 typedef enum logic [1:0]
 {
-    RegWriteSrcType_Result  = 2'h0,
-    RegWriteSrcType_NextPc  = 2'h1,
-    RegWriteSrcType_Memory  = 2'h2,
-    RegWriteSrcType_Csr     = 2'h3
-} RegWriteSrcType;
+    IntRegWriteSrcType_Result   = 2'h0,
+    IntRegWriteSrcType_NextPc   = 2'h1,
+    IntRegWriteSrcType_Memory   = 2'h2,
+    IntRegWriteSrcType_Csr      = 2'h3
+} IntRegWriteSrcType;
 
-typedef enum logic
+typedef enum logic [1:0]
 {
-    ResultType_Alu      = 1'h0,
-    ResultType_MulDiv   = 1'h1
-} ResultType;
+    IntResultType_Alu      = 2'h0,
+    IntResultType_MulDiv   = 2'h1,
+    IntResultType_Fp32     = 2'h2
+} IntResultType;
 
 typedef enum logic
 {
@@ -140,10 +149,11 @@ typedef struct packed
     AtomicType atomicType;
     BranchType branchType;
     FenceType fenceType;
+    FpUnitCommand fpUnitCommand;
     LoadStoreType loadStoreType;
     MulDivType mulDivType;
-    RegWriteSrcType regWriteSrcType;
-    ResultType resultType;
+    IntRegWriteSrcType intRegWriteSrcType;
+    IntResultType intResultType;
     TrapOpType trapOpType;
     Privilege trapReturnPrivilege;
     RegType srcRegType1;
