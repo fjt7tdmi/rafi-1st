@@ -269,7 +269,13 @@ module ExecuteStage(
         intBypass.readAddr2 = prevStage.srcRegAddr2;
         intBypass.writeAddr = prevStage.dstRegAddr;
         intBypass.writeValue = dstIntRegValue;
-        intBypass.writeEnable = valid && op.regWriteEnable && !op.isLoad;
+        intBypass.writeEnable = valid && op.regWriteEnable && op.dstRegType == RegType_Int && !(op.isLoad || op.isAtomic) && !ctrl.exStallReq;
+
+        fpBypass.readAddr1 = prevStage.srcRegAddr1;
+        fpBypass.readAddr2 = prevStage.srcRegAddr2;
+        fpBypass.writeAddr = prevStage.dstRegAddr;
+        fpBypass.writeValue = dstFpRegValue;
+        fpBypass.writeEnable = valid && op.regWriteEnable && op.dstRegType == RegType_Fp && !(op.isLoad || op.isAtomic) && !ctrl.exStallReq;
     end
 
     always_comb begin
