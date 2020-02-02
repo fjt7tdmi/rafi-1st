@@ -91,12 +91,13 @@ typedef enum logic [1:0]
     FenceType_Vma       = 2'b10
 } FenceType;
 
-typedef enum logic [1:0]
+typedef enum logic [2:0]
 {
-    FpUnitCommand_Move  = 2'h0,
-    FpUnitCommand_Sgnj  = 2'h1,
-    FpUnitCommand_Sgnjn = 2'h2,
-    FpUnitCommand_Sgnjx = 2'h3
+    FpUnitCommand_Move  = 3'h0,
+    FpUnitCommand_Sgnj  = 3'h1,
+    FpUnitCommand_Sgnjn = 3'h2,
+    FpUnitCommand_Sgnjx = 3'h3,
+    FpUnitCommand_Class = 3'h4
 } FpUnitCommand;
 
 typedef enum logic [2:0]
@@ -156,8 +157,6 @@ typedef struct packed
     IntResultType intResultType;
     TrapOpType trapOpType;
     Privilege trapReturnPrivilege;
-    RegType srcRegType1;
-    RegType srcRegType2;
     RegType dstRegType;
     word_t imm;
     logic isAtomic;
