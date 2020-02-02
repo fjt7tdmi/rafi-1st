@@ -25,7 +25,7 @@ module RegReadStage(
     DecodeStageIF.NextStage prevStage,
     RegReadStageIF.ThisStage nextStage,
     PipelineControllerIF.RegReadStage ctrl,
-    ControlStatusRegisterIF.RegReadStage csr,
+    CsrIF.RegReadStage csr,
     IntRegFileIF.RegReadStage intRegFile,
     FpRegFileIF.RegReadStage fpRegFile,
     input   logic clk,

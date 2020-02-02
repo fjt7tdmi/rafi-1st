@@ -20,7 +20,7 @@ import Rv32Types::*;
 
 import ProcessorTypes::*;
 
-interface ControlStatusRegisterIF;
+interface CsrIF;
     addr_t nextPc;
 
     word_t readValue;
@@ -43,7 +43,7 @@ interface ControlStatusRegisterIF;
     logic trapReturn;
     Privilege trapReturnPrivilege;
 
-    modport ControlStatusRegister(
+    modport Csr(
     output
         nextPc,
         readValue,

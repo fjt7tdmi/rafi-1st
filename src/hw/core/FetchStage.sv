@@ -25,7 +25,7 @@ module FetchStage(
     FetchStageIF.ThisStage nextStage,
     FetchUnitIF.FetchStage fetchUnit,
     PipelineControllerIF.FetchStage ctrl,
-    ControlStatusRegisterIF.FetchStage csr,
+    CsrIF.FetchStage csr,
     input   logic clk,
     input   logic rst
 );

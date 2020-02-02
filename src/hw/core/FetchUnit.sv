@@ -26,7 +26,7 @@ module FetchUnit (
     FetchUnitIF.FetchUnit bus,
     BusAccessUnitIF.FetchUnit mem,
     PipelineControllerIF.FetchUnit ctrl,
-    ControlStatusRegisterIF.FetchUnit csr,
+    CsrIF.FetchUnit csr,
     input logic clk,
     input logic rst
 );
