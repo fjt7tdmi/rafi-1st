@@ -157,9 +157,12 @@ module ExecuteStage(
     uint64_t srcFpRegValue2;
     uint64_t dstFpRegValue;
 
-    word_t result;
-    word_t resultAlu;
-    word_t resultMulDiv;
+    word_t intResult;
+    word_t intResultAlu;
+    word_t intResultMulDiv;
+    word_t intResultFp32;
+
+    uint32_t fp32Result;
 
     logic branchTaken;
     addr_t branchTarget;
@@ -172,7 +175,7 @@ module ExecuteStage(
     // Modules
     ExecuteStage_MulDivUnit m_MulDivUnit(
         .done(doneMulDiv),
-        .result(resultMulDiv),
+        .result(intResultMulDiv),
         .mulDivType(op.mulDivType),
         .src1(srcIntRegValue1),
         .src2(srcIntRegValue2),
@@ -183,13 +186,25 @@ module ExecuteStage(
         .rst
     );
 
+    Fp32Unit m_Fp32Unit(
+        .intResult(intResultFp32),
+        .fpResult(fp32Result),
+        .command(op.fpUnitCommand),
+        .intSrc1(srcIntRegValue1),
+        .intSrc2(srcIntRegValue2),
+        .fpSrc1(srcFpRegValue1[31:0]),
+        .fpSrc2(srcFpRegValue2[31:0]),
+        .clk,
+        .rst
+    );
+
     always_comb begin
         valid = prevStage.valid && !ctrl.flush;
         op = prevStage.op;
     end
 
     always_comb begin
-        enableMulDiv = valid && (op.resultType == ResultType_MulDiv);
+        enableMulDiv = valid && (op.intResultType == IntResultType_MulDiv);
     end
 
     // src
@@ -206,7 +221,7 @@ module ExecuteStage(
         AluSrcType1_Pc: aluSrc1 = prevStage.pc;
         AluSrcType1_Reg: aluSrc1 = srcIntRegValue1;
         AluSrcType1_Csr: aluSrc1 = prevStage.srcCsrValue;
-        default: aluSrc1 = 'x;
+        default: aluSrc1 = '0;
         endcase
 
         // aluSrc2
@@ -215,33 +230,34 @@ module ExecuteStage(
         AluSrcType2_Imm: aluSrc2 = op.imm;
         AluSrcType2_Reg: aluSrc2 = srcIntRegValue2;
         AluSrcType2_Csr: aluSrc2 = prevStage.srcCsrValue;
-        default: aluSrc2 = 'x;
+        default: aluSrc2 = '0;
         endcase
     end
 
     // result
     always_comb begin
-        resultAlu = ALU(op.aluCommand, aluSrc1, aluSrc2);
+        intResultAlu = ALU(op.aluCommand, aluSrc1, aluSrc2);
 
-        unique case (op.resultType)
-        ResultType_Alu:     result = resultAlu;
-        ResultType_MulDiv:  result = resultMulDiv;
-        default:            result = 'x;
+        unique case (op.intResultType)
+        IntResultType_Alu:      intResult = intResultAlu;
+        IntResultType_MulDiv:   intResult = intResultMulDiv;
+        IntResultType_Fp32:     intResult = intResultFp32;
+        default:                intResult = '0;
         endcase
 
         branchTaken = op.isBranch && BranchComparator(op.branchType, srcIntRegValue1, srcIntRegValue2);
-        branchTarget = result;
+        branchTarget = intResult;
 
         // dstIntRegValue
-        unique case (op.regWriteSrcType)
-        RegWriteSrcType_Result: dstIntRegValue = result;
-        RegWriteSrcType_NextPc: dstIntRegValue = prevStage.pc + InsnSize;
-        RegWriteSrcType_Csr:    dstIntRegValue = prevStage.srcCsrValue;
+        unique case (op.intRegWriteSrcType)
+        IntRegWriteSrcType_Result:  dstIntRegValue = intResult;
+        IntRegWriteSrcType_NextPc:  dstIntRegValue = prevStage.pc + InsnSize;
+        IntRegWriteSrcType_Csr:     dstIntRegValue = prevStage.srcCsrValue;
         default: dstIntRegValue = '0;
         endcase
 
         // dstFpRegValue
-        dstFpRegValue = '0;
+        dstFpRegValue = {32'h0, fp32Result};
     end
 
     always_comb begin
@@ -344,11 +360,11 @@ module ExecuteStage(
             nextStage.op <= prevStage.op;
             nextStage.pc <= prevStage.pc;
             nextStage.csrAddr <= prevStage.csrAddr;
-            nextStage.dstCsrValue <= result;
+            nextStage.dstCsrValue <= intResult;
             nextStage.dstRegAddr <= prevStage.dstRegAddr;
             nextStage.dstIntRegValue <= dstIntRegValue;
             nextStage.dstFpRegValue <= dstFpRegValue;
-            nextStage.memAddr <= result;
+            nextStage.memAddr <= intResult;
             nextStage.storeRegValue <= srcIntRegValue2;
             nextStage.branchTaken <= branchTaken;
             nextStage.branchTarget <= branchTarget;

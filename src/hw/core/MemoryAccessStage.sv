@@ -50,7 +50,7 @@ module MemoryAccessStage(
     end
 
     always_comb begin
-        dstIntRegValue = (op.regWriteSrcType == RegWriteSrcType_Memory) ?
+        dstIntRegValue = (op.intRegWriteSrcType == IntRegWriteSrcType_Memory) ?
             loadStoreUnit.result :
             prevStage.dstIntRegValue;
         dstFpRegValue = prevStage.dstFpRegValue;
