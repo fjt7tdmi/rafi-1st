@@ -31,6 +31,11 @@ parameter csr_addr_ustatus  = 12'h000;
 parameter csr_addr_uie      = 12'h004;
 parameter csr_addr_utvec    = 12'h005;
 
+// User Floating-Point CSRs
+parameter csr_addr_fflags   = 12'h001;
+parameter csr_addr_frm      = 12'h002;
+parameter csr_addr_fcsr     = 12'h003;
+
 // User Trap Handling
 parameter csr_addr_uscratch = 12'h040;
 parameter csr_addr_uepc     = 12'h041;
@@ -247,10 +252,16 @@ module ControlStatusRegister(
     word_t r_MachineScratch;
     word_t r_MachineExceptionDelegate;
 
+    logic [2:0] reg_frm;
+    logic [4:0] reg_fflags;
+
     always_comb begin
         // readValue
         unique case (bus.readAddr)
         csr_addr_ustatus:   readValue = read_ustatus(r_Status);
+        csr_addr_fflags:    readValue = {27'h0, reg_fflags};
+        csr_addr_frm:       readValue = {29'h0, reg_frm};
+        csr_addr_fcsr:      readValue = {24'h0, reg_frm, reg_fflags};
         csr_addr_utvec:     readValue = r_UserTrapVector;
         csr_addr_uscratch:  readValue = r_UserScratch;
         csr_addr_uepc:      readValue = r_UserExceptionProgramCounter;
@@ -415,6 +426,9 @@ module ControlStatusRegister(
             r_MachineTrapVector <= '0;
             r_MachineExceptionDelegate <= '0;
             r_MachineScratch <= '0;
+
+            reg_fflags <= '0;
+            reg_frm <= '0;
         end
         else begin
             // Performance Counters
@@ -511,6 +525,23 @@ module ControlStatusRegister(
             r_MachineExceptionDelegate <= (bus.writeEnable && bus.writeAddr == csr_addr_medeleg)
                 ? bus.writeValue
                 : r_MachineExceptionDelegate;
+
+            if (bus.writeEnable && bus.writeAddr == csr_addr_fflags) begin
+                reg_fflags <= bus.writeValue[4:0];
+                reg_frm <= reg_frm;
+            end
+            else if (bus.writeEnable && bus.writeAddr == csr_addr_frm) begin
+                reg_fflags <= reg_fflags;
+                reg_frm <= bus.writeValue[2:0];
+            end
+            else if (bus.writeEnable && bus.writeAddr == csr_addr_fcsr) begin
+                reg_fflags <= bus.writeValue[4:0];
+                reg_frm <= bus.writeValue[7:5];
+            end
+            else begin
+                reg_fflags <= reg_fflags;
+                reg_frm <= reg_frm;
+            end
         end
     end
 endmodule
