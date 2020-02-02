@@ -145,8 +145,6 @@ function automatic Op DecodeRV32I(insn_t insn);
     op.intResultType = IntResultType_Alu;
     op.trapOpType = TrapOpType_Ecall;
     op.trapReturnPrivilege = Privilege_User;
-    op.srcRegType1 = RegType_Int;
-    op.srcRegType2 = RegType_Int;
     op.dstRegType = RegType_Int;
     op.imm = '0;
     op.isAtomic = 0;
@@ -401,8 +399,6 @@ function automatic Op DecodeRV32M(insn_t insn);
     op.intResultType = IntResultType_MulDiv;
     op.trapOpType = TrapOpType_Ebreak;          // unused
     op.trapReturnPrivilege = Privilege_User;    // unused
-    op.srcRegType1 = RegType_Int;
-    op.srcRegType2 = RegType_Int;
     op.dstRegType = RegType_Int;
     op.imm = '0;
     op.isAtomic = 0;
@@ -452,8 +448,6 @@ function automatic Op DecodeRV32A(insn_t insn);
     op.intResultType = IntResultType_Alu;       // unused
     op.trapOpType = TrapOpType_Ebreak;          // unused
     op.trapReturnPrivilege = Privilege_User;    // unused
-    op.srcRegType1 = RegType_Int;
-    op.srcRegType2 = RegType_Int;
     op.dstRegType = RegType_Int;
     op.imm = '0;
     op.isAtomic = 1;
@@ -492,8 +486,6 @@ function automatic Op DecodeRV32F(insn_t insn);
     op.intResultType = IntResultType_Fp32;
     op.trapOpType = '0;
     op.trapReturnPrivilege = '0;
-    op.srcRegType1 = '0;
-    op.srcRegType2 = '0;
     op.dstRegType = '0;
     op.imm = '0;
     op.isAtomic = 0;
@@ -513,35 +505,30 @@ function automatic Op DecodeRV32F(insn_t insn);
         if (funct7 == 7'b1110000 && rs2 == 5'b00000 && rm == 3'b000) begin
             // FMV.X.W
             op.fpUnitCommand = FpUnitCommand_Move;
-            op.srcRegType1 = RegType_Fp;
             op.dstRegType = RegType_Int;
             op.regWriteEnable = 1;
         end
         else if (funct7 == 7'b1111000 && rs2 == 5'b00000 && rm == 3'b000) begin
             // FMV.W.X
             op.fpUnitCommand = FpUnitCommand_Move;
-            op.srcRegType1 = RegType_Int;
             op.dstRegType = RegType_Fp;
             op.regWriteEnable = 1;
         end
         else if (funct7 == 7'b0010000 && rm == 3'b000) begin
             // FSGNJ.S
             op.fpUnitCommand = FpUnitCommand_Sgnj;
-            op.srcRegType1 = RegType_Fp;
             op.dstRegType = RegType_Fp;
             op.regWriteEnable = 1;
         end
         else if (funct7 == 7'b0010000 && rm == 3'b001) begin
             // FSGNJN.S
             op.fpUnitCommand = FpUnitCommand_Sgnjn;
-            op.srcRegType1 = RegType_Fp;
             op.dstRegType = RegType_Fp;
             op.regWriteEnable = 1;
         end
         else if (funct7 == 7'b0010000 && rm == 3'b010) begin
             // FSGNJX.S
             op.fpUnitCommand = FpUnitCommand_Sgnjx;
-            op.srcRegType1 = RegType_Fp;
             op.dstRegType = RegType_Fp;
             op.regWriteEnable = 1;
         end

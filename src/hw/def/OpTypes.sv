@@ -156,8 +156,6 @@ typedef struct packed
     IntResultType intResultType;
     TrapOpType trapOpType;
     Privilege trapReturnPrivilege;
-    RegType srcRegType1;
-    RegType srcRegType2;
     RegType dstRegType;
     word_t imm;
     logic isAtomic;
