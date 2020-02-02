@@ -27,78 +27,78 @@ import ProcessorTypes::*;
 //
 
 // User Trap Setup
-parameter csr_addr_ustatus  = 12'h000;
-parameter csr_addr_uie      = 12'h004;
-parameter csr_addr_utvec    = 12'h005;
+parameter CSR_ADDR_USTATUS  = 12'h000;
+parameter CSR_ADDR_UIE      = 12'h004;
+parameter CSR_ADDR_UTVEC    = 12'h005;
 
 // User Floating-Point CSRs
-parameter csr_addr_fflags   = 12'h001;
-parameter csr_addr_frm      = 12'h002;
-parameter csr_addr_fcsr     = 12'h003;
+parameter CSR_ADDR_FFLAGS   = 12'h001;
+parameter CSR_ADDR_FRM      = 12'h002;
+parameter CSR_ADDR_FCSR     = 12'h003;
 
 // User Trap Handling
-parameter csr_addr_uscratch = 12'h040;
-parameter csr_addr_uepc     = 12'h041;
-parameter csr_addr_ucause   = 12'h042;
-parameter csr_addr_utval    = 12'h043;
-parameter csr_addr_uip      = 12'h044;
+parameter CSR_ADDR_USCRATCH = 12'h040;
+parameter CSR_ADDR_UEPC     = 12'h041;
+parameter CSR_ADDR_UCAUSE   = 12'h042;
+parameter CSR_ADDR_UTVAL    = 12'h043;
+parameter CSR_ADDR_UIP      = 12'h044;
 
 // Supervisor Trap Setup
-parameter csr_addr_sstatus      = 12'h100;
-parameter csr_addr_sedeleg      = 12'h102;
-parameter csr_addr_sideleg      = 12'h103;
-parameter csr_addr_sie          = 12'h104;
-parameter csr_addr_stvec        = 12'h105;
-parameter csr_addr_scounteren   = 12'h106; // hard-wired to 0
+parameter CSR_ADDR_SSTATUS      = 12'h100;
+parameter CSR_ADDR_SEDELEG      = 12'h102;
+parameter CSR_ADDR_SIDELEG      = 12'h103;
+parameter CSR_ADDR_SIE          = 12'h104;
+parameter CSR_ADDR_STVEC        = 12'h105;
+parameter CSR_ADDR_SCOUNTEREN   = 12'h106; // hard-wired to 0
 
 // User Trap Handling
-parameter csr_addr_sscratch = 12'h140;
-parameter csr_addr_sepc     = 12'h141;
-parameter csr_addr_scause   = 12'h142;
-parameter csr_addr_stval    = 12'h143;
-parameter csr_addr_sip      = 12'h144;
+parameter CSR_ADDR_SSCRATCH = 12'h140;
+parameter CSR_ADDR_SEPC     = 12'h141;
+parameter CSR_ADDR_SCAUSE   = 12'h142;
+parameter CSR_ADDR_STVAL    = 12'h143;
+parameter CSR_ADDR_SIP      = 12'h144;
 
 // Supervisor Protection and Translation
-parameter csr_addr_satp     = 12'h180;
+parameter CSR_ADDR_SATP     = 12'h180;
 
 // Machine Trap Setup
-parameter csr_addr_mstatus      = 12'h300;
-parameter csr_addr_misa         = 12'h301;
-parameter csr_addr_medeleg      = 12'h302;
-parameter csr_addr_mideleg      = 12'h303;
-parameter csr_addr_mie          = 12'h304;
-parameter csr_addr_mtvec        = 12'h305;
-parameter csr_addr_mcounteren   = 12'h306; // hard-wired to 0
+parameter CSR_ADDR_MSTATUS      = 12'h300;
+parameter CSR_ADDR_MISA         = 12'h301;
+parameter CSR_ADDR_MEDELEG      = 12'h302;
+parameter CSR_ADDR_MIDELEG      = 12'h303;
+parameter CSR_ADDR_MIE          = 12'h304;
+parameter CSR_ADDR_MTVEC        = 12'h305;
+parameter CSR_ADDR_MCOUNTEREN   = 12'h306; // hard-wired to 0
 
 // Machine Trap handling
-parameter csr_addr_mscratch = 12'h340;
-parameter csr_addr_mepc     = 12'h341;
-parameter csr_addr_mcause   = 12'h342;
-parameter csr_addr_mtval    = 12'h343;
-parameter csr_addr_mip      = 12'h344;
+parameter CSR_ADDR_MSCRATCH = 12'h340;
+parameter CSR_ADDR_MEPC     = 12'h341;
+parameter CSR_ADDR_MCAUSE   = 12'h342;
+parameter CSR_ADDR_MTVAL    = 12'h343;
+parameter CSR_ADDR_MIP      = 12'h344;
 
 // User Counter/Timers
-parameter csr_addr_cycle    = 12'hc00;
-parameter csr_addr_time     = 12'hc01;
-parameter csr_addr_instret  = 12'hc02;
+parameter CSR_ADDR_CYCLE    = 12'hc00;
+parameter CSR_ADDR_TIME     = 12'hc01;
+parameter CSR_ADDR_INSTRET  = 12'hc02;
 
-parameter csr_addr_cycleh   = 12'hc80;
-parameter csr_addr_timeh    = 12'hc81;
-parameter csr_addr_instreth = 12'hc82;
+parameter CSR_ADDR_CYCLEH   = 12'hc80;
+parameter CSR_ADDR_TIMEH    = 12'hc81;
+parameter CSR_ADDR_INSTRETH = 12'hc82;
 
 // Machine Information Registers
-parameter csr_addr_mvendorid    = 12'hf11;
-parameter csr_addr_marchid      = 12'hf12;
-parameter csr_addr_mimpid       = 12'hf13;
-parameter csr_addr_mhartid      = 12'hf14;
+parameter CSR_ADDR_MVENDORID    = 12'hf11;
+parameter CSR_ADDR_MARCHID      = 12'hf12;
+parameter CSR_ADDR_MIMPID       = 12'hf13;
+parameter CSR_ADDR_MHARTID      = 12'hf14;
 
 // ----------------------------------------------------------------------------
 // Constants
 //
-parameter VendorId = 0; // non commercial
-parameter ArchitectureId = 0; // not implemented
-parameter ImplementationId = 0; // not implemented
-parameter HardwareThreadId = 0;
+parameter VENDOR_ID = 0; // non commercial
+parameter ARCHITECTURE_ID = 0; // not implemented
+parameter IMPLEMENTATION_ID = 0; // not implemented
+parameter HARDWARE_THREAD_ID = 0;
 
 // ----------------------------------------------------------------------------
 // Functions
@@ -161,14 +161,14 @@ function automatic csr_xstatus_t read_ustatus(csr_xstatus_t currentValue);
     return currentValue & get_ustatus_mask();
 endfunction
 
-function automatic csr_xstatus_t write_sstatus(csr_xstatus_t currentValue, csr_xstatus_t writeValue);
+function automatic csr_xstatus_t write_sstatus(csr_xstatus_t currentValue, csr_xstatus_t write_value);
     csr_xstatus_t mask = get_sstatus_mask();
-    return (currentValue & (~mask)) | (writeValue & mask);
+    return (currentValue & (~mask)) | (write_value & mask);
 endfunction
 
-function automatic csr_xstatus_t write_ustatus(csr_xstatus_t currentValue, csr_xstatus_t writeValue);
+function automatic csr_xstatus_t write_ustatus(csr_xstatus_t currentValue, csr_xstatus_t write_value);
     csr_xstatus_t mask = get_ustatus_mask();
-    return (currentValue & (~mask)) | (writeValue & mask);
+    return (currentValue & (~mask)) | (write_value & mask);
 endfunction
 
 function automatic csr_xstatus_t update_xstatus_mpp(csr_xstatus_t current, Privilege mpp);
@@ -211,330 +211,330 @@ module ControlStatusRegister(
     input logic rst
 );
     // Wires
-    Privilege nextPrivilege;
-    csr_xstatus_t nextStatus;
+    Privilege next_priv;
+    csr_xstatus_t next_status;
 
-    addr_t nextPc;
+    addr_t next_pc;
 
-    word_t readValue;
-    csr_xstatus_t writeValue;
+    word_t read_value;
+    csr_xstatus_t write_value;
 
     // Registers (performance counters)
-    uint64_t r_Cycle;
+    uint64_t reg_cycle;
 
     // Registers (written by trap or trap-return)
-    Privilege r_Privilege;
+    Privilege reg_priv;
 
-    csr_xstatus_t r_Status;
+    csr_xstatus_t reg_status;
 
-    word_t r_UserExceptionProgramCounter;
-    exception_code_t r_UserCause;
-    word_t r_UserTrapValue;
+    word_t reg_uepc;
+    exception_code_t reg_ucause;
+    word_t reg_utval;
 
-    word_t r_SupervisorExceptionProgramCounter;
-    exception_code_t r_SupervisorCause;
-    word_t r_SupervisorTrapValue;
+    word_t reg_sepc;
+    exception_code_t reg_scause;
+    word_t reg_stval;
 
-    word_t r_MachineExceptionProgramCounter;
-    exception_code_t r_MachineCause;
-    word_t r_MachineTrapValue;
+    word_t reg_mepc;
+    exception_code_t reg_mcause;
+    word_t reg_mtval;
 
     // Registers (written by csr insructions)
-    csr_xtvec_t r_UserTrapVector;
-    word_t r_UserScratch;
+    csr_xtvec_t reg_utvec;
+    word_t reg_uscratch;
 
-    csr_xtvec_t r_SupervisorTrapVector;
-    word_t r_SupervisorScratch;
-    word_t r_SupervisorExceptionDelegate;
-    csr_satp_t r_SupervisorAddressTranslationProtection;
+    csr_xtvec_t reg_stvec;
+    word_t reg_sscratch;
+    word_t reg_sedeleg;
+    csr_satp_t reg_satp;
 
-    csr_xtvec_t r_MachineTrapVector;
-    word_t r_MachineScratch;
-    word_t r_MachineExceptionDelegate;
+    csr_xtvec_t reg_mtvec;
+    word_t reg_mscratch;
+    word_t reg_medeleg;
 
     logic [2:0] reg_frm;
     logic [4:0] reg_fflags;
 
     always_comb begin
-        // readValue
+        // read_value
         unique case (bus.readAddr)
-        csr_addr_ustatus:   readValue = read_ustatus(r_Status);
-        csr_addr_fflags:    readValue = {27'h0, reg_fflags};
-        csr_addr_frm:       readValue = {29'h0, reg_frm};
-        csr_addr_fcsr:      readValue = {24'h0, reg_frm, reg_fflags};
-        csr_addr_utvec:     readValue = r_UserTrapVector;
-        csr_addr_uscratch:  readValue = r_UserScratch;
-        csr_addr_uepc:      readValue = r_UserExceptionProgramCounter;
-        csr_addr_ucause:    readValue = read_xcause(r_UserCause);
-        csr_addr_utval:     readValue = r_UserTrapValue;
+        CSR_ADDR_USTATUS:   read_value = read_ustatus(reg_status);
+        CSR_ADDR_FFLAGS:    read_value = {27'h0, reg_fflags};
+        CSR_ADDR_FRM:       read_value = {29'h0, reg_frm};
+        CSR_ADDR_FCSR:      read_value = {24'h0, reg_frm, reg_fflags};
+        CSR_ADDR_UTVEC:     read_value = reg_utvec;
+        CSR_ADDR_USCRATCH:  read_value = reg_uscratch;
+        CSR_ADDR_UEPC:      read_value = reg_uepc;
+        CSR_ADDR_UCAUSE:    read_value = read_xcause(reg_ucause);
+        CSR_ADDR_UTVAL:     read_value = reg_utval;
 
-        csr_addr_sstatus:   readValue = read_sstatus(r_Status);
-        csr_addr_sedeleg:   readValue = r_SupervisorExceptionDelegate;
-        csr_addr_stvec:     readValue = r_SupervisorTrapVector;
-        csr_addr_sscratch:  readValue = r_SupervisorScratch;
-        csr_addr_sepc:      readValue = r_SupervisorExceptionProgramCounter;
-        csr_addr_scause:    readValue = read_xcause(r_SupervisorCause);
-        csr_addr_stval:     readValue = r_SupervisorTrapValue;
-        csr_addr_satp:      readValue = r_SupervisorAddressTranslationProtection;
+        CSR_ADDR_SSTATUS:   read_value = read_sstatus(reg_status);
+        CSR_ADDR_SEDELEG:   read_value = reg_sedeleg;
+        CSR_ADDR_STVEC:     read_value = reg_stvec;
+        CSR_ADDR_SSCRATCH:  read_value = reg_sscratch;
+        CSR_ADDR_SEPC:      read_value = reg_sepc;
+        CSR_ADDR_SCAUSE:    read_value = read_xcause(reg_scause);
+        CSR_ADDR_STVAL:     read_value = reg_stval;
+        CSR_ADDR_SATP:      read_value = reg_satp;
 
-        csr_addr_mstatus:   readValue = r_Status;
-        csr_addr_misa:      readValue = read_misa();
-        csr_addr_medeleg:   readValue = r_MachineExceptionDelegate;
-        csr_addr_mtvec:     readValue = r_MachineTrapVector;
-        csr_addr_mscratch:  readValue = r_MachineScratch;
-        csr_addr_mepc:      readValue = r_MachineExceptionProgramCounter;
-        csr_addr_mcause:    readValue = read_xcause(r_MachineCause);
-        csr_addr_mtval:     readValue = r_MachineTrapValue;
+        CSR_ADDR_MSTATUS:   read_value = reg_status;
+        CSR_ADDR_MISA:      read_value = read_misa();
+        CSR_ADDR_MEDELEG:   read_value = reg_medeleg;
+        CSR_ADDR_MTVEC:     read_value = reg_mtvec;
+        CSR_ADDR_MSCRATCH:  read_value = reg_mscratch;
+        CSR_ADDR_MEPC:      read_value = reg_mepc;
+        CSR_ADDR_MCAUSE:    read_value = read_xcause(reg_mcause);
+        CSR_ADDR_MTVAL:     read_value = reg_mtval;
 
-        csr_addr_cycle:     readValue = r_Cycle[31:0];
-        csr_addr_time:      readValue = r_Cycle[31:0];
-        csr_addr_instret:   readValue = bus.readOpId[31:0];
-        csr_addr_cycleh:    readValue = r_Cycle[63:32];
-        csr_addr_timeh:     readValue = r_Cycle[63:32];
-        csr_addr_instreth:  readValue = bus.readOpId[63:32];
+        CSR_ADDR_CYCLE:     read_value = reg_cycle[31:0];
+        CSR_ADDR_TIME:      read_value = reg_cycle[31:0];
+        CSR_ADDR_INSTRET:   read_value = bus.readOpId[31:0];
+        CSR_ADDR_CYCLEH:    read_value = reg_cycle[63:32];
+        CSR_ADDR_TIMEH:     read_value = reg_cycle[63:32];
+        CSR_ADDR_INSTRETH:  read_value = bus.readOpId[63:32];
 
-        csr_addr_mvendorid: readValue = VendorId;
-        csr_addr_marchid:   readValue = ArchitectureId;
-        csr_addr_mimpid:    readValue = ImplementationId;
-        csr_addr_mhartid:   readValue = HardwareThreadId;
-        default:            readValue = '0;
+        CSR_ADDR_MVENDORID: read_value = VENDOR_ID;
+        CSR_ADDR_MARCHID:   read_value = ARCHITECTURE_ID;
+        CSR_ADDR_MIMPID:    read_value = IMPLEMENTATION_ID;
+        CSR_ADDR_MHARTID:   read_value = HARDWARE_THREAD_ID;
+        default:            read_value = '0;
         endcase
 
-        // writeValue
-        writeValue = bus.writeValue;
+        // write_value
+        write_value = bus.writeValue;
 
-        // nextPrivilege
+        // next_priv
         if (bus.trapInfo.valid) begin
-            nextPrivilege = calc_next_privilege(
+            next_priv = calc_next_privilege(
                 .cause(bus.trapInfo.cause),
-                .machineExceptionDelegate(r_MachineExceptionDelegate),
-                .supervisorExceptionDelegate(r_SupervisorExceptionDelegate)
+                .machineExceptionDelegate(reg_medeleg),
+                .supervisorExceptionDelegate(reg_sedeleg)
             );
         end
         else if (bus.trapReturn) begin
             if (bus.trapReturnPrivilege == Privilege_Machine) begin
-                nextPrivilege = Privilege'(r_Status.mpp);
+                next_priv = Privilege'(reg_status.mpp);
             end
             else if (bus.trapReturnPrivilege == Privilege_Supervisor) begin
-                nextPrivilege = Privilege'(r_Status.spp);
+                next_priv = Privilege'(reg_status.spp);
             end
             else begin
-                nextPrivilege = Privilege_User;
+                next_priv = Privilege_User;
             end
         end
         else begin
-            nextPrivilege = r_Privilege;
+            next_priv = reg_priv;
         end
 
-        // nextStatus
+        // next_status
         if (bus.trapInfo.valid) begin
-            if (nextPrivilege == Privilege_Machine) begin
-                nextStatus = update_xstatus_mpp(r_Status, r_Privilege);
+            if (next_priv == Privilege_Machine) begin
+                next_status = update_xstatus_mpp(reg_status, reg_priv);
             end
-            else if (nextPrivilege == Privilege_Supervisor) begin
-                nextStatus = update_xstatus_spp(r_Status, r_Privilege);
+            else if (next_priv == Privilege_Supervisor) begin
+                next_status = update_xstatus_spp(reg_status, reg_priv);
             end
             else begin
-                nextStatus = r_Status;
+                next_status = reg_status;
             end
         end
         else if (bus.trapReturn) begin
             if (bus.trapReturnPrivilege == Privilege_Machine) begin
-                nextStatus = update_xstatus_mpp_mie(r_Status, Privilege_User, r_Status.mpie);
+                next_status = update_xstatus_mpp_mie(reg_status, Privilege_User, reg_status.mpie);
             end
-            else if (nextPrivilege == Privilege_Supervisor) begin
-                nextStatus = update_xstatus_spp_sie(r_Status, Privilege_User, r_Status.spie);
+            else if (next_priv == Privilege_Supervisor) begin
+                next_status = update_xstatus_spp_sie(reg_status, Privilege_User, reg_status.spie);
             end
             else begin
-                nextStatus = r_Status;
+                next_status = reg_status;
             end
         end
-        else if (bus.writeEnable && bus.writeAddr == csr_addr_mstatus) begin
-            nextStatus = writeValue;
+        else if (bus.writeEnable && bus.writeAddr == CSR_ADDR_MSTATUS) begin
+            next_status = write_value;
         end
-        else if (bus.writeEnable && bus.writeAddr == csr_addr_sstatus) begin
-            nextStatus = write_sstatus(r_Status, writeValue);
+        else if (bus.writeEnable && bus.writeAddr == CSR_ADDR_SSTATUS) begin
+            next_status = write_sstatus(reg_status, write_value);
         end
-        else if (bus.writeEnable && bus.writeAddr == csr_addr_ustatus) begin
-            nextStatus = write_ustatus(r_Status, writeValue);
+        else if (bus.writeEnable && bus.writeAddr == CSR_ADDR_USTATUS) begin
+            next_status = write_ustatus(reg_status, write_value);
         end
         else begin
-            nextStatus = r_Status;
+            next_status = reg_status;
         end
 
-        // nextPc
-        if (bus.trapInfo.valid && nextPrivilege == Privilege_Machine) begin
-            nextPc = {r_MachineTrapVector.base, 2'b00};
+        // next_pc
+        if (bus.trapInfo.valid && next_priv == Privilege_Machine) begin
+            next_pc = {reg_mtvec.base, 2'b00};
         end
-        else if (bus.trapInfo.valid && nextPrivilege == Privilege_Supervisor) begin
-            nextPc = {r_SupervisorTrapVector.base, 2'b00};
+        else if (bus.trapInfo.valid && next_priv == Privilege_Supervisor) begin
+            next_pc = {reg_stvec.base, 2'b00};
         end
-        else if (bus.trapInfo.valid && nextPrivilege == Privilege_User) begin
-            nextPc = {r_UserTrapVector.base, 2'b00};
+        else if (bus.trapInfo.valid && next_priv == Privilege_User) begin
+            next_pc = {reg_utvec.base, 2'b00};
         end
         else if (bus.trapReturn && bus.trapReturnPrivilege == Privilege_Machine) begin
-            nextPc = r_MachineExceptionProgramCounter;
+            next_pc = reg_mepc;
         end
         else if (bus.trapReturn && bus.trapReturnPrivilege == Privilege_Supervisor) begin
-            nextPc = r_SupervisorExceptionProgramCounter;
+            next_pc = reg_sepc;
         end
         else if (bus.trapReturn && bus.trapReturnPrivilege == Privilege_User) begin
-            nextPc = r_UserExceptionProgramCounter;
+            next_pc = reg_uepc;
         end
         else begin
-            nextPc = '0;
+            next_pc = '0;
         end
 
         // bus output
-        bus.nextPc = nextPc;
-        bus.readValue = readValue;
+        bus.nextPc = next_pc;
+        bus.readValue = read_value;
         bus.readIllegal = 0; // TEMP: Disable illegal access exception for riscv-tests
 
-        bus.satp = r_SupervisorAddressTranslationProtection;
-        bus.mstatus = r_Status;
-        bus.privilege = r_Privilege;
-        bus.trapSupervisorReturn = r_Status.tsr;
+        bus.satp = reg_satp;
+        bus.mstatus = reg_status;
+        bus.privilege = reg_priv;
+        bus.trapSupervisorReturn = reg_status.tsr;
     end
 
     always_ff @(posedge clk) begin
         if (rst) begin
-            r_Cycle <= '0;
+            reg_cycle <= '0;
 
-            r_Privilege <= Privilege_Machine;
-            r_Status <= '0;
+            reg_priv <= Privilege_Machine;
+            reg_status <= '0;
 
-            r_UserExceptionProgramCounter <= '0;
-            r_UserCause <= '0;
-            r_UserTrapValue <= '0;
+            reg_uepc <= '0;
+            reg_ucause <= '0;
+            reg_utval <= '0;
 
-            r_SupervisorExceptionProgramCounter <= '0;
-            r_SupervisorCause <= '0;
-            r_SupervisorTrapValue <= '0;
+            reg_sepc <= '0;
+            reg_scause <= '0;
+            reg_stval <= '0;
 
-            r_MachineExceptionProgramCounter <= '0;
-            r_MachineCause <= '0;
-            r_MachineTrapValue <= '0;
+            reg_mepc <= '0;
+            reg_mcause <= '0;
+            reg_mtval <= '0;
 
-            r_UserTrapVector <= '0;
-            r_UserScratch <= '0;
+            reg_utvec <= '0;
+            reg_uscratch <= '0;
 
-            r_SupervisorTrapVector <= '0;
-            r_SupervisorScratch <= '0;
-            r_SupervisorExceptionDelegate <= '0;
-            r_SupervisorAddressTranslationProtection <= '0;
+            reg_stvec <= '0;
+            reg_sscratch <= '0;
+            reg_sedeleg <= '0;
+            reg_satp <= '0;
 
-            r_MachineTrapVector <= '0;
-            r_MachineExceptionDelegate <= '0;
-            r_MachineScratch <= '0;
+            reg_mtvec <= '0;
+            reg_medeleg <= '0;
+            reg_mscratch <= '0;
 
             reg_fflags <= '0;
             reg_frm <= '0;
         end
         else begin
             // Performance Counters
-            r_Cycle <= r_Cycle + 1;
+            reg_cycle <= reg_cycle + 1;
 
             // Registers written by trap or trap-return
-            r_Privilege <= nextPrivilege;
-            r_Status <= nextStatus;
+            reg_priv <= next_priv;
+            reg_status <= next_status;
 
-            if (bus.trapInfo.valid && nextPrivilege == Privilege_User) begin
-                r_UserExceptionProgramCounter <= bus.trapPc;
-                r_UserCause <= bus.trapInfo.cause;
-                r_UserTrapValue <= bus.trapInfo.value;
+            if (bus.trapInfo.valid && next_priv == Privilege_User) begin
+                reg_uepc <= bus.trapPc;
+                reg_ucause <= bus.trapInfo.cause;
+                reg_utval <= bus.trapInfo.value;
             end
             else begin
-                r_UserExceptionProgramCounter <= (bus.writeEnable && bus.writeAddr == csr_addr_uepc)
+                reg_uepc <= (bus.writeEnable && bus.writeAddr == CSR_ADDR_UEPC)
                     ? bus.writeValue
-                    : r_UserExceptionProgramCounter;
-                r_UserCause <= (bus.writeEnable && bus.writeAddr == csr_addr_ucause)
+                    : reg_uepc;
+                reg_ucause <= (bus.writeEnable && bus.writeAddr == CSR_ADDR_UCAUSE)
                     ? bus.writeValue[3:0]
-                    : r_UserCause;
-                r_UserTrapValue <= (bus.writeEnable && bus.writeAddr == csr_addr_utval)
+                    : reg_ucause;
+                reg_utval <= (bus.writeEnable && bus.writeAddr == CSR_ADDR_UTVAL)
                     ? bus.writeValue
-                    : r_UserTrapValue;
+                    : reg_utval;
             end
 
-            if (bus.trapInfo.valid && nextPrivilege == Privilege_Supervisor) begin
-                r_SupervisorExceptionProgramCounter <= bus.trapPc;
-                r_SupervisorCause <= bus.trapInfo.cause;
-                r_SupervisorTrapValue <= bus.trapInfo.value;
+            if (bus.trapInfo.valid && next_priv == Privilege_Supervisor) begin
+                reg_sepc <= bus.trapPc;
+                reg_scause <= bus.trapInfo.cause;
+                reg_stval <= bus.trapInfo.value;
             end
             else begin
-                r_SupervisorExceptionProgramCounter <= (bus.writeEnable && bus.writeAddr == csr_addr_sepc)
+                reg_sepc <= (bus.writeEnable && bus.writeAddr == CSR_ADDR_SEPC)
                     ? bus.writeValue
-                    : r_SupervisorExceptionProgramCounter;
-                r_SupervisorCause <= (bus.writeEnable && bus.writeAddr == csr_addr_scause)
+                    : reg_sepc;
+                reg_scause <= (bus.writeEnable && bus.writeAddr == CSR_ADDR_SCAUSE)
                     ? bus.writeValue[3:0]
-                    : r_SupervisorCause;
-                r_SupervisorTrapValue <= (bus.writeEnable && bus.writeAddr == csr_addr_stval)
+                    : reg_scause;
+                reg_stval <= (bus.writeEnable && bus.writeAddr == CSR_ADDR_STVAL)
                     ? bus.writeValue
-                    : r_SupervisorTrapValue;
+                    : reg_stval;
             end
 
-            if (bus.trapInfo.valid && nextPrivilege == Privilege_Machine) begin
-                r_MachineExceptionProgramCounter <= bus.trapPc;
-                r_MachineCause <= bus.trapInfo.cause;
-                r_MachineTrapValue <= bus.trapInfo.value;
+            if (bus.trapInfo.valid && next_priv == Privilege_Machine) begin
+                reg_mepc <= bus.trapPc;
+                reg_mcause <= bus.trapInfo.cause;
+                reg_mtval <= bus.trapInfo.value;
             end
             else begin
-                r_MachineExceptionProgramCounter <= (bus.writeEnable && bus.writeAddr == csr_addr_mepc)
+                reg_mepc <= (bus.writeEnable && bus.writeAddr == CSR_ADDR_MEPC)
                     ? bus.writeValue
-                    : r_MachineExceptionProgramCounter;
-                r_MachineCause <= (bus.writeEnable && bus.writeAddr == csr_addr_mcause)
+                    : reg_mepc;
+                reg_mcause <= (bus.writeEnable && bus.writeAddr == CSR_ADDR_MCAUSE)
                     ? bus.writeValue[3:0]
-                    : r_MachineCause;
-                r_MachineTrapValue <= (bus.writeEnable && bus.writeAddr == csr_addr_mtval)
+                    : reg_mcause;
+                reg_mtval <= (bus.writeEnable && bus.writeAddr == CSR_ADDR_MTVAL)
                     ? bus.writeValue
-                    : r_MachineTrapValue;
+                    : reg_mtval;
             end
 
             // Registers written by csr insructions
-            r_UserTrapVector <= (bus.writeEnable && bus.writeAddr == csr_addr_utvec)
+            reg_utvec <= (bus.writeEnable && bus.writeAddr == CSR_ADDR_UTVEC)
                 ? bus.writeValue
-                : r_UserTrapVector;
+                : reg_utvec;
 
-            r_UserScratch <= (bus.writeEnable && bus.writeAddr == csr_addr_uscratch)
+            reg_uscratch <= (bus.writeEnable && bus.writeAddr == CSR_ADDR_USCRATCH)
                 ? bus.writeValue
-                : r_UserScratch;
+                : reg_uscratch;
 
-            r_SupervisorTrapVector <= (bus.writeEnable && bus.writeAddr == csr_addr_stvec)
+            reg_stvec <= (bus.writeEnable && bus.writeAddr == CSR_ADDR_STVEC)
                 ? bus.writeValue
-                : r_SupervisorTrapVector;
+                : reg_stvec;
 
-            r_SupervisorScratch <= (bus.writeEnable && bus.writeAddr == csr_addr_sscratch)
+            reg_sscratch <= (bus.writeEnable && bus.writeAddr == CSR_ADDR_SSCRATCH)
                 ? bus.writeValue
-                : r_SupervisorScratch;
+                : reg_sscratch;
 
-            r_SupervisorExceptionDelegate <= (bus.writeEnable && bus.writeAddr == csr_addr_sedeleg)
+            reg_sedeleg <= (bus.writeEnable && bus.writeAddr == CSR_ADDR_SEDELEG)
                 ? bus.writeValue
-                : r_SupervisorExceptionDelegate;
+                : reg_sedeleg;
 
-            r_SupervisorAddressTranslationProtection <= (bus.writeEnable && bus.writeAddr == csr_addr_satp)
+            reg_satp <= (bus.writeEnable && bus.writeAddr == CSR_ADDR_SATP)
                 ? bus.writeValue
-                : r_SupervisorAddressTranslationProtection;
+                : reg_satp;
 
-            r_MachineTrapVector <= (bus.writeEnable && bus.writeAddr == csr_addr_mtvec)
+            reg_mtvec <= (bus.writeEnable && bus.writeAddr == CSR_ADDR_MTVEC)
                 ? bus.writeValue
-                : r_MachineTrapVector;
+                : reg_mtvec;
 
-            r_MachineScratch <= (bus.writeEnable && bus.writeAddr == csr_addr_mscratch)
+            reg_mscratch <= (bus.writeEnable && bus.writeAddr == CSR_ADDR_MSCRATCH)
                 ? bus.writeValue
-                : r_MachineScratch;
+                : reg_mscratch;
 
-            r_MachineExceptionDelegate <= (bus.writeEnable && bus.writeAddr == csr_addr_medeleg)
+            reg_medeleg <= (bus.writeEnable && bus.writeAddr == CSR_ADDR_MEDELEG)
                 ? bus.writeValue
-                : r_MachineExceptionDelegate;
+                : reg_medeleg;
 
-            if (bus.writeEnable && bus.writeAddr == csr_addr_fflags) begin
+            if (bus.writeEnable && bus.writeAddr == CSR_ADDR_FFLAGS) begin
                 reg_fflags <= bus.writeValue[4:0];
                 reg_frm <= reg_frm;
             end
-            else if (bus.writeEnable && bus.writeAddr == csr_addr_frm) begin
+            else if (bus.writeEnable && bus.writeAddr == CSR_ADDR_FRM) begin
                 reg_fflags <= reg_fflags;
                 reg_frm <= bus.writeValue[2:0];
             end
-            else if (bus.writeEnable && bus.writeAddr == csr_addr_fcsr) begin
+            else if (bus.writeEnable && bus.writeAddr == CSR_ADDR_FCSR) begin
                 reg_fflags <= bus.writeValue[4:0];
                 reg_frm <= bus.writeValue[7:5];
             end
