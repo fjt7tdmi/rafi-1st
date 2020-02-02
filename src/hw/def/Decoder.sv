@@ -502,19 +502,7 @@ function automatic Op DecodeRV32F(insn_t insn);
 
     unique case (opcode)
     7'b1010011: begin
-        if (funct7 == 7'b1110000 && rs2 == 5'b00000 && rm == 3'b000) begin
-            // FMV.X.W
-            op.fpUnitCommand = FpUnitCommand_Move;
-            op.dstRegType = RegType_Int;
-            op.regWriteEnable = 1;
-        end
-        else if (funct7 == 7'b1111000 && rs2 == 5'b00000 && rm == 3'b000) begin
-            // FMV.W.X
-            op.fpUnitCommand = FpUnitCommand_Move;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
-        end
-        else if (funct7 == 7'b0010000 && rm == 3'b000) begin
+        if (funct7 == 7'b0010000 && rm == 3'b000) begin
             // FSGNJ.S
             op.fpUnitCommand = FpUnitCommand_Sgnj;
             op.dstRegType = RegType_Fp;
@@ -529,6 +517,30 @@ function automatic Op DecodeRV32F(insn_t insn);
         else if (funct7 == 7'b0010000 && rm == 3'b010) begin
             // FSGNJX.S
             op.fpUnitCommand = FpUnitCommand_Sgnjx;
+            op.dstRegType = RegType_Fp;
+            op.regWriteEnable = 1;
+        end
+        else if (funct7 == 7'b0010000 && rm == 3'b010) begin
+            // FSGNJX.S
+            op.fpUnitCommand = FpUnitCommand_Sgnjx;
+            op.dstRegType = RegType_Fp;
+            op.regWriteEnable = 1;
+        end
+        else if (funct7 == 7'b1110000 && rs2 == 5'b00000 && rm == 3'b000) begin
+            // FMV.X.W
+            op.fpUnitCommand = FpUnitCommand_Move;
+            op.dstRegType = RegType_Int;
+            op.regWriteEnable = 1;
+        end
+        else if (funct7 == 7'b1110000 && rs2 == 5'b00000 && rm == 3'b001) begin
+            // FCLASS.S
+            op.fpUnitCommand = FpUnitCommand_Class;
+            op.dstRegType = RegType_Int;
+            op.regWriteEnable = 1;
+        end
+        else if (funct7 == 7'b1111000 && rs2 == 5'b00000 && rm == 3'b000) begin
+            // FMV.W.X
+            op.fpUnitCommand = FpUnitCommand_Move;
             op.dstRegType = RegType_Fp;
             op.regWriteEnable = 1;
         end
