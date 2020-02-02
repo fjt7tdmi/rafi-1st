@@ -496,7 +496,7 @@ function automatic Op DecodeRV32F(insn_t insn);
     op.srcRegType2 = '0;
     op.dstRegType = '0;
     op.imm = '0;
-    op.isAtomic = 1;
+    op.isAtomic = 0;
     op.isBranch = 0;
     op.isFence = 0;
     op.isLoad = 0;
