@@ -82,7 +82,7 @@ module FetchUnitTest;
         .AddrWidth(ICacheMemAddrWidth)
     ) m_MemoryAccessArbiterIF();
     PipelineControllerIF m_PipelineControllerIF();
-    ControlStatusRegisterIF m_ControlStatusRegisterIF();
+    CsrIF m_CsrIF();
 
     MemoryAccessArbiter m_MemoryAccessArbiter (
         .bus(m_MemoryAccessArbiterIF.MemoryAccessArbiter),
@@ -94,7 +94,7 @@ module FetchUnitTest;
         .bus(m_FetchUnitIF.FetchUnit),
         .mem(m_MemoryAccessArbiterIF.FetchUnit),
         .ctrl(m_PipelineControllerIF.FetchUnit),
-        .csr(m_ControlStatusRegisterIF.FetchUnit),
+        .csr(m_CsrIF.FetchUnit),
         .clk,
         .rst
     );
@@ -147,11 +147,11 @@ module FetchUnitTest;
         m_PipelineControllerIF.nextPc = '0;
         m_PipelineControllerIF.flush = '0;
         m_PipelineControllerIF.stall = '0;
-        m_ControlStatusRegisterIF.nextPc = '0;
-        m_ControlStatusRegisterIF.satp = '0;
-        m_ControlStatusRegisterIF.mstatus = '0;
-        m_ControlStatusRegisterIF.privilege = Privilege_Machine;
-        m_ControlStatusRegisterIF.trapInfo = '0;
+        m_CsrIF.nextPc = '0;
+        m_CsrIF.satp = '0;
+        m_CsrIF.mstatus = '0;
+        m_CsrIF.privilege = Privilege_Machine;
+        m_CsrIF.trapInfo = '0;
     end
 
     // Wait ICache Hit

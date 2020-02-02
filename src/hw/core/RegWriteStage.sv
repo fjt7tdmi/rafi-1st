@@ -23,7 +23,7 @@ import ProcessorTypes::*;
 
 module RegWriteStage(
     MemoryAccessStageIF.NextStage prevStage,
-    ControlStatusRegisterIF.RegWriteStage csr,
+    CsrIF.RegWriteStage csr,
     IntRegFileIF.RegWriteStage intRegFile,
     FpRegFileIF.RegWriteStage fpRegFile,
     input   logic clk,

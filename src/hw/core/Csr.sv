@@ -205,8 +205,8 @@ endfunction
 // ----------------------------------------------------------------------------
 // Module definition
 //
-module ControlStatusRegister(
-    ControlStatusRegisterIF.ControlStatusRegister bus,
+module Csr(
+    CsrIF.Csr bus,
     input logic clk,
     input logic rst
 );

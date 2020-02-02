@@ -52,7 +52,7 @@ module Core (
     IntBypassLogicIF m_IntBypassLogicIF();
     FpBypassLogicIF m_FpBypassLogicIF();
     LoadStoreUnitIF m_LoadStoreUnitIF();
-    ControlStatusRegisterIF m_ControlStatusRegisterIF();
+    CsrIF m_CsrIF();
     FetchUnitIF m_FetchUnitIF();
     BusAccessUnitIF m_BusAccessUnitIF();
 
@@ -68,7 +68,7 @@ module Core (
         .nextStage(m_FetchStageIF.ThisStage),
         .fetchUnit(m_FetchUnitIF.FetchStage),
         .ctrl(m_PipelineControllerIF.FetchStage),
-        .csr(m_ControlStatusRegisterIF.FetchStage),
+        .csr(m_CsrIF.FetchStage),
         .clk,
         .rst(rstInternal)
     );
@@ -83,7 +83,7 @@ module Core (
         .prevStage(m_DecodeStageIF.NextStage),
         .nextStage(m_RegReadStageIF.ThisStage),
         .ctrl(m_PipelineControllerIF.RegReadStage),
-        .csr(m_ControlStatusRegisterIF.RegReadStage),
+        .csr(m_CsrIF.RegReadStage),
         .intRegFile(m_IntRegFileIF.RegReadStage),
         .fpRegFile(m_FpRegFileIF.RegReadStage),
         .clk,
@@ -93,7 +93,7 @@ module Core (
         .prevStage(m_RegReadStageIF.NextStage),
         .nextStage(m_ExecuteStageIF.ThisStage),
         .ctrl(m_PipelineControllerIF.ExecuteStage),
-        .csr(m_ControlStatusRegisterIF.ExecuteStage),
+        .csr(m_CsrIF.ExecuteStage),
         .intBypass(m_IntBypassLogicIF.ExecuteStage),
         .fpBypass(m_FpBypassLogicIF.ExecuteStage),
         .clk,
@@ -112,7 +112,7 @@ module Core (
     );
     RegWriteStage m_RegWriteStage(
         .prevStage(m_MemoryAccessStageIF.NextStage),
-        .csr(m_ControlStatusRegisterIF.RegWriteStage),
+        .csr(m_CsrIF.RegWriteStage),
         .intRegFile(m_IntRegFileIF.RegWriteStage),
         .fpRegFile(m_FpRegFileIF.RegWriteStage),
         .clk,
@@ -141,8 +141,8 @@ module Core (
         .clk,
         .rst(rstInternal)
     );
-    ControlStatusRegister m_ControlStatusRegister(
-        .bus(m_ControlStatusRegisterIF.ControlStatusRegister),
+    Csr m_Csr(
+        .bus(m_CsrIF.Csr),
         .clk,
         .rst(rstInternal)
     );
@@ -156,14 +156,14 @@ module Core (
         .bus(m_FetchUnitIF.FetchUnit),
         .mem(m_BusAccessUnitIF.FetchUnit),
         .ctrl(m_PipelineControllerIF.FetchUnit),
-        .csr(m_ControlStatusRegisterIF.FetchUnit),
+        .csr(m_CsrIF.FetchUnit),
         .clk,
         .rst(rstInternal)
     );
     LoadStoreUnit m_LoadStoreUnit(
         .bus(m_LoadStoreUnitIF.LoadStoreUnit),
         .mem(m_BusAccessUnitIF.LoadStoreUnit),
-        .csr(m_ControlStatusRegisterIF.LoadStoreUnit),
+        .csr(m_CsrIF.LoadStoreUnit),
         .hostIoValue,
         .clk,
         .rst(rstInternal)

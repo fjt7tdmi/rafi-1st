@@ -135,7 +135,7 @@ module ExecuteStage(
     RegReadStageIF.NextStage prevStage,
     ExecuteStageIF.ThisStage nextStage,
     PipelineControllerIF.ExecuteStage ctrl,
-    ControlStatusRegisterIF.ExecuteStage csr,
+    CsrIF.ExecuteStage csr,
     IntBypassLogicIF.ExecuteStage intBypass,
     FpBypassLogicIF.ExecuteStage fpBypass,
     input logic clk,

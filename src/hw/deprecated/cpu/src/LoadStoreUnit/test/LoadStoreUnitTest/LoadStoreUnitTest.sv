@@ -86,7 +86,7 @@ module LoadStoreUnitTest;
         .LineSize(ICacheLineSize),
         .AddrWidth(ICacheMemAddrWidth)
     ) m_MemoryAccessArbiterIF();
-    ControlStatusRegisterIF m_ControlStatusRegisterIF();
+    CsrIF m_CsrIF();
 
     MemoryAccessArbiter m_MemoryAccessArbiter (
         .bus(m_MemoryAccessArbiterIF.MemoryAccessArbiter),
@@ -97,7 +97,7 @@ module LoadStoreUnitTest;
     LoadStoreUnit m_LoadStoreUnit (
         .bus(m_LoadStoreUnitIF.LoadStoreUnit),
         .mem(m_MemoryAccessArbiterIF.LoadStoreUnit),
-        .csr(m_ControlStatusRegisterIF.LoadStoreUnit),
+        .csr(m_CsrIF.LoadStoreUnit),
         .clk,
         .rst
     );
@@ -149,11 +149,11 @@ module LoadStoreUnitTest;
         m_MemoryAccessArbiterIF.icReadReq = '0;
         m_MemoryAccessArbiterIF.icWriteReq = '0;
         m_MemoryAccessArbiterIF.icWriteValue = '0;
-        m_ControlStatusRegisterIF.nextPc = '0;
-        m_ControlStatusRegisterIF.satp = '0;
-        m_ControlStatusRegisterIF.mstatus = '0;
-        m_ControlStatusRegisterIF.privilege = Privilege_Machine;
-        m_ControlStatusRegisterIF.trapInfo = '0;
+        m_CsrIF.nextPc = '0;
+        m_CsrIF.satp = '0;
+        m_CsrIF.mstatus = '0;
+        m_CsrIF.privilege = Privilege_Machine;
+        m_CsrIF.trapInfo = '0;
     end
 
     // Wait cache Hit

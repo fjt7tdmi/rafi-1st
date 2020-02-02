@@ -27,7 +27,7 @@ import TlbTypes::*;
 module LoadStoreUnit (
     LoadStoreUnitIF.LoadStoreUnit bus,
     BusAccessUnitIF.LoadStoreUnit mem,
-    ControlStatusRegisterIF.LoadStoreUnit csr,
+    CsrIF.LoadStoreUnit csr,
     output  logic [31:0] hostIoValue,
     input   logic clk,
     input   logic rst

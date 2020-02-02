@@ -557,8 +557,8 @@ if (verilator_FOUND)
         src/hw/core/BusAccessUnitIF.sv
         src/hw/core/BypassLogic.sv
         src/hw/core/BypassLogicIF.sv
-        src/hw/core/ControlStatusRegister.sv
-        src/hw/core/ControlStatusRegisterIF.sv
+        src/hw/core/Csr.sv
+        src/hw/core/CsrIF.sv
         src/hw/core/DecodeStage.sv
         src/hw/core/DecodeStageIF.sv
         src/hw/core/ExecuteStage.sv
