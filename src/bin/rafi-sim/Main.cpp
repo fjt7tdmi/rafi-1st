@@ -21,15 +21,25 @@
 
 int main(int argc, char** argv)
 {
+    int exitCode = 0;
+
     rafi::sim::CommandLineOption option(argc, argv);
     rafi::sim::Simulator simulator(option);
 
-    simulator.Process(option.GetCycle());
-
+    try
+    {
+        simulator.Process(option.GetCycle());    
+    }
+    catch (rafi::emu::RafiEmuException)
+    {
+        std::cout << "Simulation stopped by exception." << std::endl;
+        exitCode = 1;
+    }
+    
     std::cout << "Simulation finished @ cycle "
         << std::dec << simulator.GetCycle()
         << std::hex << " (0x" << simulator.GetCycle() << ")" << std::endl;
 
-    return 0;
+    return exitCode;
 }
 
