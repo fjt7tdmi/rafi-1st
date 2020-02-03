@@ -25,7 +25,6 @@ interface DecodeStageIF;
     logic valid;
     addr_t pc;
     insn_t insn;
-    uint64_t opId;
     Op op;
     csr_addr_t csrAddr;
     reg_addr_t srcRegAddr1;
@@ -38,7 +37,6 @@ interface DecodeStageIF;
         valid,
         pc,
         insn,
-        opId,
         op,
         csrAddr,
         srcRegAddr1,
@@ -52,7 +50,6 @@ interface DecodeStageIF;
         valid,
         pc,
         insn,
-        opId,
         op,
         csrAddr,
         srcRegAddr1,

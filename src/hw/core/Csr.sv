@@ -288,10 +288,10 @@ module Csr(
 
         CSR_ADDR_CYCLE:     read_value = reg_cycle[31:0];
         CSR_ADDR_TIME:      read_value = reg_cycle[31:0];
-        CSR_ADDR_INSTRET:   read_value = bus.readOpId[31:0];
+        CSR_ADDR_INSTRET:   read_value = '0; // TODO: impl
         CSR_ADDR_CYCLEH:    read_value = reg_cycle[63:32];
         CSR_ADDR_TIMEH:     read_value = reg_cycle[63:32];
-        CSR_ADDR_INSTRETH:  read_value = bus.readOpId[63:32];
+        CSR_ADDR_INSTRETH:  read_value = '0; // TODO: impl
 
         CSR_ADDR_MVENDORID: read_value = VENDOR_ID;
         CSR_ADDR_MARCHID:   read_value = ARCHITECTURE_ID;

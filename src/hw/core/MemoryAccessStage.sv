@@ -33,11 +33,7 @@ module MemoryAccessStage(
     input logic clk,
     input logic rst
 );
-    // Registers
-    uint64_t r_OpCommitCount;
-
     // Wires
-    uint64_t nextOpCommitCount;
     logic valid;
     Op op;
     word_t dstIntRegValue;
@@ -54,7 +50,6 @@ module MemoryAccessStage(
             loadStoreUnit.result :
             prevStage.dstIntRegValue;
         dstFpRegValue = prevStage.dstFpRegValue;
-        nextOpCommitCount = valid ? r_OpCommitCount + 1 : r_OpCommitCount;
     end
 
     // trapInfo
@@ -107,7 +102,6 @@ module MemoryAccessStage(
     end
 
     always_comb begin
-        ctrl.opCommitCount = r_OpCommitCount;
         ctrl.maStallReq = loadStoreUnit.enable && !loadStoreUnit.done;
         // TODO: implement for VM (page fault exception, etc.)
         ctrl.flushReq = valid && !ctrl.maStallReq && (
@@ -166,16 +160,6 @@ module MemoryAccessStage(
             nextStage.trapInfo <= trapInfo;
             nextStage.trapReturn <= prevStage.trapReturn;
             nextStage.debugInsn <= prevStage.debugInsn;
-        end
-
-        if (rst) begin
-            r_OpCommitCount <= '0;
-        end
-        else if (ctrl.maStallReq) begin
-            r_OpCommitCount <= r_OpCommitCount;
-        end
-        else begin
-            r_OpCommitCount <= nextOpCommitCount;
         end
     end
 endmodule

@@ -27,7 +27,6 @@ interface CsrIF;
     csr_addr_t readAddr;
     logic readEnable;
     logic readIllegal;
-    uint64_t readOpId;
 
     csr_satp_t satp;
     csr_xstatus_t mstatus;
@@ -55,7 +54,6 @@ interface CsrIF;
     input
         readAddr,
         readEnable,
-        readOpId,
         writeValue,
         writeAddr,
         writeEnable,
@@ -94,7 +92,6 @@ interface CsrIF;
     output
         readAddr,
         readEnable,
-        readOpId,
     input
         readValue,
         readIllegal
