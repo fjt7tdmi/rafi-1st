@@ -36,10 +36,6 @@ module DecodeStage(
     reg_addr_t srcRegAddr2;
     reg_addr_t dstRegAddr;
     TrapInfo trapInfo;
-    uint64_t nextOpId;
-
-    // Register
-    uint64_t opId;
 
     always_comb begin
         valid = prevStage.valid;
@@ -57,7 +53,6 @@ module DecodeStage(
         else begin
             trapInfo = prevStage.trapInfo;
         end
-        nextOpId = valid ? opId + 1 : opId;
     end
 
     always_ff @(posedge clk) begin
@@ -65,7 +60,6 @@ module DecodeStage(
             nextStage.valid <= '0;
             nextStage.pc <= '0;
             nextStage.op <= '0;
-            nextStage.opId <= '0;
             nextStage.insn <= '0;
             nextStage.csrAddr <= '0;
             nextStage.srcRegAddr1 <= '0;
@@ -77,7 +71,6 @@ module DecodeStage(
             nextStage.valid <= nextStage.valid;
             nextStage.pc <= nextStage.pc;
             nextStage.op <= nextStage.op;
-            nextStage.opId <= nextStage.opId;
             nextStage.insn <= nextStage.insn;
             nextStage.csrAddr <= nextStage.csrAddr;
             nextStage.srcRegAddr1 <= nextStage.srcRegAddr1;
@@ -89,7 +82,6 @@ module DecodeStage(
             nextStage.valid <= '0;
             nextStage.pc <= '0;
             nextStage.op <= '0;
-            nextStage.opId <= '0;
             nextStage.insn <= '0;
             nextStage.csrAddr <= '0;
             nextStage.srcRegAddr1 <= '0;
@@ -101,23 +93,12 @@ module DecodeStage(
             nextStage.valid <= prevStage.valid;
             nextStage.pc <= prevStage.pc;
             nextStage.op <= op;
-            nextStage.opId <= opId;
             nextStage.insn <= prevStage.insn;
             nextStage.csrAddr <= csrAddr;
             nextStage.srcRegAddr1 <= srcRegAddr1;
             nextStage.srcRegAddr2 <= srcRegAddr2;
             nextStage.dstRegAddr <= dstRegAddr;
             nextStage.trapInfo <= trapInfo;
-        end
-
-        if (rst) begin
-            opId <= '0;
-        end
-        else if (ctrl.flush) begin
-            opId <= ctrl.opCommitCount;
-        end
-        else begin
-            opId <= nextOpId;
         end
     end
 endmodule

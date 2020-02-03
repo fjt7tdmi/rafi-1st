@@ -64,7 +64,6 @@ typedef struct packed
 {
     TraceChildHeader header;
     int32_t cycle;
-    int32_t opId;
     int32_t insn;
     int32_t reserved;
 } BasicInfoNode;

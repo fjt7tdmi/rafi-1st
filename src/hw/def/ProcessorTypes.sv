@@ -39,7 +39,7 @@ parameter RegAddrWidth = 5;
 parameter RegFileSize = 32; // Number of registers in register files
 
 // Bypass Logic
-parameter BypassDepth = 3;
+parameter BypassDepth = 2;
 parameter BypassReadPortCount = 2;
 
 // ----------------------------------------------------------------------------

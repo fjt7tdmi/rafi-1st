@@ -28,12 +28,8 @@ interface PipelineControllerIF;
     logic ifStall;
     logic idStall;
     logic rrStall;
-    logic exStall;
 
     logic exStallReq;
-    logic maStallReq;
-
-    uint64_t opCommitCount;
 
     modport FetchStage(
     input
@@ -44,8 +40,7 @@ interface PipelineControllerIF;
     modport DecodeStage(
     input
         idStall,
-        flush,
-        opCommitCount
+        flush
     );
 
     modport RegReadStage(
@@ -57,17 +52,8 @@ interface PipelineControllerIF;
     modport ExecuteStage(
     output
         exStallReq,
-    input
-        exStall,
-        flush
-    );
-
-    modport MemoryAccessStage(
-    output
-        maStallReq,
         flushReq,
-        nextPc,
-        opCommitCount
+        nextPc
     );
 
     modport BypassLogic(
@@ -89,11 +75,9 @@ interface PipelineControllerIF;
         ifStall,
         idStall,
         rrStall,
-        exStall,
         flush,
     input
         exStallReq,
-        maStallReq,
         flushReq
     );
 endinterface

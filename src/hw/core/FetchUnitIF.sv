@@ -37,7 +37,7 @@ interface FetchUnitIF;
         iCacheLine
     );
 
-    modport MemoryAccessStage(
+    modport ExecuteStage(
     output
         invalidateICache,
         invalidateTlb

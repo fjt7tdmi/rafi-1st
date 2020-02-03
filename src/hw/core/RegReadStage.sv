@@ -39,7 +39,6 @@ module RegReadStage(
         fpRegFile.readAddr2 = prevStage.srcRegAddr2;
         csr.readAddr = prevStage.csrAddr;
         csr.readEnable = prevStage.op.csrReadEnable;
-        csr.readOpId = prevStage.opId;
     end
 
     always_ff @(posedge clk) begin
