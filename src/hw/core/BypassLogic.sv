@@ -53,8 +53,6 @@ module IntBypassLogic(
     reg_addr_t readAddr[BypassReadPortCount];
     word_t readValue[BypassReadPortCount];
 
-    logic loadHit[BypassReadPortCount];
-
     logic [BypassDepth-1:0] camHits[BypassReadPortCount];
     _index_t camIndex[BypassReadPortCount];
 
@@ -71,20 +69,15 @@ module IntBypassLogic(
     // Bypass CAM
     always_comb begin
         for (int i = 0; i < BypassReadPortCount; i++) begin
-            loadHit[i] = bus.loadWriteEnable && bus.loadWriteAddr == readAddr[i];
-
             for (int j = 0; j < BypassDepth; j++) begin
                 camHits[i][j] = pipeline[j].valid && (pipeline[j].addr == readAddr[i]);
             end
             camIndex[i] = encodeIndex(camHits[i]);
 
-            hit[i] = |(camHits[i]) || loadHit[i];
+            hit[i] = |(camHits[i]);
             if (readAddr[i] == '0) begin
                 // zero register
                 readValue[i] = '0;
-            end
-            else if (loadHit[i]) begin
-                readValue[i] = bus.loadWriteValue;
             end
             else if (|(camHits[i])) begin
                 readValue[i] = pipeline[camIndex[i]].value;
@@ -113,16 +106,7 @@ module IntBypassLogic(
             pipeline[0].addr <= bus.writeAddr;
             pipeline[0].value <= bus.writeValue;
 
-            if (bus.loadWriteEnable) begin
-                pipeline[1].valid <= bus.loadWriteEnable;
-                pipeline[1].addr <= bus.loadWriteAddr;
-                pipeline[1].value <= bus.loadWriteValue;
-            end
-            else begin
-                pipeline[1] <= pipeline[0];
-            end
-
-            for (int i = 2; i < BypassDepth; i++) begin
+            for (int i = 1; i < BypassDepth; i++) begin
                 pipeline[i] <= pipeline[i-1];
             end
         end
@@ -162,8 +146,6 @@ module FpBypassLogic(
     reg_addr_t readAddr[BypassReadPortCount];
     word_t readValue[BypassReadPortCount];
 
-    logic loadHit[BypassReadPortCount];
-
     logic [BypassDepth-1:0] camHits[BypassReadPortCount];
     _index_t camIndex[BypassReadPortCount];
 
@@ -180,18 +162,13 @@ module FpBypassLogic(
     // Bypass CAM
     always_comb begin
         for (int i = 0; i < BypassReadPortCount; i++) begin
-            loadHit[i] = bus.loadWriteEnable && bus.loadWriteAddr == readAddr[i];
-
             for (int j = 0; j < BypassDepth; j++) begin
                 camHits[i][j] = pipeline[j].valid && (pipeline[j].addr == readAddr[i]);
             end
             camIndex[i] = encodeIndex(camHits[i]);
 
-            hit[i] = |(camHits[i]) || loadHit[i];
-            if (loadHit[i]) begin
-                readValue[i] = bus.loadWriteValue;
-            end
-            else if (|(camHits[i])) begin
+            hit[i] = |(camHits[i]);
+            if (|(camHits[i])) begin
                 readValue[i] = pipeline[camIndex[i]].value;
             end
             else begin
@@ -218,16 +195,7 @@ module FpBypassLogic(
             pipeline[0].addr <= bus.writeAddr;
             pipeline[0].value <= bus.writeValue;
 
-            if (bus.loadWriteEnable) begin
-                pipeline[1].valid <= bus.loadWriteEnable;
-                pipeline[1].addr <= bus.loadWriteAddr;
-                pipeline[1].value <= bus.loadWriteValue;
-            end
-            else begin
-                pipeline[1] <= pipeline[0];
-            end
-
-            for (int i = 2; i < BypassDepth; i++) begin
+            for (int i = 1; i < BypassDepth; i++) begin
                 pipeline[i] <= pipeline[i-1];
             end
         end

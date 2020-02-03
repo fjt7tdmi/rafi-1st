@@ -33,7 +33,7 @@ interface LoadStoreUnitIF;
     word_t result;
     word_t storeRegValue;
 
-    modport MemoryAccessStage(
+    modport ExecuteStage(
     output
         addr,
         enable,

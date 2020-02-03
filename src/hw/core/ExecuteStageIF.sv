@@ -32,9 +32,6 @@ interface ExecuteStageIF;
     word_t dstIntRegValue;
     uint64_t dstFpRegValue;
 
-    addr_t memAddr;
-    word_t storeRegValue;
-
     logic branchTaken;
     addr_t branchTarget;
 
@@ -53,8 +50,6 @@ interface ExecuteStageIF;
         dstRegAddr,
         dstIntRegValue,
         dstFpRegValue,
-        memAddr,
-        storeRegValue,
         branchTaken,
         branchTarget,
         trapInfo,
@@ -72,8 +67,6 @@ interface ExecuteStageIF;
         dstRegAddr,
         dstIntRegValue,
         dstFpRegValue,
-        memAddr,
-        storeRegValue,
         branchTaken,
         branchTarget,
         trapInfo,

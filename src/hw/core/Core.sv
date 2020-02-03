@@ -94,6 +94,8 @@ module Core (
         .nextStage(m_ExecuteStageIF.ThisStage),
         .ctrl(m_PipelineControllerIF.ExecuteStage),
         .csr(m_CsrIF.ExecuteStage),
+        .fetchUnit(m_FetchUnitIF.ExecuteStage),
+        .loadStoreUnit(m_LoadStoreUnitIF.ExecuteStage),
         .intBypass(m_IntBypassLogicIF.ExecuteStage),
         .fpBypass(m_FpBypassLogicIF.ExecuteStage),
         .clk,
@@ -102,11 +104,6 @@ module Core (
     MemoryAccessStage m_MemoryAccessStage(
         .prevStage(m_ExecuteStageIF.NextStage),
         .nextStage(m_MemoryAccessStageIF.ThisStage),
-        .loadStoreUnit(m_LoadStoreUnitIF.MemoryAccessStage),
-        .fetchUnit(m_FetchUnitIF.MemoryAccessStage),
-        .ctrl(m_PipelineControllerIF.MemoryAccessStage),
-        .intBypass(m_IntBypassLogicIF.MemoryAccessStage),
-        .fpBypass(m_FpBypassLogicIF.MemoryAccessStage),
         .clk,
         .rst(rstInternal)
     );

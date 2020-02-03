@@ -52,11 +52,37 @@ function automatic logic BranchComparator(BranchType branchType, word_t src1, wo
     endcase
 endfunction
 
+function automatic LoadStoreUnitCommand getLoadStoreUnitCommand(Op op);
+    if (op.isLoad) begin
+        return LoadStoreUnitCommand_Load;
+    end
+    else if (op.isStore) begin
+        return LoadStoreUnitCommand_Store;
+    end
+    else if (op.isFence && (op.fenceType == FenceType_I || op.fenceType == FenceType_Vma)) begin
+        return LoadStoreUnitCommand_Invalidate;
+    end
+    else if (op.isAtomic && op.atomicType == AtomicType_LoadReserved) begin
+        return LoadStoreUnitCommand_LoadReserved;
+    end
+    else if (op.isAtomic && op.atomicType == AtomicType_StoreConditional) begin
+        return LoadStoreUnitCommand_StoreConditional;
+    end
+    else if (op.isAtomic) begin
+        return LoadStoreUnitCommand_AtomicMemOp;
+    end
+    else begin
+        return LoadStoreUnitCommand_None;
+    end
+endfunction
+
 module ExecuteStage(
     RegReadStageIF.NextStage prevStage,
     ExecuteStageIF.ThisStage nextStage,
     PipelineControllerIF.ExecuteStage ctrl,
     CsrIF.ExecuteStage csr,
+    FetchUnitIF.ExecuteStage fetchUnit,
+    LoadStoreUnitIF.ExecuteStage loadStoreUnit,
     IntBypassLogicIF.ExecuteStage intBypass,
     FpBypassLogicIF.ExecuteStage fpBypass,
     input logic clk,
@@ -93,6 +119,11 @@ module ExecuteStage(
     TrapInfo trapInfo;
     logic trapReturn;
 
+    addr_t memAddr;
+    word_t storeRegValue;
+    logic invalidateICache;
+    logic invalidateTlb;
+
     // Modules
     MulDivUnit m_MulDivUnit(
         .done(doneMulDiv),
@@ -101,8 +132,8 @@ module ExecuteStage(
         .src1(srcIntRegValue1),
         .src2(srcIntRegValue2),
         .enable(enableMulDiv),
-        .stall(ctrl.exStall),
-        .flush(ctrl.flush),
+        .stall(0),
+        .flush(0),
         .clk,
         .rst
     );
@@ -120,7 +151,7 @@ module ExecuteStage(
     );
 
     always_comb begin
-        valid = prevStage.valid && !ctrl.flush;
+        valid = prevStage.valid;
         op = prevStage.op;
     end
 
@@ -165,42 +196,87 @@ module ExecuteStage(
         IntResultType_Fp32:     intResult = intResultFp32;
         default:                intResult = '0;
         endcase
-
+    
         branchTaken = op.isBranch && BranchComparator(op.branchType, srcIntRegValue1, srcIntRegValue2);
         branchTarget = intResult;
+    end
 
-        // dstIntRegValue
+    // dstIntRegValue
+    always_comb begin
         unique case (op.intRegWriteSrcType)
         IntRegWriteSrcType_Result:  dstIntRegValue = intResult;
         IntRegWriteSrcType_NextPc:  dstIntRegValue = prevStage.pc + InsnSize;
+        IntRegWriteSrcType_Memory:  dstIntRegValue = loadStoreUnit.result;
         IntRegWriteSrcType_Csr:     dstIntRegValue = prevStage.srcCsrValue;
         default: dstIntRegValue = '0;
         endcase
+    end
 
-        // dstFpRegValue
+    // dstFpRegValue
+    always_comb begin
         dstFpRegValue = {32'h0, fp32Result};
     end
 
+    // FetchUnit
     always_comb begin
-        ctrl.exStallReq = enableMulDiv && (!doneMulDiv);
+        invalidateICache = valid && op.isFence &&
+            (op.fenceType == FenceType_I || op.fenceType == FenceType_Vma);
+        invalidateTlb = valid && op.isFence && op.fenceType == FenceType_Vma;
+
+        fetchUnit.invalidateICache = invalidateICache;
+        fetchUnit.invalidateTlb = invalidateTlb;
     end
 
+    // LoadStoreUnit
+    always_comb begin
+        memAddr = intResult;
+        storeRegValue = srcIntRegValue2;
+
+        loadStoreUnit.addr = memAddr;
+        loadStoreUnit.enable = valid && (op.isLoad || op.isStore || op.isFence || op.isAtomic) && !prevStage.trapInfo.valid;
+        loadStoreUnit.invalidateTlb = valid && op.isFence && op.fenceType == FenceType_Vma;
+        loadStoreUnit.loadStoreType = op.loadStoreType;
+        loadStoreUnit.atomicType = op.atomicType;
+        loadStoreUnit.storeRegValue = storeRegValue;
+        loadStoreUnit.command = getLoadStoreUnitCommand(op);
+    end
+    
+    // PipelineController
+    always_comb begin
+        ctrl.exStallReq = (enableMulDiv && !doneMulDiv) || (loadStoreUnit.enable && !loadStoreUnit.done);
+        ctrl.flushReq = valid && !ctrl.exStallReq && (
+            (op.isBranch && branchTaken) ||
+            op.csrWriteEnable ||
+            invalidateICache ||
+            invalidateTlb ||
+            trapInfo.valid ||
+            trapReturn);
+
+        if (op.isBranch && branchTaken) begin
+            ctrl.nextPc = branchTarget;
+        end
+        else begin
+            ctrl.nextPc = prevStage.pc + InsnSize;
+        end
+    end
+
+    // Bypass
     always_comb begin
         intBypass.readAddr1 = prevStage.srcRegAddr1;
         intBypass.readAddr2 = prevStage.srcRegAddr2;
         intBypass.writeAddr = prevStage.dstRegAddr;
         intBypass.writeValue = dstIntRegValue;
-        intBypass.writeEnable = valid && op.regWriteEnable && op.dstRegType == RegType_Int && !(op.isLoad || op.isAtomic) && !ctrl.exStallReq;
+        intBypass.writeEnable = valid && op.regWriteEnable && op.dstRegType == RegType_Int && !ctrl.exStallReq;
 
         fpBypass.readAddr1 = prevStage.srcRegAddr1;
         fpBypass.readAddr2 = prevStage.srcRegAddr2;
         fpBypass.writeAddr = prevStage.dstRegAddr;
         fpBypass.writeValue = dstFpRegValue;
-        fpBypass.writeEnable = valid && op.regWriteEnable && op.dstRegType == RegType_Fp && !(op.isLoad || op.isAtomic) && !ctrl.exStallReq;
+        fpBypass.writeEnable = valid && op.regWriteEnable && op.dstRegType == RegType_Fp && !ctrl.exStallReq;
     end
 
+    // trapInfo
     always_comb begin
-        // trapInfo
         if (prevStage.trapInfo.valid) begin
             trapInfo = prevStage.trapInfo;
         end
@@ -223,6 +299,11 @@ module ExecuteStage(
             trapInfo.value = prevStage.insn;
             trapInfo.cause = ExceptionCode_IllegalInsn;
         end
+        else if (valid && loadStoreUnit.fault) begin
+            trapInfo.valid = 1;
+            trapInfo.value = memAddr;
+            trapInfo.cause = op.isStore ? ExceptionCode_StorePageFault : ExceptionCode_LoadPageFault;
+        end
         else begin
             trapInfo = '0;
         end
@@ -231,7 +312,7 @@ module ExecuteStage(
     end
 
     always_ff @(posedge clk) begin
-        if (rst || ctrl.flush) begin
+        if (rst || ctrl.exStallReq) begin
             nextStage.valid <= '0;
             nextStage.op <= '0;
             nextStage.pc <= '0;
@@ -240,42 +321,6 @@ module ExecuteStage(
             nextStage.dstRegAddr <= '0;
             nextStage.dstIntRegValue <= '0;
             nextStage.dstFpRegValue <= '0;
-            nextStage.memAddr <= '0;
-            nextStage.storeRegValue <= '0;
-            nextStage.branchTaken <= '0;
-            nextStage.branchTarget <= '0;
-            nextStage.trapInfo <= '0;
-            nextStage.trapReturn <= '0;
-            nextStage.debugInsn <= '0;
-        end
-        else if (ctrl.exStall) begin
-            nextStage.valid <= nextStage.valid;
-            nextStage.op <= nextStage.op;
-            nextStage.pc <= nextStage.pc;
-            nextStage.csrAddr <= nextStage.csrAddr;
-            nextStage.dstCsrValue <= nextStage.dstCsrValue;
-            nextStage.dstRegAddr <= nextStage.dstRegAddr;
-            nextStage.dstIntRegValue <= nextStage.dstIntRegValue;
-            nextStage.dstFpRegValue <= nextStage.dstFpRegValue;
-            nextStage.memAddr <= nextStage.memAddr;
-            nextStage.storeRegValue <= nextStage.storeRegValue;
-            nextStage.branchTaken <= nextStage.branchTaken;
-            nextStage.branchTarget <= nextStage.branchTarget;
-            nextStage.trapInfo <= nextStage.trapInfo;
-            nextStage.trapReturn <= nextStage.trapReturn;
-            nextStage.debugInsn <= nextStage.debugInsn;
-        end
-        else if (ctrl.exStallReq) begin
-            nextStage.valid <= '0;
-            nextStage.op <= '0;
-            nextStage.pc <= '0;
-            nextStage.csrAddr <= '0;
-            nextStage.dstCsrValue <= '0;
-            nextStage.dstRegAddr <= '0;
-            nextStage.dstIntRegValue <= '0;
-            nextStage.dstFpRegValue <= '0;
-            nextStage.memAddr <= '0;
-            nextStage.storeRegValue <= '0;
             nextStage.branchTaken <= '0;
             nextStage.branchTarget <= '0;
             nextStage.trapInfo <= '0;
@@ -291,8 +336,6 @@ module ExecuteStage(
             nextStage.dstRegAddr <= prevStage.dstRegAddr;
             nextStage.dstIntRegValue <= dstIntRegValue;
             nextStage.dstFpRegValue <= dstFpRegValue;
-            nextStage.memAddr <= intResult;
-            nextStage.storeRegValue <= srcIntRegValue2;
             nextStage.branchTaken <= branchTaken;
             nextStage.branchTarget <= branchTarget;
             nextStage.trapInfo <= trapInfo;

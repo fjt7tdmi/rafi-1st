@@ -25,10 +25,6 @@ interface IntBypassLogicIF;
     word_t writeValue;
     logic writeEnable;
 
-    reg_addr_t loadWriteAddr;
-    word_t loadWriteValue;
-    logic loadWriteEnable;
-
     reg_addr_t readAddr1;
     reg_addr_t readAddr2;
     word_t readValue1;
@@ -46,9 +42,6 @@ interface IntBypassLogicIF;
         writeAddr,
         writeValue,
         writeEnable,
-        loadWriteAddr,
-        loadWriteValue,
-        loadWriteEnable,
         readAddr1,
         readAddr2
     );
@@ -66,24 +59,12 @@ interface IntBypassLogicIF;
         hit1,
         hit2
     );
-
-    modport MemoryAccessStage(
-    output
-        loadWriteAddr,
-        loadWriteValue,
-        loadWriteEnable
-    );
-
 endinterface
 
 interface FpBypassLogicIF;
     reg_addr_t writeAddr;
     uint64_t writeValue;
     logic writeEnable;
-
-    reg_addr_t loadWriteAddr;
-    uint64_t loadWriteValue;
-    logic loadWriteEnable;
 
     reg_addr_t readAddr1;
     reg_addr_t readAddr2;
@@ -102,9 +83,6 @@ interface FpBypassLogicIF;
         writeAddr,
         writeValue,
         writeEnable,
-        loadWriteAddr,
-        loadWriteValue,
-        loadWriteEnable,
         readAddr1,
         readAddr2
     );
@@ -122,12 +100,4 @@ interface FpBypassLogicIF;
         hit1,
         hit2
     );
-
-    modport MemoryAccessStage(
-    output
-        loadWriteAddr,
-        loadWriteValue,
-        loadWriteEnable
-    );
-
 endinterface

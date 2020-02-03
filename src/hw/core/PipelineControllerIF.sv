@@ -28,10 +28,8 @@ interface PipelineControllerIF;
     logic ifStall;
     logic idStall;
     logic rrStall;
-    logic exStall;
 
     logic exStallReq;
-    logic maStallReq;
 
     modport FetchStage(
     input
@@ -54,14 +52,6 @@ interface PipelineControllerIF;
     modport ExecuteStage(
     output
         exStallReq,
-    input
-        exStall,
-        flush
-    );
-
-    modport MemoryAccessStage(
-    output
-        maStallReq,
         flushReq,
         nextPc
     );
@@ -85,11 +75,9 @@ interface PipelineControllerIF;
         ifStall,
         idStall,
         rrStall,
-        exStall,
         flush,
     input
         exStallReq,
-        maStallReq,
         flushReq
     );
 endinterface

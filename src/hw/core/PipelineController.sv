@@ -28,10 +28,9 @@ module PipelineController(
     always_comb begin
         bus.flush = bus.flushReq;
 
-        bus.ifStall = bus.exStallReq | bus.maStallReq;
-        bus.idStall = bus.exStallReq | bus.maStallReq;
-        bus.rrStall = bus.exStallReq | bus.maStallReq;
-        bus.bypassStall = bus.exStallReq | bus.maStallReq;
-        bus.exStall = bus.maStallReq;
+        bus.ifStall = bus.exStallReq;
+        bus.idStall = bus.exStallReq;
+        bus.rrStall = bus.exStallReq;
+        bus.bypassStall = bus.exStallReq;
     end
 endmodule
