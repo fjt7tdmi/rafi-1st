@@ -52,85 +52,6 @@ function automatic logic BranchComparator(BranchType branchType, word_t src1, wo
     endcase
 endfunction
 
-module ExecuteStage_MulDivUnit(
-    output logic done,
-    output logic [31:0] result,
-    input MulDivType mulDivType,
-    input logic [31:0] src1,
-    input logic [31:0] src2,
-    input logic enable,
-    input logic stall,
-    input logic flush,
-    input logic clk,
-    input logic rst
-);
-    // MulUnit
-    logic mulDone;
-    logic [31:0] mulResult;
-    logic mulHigh;
-    logic mulSrcSigned1;
-    logic mulSrcSigned2;
-
-    MulUnit m_MulUnit(
-        .done(mulDone),
-        .result(mulResult),
-        .high(mulHigh),
-        .srcSigned1(mulSrcSigned1),
-        .srcSigned2(mulSrcSigned2),
-        .src1,
-        .src2,
-        .enable,
-        .stall,
-        .flush,
-        .clk,
-        .rst
-    );
-
-    // DivUnit
-    logic divDone;
-    logic [31:0] quotient;
-    logic [31:0] remnant;
-    logic divSigned;
-
-    DivUnit #(
-        .N(32)
-    ) m_DivUnit (
-        .done(divDone),
-        .quotient,
-        .remnant,
-        .isSigned(divSigned),
-        .dividend(src1),
-        .divisor(src2),
-        .enable,
-        .stall,
-        .flush,
-        .clk,
-        .rst
-    );
-
-    always_comb begin
-        mulHigh = (mulDivType == MulDivType_Mulh || mulDivType == MulDivType_Mulhsu || mulDivType == MulDivType_Mulhu);
-        mulSrcSigned1 = (mulDivType == MulDivType_Mulh || mulDivType == MulDivType_Mulhsu);
-        mulSrcSigned2 = (mulDivType == MulDivType_Mulh);
-        divSigned = (mulDivType == MulDivType_Div || mulDivType == MulDivType_Rem);
-    end
-
-    always_comb begin
-        if (mulDivType == MulDivType_Mul || mulDivType == MulDivType_Mulh || mulDivType == MulDivType_Mulhsu || mulDivType == MulDivType_Mulhu) begin
-            done = mulDone;
-            result = mulResult;
-        end
-        else if (mulDivType == MulDivType_Div || mulDivType == MulDivType_Divu) begin
-            done = divDone;
-            result = quotient;
-        end
-        else begin
-            done = divDone;
-            result = remnant;
-        end
-    end
-endmodule
-
 module ExecuteStage(
     RegReadStageIF.NextStage prevStage,
     ExecuteStageIF.ThisStage nextStage,
@@ -173,7 +94,7 @@ module ExecuteStage(
     logic trapReturn;
 
     // Modules
-    ExecuteStage_MulDivUnit m_MulDivUnit(
+    MulDivUnit m_MulDivUnit(
         .done(doneMulDiv),
         .result(intResultMulDiv),
         .mulDivType(op.mulDivType),
