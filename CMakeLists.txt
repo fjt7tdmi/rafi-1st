@@ -565,8 +565,6 @@ if (verilator_FOUND)
         src/hw/core/ExecuteStageIF.sv
         src/hw/core/FetchStage.sv
         src/hw/core/FetchStageIF.sv
-        src/hw/core/MemoryAccessStage.sv
-        src/hw/core/MemoryAccessStageIF.sv
         src/hw/core/MulDivUnit.sv
         src/hw/core/PipelineController.sv
         src/hw/core/PipelineControllerIF.sv

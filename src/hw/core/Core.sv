@@ -45,7 +45,6 @@ module Core (
     DecodeStageIF m_DecodeStageIF();
     RegReadStageIF m_RegReadStageIF();
     ExecuteStageIF m_ExecuteStageIF();
-    MemoryAccessStageIF m_MemoryAccessStageIF();
     PipelineControllerIF m_PipelineControllerIF();
     IntRegFileIF m_IntRegFileIF();
     FpRegFileIF m_FpRegFileIF();
@@ -101,14 +100,8 @@ module Core (
         .clk,
         .rst(rstInternal)
     );
-    MemoryAccessStage m_MemoryAccessStage(
-        .prevStage(m_ExecuteStageIF.NextStage),
-        .nextStage(m_MemoryAccessStageIF.ThisStage),
-        .clk,
-        .rst(rstInternal)
-    );
     RegWriteStage m_RegWriteStage(
-        .prevStage(m_MemoryAccessStageIF.NextStage),
+        .prevStage(m_ExecuteStageIF.NextStage),
         .csr(m_CsrIF.RegWriteStage),
         .intRegFile(m_IntRegFileIF.RegWriteStage),
         .fpRegFile(m_FpRegFileIF.RegWriteStage),

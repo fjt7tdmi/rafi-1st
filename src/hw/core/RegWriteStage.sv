@@ -22,7 +22,7 @@ import OpTypes::*;
 import ProcessorTypes::*;
 
 module RegWriteStage(
-    MemoryAccessStageIF.NextStage prevStage,
+    ExecuteStageIF.NextStage prevStage,
     CsrIF.RegWriteStage csr,
     IntRegFileIF.RegWriteStage intRegFile,
     FpRegFileIF.RegWriteStage fpRegFile,
