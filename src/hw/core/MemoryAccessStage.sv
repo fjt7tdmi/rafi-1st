@@ -22,6 +22,30 @@ import OpTypes::*;
 import ProcessorTypes::*;
 import LoadStoreUnitTypes::*;
 
+function automatic LoadStoreUnitCommand getLoadStoreUnitCommand(Op op);
+    if (op.isLoad) begin
+        return LoadStoreUnitCommand_Load;
+    end
+    else if (op.isStore) begin
+        return LoadStoreUnitCommand_Store;
+    end
+    else if (op.isFence && (op.fenceType == FenceType_I || op.fenceType == FenceType_Vma)) begin
+        return LoadStoreUnitCommand_Invalidate;
+    end
+    else if (op.isAtomic && op.atomicType == AtomicType_LoadReserved) begin
+        return LoadStoreUnitCommand_LoadReserved;
+    end
+    else if (op.isAtomic && op.atomicType == AtomicType_StoreConditional) begin
+        return LoadStoreUnitCommand_StoreConditional;
+    end
+    else if (op.isAtomic) begin
+        return LoadStoreUnitCommand_AtomicMemOp;
+    end
+    else begin
+        return LoadStoreUnitCommand_None;
+    end
+endfunction
+
 module MemoryAccessStage(
     ExecuteStageIF.NextStage prevStage,
     MemoryAccessStageIF.ThisStage nextStage,
@@ -71,28 +95,7 @@ module MemoryAccessStage(
         loadStoreUnit.loadStoreType = op.loadStoreType;
         loadStoreUnit.atomicType = op.atomicType;
         loadStoreUnit.storeRegValue = prevStage.storeRegValue;
-
-        if (op.isLoad) begin
-            loadStoreUnit.command = LoadStoreUnitCommand_Load;
-        end
-        else if (op.isStore) begin
-            loadStoreUnit.command = LoadStoreUnitCommand_Store;
-        end
-        else if (op.isFence && (op.fenceType == FenceType_I || op.fenceType == FenceType_Vma)) begin
-            loadStoreUnit.command = LoadStoreUnitCommand_Invalidate;
-        end
-        else if (op.isAtomic && op.atomicType == AtomicType_LoadReserved) begin
-            loadStoreUnit.command = LoadStoreUnitCommand_LoadReserved;
-        end
-        else if (op.isAtomic && op.atomicType == AtomicType_StoreConditional) begin
-            loadStoreUnit.command = LoadStoreUnitCommand_StoreConditional;
-        end
-        else if (op.isAtomic) begin
-            loadStoreUnit.command = LoadStoreUnitCommand_AtomicMemOp;
-        end
-        else begin
-            loadStoreUnit.command = LoadStoreUnitCommand_None;
-        end
+        loadStoreUnit.command = getLoadStoreUnitCommand(op);
     end
 
     always_comb begin
