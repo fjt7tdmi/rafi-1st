@@ -143,6 +143,7 @@ function automatic Op DecodeRV32I(insn_t insn);
     op.mulDivType = MulDivType_Mul; // unused
     op.intRegWriteSrcType = IntRegWriteSrcType_Result;
     op.intResultType = IntResultType_Alu;
+    op.storeSrcType = StoreSrcType_Int;
     op.trapOpType = TrapOpType_Ecall;
     op.trapReturnPrivilege = Privilege_User;
     op.dstRegType = RegType_Int;
@@ -397,6 +398,7 @@ function automatic Op DecodeRV32M(insn_t insn);
     op.mulDivType = mulDivType;
     op.intRegWriteSrcType = IntRegWriteSrcType_Result;
     op.intResultType = IntResultType_MulDiv;
+    op.storeSrcType = '0;
     op.trapOpType = TrapOpType_Ebreak;          // unused
     op.trapReturnPrivilege = Privilege_User;    // unused
     op.dstRegType = RegType_Int;
@@ -446,6 +448,7 @@ function automatic Op DecodeRV32A(insn_t insn);
     op.mulDivType = MulDivType_Mul;             // unused
     op.intRegWriteSrcType = IntRegWriteSrcType_Memory;
     op.intResultType = IntResultType_Alu;       // unused
+    op.storeSrcType = '0;
     op.trapOpType = TrapOpType_Ebreak;          // unused
     op.trapReturnPrivilege = Privilege_User;    // unused
     op.dstRegType = RegType_Int;
@@ -468,6 +471,7 @@ endfunction
 function automatic Op DecodeRV32F(insn_t insn);
     logic [6:0] funct7 = insn[31:25];
     logic [4:0] rs2 = insn[24:20];
+    logic [2:0] funct3 = insn[14:12];
     logic [2:0] rm = insn[14:12];
     logic [6:0] opcode = insn[6:0];
 
@@ -484,6 +488,7 @@ function automatic Op DecodeRV32F(insn_t insn);
     op.mulDivType = '0;
     op.intRegWriteSrcType = '0;
     op.intResultType = IntResultType_Fp32;
+    op.storeSrcType = StoreSrcType_Fp;
     op.trapOpType = '0;
     op.trapReturnPrivilege = '0;
     op.dstRegType = '0;
@@ -501,6 +506,38 @@ function automatic Op DecodeRV32F(insn_t insn);
     op.regWriteEnable = 0;
 
     unique case (opcode)
+    7'b0000111: begin
+        if (funct3 == 3'b010) begin
+            // FLW
+            op.aluSrcType1 = AluSrcType1_Reg;
+            op.aluSrcType2 = AluSrcType2_Imm;
+            op.intRegWriteSrcType = IntRegWriteSrcType_Memory;
+            op.intResultType = IntResultType_Alu;
+            op.loadStoreType = LoadStoreType_Word;
+            op.imm = sext12(insn[31:20]);
+            op.isLoad = 1;
+            op.regWriteEnable = 1;
+            op.dstRegType = RegType_Fp;
+        end
+        else begin
+            op.isUnknown = 1;
+        end
+    end
+    7'b0100111: begin
+        if (funct3 == 3'b010) begin
+            // FSW
+            op.aluSrcType1 = AluSrcType1_Reg;
+            op.aluSrcType2 = AluSrcType2_Imm;
+            op.intResultType = IntResultType_Alu;
+            op.loadStoreType = LoadStoreType_Word;
+            op.imm = sext12({insn[31:25], insn[11:7]});
+            op.isStore = 1;
+            op.dstRegType = RegType_Fp;
+        end
+        else begin
+            op.isUnknown = 1;
+        end
+    end
     7'b1010011: begin
         if (funct7 == 7'b0010000 && rm == 3'b000) begin
             // FSGNJ.S
