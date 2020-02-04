@@ -270,6 +270,7 @@ add_library(librafi_trace
     include/rafi/trace/TraceShortPrinter.h
     include/rafi/trace/TraceTextPrinter.h
     include/rafi/trace/TraceTextReader.h
+    include/rafi/trace/TraceUtil.h
     src/lib/op/OpDecoder.cpp
     src/lib/op/RV32I.cpp
     src/lib/op/RV32M.cpp
@@ -306,6 +307,7 @@ add_library(librafi_trace
     src/lib/trace/TraceShortPrinter.cpp
     src/lib/trace/TraceTextPrinter.cpp
     src/lib/trace/TraceTextReader.cpp
+    src/lib/trace/TraceUtil.cpp
 )
 
 # =========================================================================
@@ -331,8 +333,6 @@ add_library(librafi_emu
 #
 add_executable(rafi-check-io
     src/bin/rafi-check-io/Main.cpp
-    src/bin/util/TraceUtil.cpp
-    src/bin/util/TraceUtil.h
 )
 
 include_directories(rafi-check-io include)
@@ -349,8 +349,6 @@ target_link_libraries(rafi-check-io
 #
 add_executable(rafi-conv
     src/bin/rafi-conv/Main.cpp
-    src/bin/util/TraceUtil.cpp
-    src/bin/util/TraceUtil.h
 )
 
 include_directories(rafi-conv include)
@@ -371,8 +369,6 @@ add_executable(rafi-diff
     src/bin/rafi-diff/CommandLineOption.h
     src/bin/rafi-diff/CycleComparator.cpp
     src/bin/rafi-diff/CycleComparator.h
-    src/bin/util/TraceUtil.cpp
-    src/bin/util/TraceUtil.h
 )
 
 include_directories(rafi-diff include)
@@ -393,8 +389,6 @@ add_executable(rafi-dump
     src/bin/rafi-dump/CycleFilter.cpp
     src/bin/rafi-dump/CycleFilter.h
     src/bin/rafi-dump/Main.cpp
-    src/bin/util/TraceUtil.cpp
-    src/bin/util/TraceUtil.h
 )
 
 include_directories(rafi-dump include)

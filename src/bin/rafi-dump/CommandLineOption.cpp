@@ -19,7 +19,7 @@
 
 #include <boost/program_options.hpp>
 
-#include <rafi/common.h>
+#include <rafi/trace.h>
 
 #include "CommandLineOption.h"
 
@@ -69,15 +69,15 @@ CommandLineOption::CommandLineOption(int argc, char** argv)
 
     if (mode.empty() || mode == "short")
     {
-        m_PrinterType = PrinterType::Short;
+        m_PrinterType = trace::PrinterType::Short;
     }
     else if (mode == "json")
     {
-        m_PrinterType = PrinterType::Json;
+        m_PrinterType = trace::PrinterType::Json;
     }
     else if (mode == "text")
     {
-        m_PrinterType = PrinterType::Text;
+        m_PrinterType = trace::PrinterType::Text;
     }
     else
     {
@@ -86,7 +86,7 @@ CommandLineOption::CommandLineOption(int argc, char** argv)
     }
 }
 
-PrinterType CommandLineOption::GetPrinterType() const
+trace::PrinterType CommandLineOption::GetPrinterType() const
 {
     return m_PrinterType;
 }

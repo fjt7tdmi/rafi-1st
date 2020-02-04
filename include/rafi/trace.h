@@ -40,3 +40,4 @@
 #include "trace/TraceShortPrinter.h"
 #include "trace/TraceJsonPrinter.h"
 #include "trace/TraceTextPrinter.h"
+#include "trace/TraceUtil.h"

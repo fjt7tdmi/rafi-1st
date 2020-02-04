@@ -22,8 +22,6 @@
 
 #include <rafi/trace.h>
 
-#include "../util/TraceUtil.h"
-
 #include "CommandLineOption.h"
 #include "CycleComparator.h"
 
@@ -101,8 +99,8 @@ int main(int argc, char** argv)
 {
     rafi::CommandLineOption option(argc, argv);
 
-    auto expect = rafi::MakeTraceReader(option.GetExpectPath());
-    auto actual = rafi::MakeTraceReader(option.GetActualPath());
+    auto expect = rafi::trace::MakeTraceReader(option.GetExpectPath());
+    auto actual = rafi::trace::MakeTraceReader(option.GetActualPath());
 
     try
     {

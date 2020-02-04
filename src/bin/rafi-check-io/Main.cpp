@@ -22,8 +22,6 @@
 
 #include <rafi/trace.h>
 
-#include "../util/TraceUtil.h"
-
 namespace rafi {
 
 namespace {
@@ -53,7 +51,7 @@ bool CheckIo(const char* name, const char* path)
 {
     try
     {
-        auto reader = MakeTraceReader(path);
+        auto reader = trace::MakeTraceReader(path);
 
         // Find IoNode
         const auto hostIoValue = GetLastHostIoValue(reader.get());
