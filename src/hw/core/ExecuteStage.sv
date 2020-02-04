@@ -93,7 +93,6 @@ module ExecuteStage(
     Op op;
 
     logic enableMulDiv;
-
     logic doneMulDiv;
 
     word_t srcIntRegValue1;
@@ -159,6 +158,16 @@ module ExecuteStage(
         enableMulDiv = valid && (op.intResultType == IntResultType_MulDiv);
     end
 
+    // CSR
+    always_comb begin
+        csr.readAddr = prevStage.csrAddr;
+        csr.readEnable = op.csrReadEnable;
+
+        csr.writeEnable = valid && !trapInfo.valid && op.csrWriteEnable;
+        csr.writeAddr = prevStage.csrAddr;
+        csr.writeValue = intResult;
+    end
+
     // src
     always_comb begin
         srcIntRegValue1 = intBypass.hit1 ? intBypass.readValue1 : prevStage.srcIntRegValue1;
@@ -172,7 +181,7 @@ module ExecuteStage(
         AluSrcType1_Zero: aluSrc1 = '0;
         AluSrcType1_Pc: aluSrc1 = prevStage.pc;
         AluSrcType1_Reg: aluSrc1 = srcIntRegValue1;
-        AluSrcType1_Csr: aluSrc1 = prevStage.srcCsrValue;
+        AluSrcType1_Csr: aluSrc1 = csr.readValue;
         default: aluSrc1 = '0;
         endcase
 
@@ -181,7 +190,7 @@ module ExecuteStage(
         AluSrcType2_Zero: aluSrc2 = '0;
         AluSrcType2_Imm: aluSrc2 = op.imm;
         AluSrcType2_Reg: aluSrc2 = srcIntRegValue2;
-        AluSrcType2_Csr: aluSrc2 = prevStage.srcCsrValue;
+        AluSrcType2_Csr: aluSrc2 = csr.readValue;
         default: aluSrc2 = '0;
         endcase
     end
@@ -207,7 +216,7 @@ module ExecuteStage(
         IntRegWriteSrcType_Result:  dstIntRegValue = intResult;
         IntRegWriteSrcType_NextPc:  dstIntRegValue = prevStage.pc + InsnSize;
         IntRegWriteSrcType_Memory:  dstIntRegValue = loadStoreUnit.result;
-        IntRegWriteSrcType_Csr:     dstIntRegValue = prevStage.srcCsrValue;
+        IntRegWriteSrcType_Csr:     dstIntRegValue = csr.readValue;
         default: dstIntRegValue = '0;
         endcase
     end
@@ -287,13 +296,19 @@ module ExecuteStage(
         if (prevStage.trapInfo.valid) begin
             trapInfo = prevStage.trapInfo;
         end
+        else if (valid && csr.readEnable && csr.readIllegal) begin
+            trapInfo.valid = 1;
+            trapInfo.value = prevStage.insn;
+            trapInfo.cause = ExceptionCode_IllegalInsn;
+        end
         else if (valid && op.isTrap && op.trapOpType == TrapOpType_Ecall) begin
             trapInfo.valid = 1;
             trapInfo.value = '0;
+
             unique case (csr.privilege)
-            Privilege_Machine: trapInfo.cause = ExceptionCode_EcallFromMachine;
-            Privilege_Supervisor: trapInfo.cause = ExceptionCode_EcallFromSupervisor;
-            default: trapInfo.cause = ExceptionCode_EcallFromUser;
+            Privilege_Machine:      trapInfo.cause = ExceptionCode_EcallFromMachine;
+            Privilege_Supervisor:   trapInfo.cause = ExceptionCode_EcallFromSupervisor;
+            default:                trapInfo.cause = ExceptionCode_EcallFromUser;
             endcase
         end
         else if (valid && op.isTrap && op.trapOpType == TrapOpType_Ebreak) begin
@@ -324,7 +339,6 @@ module ExecuteStage(
             nextStage.op <= '0;
             nextStage.pc <= '0;
             nextStage.csrAddr <= '0;
-            nextStage.dstCsrValue <= '0;
             nextStage.dstRegAddr <= '0;
             nextStage.dstIntRegValue <= '0;
             nextStage.dstFpRegValue <= '0;
@@ -339,7 +353,6 @@ module ExecuteStage(
             nextStage.op <= prevStage.op;
             nextStage.pc <= prevStage.pc;
             nextStage.csrAddr <= prevStage.csrAddr;
-            nextStage.dstCsrValue <= intResult;
             nextStage.dstRegAddr <= prevStage.dstRegAddr;
             nextStage.dstIntRegValue <= dstIntRegValue;
             nextStage.dstFpRegValue <= dstFpRegValue;

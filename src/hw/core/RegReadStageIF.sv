@@ -27,7 +27,6 @@ interface RegReadStageIF;
     addr_t pc;
     insn_t insn;
     csr_addr_t csrAddr;
-    word_t srcCsrValue;
     reg_addr_t srcRegAddr1;
     reg_addr_t srcRegAddr2;
     reg_addr_t dstRegAddr;
@@ -44,7 +43,6 @@ interface RegReadStageIF;
         pc,
         insn,
         csrAddr,
-        srcCsrValue,
         srcRegAddr1,
         srcRegAddr2,
         srcIntRegValue1,
@@ -62,7 +60,6 @@ interface RegReadStageIF;
         pc,
         insn,
         csrAddr,
-        srcCsrValue,
         srcRegAddr1,
         srcRegAddr2,
         srcIntRegValue1,

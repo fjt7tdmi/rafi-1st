@@ -27,7 +27,6 @@ interface ExecuteStageIF;
     Op op;
 
     csr_addr_t csrAddr;
-    word_t dstCsrValue;
     reg_addr_t dstRegAddr;
     word_t dstIntRegValue;
     uint64_t dstFpRegValue;
@@ -46,7 +45,6 @@ interface ExecuteStageIF;
         pc,
         op,
         csrAddr,
-        dstCsrValue,
         dstRegAddr,
         dstIntRegValue,
         dstFpRegValue,
@@ -63,7 +61,6 @@ interface ExecuteStageIF;
         pc,
         op,
         csrAddr,
-        dstCsrValue,
         dstRegAddr,
         dstIntRegValue,
         dstFpRegValue,
