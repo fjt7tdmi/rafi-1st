@@ -20,8 +20,6 @@
 
 #include <rafi/trace.h>
 
-#include "../util/TraceUtil.h"
-
 namespace rafi { namespace dump {
 
 class CommandLineOption
@@ -29,7 +27,7 @@ class CommandLineOption
 public:
     CommandLineOption(int argc, char** argv);
 
-    PrinterType GetPrinterType() const;
+    trace::PrinterType GetPrinterType() const;
 
     const std::string& GetFilterDescription() const;
     const std::string& GetPath() const;
@@ -39,7 +37,7 @@ public:
     const int GetCycleEnd() const;
 
 private:
-    PrinterType m_PrinterType;
+    trace::PrinterType m_PrinterType;
 
     std::string m_FilterDescription;
     std::string m_Path;

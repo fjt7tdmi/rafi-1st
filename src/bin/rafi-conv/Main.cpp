@@ -19,15 +19,13 @@
 
 #include <rafi/trace.h>
 
-#include "../util/TraceUtil.h"
-
 namespace rafi {
 
 void Convert(const char* inPath, const char* outPathBase)
 {
     try
     {
-        auto reader = MakeTraceReader(inPath);
+        auto reader = trace::MakeTraceReader(inPath);
         auto writer = std::make_unique<trace::TraceIndexWriter>(outPathBase);
 
         while (!reader->IsEnd())

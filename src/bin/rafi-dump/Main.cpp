@@ -24,8 +24,6 @@
 
 #include <rafi/trace.h>
 
-#include "../util/TraceUtil.h"
-
 #include "CommandLineOption.h"
 #include "CycleFilter.h"
 
@@ -50,8 +48,8 @@ XLEN GetXLEN(const std::string& path)
 
 void PrintTrace(const CommandLineOption& option, IFilter* filter)
 {
-    auto reader = rafi::MakeTraceReader(option.GetPath());
-    auto printer = rafi::MakeTracePrinter(option.GetPrinterType(), GetXLEN(option.GetPath()));
+    auto reader = rafi::trace::MakeTraceReader(option.GetPath());
+    auto printer = rafi::trace::MakeTracePrinter(option.GetPrinterType(), GetXLEN(option.GetPath()));
 
     const int begin = option.GetCycleBegin();
     const int end = std::min(option.GetCycleBegin() + option.GetCycleCount(), option.GetCycleEnd());
