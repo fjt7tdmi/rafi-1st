@@ -138,6 +138,12 @@ typedef enum logic [1:0]
 
 typedef enum logic
 {
+    StoreSrcType_Int    = 1'h0,
+    StoreSrcType_Fp     = 1'h1
+} StoreSrcType;
+
+typedef enum logic
+{
     TrapOpType_Ecall    = 1'h0,
     TrapOpType_Ebreak   = 1'h1
 } TrapOpType;
@@ -155,6 +161,7 @@ typedef struct packed
     MulDivType mulDivType;
     IntRegWriteSrcType intRegWriteSrcType;
     IntResultType intResultType;
+    StoreSrcType storeSrcType;
     TrapOpType trapOpType;
     Privilege trapReturnPrivilege;
     RegType dstRegType;

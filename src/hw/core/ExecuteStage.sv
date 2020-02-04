@@ -214,7 +214,9 @@ module ExecuteStage(
 
     // dstFpRegValue
     always_comb begin
-        dstFpRegValue = {32'h0, fp32Result};
+        dstFpRegValue = op.isLoad
+            ? {32'h0, loadStoreUnit.result}
+            : {32'h0, fp32Result};
     end
 
     // FetchUnit
@@ -230,7 +232,12 @@ module ExecuteStage(
     // LoadStoreUnit
     always_comb begin
         memAddr = intResult;
-        storeRegValue = srcIntRegValue2;
+        
+        unique case (op.storeSrcType)
+        StoreSrcType_Int:   storeRegValue = srcIntRegValue2;
+        StoreSrcType_Fp:    storeRegValue = srcFpRegValue2[31:0];
+        default:            storeRegValue = '0;
+        endcase
 
         loadStoreUnit.addr = memAddr;
         loadStoreUnit.enable = valid && (op.isLoad || op.isStore || op.isFence || op.isAtomic) && !prevStage.trapInfo.valid;
