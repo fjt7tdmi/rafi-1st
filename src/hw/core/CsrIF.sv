@@ -92,6 +92,9 @@ interface CsrIF;
     output
         readAddr,
         readEnable,
+        writeValue,
+        writeAddr,
+        writeEnable,
     input
         privilege,
         trapSupervisorReturn,
@@ -101,9 +104,6 @@ interface CsrIF;
 
     modport RegWriteStage(
     output
-        writeValue,
-        writeAddr,
-        writeEnable,
         trapInfo,
         trapPc,
         trapReturn,

@@ -162,6 +162,10 @@ module ExecuteStage(
     always_comb begin
         csr.readAddr = prevStage.csrAddr;
         csr.readEnable = op.csrReadEnable;
+
+        csr.writeEnable = valid && !trapInfo.valid && op.csrWriteEnable;
+        csr.writeAddr = prevStage.csrAddr;
+        csr.writeValue = intResult;
     end
 
     // src
@@ -294,17 +298,17 @@ module ExecuteStage(
         end
         else if (valid && csr.readEnable && csr.readIllegal) begin
             trapInfo.valid = 1;
-            trapInfo.cause = ExceptionCode_IllegalInsn;
             trapInfo.value = prevStage.insn;
+            trapInfo.cause = ExceptionCode_IllegalInsn;
         end
         else if (valid && op.isTrap && op.trapOpType == TrapOpType_Ecall) begin
             trapInfo.valid = 1;
             trapInfo.value = '0;
 
             unique case (csr.privilege)
-            Privilege_Machine: trapInfo.cause = ExceptionCode_EcallFromMachine;
-            Privilege_Supervisor: trapInfo.cause = ExceptionCode_EcallFromSupervisor;
-            default: trapInfo.cause = ExceptionCode_EcallFromUser;
+            Privilege_Machine:      trapInfo.cause = ExceptionCode_EcallFromMachine;
+            Privilege_Supervisor:   trapInfo.cause = ExceptionCode_EcallFromSupervisor;
+            default:                trapInfo.cause = ExceptionCode_EcallFromUser;
             endcase
         end
         else if (valid && op.isTrap && op.trapOpType == TrapOpType_Ebreak) begin
@@ -335,7 +339,6 @@ module ExecuteStage(
             nextStage.op <= '0;
             nextStage.pc <= '0;
             nextStage.csrAddr <= '0;
-            nextStage.dstCsrValue <= '0;
             nextStage.dstRegAddr <= '0;
             nextStage.dstIntRegValue <= '0;
             nextStage.dstFpRegValue <= '0;
@@ -350,7 +353,6 @@ module ExecuteStage(
             nextStage.op <= prevStage.op;
             nextStage.pc <= prevStage.pc;
             nextStage.csrAddr <= prevStage.csrAddr;
-            nextStage.dstCsrValue <= intResult;
             nextStage.dstRegAddr <= prevStage.dstRegAddr;
             nextStage.dstIntRegValue <= dstIntRegValue;
             nextStage.dstFpRegValue <= dstFpRegValue;

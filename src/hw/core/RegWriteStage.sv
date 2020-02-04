@@ -45,9 +45,6 @@ module RegWriteStage(
     end
 
     always_comb begin
-        csr.writeEnable = commit && op.csrWriteEnable;
-        csr.writeAddr = prevStage.csrAddr;
-        csr.writeValue = prevStage.dstCsrValue;
         csr.trapInfo.valid = valid && prevStage.trapInfo.valid;
         csr.trapInfo.cause = prevStage.trapInfo.cause;
         csr.trapInfo.value = prevStage.trapInfo.value;
