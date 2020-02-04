@@ -71,7 +71,7 @@ protected:
     VDivUnit* m_pTop;
 };
 
-INSTANTIATE_TEST_CASE_P(AllConfig, DivUnitTest, ::testing::ValuesIn(DivUnitConfigs));
+INSTANTIATE_TEST_SUITE_P(AllConfig, DivUnitTest, ::testing::ValuesIn(DivUnitConfigs));
 
 void DoBasicTest(VDivUnit* pTop, const DivUnitConfig& config, uint32_t dividend, uint32_t divisor)
 {

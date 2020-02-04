@@ -80,7 +80,7 @@ protected:
     VMulUnit* m_pTop;
 };
 
-INSTANTIATE_TEST_CASE_P(AllConfig, MulUnitTest, ::testing::ValuesIn(MulUnitConfigs));
+INSTANTIATE_TEST_SUITE_P(AllConfig, MulUnitTest, ::testing::ValuesIn(MulUnitConfigs));
 
 void DoBasicTest(VMulUnit* pTop, const MulUnitConfig& config, uint32_t src1, uint32_t src2)
 {
