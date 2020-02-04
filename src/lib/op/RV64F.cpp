@@ -518,16 +518,16 @@ std::string FCVT_WU_S::ToString() const
     const auto rm = GetRoundingModeName(m_Rm);
     if (rm)
     {
-        std::sprintf(s, "fcvt.wu.s %s,%s",
-            GetIntRegName(m_Rd),
-            GetFpRegName(m_Rs1));
-    }
-    else
-    {
         std::sprintf(s, "fcvt.wu.s %s,%s,%s",
             GetIntRegName(m_Rd),
             GetFpRegName(m_Rs1),
             rm);
+    }
+    else
+    {
+        std::sprintf(s, "fcvt.wu.s %s,%s",
+            GetIntRegName(m_Rd),
+            GetFpRegName(m_Rs1));
     }
 
     return std::string(s);
@@ -676,16 +676,16 @@ std::string FCVT_S_WU::ToString() const
     const auto rm = GetRoundingModeName(m_Rm);
     if (rm)
     {
-        std::sprintf(s, "fcvt.s.wu %s,%s",
-            GetFpRegName(m_Rd),
-            GetIntRegName(m_Rs1));
-    }
-    else
-    {
         std::sprintf(s, "fcvt.s.wu %s,%s,%s",
             GetFpRegName(m_Rd),
             GetIntRegName(m_Rs1),
             rm);
+    }
+    else
+    {
+        std::sprintf(s, "fcvt.s.wu %s,%s",
+            GetFpRegName(m_Rd),
+            GetIntRegName(m_Rs1));
     }
 
     return std::string(s);
@@ -756,16 +756,16 @@ std::string FCVT_LU_S::ToString() const
     const auto rm = GetRoundingModeName(m_Rm);
     if (rm)
     {
-        std::sprintf(s, "fcvt.lu.s %s,%s",
-            GetIntRegName(m_Rd),
-            GetFpRegName(m_Rs1));
-    }
-    else
-    {
         std::sprintf(s, "fcvt.lu.s %s,%s,%s",
             GetIntRegName(m_Rd),
             GetFpRegName(m_Rs1),
             rm);
+    }
+    else
+    {
+        std::sprintf(s, "fcvt.lu.s %s,%s",
+            GetIntRegName(m_Rd),
+            GetFpRegName(m_Rs1));
     }
 
     return std::string(s);
@@ -818,16 +818,16 @@ std::string FCVT_S_LU::ToString() const
     const auto rm = GetRoundingModeName(m_Rm);
     if (rm)
     {
-        std::sprintf(s, "fcvt.s.lu %s,%s",
-            GetFpRegName(m_Rd),
-            GetIntRegName(m_Rs1));
-    }
-    else
-    {
         std::sprintf(s, "fcvt.s.lu %s,%s,%s",
             GetFpRegName(m_Rd),
             GetIntRegName(m_Rs1),
             rm);
+    }
+    else
+    {
+        std::sprintf(s, "fcvt.s.lu %s,%s",
+            GetFpRegName(m_Rd),
+            GetIntRegName(m_Rs1));
     }
 
     return std::string(s);

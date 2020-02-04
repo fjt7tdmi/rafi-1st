@@ -518,16 +518,16 @@ std::string FCVT_D_S::ToString() const
     const auto rm = GetRoundingModeName(m_Rm);
     if (rm)
     {
-        std::sprintf(s, "fcvt.d.s %s,%s",
-            GetFpRegName(m_Rd),
-            GetFpRegName(m_Rs1));
-    }
-    else
-    {
         std::sprintf(s, "fcvt.d.s %s,%s,%s",
             GetFpRegName(m_Rd),
             GetFpRegName(m_Rs1),
             rm);
+    }
+    else
+    {
+        std::sprintf(s, "fcvt.d.s %s,%s",
+            GetFpRegName(m_Rd),
+            GetFpRegName(m_Rs1));
     }
 
     return std::string(s);
@@ -689,16 +689,16 @@ std::string FCVT_D_W::ToString() const
     const auto rm = GetRoundingModeName(m_Rm);
     if (rm)
     {
-        std::sprintf(s, "fcvt.d.w %s,%s",
-            GetFpRegName(m_Rd),
-            GetIntRegName(m_Rs1));
-    }
-    else
-    {
         std::sprintf(s, "fcvt.d.w %s,%s,%s",
             GetFpRegName(m_Rd),
             GetIntRegName(m_Rs1),
             rm);
+    }
+    else
+    {
+        std::sprintf(s, "fcvt.d.w %s,%s",
+            GetFpRegName(m_Rd),
+            GetIntRegName(m_Rs1));
     }
 
     return std::string(s);
@@ -720,16 +720,16 @@ std::string FCVT_D_WU::ToString() const
     const auto rm = GetRoundingModeName(m_Rm);
     if (rm)
     {
-        std::sprintf(s, "fcvt.d.wu %s,%s",
-            GetFpRegName(m_Rd),
-            GetIntRegName(m_Rs1));
-    }
-    else
-    {
         std::sprintf(s, "fcvt.d.wu %s,%s,%s",
             GetFpRegName(m_Rd),
             GetIntRegName(m_Rs1),
             rm);
+    }
+    else
+    {
+        std::sprintf(s, "fcvt.d.wu %s,%s",
+            GetFpRegName(m_Rd),
+            GetIntRegName(m_Rs1));
     }
 
     return std::string(s);
@@ -831,16 +831,16 @@ std::string FCVT_D_L::ToString() const
     const auto rm = GetRoundingModeName(m_Rm);
     if (rm)
     {
-        std::sprintf(s, "fcvt.d.l %s,%s",
-            GetFpRegName(m_Rd),
-            GetIntRegName(m_Rs1));
-    }
-    else
-    {
         std::sprintf(s, "fcvt.d.l %s,%s,%s",
             GetFpRegName(m_Rd),
             GetIntRegName(m_Rs1),
             rm);
+    }
+    else
+    {
+        std::sprintf(s, "fcvt.d.l %s,%s",
+            GetFpRegName(m_Rd),
+            GetIntRegName(m_Rs1));
     }
 
     return std::string(s);
@@ -862,16 +862,16 @@ std::string FCVT_D_LU::ToString() const
     const auto rm = GetRoundingModeName(m_Rm);
     if (rm)
     {
-        std::sprintf(s, "fcvt.d.lu %s,%s",
-            GetFpRegName(m_Rd),
-            GetIntRegName(m_Rs1));
-    }
-    else
-    {
         std::sprintf(s, "fcvt.d.wu %s,%s,%s",
             GetFpRegName(m_Rd),
             GetIntRegName(m_Rs1),
             rm);
+    }
+    else
+    {
+        std::sprintf(s, "fcvt.d.lu %s,%s",
+            GetFpRegName(m_Rd),
+            GetIntRegName(m_Rs1));
     }
 
     return std::string(s);
