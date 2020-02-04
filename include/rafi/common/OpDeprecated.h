@@ -437,6 +437,4 @@ struct Op
 
 const char* GetString(const OpCode& op);
 
-int SNPrintOp(char* buffer, int bufferSize, const Op& op);
-
 }

@@ -17,6 +17,7 @@
 #include <cinttypes>
 #include <cstring>
 
+#include <rafi/op.h>
 #include <rafi/trace.h>
 
 namespace rafi { namespace trace {
@@ -41,6 +42,11 @@ namespace {
 class TraceJsonPrinterImpl
 {
 public:
+    TraceJsonPrinterImpl(XLEN xlen)
+        : m_Decoder(xlen)
+    {
+    }
+
     void Print(const trace::ICycle* pCycle)
     {
         printf("{\n");
@@ -59,6 +65,8 @@ public:
     }
 
 private:
+    rafi::OpDecoder m_Decoder;
+
     void PrintPc(const trace::ICycle* pCycle) const
     {
         printf(
@@ -193,17 +201,12 @@ private:
 
     void PrintOpEvent(const trace::ICycle* pCycle) const
     {
-        Decoder decoder(pCycle->GetXLEN());
-
         for (int i = 0; i < pCycle->GetOpEventCount(); i++)
         {
             OpEvent e;
             pCycle->CopyOpEvent(&e, i);
 
-            auto op = decoder.Decode(e.insn);
-
-            char opStr[64];
-            SNPrintOp(opStr, sizeof(opStr), op);
+            auto op = m_Decoder.Decode(e.insn);
 
             printf(
                 "  Op {\n"
@@ -211,7 +214,7 @@ private:
                 "    priv:  %s\n"
                 "  }\n",
                 e.insn,
-                opStr,
+                op->ToString().c_str(),
                 GetString(e.priv)
             );
         }
@@ -268,9 +271,9 @@ private:
     uint64_t m_Cycle{ 0 };
 };
 
-TraceJsonPrinter::TraceJsonPrinter()
+TraceJsonPrinter::TraceJsonPrinter(XLEN xlen)
 {
-    m_pImpl = new TraceJsonPrinterImpl();
+    m_pImpl = new TraceJsonPrinterImpl(xlen);
 }
 
 TraceJsonPrinter::~TraceJsonPrinter()

@@ -3889,10 +3889,7 @@ void Executor::UpdateFpCsr()
 [[noreturn]]
 void Executor::Error(const Op& op)
 {
-    char opDescription[1024];
-    SNPrintOp(opDescription, sizeof(opDescription), op);
-
-    fprintf(stderr, "[Executor::Error] Unable to handle Op: %s\n", opDescription);
+    fprintf(stderr, "[Executor::Error] Unable to handle Op: %s\n", GetString(op.opCode));
 
     std::exit(1);
 }

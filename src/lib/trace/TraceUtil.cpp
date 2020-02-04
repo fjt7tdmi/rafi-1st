@@ -47,7 +47,7 @@ std::unique_ptr<trace::ITracePrinter> MakeTracePrinter(PrinterType printerType, 
         case PrinterType::Text:
             return std::make_unique<trace::TraceTextPrinter>();
         case PrinterType::Json:
-            return std::make_unique<trace::TraceJsonPrinter>();
+            return std::make_unique<trace::TraceJsonPrinter>(xlen);
         case PrinterType::Short:
             return std::make_unique<trace::TraceShortPrinter>(xlen);
         default:
