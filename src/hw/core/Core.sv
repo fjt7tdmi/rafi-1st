@@ -82,7 +82,6 @@ module Core (
         .prevStage(m_DecodeStageIF.NextStage),
         .nextStage(m_RegReadStageIF.ThisStage),
         .ctrl(m_PipelineControllerIF.RegReadStage),
-        .csr(m_CsrIF.RegReadStage),
         .intRegFile(m_IntRegFileIF.RegReadStage),
         .fpRegFile(m_FpRegFileIF.RegReadStage),
         .clk,

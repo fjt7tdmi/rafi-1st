@@ -93,7 +93,6 @@ module ExecuteStage(
     Op op;
 
     logic enableMulDiv;
-
     logic doneMulDiv;
 
     word_t srcIntRegValue1;
@@ -159,6 +158,12 @@ module ExecuteStage(
         enableMulDiv = valid && (op.intResultType == IntResultType_MulDiv);
     end
 
+    // CSR
+    always_comb begin
+        csr.readAddr = prevStage.csrAddr;
+        csr.readEnable = op.csrReadEnable;
+    end
+
     // src
     always_comb begin
         srcIntRegValue1 = intBypass.hit1 ? intBypass.readValue1 : prevStage.srcIntRegValue1;
@@ -172,7 +177,7 @@ module ExecuteStage(
         AluSrcType1_Zero: aluSrc1 = '0;
         AluSrcType1_Pc: aluSrc1 = prevStage.pc;
         AluSrcType1_Reg: aluSrc1 = srcIntRegValue1;
-        AluSrcType1_Csr: aluSrc1 = prevStage.srcCsrValue;
+        AluSrcType1_Csr: aluSrc1 = csr.readValue;
         default: aluSrc1 = '0;
         endcase
 
@@ -181,7 +186,7 @@ module ExecuteStage(
         AluSrcType2_Zero: aluSrc2 = '0;
         AluSrcType2_Imm: aluSrc2 = op.imm;
         AluSrcType2_Reg: aluSrc2 = srcIntRegValue2;
-        AluSrcType2_Csr: aluSrc2 = prevStage.srcCsrValue;
+        AluSrcType2_Csr: aluSrc2 = csr.readValue;
         default: aluSrc2 = '0;
         endcase
     end
@@ -207,7 +212,7 @@ module ExecuteStage(
         IntRegWriteSrcType_Result:  dstIntRegValue = intResult;
         IntRegWriteSrcType_NextPc:  dstIntRegValue = prevStage.pc + InsnSize;
         IntRegWriteSrcType_Memory:  dstIntRegValue = loadStoreUnit.result;
-        IntRegWriteSrcType_Csr:     dstIntRegValue = prevStage.srcCsrValue;
+        IntRegWriteSrcType_Csr:     dstIntRegValue = csr.readValue;
         default: dstIntRegValue = '0;
         endcase
     end
@@ -287,9 +292,15 @@ module ExecuteStage(
         if (prevStage.trapInfo.valid) begin
             trapInfo = prevStage.trapInfo;
         end
+        else if (valid && csr.readEnable && csr.readIllegal) begin
+            trapInfo.valid = 1;
+            trapInfo.cause = ExceptionCode_IllegalInsn;
+            trapInfo.value = prevStage.insn;
+        end
         else if (valid && op.isTrap && op.trapOpType == TrapOpType_Ecall) begin
             trapInfo.valid = 1;
             trapInfo.value = '0;
+
             unique case (csr.privilege)
             Privilege_Machine: trapInfo.cause = ExceptionCode_EcallFromMachine;
             Privilege_Supervisor: trapInfo.cause = ExceptionCode_EcallFromSupervisor;

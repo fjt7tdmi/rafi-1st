@@ -25,7 +25,6 @@ module RegReadStage(
     DecodeStageIF.NextStage prevStage,
     RegReadStageIF.ThisStage nextStage,
     PipelineControllerIF.RegReadStage ctrl,
-    CsrIF.RegReadStage csr,
     IntRegFileIF.RegReadStage intRegFile,
     FpRegFileIF.RegReadStage fpRegFile,
     input   logic clk,
@@ -37,8 +36,6 @@ module RegReadStage(
         intRegFile.readAddr2 = prevStage.srcRegAddr2;
         fpRegFile.readAddr1 = prevStage.srcRegAddr1;
         fpRegFile.readAddr2 = prevStage.srcRegAddr2;
-        csr.readAddr = prevStage.csrAddr;
-        csr.readEnable = prevStage.op.csrReadEnable;
     end
 
     always_ff @(posedge clk) begin
@@ -48,7 +45,6 @@ module RegReadStage(
             nextStage.pc <= '0;
             nextStage.insn <= '0;
             nextStage.csrAddr <= '0;
-            nextStage.srcCsrValue <= '0;
             nextStage.srcRegAddr1 <= '0;
             nextStage.srcRegAddr2 <= '0;
             nextStage.srcIntRegValue1 <= '0;
@@ -64,7 +60,6 @@ module RegReadStage(
             nextStage.pc <= nextStage.pc;
             nextStage.insn <= nextStage.insn;
             nextStage.csrAddr <= nextStage.csrAddr;
-            nextStage.srcCsrValue <= nextStage.srcCsrValue;
             nextStage.srcRegAddr1 <= nextStage.srcRegAddr1;
             nextStage.srcRegAddr2 <= nextStage.srcRegAddr2;
             nextStage.srcIntRegValue1 <= nextStage.srcIntRegValue1;
@@ -80,7 +75,6 @@ module RegReadStage(
             nextStage.pc <= prevStage.pc;
             nextStage.insn <= prevStage.insn;
             nextStage.csrAddr <= prevStage.csrAddr;
-            nextStage.srcCsrValue <= csr.readValue;
             nextStage.srcRegAddr1 <= prevStage.srcRegAddr1;
             nextStage.srcRegAddr2 <= prevStage.srcRegAddr2;
             nextStage.dstRegAddr <= prevStage.dstRegAddr;
@@ -88,15 +82,7 @@ module RegReadStage(
             nextStage.srcIntRegValue2 <= intRegFile.readValue2;
             nextStage.srcFpRegValue1 <= fpRegFile.readValue1;
             nextStage.srcFpRegValue2 <= fpRegFile.readValue2;
-
-            if (!prevStage.trapInfo.valid && csr.readIllegal) begin
-                nextStage.trapInfo.valid <= 1;
-                nextStage.trapInfo.cause <= ExceptionCode_IllegalInsn;
-                nextStage.trapInfo.value <= prevStage.insn;
-            end
-            else begin
-                nextStage.trapInfo <= prevStage.trapInfo;
-            end
+            nextStage.trapInfo <= prevStage.trapInfo;
         end
     end
 

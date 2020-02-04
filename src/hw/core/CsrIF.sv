@@ -88,19 +88,15 @@ interface CsrIF;
         trapInfo
     );
 
-    modport RegReadStage(
+    modport ExecuteStage(
     output
         readAddr,
         readEnable,
     input
+        privilege,
+        trapSupervisorReturn,
         readValue,
         readIllegal
-    );
-
-    modport ExecuteStage(
-    input
-        privilege,
-        trapSupervisorReturn
     );
 
     modport RegWriteStage(
