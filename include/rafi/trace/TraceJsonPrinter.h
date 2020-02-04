@@ -27,7 +27,7 @@ class TraceJsonPrinterImpl;
 class TraceJsonPrinter : public ITracePrinter
 {
 public:
-    TraceJsonPrinter();
+    TraceJsonPrinter(XLEN xlen);
     virtual ~TraceJsonPrinter();
 
     virtual void Print(const ICycle* cycle) override;

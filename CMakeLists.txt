@@ -491,7 +491,6 @@ add_executable(rafi-emu-test
     src/bin/rafi-emu/gdb/GdbUtil.cpp
     src/bin/rafi-emu/gdb/GdbUtil.h
     src/bin/rafi-emu-test/GdbTest.cpp
-    src/bin/rafi-emu-test/OpGetStringTest.cpp
     src/bin/rafi-emu-test/StubEmulator.cpp
     src/bin/rafi-emu-test/StubEmulator.h
     src/bin/rafi-emu-test/TextTraceTest.cpp
