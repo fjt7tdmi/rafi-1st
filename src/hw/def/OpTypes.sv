@@ -102,6 +102,15 @@ typedef enum logic [2:0]
 
 typedef enum logic [2:0]
 {
+    FpComparatorCommand_Eq    = 3'h1,
+    FpComparatorCommand_Lt    = 3'h2,
+    FpComparatorCommand_Le    = 3'h3,
+    FpComparatorCommand_Min   = 3'h4,
+    FpComparatorCommand_Max   = 3'h5
+} FpComparatorCommand;
+
+typedef enum logic [2:0]
+{
     LoadStoreType_Byte              = 3'b000,
     LoadStoreType_HalfWord          = 3'b001,
     LoadStoreType_Word              = 3'b010,
