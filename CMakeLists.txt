@@ -592,6 +592,34 @@ if (verilator_FOUND)
     )
 
     # =========================================================================
+    # rafi-vtest-fp-comparator
+    #
+    add_executable(rafi-vtest-fp-comparator
+        src/hw/fp/FpComparatorTest.cpp
+    )
+    verilate(rafi-vtest-fp-comparator
+        PREFIX VFpComparator
+        THREADS 1
+        TRACE
+        SOURCES
+        src/hw/def/BasicTypes.sv
+        src/hw/def/RvTypes.sv
+        src/hw/def/Rv32Types.sv
+        src/hw/def/OpTypes.sv
+        src/hw/fp/FpComparator.sv
+    )
+    target_link_libraries(rafi-vtest-fp-comparator
+        PRIVATE ${GoogleTest_LIBRARIES}
+    )
+
+    # disable warnings for verilator
+    if (MSVC)
+        target_compile_options(rafi-vtest-fp-comparator
+            PUBLIC /wd"4267"
+        )
+    endif()
+
+    # =========================================================================
     # rafi-vtest-mul
     #
     add_executable(rafi-vtest-mul
@@ -619,7 +647,7 @@ if (verilator_FOUND)
     endif()
 
     # =========================================================================
-    # rafi-vtest-mul
+    # rafi-vtest-div
     #
     add_executable(rafi-vtest-div
         src/hw/div/DivUnitTest.cpp
