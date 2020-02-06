@@ -48,6 +48,7 @@ module FpComparator #(
         value[WIDTH-1] = '0;
         value[WIDTH-2:FRACTION_WIDTH-1] = '1;
         value[FRACTION_WIDTH-2:0] = '0;
+        return value;
     endfunction
 
     function automatic logic unsigned [WIDTH-1:0] get_canonical_signaling_nan();
@@ -56,6 +57,7 @@ module FpComparator #(
         value[WIDTH-2:FRACTION_WIDTH] = '1;
         value[FRACTION_WIDTH-1:1] = '0;
         value[0] = '1;
+        return value;
     endfunction
 
     logic sign1;
@@ -84,8 +86,8 @@ module FpComparator #(
         is_zero2 = exponent2 == '0 && fraction2 != '0;
         is_nan1 = exponent1 == '1 && fraction1 != '0;
         is_nan2 = exponent2 == '1 && fraction2 != '0;
-        is_signaling_nan1 = is_nan1 && fraction1[FRACTION_WIDTH-1];
-        is_signaling_nan2 = is_nan2 && fraction2[FRACTION_WIDTH-1];
+        is_signaling_nan1 = is_nan1 && fraction1[FRACTION_WIDTH-1] == '0;
+        is_signaling_nan2 = is_nan2 && fraction2[FRACTION_WIDTH-1] == '0;
     end
 
     logic sign_eq;
