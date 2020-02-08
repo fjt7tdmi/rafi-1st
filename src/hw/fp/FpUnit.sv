@@ -39,6 +39,7 @@ typedef struct packed {
 module Fp32Unit(
     output word_t intResult,
     output uint32_t fpResult,
+    input FpUnitType unit,
     input FpUnitCommand command,
     input word_t intSrc1,
     input word_t intSrc2,
@@ -64,27 +65,43 @@ module Fp32Unit(
         else                                                                            return '0;
     endfunction
 
+    uint32_t fpResultSign;
+    FpSignUnit m_FpSignUnit (
+        .fpResult(fpResultSign),
+        .command(command.sign),
+        .fpSrc1(fpSrc1),
+        .fpSrc2(fpSrc2),
+        .clk(clk),
+        .rst(rst));
+
+    uint32_t intResultCmp;
+    uint32_t fpResultCmp;
+    FpComparator m_FpComparator (
+        .intResult(intResultCmp),
+        .fpResult(fpResultCmp),
+        .command(command.cmp),
+        .fpSrc1(fpSrc1),
+        .fpSrc2(fpSrc2),
+        .clk(clk),
+        .rst(rst));
+
     always_comb begin
-        unique case (command)
-        FpUnitCommand_Move: begin
+        unique case (unit)
+        FpUnitType_Move: begin
             intResult = fpSrc1; // FMV.X.W
             fpResult = intSrc1; // FMV.W.X
         end
-        FpUnitCommand_Sgnj: begin
-            intResult = '0;
-            fpResult = {fpSrc2[31], fpSrc1[30:0]};
-        end
-        FpUnitCommand_Sgnjn: begin
-            intResult = '0;
-            fpResult = {~fpSrc2[31], fpSrc1[30:0]};
-        end
-        FpUnitCommand_Sgnjx: begin
-            intResult = '0;
-            fpResult = {fpSrc1[31] ^ fpSrc2[31], fpSrc1[30:0]};
-        end
-        FpUnitCommand_Class: begin
+        FpUnitType_Classifier: begin
             intResult = get_class(fpSrc1);
             fpResult = '0;
+        end
+        FpUnitType_Sign: begin
+            intResult = '0;
+            fpResult = fpResultSign;
+        end
+        FpUnitType_Comparator: begin
+            intResult = intResultCmp;
+            fpResult = fpResultCmp;
         end
         default: begin
             intResult = '0;
