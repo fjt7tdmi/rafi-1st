@@ -253,7 +253,7 @@ module Csr(
     word_t reg_medeleg;
 
     logic [2:0] reg_frm;
-    logic [4:0] reg_fflags;
+    fflags_t reg_fflags;
 
     always_comb begin
         // read_value
@@ -537,6 +537,10 @@ module Csr(
             else if (bus.writeEnable && bus.writeAddr == CSR_ADDR_FCSR) begin
                 reg_fflags <= bus.writeValue[4:0];
                 reg_frm <= bus.writeValue[7:5];
+            end
+            else if (bus.write_fflags) begin
+                reg_fflags <= bus.write_fflags_value;
+                reg_frm <= reg_frm;
             end
             else begin
                 reg_fflags <= reg_fflags;

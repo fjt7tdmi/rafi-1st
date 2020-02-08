@@ -39,6 +39,8 @@ typedef struct packed {
 module Fp32Unit(
     output word_t intResult,
     output uint32_t fpResult,
+    output logic writeFlags,
+    output fflags_t writeFlagsValue,
     input FpUnitType unit,
     input FpUnitCommand command,
     input word_t intSrc1,
@@ -76,10 +78,12 @@ module Fp32Unit(
 
     uint32_t intResultCmp;
     uint32_t fpResultCmp;
+    fflags_t flagsCmp;
     FpComparator m_FpComparator (
         .intResult(intResultCmp),
         .fpResult(fpResultCmp),
-        .command(command.cmp),
+        .flags(flagsCmp),
+        .command(command.cmp),        
         .fpSrc1(fpSrc1),
         .fpSrc2(fpSrc2),
         .clk(clk),
@@ -90,22 +94,32 @@ module Fp32Unit(
         FpUnitType_Move: begin
             intResult = fpSrc1; // FMV.X.W
             fpResult = intSrc1; // FMV.W.X
+            writeFlags = '0;
+            writeFlagsValue = '0;
         end
         FpUnitType_Classifier: begin
             intResult = get_class(fpSrc1);
             fpResult = '0;
+            writeFlags = '0;
+            writeFlagsValue = '0;
         end
         FpUnitType_Sign: begin
             intResult = '0;
             fpResult = fpResultSign;
+            writeFlags = '0;
+            writeFlagsValue = '0;
         end
         FpUnitType_Comparator: begin
             intResult = intResultCmp;
             fpResult = fpResultCmp;
+            writeFlags = '1;
+            writeFlagsValue = flagsCmp;
         end
         default: begin
             intResult = '0;
             fpResult = '0;
+            writeFlags = '0;
+            writeFlagsValue = '0;
         end
         endcase
     end

@@ -70,16 +70,24 @@ typedef enum logic [3:0]
     InterruptCode_MachineExternal       = 4'hb
 } InterruptCode;
 
-typedef logic unsigned  [CsrAddrWidth-1:0] csr_addr_t;
-
-typedef logic unsigned  [3:0] exception_code_t;
-
 typedef enum logic [1:0]
 {
     Privilege_User         = 2'b00,
     Privilege_Supervisor   = 2'b01,
     Privilege_Machine      = 2'b11
 } Privilege;
+
+typedef logic unsigned  [CsrAddrWidth-1:0] csr_addr_t;
+
+typedef logic unsigned  [3:0] exception_code_t;
+
+typedef struct packed {
+    logic NV;   // Invalid Operation
+    logic DZ;   // Divide by Zero
+    logic OF;   // Overflow
+    logic UF;   // Underflow
+    logic NX;   // Inexact
+} fflags_t;
 
 // ----------------------------------------------------------------------------
 

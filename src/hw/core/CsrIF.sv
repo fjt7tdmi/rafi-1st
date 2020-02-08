@@ -37,6 +37,9 @@ interface CsrIF;
     csr_addr_t writeAddr;
     logic writeEnable;
 
+    logic write_fflags;
+    fflags_t write_fflags_value;
+
     TrapInfo trapInfo;
     addr_t trapPc;
     logic trapReturn;
@@ -57,6 +60,8 @@ interface CsrIF;
         writeValue,
         writeAddr,
         writeEnable,
+        write_fflags,
+        write_fflags_value,
         trapInfo,
         trapPc,
         trapReturn,
@@ -95,6 +100,8 @@ interface CsrIF;
         writeValue,
         writeAddr,
         writeEnable,
+        write_fflags,
+        write_fflags_value,
     input
         privilege,
         trapSupervisorReturn,
