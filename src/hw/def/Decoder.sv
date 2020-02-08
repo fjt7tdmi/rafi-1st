@@ -582,6 +582,41 @@ function automatic Op DecodeRV32F(insn_t insn);
             op.dstRegType = RegType_Fp;
             op.regWriteEnable = 1;
         end
+        else if (funct7 == 7'b0010100 && rm == 3'b000) begin
+            // FMIN.S
+            op.fpUnitType = FpUnitType_Comparator;
+            op.fpUnitCommand.cmp = FpComparatorCommand_Min;
+            op.dstRegType = RegType_Fp;
+            op.regWriteEnable = 1;
+        end
+        else if (funct7 == 7'b0010100 && rm == 3'b001) begin
+            // FMAX.S
+            op.fpUnitType = FpUnitType_Comparator;
+            op.fpUnitCommand.cmp = FpComparatorCommand_Max;
+            op.dstRegType = RegType_Fp;
+            op.regWriteEnable = 1;
+        end
+        else if (funct7 == 7'b1010000 && rm == 3'b010) begin
+            // FEQ.S
+            op.fpUnitType = FpUnitType_Comparator;
+            op.fpUnitCommand.cmp = FpComparatorCommand_Eq;
+            op.dstRegType = RegType_Int;
+            op.regWriteEnable = 1;
+        end
+        else if (funct7 == 7'b1010000 && rm == 3'b001) begin
+            // FLT.S
+            op.fpUnitType = FpUnitType_Comparator;
+            op.fpUnitCommand.cmp = FpComparatorCommand_Lt;
+            op.dstRegType = RegType_Int;
+            op.regWriteEnable = 1;
+        end
+        else if (funct7 == 7'b1010000 && rm == 3'b000) begin
+            // FLE.S
+            op.fpUnitType = FpUnitType_Comparator;
+            op.fpUnitCommand.cmp = FpComparatorCommand_Le;
+            op.dstRegType = RegType_Int;
+            op.regWriteEnable = 1;
+        end
         else begin
             op.isUnknown = 1;
         end

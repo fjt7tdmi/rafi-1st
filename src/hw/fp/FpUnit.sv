@@ -74,6 +74,17 @@ module Fp32Unit(
         .clk(clk),
         .rst(rst));
 
+    uint32_t intResultCmp;
+    uint32_t fpResultCmp;
+    FpComparator m_FpComparator (
+        .intResult(intResultCmp),
+        .fpResult(fpResultCmp),
+        .command(command.cmp),
+        .fpSrc1(fpSrc1),
+        .fpSrc2(fpSrc2),
+        .clk(clk),
+        .rst(rst));
+
     always_comb begin
         unique case (unit)
         FpUnitType_Move: begin
@@ -87,6 +98,10 @@ module Fp32Unit(
         FpUnitType_Sign: begin
             intResult = '0;
             fpResult = fpResultSign;
+        end
+        FpUnitType_Comparator: begin
+            intResult = intResultCmp;
+            fpResult = fpResultCmp;
         end
         default: begin
             intResult = '0;
