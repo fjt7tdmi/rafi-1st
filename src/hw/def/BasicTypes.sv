@@ -30,4 +30,10 @@ typedef logic unsigned  [15:0]  uint16_t;
 typedef logic unsigned  [31:0]  uint32_t;
 typedef logic unsigned  [63:0]  uint64_t;
 
+typedef struct packed {
+    logic sign;
+    logic [7:0] exponent;
+    logic [22:0] fraction;
+} fp32_t;
+
 endpackage

@@ -96,29 +96,51 @@ typedef enum logic [2:0]
     FpUnitType_Move         = 3'h0,
     FpUnitType_Classifier   = 3'h1,
     FpUnitType_Sign         = 3'h2,
-    FpUnitType_Comparator   = 3'h3
+    FpUnitType_Comparator   = 3'h3,
+    FpUnitType_Converter    = 3'h4
 } FpUnitType;
 
-typedef enum logic [2:0]
+typedef enum logic [3:0]
 {
-    FpComparatorCommand_Eq    = 3'h1,
-    FpComparatorCommand_Lt    = 3'h2,
-    FpComparatorCommand_Le    = 3'h3,
-    FpComparatorCommand_Min   = 3'h4,
-    FpComparatorCommand_Max   = 3'h5
+    FpComparatorCommand_Eq    = 4'h1,
+    FpComparatorCommand_Lt    = 4'h2,
+    FpComparatorCommand_Le    = 4'h3,
+    FpComparatorCommand_Min   = 4'h4,
+    FpComparatorCommand_Max   = 4'h5
 } FpComparatorCommand;
 
-typedef enum logic [2:0]
+typedef enum logic [3:0]
 {
-    FpSignUnitCommand_Sgnj  = 3'h1,
-    FpSignUnitCommand_Sgnjn = 3'h2,
-    FpSignUnitCommand_Sgnjx = 3'h3
+    FpSignUnitCommand_Sgnj  = 4'h1,
+    FpSignUnitCommand_Sgnjn = 4'h2,
+    FpSignUnitCommand_Sgnjx = 4'h3
 } FpSignUnitCommand;
+
+typedef enum logic [3:0]
+{
+    FpConverterCommand_W_S  = 4'h0,
+    FpConverterCommand_WU_S = 4'h1,
+    FpConverterCommand_L_S  = 4'h2,
+    FpConverterCommand_LU_S = 4'h3,
+    FpConverterCommand_W_D  = 4'h4,
+    FpConverterCommand_WU_D = 4'h5,
+    FpConverterCommand_L_D  = 4'h6,
+    FpConverterCommand_LU_D = 4'h7,
+    FpConverterCommand_S_W  = 4'h8,
+    FpConverterCommand_S_WU = 4'h9,
+    FpConverterCommand_S_L  = 4'ha,
+    FpConverterCommand_S_LU = 4'hb,
+    FpConverterCommand_D_W  = 4'hc,
+    FpConverterCommand_D_WU = 4'hd,
+    FpConverterCommand_D_L  = 4'he,
+    FpConverterCommand_D_LU = 4'hf
+} FpConverterCommand;
 
 typedef union packed
 {
     FpComparatorCommand cmp;
     FpSignUnitCommand sign;
+    FpConverterCommand cvt;
 } FpUnitCommand;
 
 typedef enum logic [2:0]
