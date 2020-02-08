@@ -93,12 +93,11 @@ typedef enum logic [1:0]
 
 typedef enum logic [2:0]
 {
-    FpUnitCommand_Move  = 3'h0,
-    FpUnitCommand_Sgnj  = 3'h1,
-    FpUnitCommand_Sgnjn = 3'h2,
-    FpUnitCommand_Sgnjx = 3'h3,
-    FpUnitCommand_Class = 3'h4
-} FpUnitCommand;
+    FpUnitType_Move         = 3'h0,
+    FpUnitType_Classifier   = 3'h1,
+    FpUnitType_Sign         = 3'h2,
+    FpUnitType_Comparator   = 3'h3
+} FpUnitType;
 
 typedef enum logic [2:0]
 {
@@ -108,6 +107,19 @@ typedef enum logic [2:0]
     FpComparatorCommand_Min   = 3'h4,
     FpComparatorCommand_Max   = 3'h5
 } FpComparatorCommand;
+
+typedef enum logic [2:0]
+{
+    FpSignUnitCommand_Sgnj  = 3'h1,
+    FpSignUnitCommand_Sgnjn = 3'h2,
+    FpSignUnitCommand_Sgnjx = 3'h3
+} FpSignUnitCommand;
+
+typedef union packed
+{
+    FpComparatorCommand cmp;
+    FpSignUnitCommand sign;
+} FpUnitCommand;
 
 typedef enum logic [2:0]
 {
@@ -165,6 +177,7 @@ typedef struct packed
     AtomicType atomicType;
     BranchType branchType;
     FenceType fenceType;
+    FpUnitType fpUnitType;
     FpUnitCommand fpUnitCommand;
     LoadStoreType loadStoreType;
     MulDivType mulDivType;

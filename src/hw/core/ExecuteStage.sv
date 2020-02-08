@@ -140,6 +140,7 @@ module ExecuteStage(
     Fp32Unit m_Fp32Unit(
         .intResult(intResultFp32),
         .fpResult(fp32Result),
+        .unit(op.fpUnitType),
         .command(op.fpUnitCommand),
         .intSrc1(srcIntRegValue1),
         .intSrc2(srcIntRegValue2),

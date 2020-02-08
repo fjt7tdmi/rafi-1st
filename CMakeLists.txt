@@ -535,6 +535,7 @@ if (verilator_FOUND)
         src/hw/def/LoadStoreUnitTypes.sv
         src/hw/div/DivUnit.sv
         src/hw/fp/FpUnit.sv
+        src/hw/fp/FpSignUnit.sv
         src/hw/mul/MulUnit.sv
         src/hw/core/BlockRam.sv
         src/hw/core/FlipFlopCam.sv
