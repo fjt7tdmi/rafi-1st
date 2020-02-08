@@ -26,6 +26,7 @@ module FpComparator #(
 )(
     output word_t intResult,
     output logic unsigned [WIDTH-1:0] fpResult,
+    output fflags_t flags,
     input FpComparatorCommand command,
     input logic unsigned [WIDTH-1:0] fpSrc1,
     input logic unsigned [WIDTH-1:0] fpSrc2,
@@ -154,7 +155,6 @@ module FpComparator #(
     end
 
     always_comb begin
-        // intResult
         if (is_nan1 || is_nan2) begin
             intResult = 0;
         end
@@ -174,5 +174,20 @@ module FpComparator #(
         FpResultType_SignalingNan:  fpResult = get_canonical_signaling_nan();
         default:                    fpResult = '0;
         endcase
+
+        if (command inside { FpComparatorCommand_Lt, FpComparatorCommand_Le }) begin
+            flags.NV = is_nan1 || is_nan2;
+            flags.DZ = 0;
+            flags.OF = 0;
+            flags.UF = 0;
+            flags.NX = 0;
+        end
+        else begin
+            flags.NV = is_signaling_nan1 || is_signaling_nan2;
+            flags.DZ = 0;
+            flags.OF = 0;
+            flags.UF = 0;
+            flags.NX = 0;
+        end
     end
 endmodule

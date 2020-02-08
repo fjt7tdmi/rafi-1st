@@ -140,6 +140,8 @@ module ExecuteStage(
     Fp32Unit m_Fp32Unit(
         .intResult(intResultFp32),
         .fpResult(fp32Result),
+        .writeFlagsValue(csr.write_fflags_value),
+        .writeFlags(csr.write_fflags),
         .unit(op.fpUnitType),
         .command(op.fpUnitCommand),
         .intSrc1(srcIntRegValue1),
