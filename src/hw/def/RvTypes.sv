@@ -23,8 +23,16 @@ package RvTypes;
 // ----------------------------------------------------------------------------
 // parameter
 
-// Control Status Register
+// CSR
 parameter CsrAddrWidth = 12;
+
+// FP rouning mode
+parameter FRM_RNE = 3'b000; // Round to Nearest, ties to Even
+parameter FRM_RTZ = 3'b001; // Round towards Zero
+parameter FRM_RDN = 3'b010; // Round Down
+parameter FRM_RUP = 3'b011; // Round Up
+parameter FRM_RMM = 3'b100; // Round to Nearest, ties to Max Magnitude
+parameter FRM_DYN = 3'b111; // In instruction's rm field, selects dynamic rounding mode; In Rounding Mode register, Invalid.
 
 // ----------------------------------------------------------------------------
 // typedef
