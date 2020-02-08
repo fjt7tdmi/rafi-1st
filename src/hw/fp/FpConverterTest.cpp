@@ -88,91 +88,190 @@ protected:
     VFpConverter* m_pTop;
 };
 
-TEST_F(FpConverterTest, fcvt)
+void run_test_fcvt(VFpConverter* pTop, int command, uint32_t expectedResult, uint32_t intSrc)
 {
-    auto run_test = [this](int command, uint32_t expectedResult, uint32_t intSrc)
-    {
-        this->m_pTop->command = command;
-        this->m_pTop->roundingMode = 0;
-        this->m_pTop->intSrc = intSrc;
-        this->m_pTop->fpSrc = 0;
+    pTop->command = command;
+    pTop->roundingMode = 0;
+    pTop->intSrc = intSrc;
+    pTop->fpSrc = 0;
 
-        this->m_pTop->clk = 1;
-        this->m_pTop->eval();
-        this->m_pTop->clk = 0;
-        this->m_pTop->eval();
+    pTop->clk = 1;
+    pTop->eval();
+    pTop->clk = 0;
+    pTop->eval();
 
-        ASSERT_EQ(expectedResult, this->m_pTop->fpResult);
-    };
+    ASSERT_EQ(expectedResult, pTop->fpResult);
+};
 
-    run_test(CMD_S_W, 0x40000000, 0x00000002); //  2.0,  2
-    run_test(CMD_S_W, 0xc0000000, 0xfffffffe); // -2.0, -2
-
-    run_test(CMD_S_WU, 0x40000000, 0x00000002); //         2.0,  2
-    run_test(CMD_S_WU, 0x4f800000, 0xfffffffe); // 4.2949673e9, -2
+TEST_F(FpConverterTest, fcvt_2)
+{
+    run_test_fcvt(m_pTop, CMD_S_W, 0x40000000, 0x00000002); //  2.0,  2
 }
 
-TEST_F(FpConverterTest, fcvt_w)
+TEST_F(FpConverterTest, fcvt_3)
 {
-    auto run_test_with_flags = [this](int command, uint32_t expectedFlags, uint32_t expectedResult, uint32_t fpSrc, int roundingMode)
-    {
-        this->m_pTop->command = command;
-        this->m_pTop->roundingMode = roundingMode;
-        this->m_pTop->intSrc = 0;
-        this->m_pTop->fpSrc = fpSrc;
+    run_test_fcvt(m_pTop, CMD_S_W, 0xc0000000, 0xfffffffe); // -2.0, -2
+}
 
-        this->m_pTop->clk = 1;
-        this->m_pTop->eval();
-        this->m_pTop->clk = 0;
-        this->m_pTop->eval();
+TEST_F(FpConverterTest, fcvt_4)
+{
+    run_test_fcvt(m_pTop, CMD_S_WU, 0x40000000, 0x00000002); //         2.0,  2
+}
 
-        ASSERT_EQ(expectedFlags, this->m_pTop->flags);
-        ASSERT_EQ(expectedResult, this->m_pTop->intResult);
-    };
-        
-    run_test_with_flags(CMD_W_S, 0x01, 0xffffffff, 0xbf8ccccd, FRM_RTZ); // -1, -1.1
-    run_test_with_flags(CMD_W_S, 0x00, 0xffffffff, 0xbf800000, FRM_RTZ); // -1, -1.0
-    run_test_with_flags(CMD_W_S, 0x01, 0x00000000, 0xbf666666, FRM_RTZ); //  0, -0.9
-    run_test_with_flags(CMD_W_S, 0x01, 0x00000000, 0x3f666666, FRM_RTZ); //  0,  0.9
-    run_test_with_flags(CMD_W_S, 0x00, 0x00000001, 0x3f800000, FRM_RTZ); //  1,  1.0
-    run_test_with_flags(CMD_W_S, 0x01, 0x00000001, 0x3f8ccccd, FRM_RTZ); //  1,  1.1
-    run_test_with_flags(CMD_W_S, 0x10, 0x80000000, 0xcf32d05e, FRM_RTZ); //    -1<<31, -3e9
-    run_test_with_flags(CMD_W_S, 0x10, 0x7fffffff, 0x4f32d05e, FRM_RTZ); // (1<<31)-1,  3e9
+TEST_F(FpConverterTest, fcvt_5)
+{
+    run_test_fcvt(m_pTop, CMD_S_WU, 0x4f800000, 0xfffffffe); // 4.2949673e9, -2
+}
 
-    run_test_with_flags(CMD_WU_S, 0x10, 0x00000000, 0xc0400000, FRM_RTZ); // 0, -3.0
-    run_test_with_flags(CMD_WU_S, 0x10, 0x00000000, 0xbf800000, FRM_RTZ); // 0, -1.0
-    run_test_with_flags(CMD_WU_S, 0x01, 0x00000000, 0xbf666666, FRM_RTZ); // 0, -0.9
-    run_test_with_flags(CMD_WU_S, 0x01, 0x00000000, 0x3f666666, FRM_RTZ); // 0,  0.9
-    run_test_with_flags(CMD_WU_S, 0x00, 0x00000001, 0x3f800000, FRM_RTZ); // 1,  1.0
-    run_test_with_flags(CMD_WU_S, 0x01, 0x00000001, 0x3f8ccccd, FRM_RTZ); // 1,  1.1
-    run_test_with_flags(CMD_WU_S, 0x10, 0x00000000, 0xcf32d05e, FRM_RTZ); // 0, -3e9
-    run_test_with_flags(CMD_WU_S, 0x00, 0xb2d05e00, 0x4f32d05e, FRM_RTZ); // 300000000, 3e9
+void run_test_fcvt_w_with_flags(VFpConverter* pTop, int command, uint32_t expectedFlags, uint32_t expectedResult, uint32_t fpSrc, int roundingMode)
+{
+    pTop->command = command;
+    pTop->roundingMode = roundingMode;
+    pTop->intSrc = 0;
+    pTop->fpSrc = fpSrc;
 
-    auto run_test = [this](int command, uint32_t expectedResult, uint32_t fpSrc)
-    {
-        this->m_pTop->command = command;
-        this->m_pTop->roundingMode = 0;
-        this->m_pTop->intSrc = 0;
-        this->m_pTop->fpSrc = fpSrc;
+    pTop->clk = 1;
+    pTop->eval();
+    pTop->clk = 0;
+    pTop->eval();
 
-        this->m_pTop->clk = 1;
-        this->m_pTop->eval();
-        this->m_pTop->clk = 0;
-        this->m_pTop->eval();
+    ASSERT_EQ(expectedFlags, pTop->flags);
+    ASSERT_EQ(expectedResult, pTop->intResult);
+}
 
-        ASSERT_EQ(expectedResult, this->m_pTop->intResult);
-    };
+TEST_F(FpConverterTest, fcvt_w_2)
+{
+    run_test_fcvt_w_with_flags(m_pTop, CMD_W_S, 0x01, 0xffffffff, 0xbf8ccccd, FRM_RTZ); // -1, -1.1
+}
 
-    run_test(CMD_W_S, 0x7fffffff, 0xffffffff);
-    run_test(CMD_W_S, 0x80000000, 0xff800000);
+TEST_F(FpConverterTest, fcvt_w_3)
+{
+    run_test_fcvt_w_with_flags(m_pTop, CMD_W_S, 0x00, 0xffffffff, 0xbf800000, FRM_RTZ); // -1, -1.0
+}
 
-    run_test(CMD_W_S, 0x7fffffff, 0x7fffffff);
-    run_test(CMD_W_S, 0x7fffffff, 0x7f800000);
+TEST_F(FpConverterTest, fcvt_w_4)
+{
+    run_test_fcvt_w_with_flags(m_pTop, CMD_W_S, 0x01, 0x00000000, 0xbf666666, FRM_RTZ); //  0, -0.9
+}
 
-    run_test(CMD_WU_S, 0xffffffff, 0xffffffff);
-    run_test(CMD_WU_S, 0xffffffff, 0x7fffffff);
-    run_test(CMD_WU_S, 0x00000000, 0xff800000);
-    run_test(CMD_WU_S, 0xffffffff, 0x7f800000);
+TEST_F(FpConverterTest, fcvt_w_5)
+{
+    run_test_fcvt_w_with_flags(m_pTop, CMD_W_S, 0x01, 0x00000000, 0x3f666666, FRM_RTZ); //  0,  0.9
+}
+
+TEST_F(FpConverterTest, fcvt_w_6)
+{
+    run_test_fcvt_w_with_flags(m_pTop, CMD_W_S, 0x00, 0x00000001, 0x3f800000, FRM_RTZ); //  1,  1.0
+}
+
+TEST_F(FpConverterTest, fcvt_w_7)
+{
+    run_test_fcvt_w_with_flags(m_pTop, CMD_W_S, 0x01, 0x00000001, 0x3f8ccccd, FRM_RTZ); //  1,  1.1
+}
+
+TEST_F(FpConverterTest, fcvt_w_8)
+{
+    run_test_fcvt_w_with_flags(m_pTop, CMD_W_S, 0x10, 0x80000000, 0xcf32d05e, FRM_RTZ); //    -1<<31, -3e9
+}
+
+TEST_F(FpConverterTest, fcvt_w_9)
+{
+    run_test_fcvt_w_with_flags(m_pTop, CMD_W_S, 0x10, 0x7fffffff, 0x4f32d05e, FRM_RTZ); // (1<<31)-1,  3e9
+}
+
+TEST_F(FpConverterTest, fcvt_w_12)
+{
+    run_test_fcvt_w_with_flags(m_pTop, CMD_WU_S, 0x10, 0x00000000, 0xc0400000, FRM_RTZ); // 0, -3.0
+}
+
+TEST_F(FpConverterTest, fcvt_w_13)
+{
+    run_test_fcvt_w_with_flags(m_pTop, CMD_WU_S, 0x10, 0x00000000, 0xbf800000, FRM_RTZ); // 0, -1.0
+}
+
+TEST_F(FpConverterTest, fcvt_w_14)
+{
+    run_test_fcvt_w_with_flags(m_pTop, CMD_WU_S, 0x01, 0x00000000, 0xbf666666, FRM_RTZ); // 0, -0.9
+}
+
+TEST_F(FpConverterTest, fcvt_w_15)
+{
+    run_test_fcvt_w_with_flags(m_pTop, CMD_WU_S, 0x01, 0x00000000, 0x3f666666, FRM_RTZ); // 0,  0.9
+}
+
+TEST_F(FpConverterTest, fcvt_w_16)
+{
+    run_test_fcvt_w_with_flags(m_pTop, CMD_WU_S, 0x00, 0x00000001, 0x3f800000, FRM_RTZ); // 1,  1.0
+}
+
+TEST_F(FpConverterTest, fcvt_w_17)
+{
+    run_test_fcvt_w_with_flags(m_pTop, CMD_WU_S, 0x01, 0x00000001, 0x3f8ccccd, FRM_RTZ); // 1,  1.1
+}
+
+TEST_F(FpConverterTest, fcvt_w_18)
+{
+    run_test_fcvt_w_with_flags(m_pTop, CMD_WU_S, 0x10, 0x00000000, 0xcf32d05e, FRM_RTZ); // 0, -3e9
+}
+
+TEST_F(FpConverterTest, fcvt_w_19)
+{
+    run_test_fcvt_w_with_flags(m_pTop, CMD_WU_S, 0x00, 0xb2d05e00, 0x4f32d05e, FRM_RTZ); // 300000000, 3e9
+}
+
+void run_test_fcvt_w(VFpConverter* pTop, int command, uint32_t expectedResult, uint32_t fpSrc)
+{
+    pTop->command = command;
+    pTop->roundingMode = 0;
+    pTop->intSrc = 0;
+    pTop->fpSrc = fpSrc;
+
+    pTop->clk = 1;
+    pTop->eval();
+    pTop->clk = 0;
+    pTop->eval();
+
+    ASSERT_EQ(expectedResult, pTop->intResult);
+}
+
+TEST_F(FpConverterTest, fcvt_w_42)
+{
+    run_test_fcvt_w(m_pTop, CMD_W_S, 0x7fffffff, 0xffffffff);
+}
+
+TEST_F(FpConverterTest, fcvt_w_44)
+{
+    run_test_fcvt_w(m_pTop, CMD_W_S, 0x80000000, 0xff800000);
+}
+
+TEST_F(FpConverterTest, fcvt_w_52)
+{
+    run_test_fcvt_w(m_pTop, CMD_W_S, 0x7fffffff, 0x7fffffff);
+}
+
+TEST_F(FpConverterTest, fcvt_w_54)
+{
+    run_test_fcvt_w(m_pTop, CMD_W_S, 0x7fffffff, 0x7f800000);
+}
+
+TEST_F(FpConverterTest, fcvt_w_62)
+{
+    run_test_fcvt_w(m_pTop, CMD_WU_S, 0xffffffff, 0xffffffff);
+}
+
+TEST_F(FpConverterTest, fcvt_w_63)
+{
+    run_test_fcvt_w(m_pTop, CMD_WU_S, 0xffffffff, 0x7fffffff);
+}
+
+TEST_F(FpConverterTest, fcvt_w_64)
+{
+    run_test_fcvt_w(m_pTop, CMD_WU_S, 0x00000000, 0xff800000);
+}
+
+TEST_F(FpConverterTest, fcvt_w_65)
+{
+    run_test_fcvt_w(m_pTop, CMD_WU_S, 0xffffffff, 0x7f800000);
 }
 
 }}
