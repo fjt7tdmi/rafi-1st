@@ -30,12 +30,6 @@ parameter FP_CLASS_POS_INF          = 32'h0080;
 parameter FP_CLASS_SIGNALING_NAN    = 32'h0100;
 parameter FP_CLASS_QUIET_NAN        = 32'h0200;
 
-typedef struct packed {
-    logic sign;
-    logic [7:0] exponent;
-    logic [22:0] fraction;
-} fp32_t;
-
 module Fp32Unit(
     output word_t intResult,
     output uint32_t fpResult,
