@@ -21,25 +21,32 @@ import Rv32Types::*;
 import ProcessorTypes::*;
 
 interface CsrIF;
+    // Fetch
     addr_t nextPc;
 
+    // Read
     word_t readValue;
     csr_addr_t readAddr;
     logic readEnable;
     logic readIllegal;
 
+    // Write
+    word_t writeValue;
+    csr_addr_t writeAddr;
+    logic writeEnable;
+
+    // Priv.
     csr_satp_t satp;
     csr_xstatus_t mstatus;
     Privilege privilege;
     logic trapSupervisorReturn;
 
-    word_t writeValue;
-    csr_addr_t writeAddr;
-    logic writeEnable;
-
+    // FP
     logic write_fflags;
     fflags_t write_fflags_value;
+    logic [2:0] frm;
 
+    // Trap
     TrapInfo trapInfo;
     addr_t trapPc;
     logic trapReturn;
@@ -53,6 +60,7 @@ interface CsrIF;
         satp,
         mstatus,
         privilege,
+        frm,
         trapSupervisorReturn,
     input
         readAddr,
@@ -104,6 +112,7 @@ interface CsrIF;
         write_fflags_value,
     input
         privilege,
+        frm,
         trapSupervisorReturn,
         readValue,
         readIllegal

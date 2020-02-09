@@ -37,6 +37,7 @@ module Fp32Unit(
     output fflags_t writeFlagsValue,
     input FpUnitType unit,
     input FpUnitCommand command,
+    input logic [2:0] roundingMode,
     input word_t intSrc1,
     input word_t intSrc2,
     input uint32_t fpSrc1,
@@ -83,6 +84,20 @@ module Fp32Unit(
         .clk(clk),
         .rst(rst));
 
+    uint32_t intResultCvt;
+    uint32_t fpResultCvt;
+    fflags_t flagsCvt;
+    FpConverter m_FpConverter (
+        .intResult(intResultCvt),
+        .fp32Result(fpResultCvt),
+        .flags(flagsCvt),
+        .command(command.cvt),
+        .roundingMode(roundingMode),
+        .intSrc(intSrc1),
+        .fp32Src(fpSrc1),
+        .clk(clk),
+        .rst(rst));
+
     always_comb begin
         unique case (unit)
         FpUnitType_Move: begin
@@ -108,6 +123,12 @@ module Fp32Unit(
             fpResult = fpResultCmp;
             writeFlags = '1;
             writeFlagsValue = flagsCmp;
+        end
+        FpUnitType_Converter: begin
+            intResult = intResultCvt;
+            fpResult = fpResultCvt;
+            writeFlags = '1;
+            writeFlagsValue = flagsCvt;
         end
         default: begin
             intResult = '0;

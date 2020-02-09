@@ -535,6 +535,7 @@ if (verilator_FOUND)
         src/hw/def/LoadStoreUnitTypes.sv
         src/hw/div/DivUnit.sv
         src/hw/fp/FpComparator.sv
+        src/hw/fp/FpConverter.sv
         src/hw/fp/FpSignUnit.sv
         src/hw/fp/FpUnit.sv
         src/hw/mul/MulUnit.sv

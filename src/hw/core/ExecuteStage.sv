@@ -144,6 +144,7 @@ module ExecuteStage(
         .writeFlags(csr.write_fflags),
         .unit(op.fpUnitType),
         .command(op.fpUnitCommand),
+        .roundingMode(csr.frm),
         .intSrc1(srcIntRegValue1),
         .intSrc2(srcIntRegValue2),
         .fpSrc1(srcFpRegValue1[31:0]),
