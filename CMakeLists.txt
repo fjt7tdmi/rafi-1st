@@ -639,7 +639,7 @@ if (verilator_FOUND)
         src/hw/fp/FpConverter.sv
     )
     target_link_libraries(rafi-vtest-fp-converter
-        PRIVATE ${GoogleTest_LIBRARIES}
+        PRIVATE ${GoogleTest_LIBRARIES} ${FS_LIBRARIES}
     )
 
     # disable warnings for verilator

@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
+#if defined(__GNUC__)
+#include <experimental/filesystem>
+#else
 #include <filesystem>
+#endif
 
 #pragma warning(push)
 #pragma warning(disable : 4389)
@@ -27,6 +31,12 @@
 #include <verilated_vcd_c.h>
 
 #include "VFpConverter.h"
+
+#if defined(__GNUC__)
+namespace fs = std::experimental::filesystem;
+#else
+namespace fs = std::filesystem;
+#endif
 
 namespace rafi { namespace test {
 
@@ -83,7 +93,7 @@ protected:
     virtual void SetUp() override
     {
         const char* dir = "work/vtest";
-        std::filesystem::create_directories(dir);
+        fs::create_directories(dir);
         sprintf(m_VcdPath, "%s/%s.%s.vcd", dir,
             ::testing::UnitTest::GetInstance()->current_test_info()->test_case_name(),
             ::testing::UnitTest::GetInstance()->current_test_info()->name());
