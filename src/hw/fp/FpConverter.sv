@@ -148,7 +148,148 @@ module FpConverter_f32_to_i32 (
         flags.DZ = 0;
         flags.OF = 0;
         flags.UF = 0;
-        flags.NX = !(is_nan || overflow) && (underflow || inexact); // Set by rounding result
+        flags.NX = !(is_nan || overflow) && (underflow || inexact);
+    end
+endmodule
+
+module FpConverter_rounder_f32 (
+    output logic [7:0] roundedExponent,
+    output logic [22:0] roundedFraction,
+    output logic inexact,
+    input logic [2:0] roundingMode,
+    input logic sign,
+    input logic [7:0] exponent,
+    input logic [22:0] fraction,
+    input logic g,
+    input logic r,
+    input logic s
+);
+    logic [23:0] extendedFraction;
+    logic ulp;
+    always_comb begin
+        extendedFraction = {1'b1, fraction};
+        ulp = fraction[0];
+    end
+
+    logic increment;
+    always_comb begin
+        unique case (roundingMode)
+        FRM_RNE: begin
+            if ({g, r, s} == 3'b100) begin
+                increment = ulp ? 1 : 0;
+            end
+            else if ({g, r, s} inside {3'b101, 3'b110, 3'b111}) begin
+                increment = 1;
+            end
+            else begin
+                increment = 0;
+            end
+        end
+        FRM_RTZ: increment = (sign == '1 && {g, r, s} != 3'b000) ? 1 : 0;
+        FRM_RDN: increment = 0;
+        FRM_RUP: increment = {g, r, s} != 3'b000 ? 1 : 0;
+        FRM_RMM: increment = {g, r, s} inside {3'b100, 3'b101, 3'b110, 3'b111} ? 1 : 0;
+        default: increment = '0;
+        endcase
+    end
+
+    logic [23:0] incrementdFraction;
+    always_comb begin
+        incrementdFraction = extendedFraction + 24'h1;
+    end
+
+    always_comb begin
+        if (increment && !incrementdFraction[23]) begin
+            roundedExponent = exponent + 1;
+            roundedFraction = incrementdFraction[23:1];
+        end
+        else if (increment && incrementdFraction[23]) begin
+            roundedExponent = exponent;
+            roundedFraction = incrementdFraction[22:0];
+        end
+        else begin
+            roundedExponent = exponent;
+            roundedFraction = fraction;
+        end
+
+        inexact = g | r | s;
+    end
+endmodule
+
+module FpConverter_i32_to_f32 (
+    output fp32_t result,
+    output fflags_t flags,
+    input logic intSigned,
+    input logic [2:0] roundingMode,
+    input word_t src
+);
+    // TODO: Optimize
+    function automatic logic [5:0] GetNumberOfLeadingZero(logic [33:0] value);
+        for (int i = 0; i < 33; i++) begin
+            if (value[32 - i] == 1'b1) begin
+                return i;
+            end
+        end
+        return 0;
+    endfunction
+
+    logic sign;
+    logic [32:0] extendedSrc;
+    logic [32:0] abs;
+    always_comb begin
+        sign = intSigned ? src[31] : 1'b0;
+        extendedSrc = {sign, src};
+        abs = sign ? -extendedSrc : extendedSrc;
+    end
+
+    logic [5:0] shamt;
+    always_comb begin
+        shamt = GetNumberOfLeadingZero(abs);
+    end
+
+    logic [32:0] shifted;
+    always_comb begin
+        shifted = abs << shamt;
+    end
+
+    logic [7:0] exponent;
+    logic [22:0] fraction;
+    always_comb begin
+        exponent = 8'd32 - {2'h0, shamt} + 8'd127;
+        fraction = shifted[31:9];
+    end
+
+    logic inexact;
+    logic [7:0] rounded_exponent;
+    logic [22:0] rounded_fraction;
+
+    FpConverter_rounder_f32 rounder(
+        .inexact(inexact),
+        .roundedExponent(rounded_exponent),
+        .roundedFraction(rounded_fraction),
+        .roundingMode(roundingMode),
+        .sign(sign),
+        .exponent(exponent),
+        .fraction(fraction),
+        .g(shifted[8]),
+        .r(shifted[7]),
+        .s(|shifted[6:0]));
+
+    always_comb begin
+        if (src == '0) begin
+            result = '0;
+        end
+        else begin
+            result.sign = sign;
+            result.exponent = rounded_exponent;
+            result.fraction = rounded_fraction;
+        end
+
+        flags.NV = 0;
+        flags.DZ = 0;
+        flags.OF = 0;
+        flags.UF = 0;
+        flags.NX = inexact; // Set by rounding result
     end
 endmodule
 
@@ -191,11 +332,25 @@ module FpConverter (
         .roundingMode(roundingMode),
         .src(fp32_src));
 
+    fp32_t result_i32_to_f32;
+    fflags_t flags_i32_to_f32;    
+    FpConverter_i32_to_f32 m_i32_to_f32(
+        .result(result_i32_to_f32),
+        .flags(flags_i32_to_f32),
+        .intSigned(intSigned),
+        .roundingMode(roundingMode),
+        .src(intSrc));
+
     always_comb begin
         if (command inside {FpConverterCommand_W_S, FpConverterCommand_WU_S})  begin
             intResult = result_f32_to_i32;
             fpResult = '0;
             flags = flags_f32_to_i32;
+        end
+        else if (command inside {FpConverterCommand_S_W, FpConverterCommand_S_WU})  begin
+            intResult = '0;
+            fpResult = {32'h0, result_i32_to_f32};
+            flags = flags_i32_to_f32;
         end
         else begin
             intResult = '0;

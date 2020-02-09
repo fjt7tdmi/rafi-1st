@@ -160,12 +160,12 @@ TEST_F(FpConverterTest, fcvt_3)
 
 TEST_F(FpConverterTest, fcvt_4)
 {
-    RunTest_FCVT(this, CMD_S_WU, 0x40000000, 0x00000002); //         2.0,  2
+    RunTest_FCVT(this, CMD_S_WU, 0x40000000, 0x00000002); // 2.0,  2
 }
 
 TEST_F(FpConverterTest, fcvt_5)
 {
-    RunTest_FCVT(this, CMD_S_WU, 0x4f800000, 0xfffffffe); // 4.2949673e9, -2
+    RunTest_FCVT(this, CMD_S_WU, 0x4f800000, 0xfffffffe); // 4.2949673e9, 2^32-2
 }
 
 void RunTest_FCVT_W_WithFlags(FpConverterTest* pTest, int command, uint32_t expectedFlags, uint32_t expectedResult, uint32_t fpSrc, int roundingMode)
