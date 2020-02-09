@@ -19,20 +19,20 @@ import RvTypes::*;
 import Rv32Types::*;
 import OpTypes::*;
 
-module FpConverter_round_f32_to_i32 (
-    output word_t result,
+module FpConverter_rounder_i33 (
+    output logic [32:0] result,
     output logic inexact,
     output logic overflow,
     input logic [2:0] roundingMode,
-    input word_t value,
+    input logic [32:0] value,
     input logic g,
     input logic r,
     input logic s
 );
-    logic value_sign;
+    logic sign;
     logic ulp;
     always_comb begin
-        value_sign = value[31];
+        sign = value[32];
         ulp = value[0];
     end
 
@@ -50,7 +50,7 @@ module FpConverter_round_f32_to_i32 (
                 increment = 0;
             end
         end
-        FRM_RTZ: increment = (value_sign == '1 && {g, r, s} != 3'b000) ? 1 : 0;
+        FRM_RTZ: increment = (sign == '1 && {g, r, s} != 3'b000) ? 1 : 0;
         FRM_RDN: increment = 0;
         FRM_RUP: increment = {g, r, s} != 3'b000 ? 1 : 0;
         FRM_RMM: increment = {g, r, s} inside {3'b100, 3'b101, 3'b110, 3'b111} ? 1 : 0;
@@ -59,24 +59,27 @@ module FpConverter_round_f32_to_i32 (
     end
 
     always_comb begin
-        result = increment ? value + 1 : value;
+        result = increment ? value + 33'b1 : value;
         inexact = g | r | s;
-        overflow = result[31] && ~value[31];
+        overflow = result[32] && ~value[32];
     end
 endmodule
 
 module FpConverter_f32_to_i32 (
     output word_t result,
     output fflags_t flags,
+    input logic intSigned,
     input logic [2:0] roundingMode,
     input fp32_t src
 );
     logic is_zero;
     logic is_nan;
+    logic is_inf;
     logic [7:0] fixed_exp32;
     always_comb begin
-        is_nan = src.exponent == '1 && src.fraction != '0;
         is_zero = src.exponent == '0;
+        is_nan = src.exponent == '1 && src.fraction != '0;
+        is_inf = src.exponent == '1 && src.fraction == '0;
         fixed_exp32 = src.exponent - 127;
     end
 
@@ -92,7 +95,8 @@ module FpConverter_f32_to_i32 (
     logic rounder_overflow;
     logic [32:0] rounder_result;
 
-    FpConverter_round_f32_to_i32 rounder(
+    // Rounder input/output is always signed
+    FpConverter_rounder_i33 rounder(
         .inexact(inexact),
         .overflow(rounder_overflow),
         .result(rounder_result),
@@ -102,22 +106,42 @@ module FpConverter_f32_to_i32 (
         .r(signed_result[21]),
         .s(|signed_result[20:0]));
 
-    logic overflow;
     logic underflow;
     always_comb begin
-        overflow = (~fixed_exp32[7] && fixed_exp32 >= 31) || rounder_overflow;
         underflow = fixed_exp32[7]; // fixed_exp32 < 0
     end
 
+    // Rounder output is i33. Check if that is representable in i32 or u32.
+    logic overflow;
     always_comb begin
-        if (is_zero || is_nan || underflow) begin
-            result = '0;
-        end
-        else if (overflow) begin
-            result = src.sign ? 32'h8000_0000 : 32'h7fff_ffff;
+        if (intSigned) begin
+            overflow = ~fixed_exp32[7] && fixed_exp32 >= 31 ||
+                !underflow && (rounder_overflow || rounder_result[32] != rounder_result[31]);
         end
         else begin
-            result = rounder_result;
+            overflow = ~fixed_exp32[7] && fixed_exp32 >= 32 ||
+                !underflow && (rounder_overflow || rounder_result[32] == 1'b1);
+        end
+    end
+
+    always_comb begin
+        if (src.sign && is_inf) begin
+            result = intSigned ? 32'h8000_0000 : 32'h0000_0000;
+        end
+        else if (!src.sign && is_inf || is_nan) begin
+            result = intSigned ? 32'h7fff_ffff : 32'hffff_ffff;
+        end
+        else if (is_zero || underflow) begin
+            result = '0;
+        end
+        else if (overflow && src.sign) begin
+            result = intSigned ? 32'h8000_0000 : 32'h0000_0000;
+        end
+        else if (overflow && !src.sign) begin
+            result = intSigned ? 32'h7fff_ffff : 32'hffff_ffff;
+        end
+        else begin
+            result = rounder_result[31:0];
         end
 
         flags.NV = is_nan || overflow;
@@ -139,6 +163,20 @@ module FpConverter (
     input logic clk,
     input logic rst
 );
+    logic intSigned;
+    always_comb begin
+        intSigned = command inside {
+            FpConverterCommand_W_S,
+            FpConverterCommand_L_S,
+            FpConverterCommand_W_D,
+            FpConverterCommand_L_D,
+            FpConverterCommand_S_W,
+            FpConverterCommand_S_L,
+            FpConverterCommand_D_W,
+            FpConverterCommand_D_L
+        };
+    end
+
     fp32_t fp32_src;
     always_comb begin
         fp32_src = fpSrc[31:0];
@@ -149,21 +187,20 @@ module FpConverter (
     FpConverter_f32_to_i32 m_f32_to_i32(
         .result(result_f32_to_i32),
         .flags(flags_f32_to_i32),
+        .intSigned(intSigned),
         .roundingMode(roundingMode),
         .src(fp32_src));
 
     always_comb begin
-        unique case (command)
-        FpConverterCommand_W_S: begin
+        if (command inside {FpConverterCommand_W_S, FpConverterCommand_WU_S})  begin
             intResult = result_f32_to_i32;
             fpResult = '0;
             flags = flags_f32_to_i32;
         end
-        default: begin
+        else begin
             intResult = '0;
             fpResult = '0;
             flags = '0;
         end
-        endcase
     end
 endmodule
