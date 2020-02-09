@@ -20,20 +20,20 @@ import Rv32Types::*;
 import OpTypes::*;
 
 module FpConverter_round_f32_to_i32 (
-    output logic invalid,
-    output logic inexact,
     output word_t result,
+    output logic inexact,
+    output logic overflow,
     input logic [2:0] roundingMode,
     input word_t value,
     input logic g,
     input logic r,
     input logic s
 );
-    logic sign;
+    logic value_sign;
     logic ulp;
     always_comb begin
-        logic sign = value[31];
-        logic ulp = value[0];
+        value_sign = value[31];
+        ulp = value[0];
     end
 
     logic increment;
@@ -50,7 +50,7 @@ module FpConverter_round_f32_to_i32 (
                 increment = 0;
             end
         end
-        FRM_RTZ: increment = (sign == '1 && {g, r, s} != 3'b000) ? 1 : 0;
+        FRM_RTZ: increment = (value_sign == '1 && {g, r, s} != 3'b000) ? 1 : 0;
         FRM_RDN: increment = 0;
         FRM_RUP: increment = {g, r, s} != 3'b000 ? 1 : 0;
         FRM_RMM: increment = {g, r, s} inside {3'b100, 3'b101, 3'b110, 3'b111} ? 1 : 0;
@@ -59,16 +59,9 @@ module FpConverter_round_f32_to_i32 (
     end
 
     always_comb begin
+        result = increment ? value + 1 : value;
         inexact = g | r | s;
-
-        if (increment) begin
-            invalid = '0;
-            result = value;
-        end
-        else begin
-            invalid = (value == '1) ? 1 : 0;
-            result = value + 1;
-        end
+        overflow = result[31] && ~value[31];
     end
 endmodule
 
@@ -81,14 +74,10 @@ module FpConverter_f32_to_i32 (
     logic is_zero;
     logic is_nan;
     logic [7:0] fixed_exp32;
-    logic overflow;
-    logic underflow;
     always_comb begin
         is_nan = src.exponent == '1 && src.fraction != '0;
         is_zero = src.exponent == '0;
         fixed_exp32 = src.exponent - 127;
-        overflow = ~fixed_exp32[7] && |fixed_exp32[6:5]; // fixed_exp32 >= 32;
-        underflow = fixed_exp32[7]; // fixed_exp32 < 0
     end
 
     logic [55:0] shift_result;
@@ -96,31 +85,46 @@ module FpConverter_f32_to_i32 (
     always_comb begin
         /* verilator lint_off WIDTH */
         shift_result = {1'b1, src.fraction} << fixed_exp32[4:0];
-        signed_result = -shift_result;
+        signed_result = src.sign ? -shift_result : shift_result;
     end
 
-    logic invalid;
     logic inexact;
-    word_t rounded_result;
+    logic rounder_overflow;
+    logic [32:0] rounder_result;
 
-    FpConverter_round_f32_to_i32 round_f32_to_i32(
-        .invalid(invalid),
+    FpConverter_round_f32_to_i32 rounder(
         .inexact(inexact),
-        .result(rounded_result),
+        .overflow(rounder_overflow),
+        .result(rounder_result),
         .roundingMode(roundingMode),
-        .value(signed_result[54:23]),
+        .value(signed_result[55:23]),
         .g(signed_result[22]),
         .r(signed_result[21]),
         .s(|signed_result[20:0]));
 
+    logic overflow;
+    logic underflow;
     always_comb begin
-        result = (is_zero || is_nan || overflow || underflow || invalid) ? '0 : rounded_result;
+        overflow = (~fixed_exp32[7] && fixed_exp32 >= 31) || rounder_overflow;
+        underflow = fixed_exp32[7]; // fixed_exp32 < 0
+    end
 
-        flags.NV = is_nan || overflow || underflow || invalid;
+    always_comb begin
+        if (is_zero || is_nan || underflow) begin
+            result = '0;
+        end
+        else if (overflow) begin
+            result = src.sign ? 32'h8000_0000 : 32'h7fff_ffff;
+        end
+        else begin
+            result = rounder_result;
+        end
+
+        flags.NV = is_nan || overflow;
         flags.DZ = 0;
         flags.OF = 0;
         flags.UF = 0;
-        flags.NX = !(is_nan || overflow || underflow || invalid) && inexact; // Set by rounding result
+        flags.NX = !(is_nan || overflow) && (underflow || inexact); // Set by rounding result
     end
 endmodule
 
