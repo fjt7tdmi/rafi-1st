@@ -19,27 +19,204 @@ import RvTypes::*;
 import Rv32Types::*;
 import OpTypes::*;
 
+module FpMul #(
+    parameter EXPONENT_WIDTH = 8,
+    parameter FRACTION_WIDTH = 23,
+    parameter WIDTH = 1 + EXPONENT_WIDTH + FRACTION_WIDTH
+)(
+    output logic [WIDTH-1:0] result,
+    output fflags_t flags,
+    input logic [2:0] roundingMode,
+    input logic [WIDTH-1:0] src1,
+    input logic [WIDTH-1:0] src2
+);
+    typedef enum logic [1:0]
+    {
+        ResultType_Production = 2'h0,
+        ResultType_Zero       = 2'h1,
+        ResultType_Inf        = 2'h2,
+        ResultType_Nan        = 2'h3
+    } ResultType;
+
+    logic sign1;
+    logic sign2;
+    logic [EXPONENT_WIDTH-1:0] exponent1;
+    logic [EXPONENT_WIDTH-1:0] exponent2;
+    logic [FRACTION_WIDTH-1:0] fraction1;
+    logic [FRACTION_WIDTH-1:0] fraction2;
+    always_comb begin
+        sign1 = src1[WIDTH-1];
+        sign2 = src2[WIDTH-1];
+        exponent1 = src1[WIDTH-2:FRACTION_WIDTH];
+        exponent2 = src2[WIDTH-2:FRACTION_WIDTH];
+        fraction1 = src1[FRACTION_WIDTH-1:0];
+        fraction2 = src2[FRACTION_WIDTH-1:0];
+    end
+
+    // TODO: Support subnormalized numbers
+    logic is_zero1;
+    logic is_zero2;
+    logic is_inf1;
+    logic is_inf2;
+    logic is_nan1;
+    logic is_nan2;
+    always_comb begin
+        is_zero1 = exponent1 == '0;
+        is_zero2 = exponent2 == '0;
+        is_nan1 = exponent1 == '1 && fraction1 != '0;
+        is_nan2 = exponent2 == '1 && fraction2 != '0;
+        is_inf1 = exponent1 == '1 && fraction1 == '0;
+        is_inf2 = exponent2 == '1 && fraction2 == '0;
+    end
+
+    logic signed [EXPONENT_WIDTH+1:0] exponent1_extended;
+    logic signed [EXPONENT_WIDTH+1:0] exponent2_extended;
+    logic [FRACTION_WIDTH:0] fraction1_extended;
+    logic [FRACTION_WIDTH:0] fraction2_extended;
+    always_comb begin
+        exponent1_extended = {2'h0, exponent1};
+        exponent2_extended = {2'h0, exponent2};
+        fraction1_extended = {1'h1, fraction1};
+        fraction2_extended = {1'h1, fraction2};
+    end
+
+    // Calculate sum of exponents and production of fractions.
+    logic sign;
+    logic signed [EXPONENT_WIDTH+1:0] exponent_sum;
+    logic [FRACTION_WIDTH*2+1:0] fraction_prod;
+    always_comb begin
+        sign = sign1 ^ sign2;
+        exponent_sum = exponent1_extended + exponent2_extended - 127;
+        fraction_prod = fraction1_extended * fraction2_extended;
+    end
+
+    // Normalize
+    logic signed [EXPONENT_WIDTH+1:0] exponent_normalized;
+    logic [FRACTION_WIDTH*2:0] fraction_normalized;
+    always_comb begin
+        if (fraction_prod[FRACTION_WIDTH*2+1]) begin
+            exponent_normalized = exponent_sum + 1;
+            fraction_normalized = fraction_prod[FRACTION_WIDTH*2+1:1];
+        end
+        else begin
+            exponent_normalized = exponent_sum;
+            fraction_normalized = fraction_prod[FRACTION_WIDTH*2:0];
+        end
+    end
+
+    // Rounding
+    logic inexact;
+    logic signed [EXPONENT_WIDTH+1:0] exponent_rounded;
+    logic [FRACTION_WIDTH-1:0] fraction_rounded;
+    FpRounder #(
+        .EXPONENT_WIDTH(EXPONENT_WIDTH + 2),
+        .FRACTION_WIDTH(FRACTION_WIDTH)
+    ) rounder (
+        .inexact(inexact),
+        .roundedExponent(exponent_rounded),
+        .roundedFraction(fraction_rounded),
+        .roundingMode(roundingMode),
+        .sign(sign),
+        .exponent(exponent_normalized),
+        .fraction(fraction_normalized[FRACTION_WIDTH*2-1:FRACTION_WIDTH]),
+        .g(fraction_normalized[FRACTION_WIDTH-1]),
+        .r(fraction_normalized[FRACTION_WIDTH-2]),
+        .s(|fraction_normalized[FRACTION_WIDTH-3:0]));
+        
+    // Exception handling
+    logic overflow;
+    logic underflow;
+    always_comb begin
+        overflow = exponent_rounded >= 255;
+        underflow = exponent_rounded <= 0;
+    end
+
+    // Result
+    ResultType result_type;
+    always_comb begin
+        if (is_nan1 || is_nan2 || (is_zero1 && is_inf2) || (is_zero2 && is_inf1)) begin
+            result_type = ResultType_Nan;
+        end
+        else if (is_inf1 || is_inf2) begin
+            result_type = ResultType_Inf;
+        end
+        else if (is_zero1 || is_zero2) begin
+            result_type = ResultType_Zero;
+        end
+        else begin
+            result_type = ResultType_Production;
+        end
+    end
+    
+    always_comb begin
+        unique case (result_type)
+        ResultType_Production: begin
+            result[WIDTH-1] = sign;
+            result[WIDTH-2:FRACTION_WIDTH] = exponent_rounded[EXPONENT_WIDTH-1:0];
+            result[FRACTION_WIDTH-1:0] = fraction_rounded;
+        end
+        ResultType_Zero: begin
+            result[WIDTH-1] = sign;
+            result[WIDTH-2:0] = '0;
+        end
+        ResultType_Inf: begin
+            result[WIDTH-1] = sign;
+            result[WIDTH-2:FRACTION_WIDTH] = '1;
+            result[FRACTION_WIDTH-1:0] = '0;
+        end
+        ResultType_Nan: begin
+            // Canonical Signaling NaN
+            result[WIDTH-1] = '0;
+            result[WIDTH-2:FRACTION_WIDTH] = '1;
+            result[FRACTION_WIDTH-1:1] = '0;
+            result[0] = '1;
+        end
+        default: begin
+            result = '0;
+        end
+        endcase
+
+        flags.NV = result_type == ResultType_Nan;
+        flags.DZ = 0;
+        flags.OF = overflow;
+        flags.UF = underflow;
+        flags.NX = inexact;
+    end
+endmodule
+
 module FpMulAdd #(
     parameter EXPONENT_WIDTH = 8,
     parameter FRACTION_WIDTH = 23,
     parameter WIDTH = 1 + EXPONENT_WIDTH + FRACTION_WIDTH
 )(
-    output logic unsigned [WIDTH-1:0] fpResult,
+    output logic [WIDTH-1:0] fpResult,
     output fflags_t flags,
     input logic [2:0] roundingMode,
     input FpMulAddCommand command,
-    input logic unsigned [WIDTH-1:0] fpSrc1,
-    input logic unsigned [WIDTH-1:0] fpSrc2,
+    input logic [WIDTH-1:0] fpSrc1,
+    input logic [WIDTH-1:0] fpSrc2,
     input logic clk,
     input logic rst
 );
+    logic [WIDTH-1:0] resultMul;
+    fflags_t flagsMul;
+    FpMul m_FpMul (
+        .result(resultMul),
+        .flags(flagsMul),
+        .roundingMode(roundingMode),
+        .src1(fpSrc1),
+        .src2(fpSrc2));
+    
     always_comb begin
-        fpResult = '0;
-
-        flags.NV = 0;
-        flags.DZ = 0;
-        flags.OF = 0;
-        flags.UF = 0;
-        flags.NX = 0;
+        unique case (command)
+        FpMulAddCommand_Mul: begin
+            fpResult = resultMul;
+            flags = flagsMul;
+        end
+        default: begin
+            fpResult = '0;
+            flags = '0;
+        end
+        endcase
     end
 endmodule
