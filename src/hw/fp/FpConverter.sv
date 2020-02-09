@@ -295,12 +295,12 @@ endmodule
 
 module FpConverter (
     output word_t intResult,
-    output uint64_t fpResult,
+    output uint32_t fp32Result,
     output fflags_t flags,
     input FpConverterCommand command,
     input logic [2:0] roundingMode,
     input word_t intSrc,
-    input uint64_t fpSrc,
+    input uint32_t fp32Src,
     input logic clk,
     input logic rst
 );
@@ -318,11 +318,6 @@ module FpConverter (
         };
     end
 
-    fp32_t fp32_src;
-    always_comb begin
-        fp32_src = fpSrc[31:0];
-    end
-
     word_t result_f32_to_i32;
     fflags_t flags_f32_to_i32;    
     FpConverter_f32_to_i32 m_f32_to_i32(
@@ -330,7 +325,7 @@ module FpConverter (
         .flags(flags_f32_to_i32),
         .intSigned(intSigned),
         .roundingMode(roundingMode),
-        .src(fp32_src));
+        .src(fp32Src));
 
     fp32_t result_i32_to_f32;
     fflags_t flags_i32_to_f32;    
@@ -344,17 +339,17 @@ module FpConverter (
     always_comb begin
         if (command inside {FpConverterCommand_W_S, FpConverterCommand_WU_S})  begin
             intResult = result_f32_to_i32;
-            fpResult = '0;
+            fp32Result = '0;
             flags = flags_f32_to_i32;
         end
         else if (command inside {FpConverterCommand_S_W, FpConverterCommand_S_WU})  begin
             intResult = '0;
-            fpResult = {32'h0, result_i32_to_f32};
+            fp32Result = result_i32_to_f32;
             flags = flags_i32_to_f32;
         end
         else begin
             intResult = '0;
-            fpResult = '0;
+            fp32Result = '0;
             flags = '0;
         end
     end

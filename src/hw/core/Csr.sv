@@ -390,6 +390,7 @@ module Csr(
         bus.readValue = read_value;
         bus.readIllegal = 0; // TEMP: Disable illegal access exception for riscv-tests
 
+        bus.frm = reg_frm;
         bus.satp = reg_satp;
         bus.mstatus = reg_status;
         bus.privilege = reg_priv;
