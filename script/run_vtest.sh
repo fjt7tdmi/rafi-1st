@@ -33,6 +33,7 @@ run_test rafi-vtest-mul
 run_test rafi-vtest-timer
 run_test rafi-vtest-fp-comparator
 run_test rafi-vtest-fp-converter
+run_test rafi-vtest-fp-mul-add
 
 popd
 
