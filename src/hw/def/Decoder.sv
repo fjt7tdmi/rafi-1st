@@ -543,7 +543,28 @@ function automatic Op DecodeRV32F(insn_t insn);
         end
     end
     7'b1010011: begin
-        if (funct7 == 7'b0010000 && rm == 3'b000) begin
+        if (funct7 == 7'b0000000) begin
+            // FADD.S
+            op.fpUnitType = FpUnitType_MulAdd;
+            op.fpUnitCommand.mulAdd = FpMulAddCommand_Add;
+            op.dstRegType = RegType_Fp;
+            op.regWriteEnable = 1;
+        end
+        else if (funct7 == 7'b0000100) begin
+            // FSUB.S
+            op.fpUnitType = FpUnitType_MulAdd;
+            op.fpUnitCommand.mulAdd = FpMulAddCommand_Sub;
+            op.dstRegType = RegType_Fp;
+            op.regWriteEnable = 1;
+        end
+        else if (funct7 == 7'b0001000) begin
+            // FMUL.S
+            op.fpUnitType = FpUnitType_MulAdd;
+            op.fpUnitCommand.mulAdd = FpMulAddCommand_Mul;
+            op.dstRegType = RegType_Fp;
+            op.regWriteEnable = 1;
+        end
+        else if (funct7 == 7'b0010000 && rm == 3'b000) begin
             // FSGNJ.S
             op.fpUnitType = FpUnitType_Sign;
             op.fpUnitCommand.sign = FpSignUnitCommand_Sgnj;
@@ -562,12 +583,6 @@ function automatic Op DecodeRV32F(insn_t insn);
             op.fpUnitType = FpUnitType_Sign;
             op.fpUnitCommand.sign = FpSignUnitCommand_Sgnjx;
             op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
-        end
-        else if (funct7 == 7'b1110000 && rs2 == 5'b00000 && rm == 3'b000) begin
-            // FMV.X.W
-            op.fpUnitType = FpUnitType_Move;
-            op.dstRegType = RegType_Int;
             op.regWriteEnable = 1;
         end
         else if (funct7 == 7'b0010100 && rm == 3'b000) begin
@@ -595,6 +610,12 @@ function automatic Op DecodeRV32F(insn_t insn);
             // FCVT.WU.S
             op.fpUnitType = FpUnitType_Converter;
             op.fpUnitCommand.cvt = FpConverterCommand_WU_S;
+            op.dstRegType = RegType_Int;
+            op.regWriteEnable = 1;
+        end
+        else if (funct7 == 7'b1110000 && rs2 == 5'b00000 && rm == 3'b000) begin
+            // FMV.X.W
+            op.fpUnitType = FpUnitType_Move;
             op.dstRegType = RegType_Int;
             op.regWriteEnable = 1;
         end
