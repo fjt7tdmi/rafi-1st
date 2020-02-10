@@ -640,6 +640,7 @@ if (verilator_FOUND)
         src/hw/def/Rv32Types.sv
         src/hw/def/OpTypes.sv
         src/hw/fp/FpConverter.sv
+        src/hw/fp/FpRounder.sv
     )
     target_link_libraries(rafi-vtest-fp-converter
         PRIVATE ${GoogleTest_LIBRARIES} ${FS_LIBRARIES}

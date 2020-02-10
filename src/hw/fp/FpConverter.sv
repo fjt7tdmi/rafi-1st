@@ -152,70 +152,6 @@ module FpConverter_f32_to_i32 (
     end
 endmodule
 
-module FpConverter_rounder_f32 (
-    output logic [7:0] roundedExponent,
-    output logic [22:0] roundedFraction,
-    output logic inexact,
-    input logic [2:0] roundingMode,
-    input logic sign,
-    input logic [7:0] exponent,
-    input logic [22:0] fraction,
-    input logic g,
-    input logic r,
-    input logic s
-);
-    logic [23:0] extendedFraction;
-    logic ulp;
-    always_comb begin
-        extendedFraction = {1'b1, fraction};
-        ulp = fraction[0];
-    end
-
-    logic increment;
-    always_comb begin
-        unique case (roundingMode)
-        FRM_RNE: begin
-            if ({g, r, s} == 3'b100) begin
-                increment = ulp ? 1 : 0;
-            end
-            else if ({g, r, s} inside {3'b101, 3'b110, 3'b111}) begin
-                increment = 1;
-            end
-            else begin
-                increment = 0;
-            end
-        end
-        FRM_RTZ: increment = (sign == '1 && {g, r, s} != 3'b000) ? 1 : 0;
-        FRM_RDN: increment = 0;
-        FRM_RUP: increment = {g, r, s} != 3'b000 ? 1 : 0;
-        FRM_RMM: increment = {g, r, s} inside {3'b100, 3'b101, 3'b110, 3'b111} ? 1 : 0;
-        default: increment = '0;
-        endcase
-    end
-
-    logic [23:0] incrementdFraction;
-    always_comb begin
-        incrementdFraction = extendedFraction + 24'h1;
-    end
-
-    always_comb begin
-        if (increment && !incrementdFraction[23]) begin
-            roundedExponent = exponent + 1;
-            roundedFraction = incrementdFraction[23:1];
-        end
-        else if (increment && incrementdFraction[23]) begin
-            roundedExponent = exponent;
-            roundedFraction = incrementdFraction[22:0];
-        end
-        else begin
-            roundedExponent = exponent;
-            roundedFraction = fraction;
-        end
-
-        inexact = g | r | s;
-    end
-endmodule
-
 module FpConverter_i32_to_f32 (
     output fp32_t result,
     output fflags_t flags,
@@ -263,7 +199,10 @@ module FpConverter_i32_to_f32 (
     logic [7:0] rounded_exponent;
     logic [22:0] rounded_fraction;
 
-    FpConverter_rounder_f32 rounder(
+    FpRounder #(
+        .EXPONENT_WIDTH(8),
+        .FRACTION_WIDTH(23)
+    ) rounder (
         .inexact(inexact),
         .roundedExponent(rounded_exponent),
         .roundedFraction(rounded_fraction),
