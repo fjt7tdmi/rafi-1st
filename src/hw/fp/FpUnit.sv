@@ -98,6 +98,18 @@ module Fp32Unit(
         .clk(clk),
         .rst(rst));
 
+    uint32_t fpResultMulAdd;
+    fflags_t flagsMulAdd;
+    FpMulAdd m_FpMulAdd (
+        .fpResult(fpResultMulAdd),
+        .flags(flagsMulAdd),
+        .command(command.mulAdd),
+        .roundingMode(roundingMode),
+        .fpSrc1(fpSrc1),
+        .fpSrc2(fpSrc2),
+        .clk(clk),
+        .rst(rst));
+
     always_comb begin
         unique case (unit)
         FpUnitType_Move: begin
@@ -129,6 +141,12 @@ module Fp32Unit(
             fpResult = fpResultCvt;
             writeFlags = '1;
             writeFlagsValue = flagsCvt;
+        end
+        FpUnitType_MulAdd: begin
+            intResult = '0;
+            fpResult = fpResultMulAdd;
+            writeFlags = '1;
+            writeFlagsValue = flagsMulAdd;
         end
         default: begin
             intResult = '0;

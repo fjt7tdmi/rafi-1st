@@ -1,4 +1,5 @@
 [
+    { "name": "rv32uf-p-fadd",          "host-io-addr": "0x80001000", "cycle": 10000 },
     { "name": "rv32uf-p-fclass",        "host-io-addr": "0x80001000", "cycle": 10000 },
     { "name": "rv32uf-p-fcmp",          "host-io-addr": "0x80001000", "cycle": 10000 },
     { "name": "rv32uf-p-fcvt",          "host-io-addr": "0x80001000", "cycle": 10000 },
