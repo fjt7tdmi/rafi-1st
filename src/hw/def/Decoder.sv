@@ -613,6 +613,18 @@ function automatic Op DecodeRV32F(insn_t insn);
             op.dstRegType = RegType_Fp;
             op.regWriteEnable = 1;
         end
+        else if (funct7 == 7'b0001100) begin
+            // FDIV.S
+            op.fpUnitType = FpUnitType_Div;
+            op.dstRegType = RegType_Fp;
+            op.regWriteEnable = 1;
+        end
+        else if (funct7 == 7'b0101100 && rs2 == 5'b00000) begin
+            // FSQRT.S
+            op.fpUnitType = FpUnitType_Sqrt;
+            op.dstRegType = RegType_Fp;
+            op.regWriteEnable = 1;
+        end
         else if (funct7 == 7'b0010000 && rm == 3'b000) begin
             // FSGNJ.S
             op.fpUnitType = FpUnitType_Sign;

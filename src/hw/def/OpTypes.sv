@@ -98,7 +98,9 @@ typedef enum logic [2:0]
     FpUnitType_Sign         = 3'h2,
     FpUnitType_Comparator   = 3'h3,
     FpUnitType_Converter    = 3'h4,
-    FpUnitType_MulAdd       = 3'h5
+    FpUnitType_MulAdd       = 3'h5,
+    FpUnitType_Div          = 3'h6,
+    FpUnitType_Sqrt         = 3'h7
 } FpUnitType;
 
 typedef enum logic [3:0]

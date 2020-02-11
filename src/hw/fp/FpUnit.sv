@@ -112,6 +112,27 @@ module Fp32Unit(
         .clk(clk),
         .rst(rst));
 
+    uint32_t fpResultDiv;
+    fflags_t flagsDiv;
+    FpDivUnit m_FpDivUnit (
+        .fpResult(fpResultDiv),
+        .flags(flagsDiv),
+        .roundingMode(roundingMode),
+        .fpSrc1(fpSrc1),
+        .fpSrc2(fpSrc2),
+        .clk(clk),
+        .rst(rst));
+
+    uint32_t fpResultSqrt;
+    fflags_t flagsSqrt;
+    FpSqrtUnit m_FpSqrtUnit (
+        .fpResult(fpResultSqrt),
+        .flags(flagsSqrt),
+        .roundingMode(roundingMode),
+        .fpSrc(fpSrc1),
+        .clk(clk),
+        .rst(rst));
+
     always_comb begin
         unique case (unit)
         FpUnitType_Move: begin
@@ -149,6 +170,18 @@ module Fp32Unit(
             fpResult = fpResultMulAdd;
             writeFlags = '1;
             writeFlagsValue = flagsMulAdd;
+        end
+        FpUnitType_Div: begin
+            intResult = '0;
+            fpResult = fpResultDiv;
+            writeFlags = '1;
+            writeFlagsValue = flagsDiv;
+        end
+        FpUnitType_Sqrt: begin
+            intResult = '0;
+            fpResult = fpResultSqrt;
+            writeFlags = '1;
+            writeFlagsValue = flagsSqrt;
         end
         default: begin
             intResult = '0;

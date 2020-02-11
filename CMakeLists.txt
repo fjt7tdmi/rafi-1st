@@ -536,9 +536,11 @@ if (verilator_FOUND)
         src/hw/div/DivUnit.sv
         src/hw/fp/FpComparator.sv
         src/hw/fp/FpConverter.sv
+        src/hw/fp/FpDivUnit.sv
         src/hw/fp/FpMulAdd.sv
         src/hw/fp/FpRounder.sv
         src/hw/fp/FpSignUnit.sv
+        src/hw/fp/FpSqrtUnit.sv
         src/hw/fp/FpUnit.sv
         src/hw/mul/MulUnit.sv
         src/hw/core/BlockRam.sv
