@@ -668,6 +668,7 @@ if (verilator_FOUND)
         src/hw/def/RvTypes.sv
         src/hw/def/Rv32Types.sv
         src/hw/fp/FpDivUnit.sv
+        src/hw/fp/FpRounder.sv
     )
     target_link_libraries(rafi-vtest-fp-div
         PRIVATE ${GoogleTest_LIBRARIES} ${FS_LIBRARIES}
