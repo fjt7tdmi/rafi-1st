@@ -654,6 +654,33 @@ if (verilator_FOUND)
     endif()
 
     # =========================================================================
+    # rafi-vtest-fp-div
+    #
+    add_executable(rafi-vtest-fp-div
+        src/hw/fp/FpDivUnitTest.cpp
+    )
+    verilate(rafi-vtest-fp-div
+        PREFIX VFpDivUnit
+        THREADS 1
+        TRACE
+        SOURCES
+        src/hw/def/BasicTypes.sv
+        src/hw/def/RvTypes.sv
+        src/hw/def/Rv32Types.sv
+        src/hw/fp/FpDivUnit.sv
+    )
+    target_link_libraries(rafi-vtest-fp-div
+        PRIVATE ${GoogleTest_LIBRARIES} ${FS_LIBRARIES}
+    )
+
+    # disable warnings for verilator
+    if (MSVC)
+        target_compile_options(rafi-vtest-fp-div
+            PUBLIC /wd"4267"
+        )
+    endif()
+    
+    # =========================================================================
     # rafi-vtest-fp-mul-add
     #
     add_executable(rafi-vtest-fp-mul-add
