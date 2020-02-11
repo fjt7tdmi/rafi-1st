@@ -139,9 +139,13 @@ typedef enum logic [3:0]
 
 typedef enum logic [3:0]
 {
-    FpMulAddCommand_Add = 4'h0,
-    FpMulAddCommand_Sub = 4'h1,
-    FpMulAddCommand_Mul = 4'h2
+    FpMulAddCommand_FMADD   = 4'h0,
+    FpMulAddCommand_FMSUB   = 4'h1,
+    FpMulAddCommand_FNMSUB  = 4'h2,
+    FpMulAddCommand_FNMADD  = 4'h3,
+    FpMulAddCommand_FADD    = 4'h4,
+    FpMulAddCommand_FSUB    = 4'h5,
+    FpMulAddCommand_FMUL    = 4'h6
 } FpMulAddCommand;
 
 typedef union packed

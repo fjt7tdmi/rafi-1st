@@ -122,7 +122,7 @@ module FpMul #(
         .g(fraction_normalized[FRACTION_WIDTH-1]),
         .r(fraction_normalized[FRACTION_WIDTH-2]),
         .s(|fraction_normalized[FRACTION_WIDTH-3:0]));
-        
+
     // Exception handling
     logic overflow;
     logic underflow;
@@ -147,7 +147,7 @@ module FpMul #(
             result_type = ResultType_Production;
         end
     end
-    
+
     always_comb begin
         unique case (result_type)
         ResultType_Production: begin
@@ -191,8 +191,9 @@ module FpAdd #(
 )(
     output logic [WIDTH-1:0] result,
     output fflags_t flags,
-    input logic isSub,
     input logic [2:0] roundingMode,
+    input logic minus1,
+    input logic minus2,
     input logic [WIDTH-1:0] src1,
     input logic [WIDTH-1:0] src2
 );
@@ -205,7 +206,7 @@ module FpAdd #(
         ResultType_Inf  = 2'h2,
         ResultType_Nan  = 2'h3
     } ResultType;
-    
+
     logic sign1;
     logic sign2;
     logic [EXPONENT_WIDTH-1:0] exponent1;
@@ -213,8 +214,8 @@ module FpAdd #(
     logic [FRACTION_WIDTH-1:0] fraction1;
     logic [FRACTION_WIDTH-1:0] fraction2;
     always_comb begin
-        sign1 = src1[WIDTH-1];
-        sign2 = src2[WIDTH-1];
+        sign1 = src1[WIDTH-1] ^ minus1;
+        sign2 = src2[WIDTH-1] ^ minus2;
         exponent1 = src1[WIDTH-2:FRACTION_WIDTH];
         exponent2 = src2[WIDTH-2:FRACTION_WIDTH];
         fraction1 = src1[FRACTION_WIDTH-1:0];
@@ -236,7 +237,7 @@ module FpAdd #(
         is_inf1 = exponent1 == '1 && fraction1 == '0;
         is_inf2 = exponent2 == '1 && fraction2 == '0;
     end
-    
+
     // Compare abs(src1) and abs(src2)
     logic ge; // abs(src1) >= abs(src2)
     logic sign_large;
@@ -255,7 +256,7 @@ module FpAdd #(
         fraction_large = ge ? fraction1 : fraction2;
         fraction_small = ge ? fraction2 : fraction1;
     end
-    
+
     // Extend for shift and rounding
     logic [FRACTION_WIDTH*2+3:0] fraction_large_extended;
     logic [FRACTION_WIDTH*2+3:0] fraction_small_extended;
@@ -282,7 +283,7 @@ module FpAdd #(
     logic minus;
     logic [FRACTION_WIDTH*2+3:0] fraction_added;
     always_comb begin
-        minus = (~isSub && sign_large != sign_small) || (isSub && sign_large == sign_small);
+        minus = sign_large != sign_small;
         fraction_added = fraction_large_extended +
             (minus ? -fraction_small_shifted : fraction_small_shifted);
     end
@@ -308,12 +309,6 @@ module FpAdd #(
         fraction_normalized = fraction_added << shamt_normalize;
     end
 
-    // Result sign
-    logic sign;
-    always_comb begin
-        sign = (!ge && isSub) ? ~sign_large : sign_large;
-    end
-
     // Rounding
     logic inexact;
     logic [EXPONENT_WIDTH+1:0] exponent_rounded;
@@ -327,7 +322,7 @@ module FpAdd #(
         .roundedExponent(exponent_rounded),
         .roundedFraction(fraction_rounded),
         .roundingMode(roundingMode),
-        .sign(sign),
+        .sign(sign_large),
         .exponent(exponent_normalized[EXPONENT_WIDTH-1:0]),
         .fraction(fraction_normalized[FRACTION_WIDTH*2+2:FRACTION_WIDTH+3]),
         .g(fraction_normalized[FRACTION_WIDTH+2]),
@@ -349,7 +344,7 @@ module FpAdd #(
         if (is_nan1 || is_nan2) begin
             result_type = ResultType_Nan;
         end
-        else if (is_inf1 && is_inf2 && ((~isSub && sign1 != sign2) || (isSub && sign1 == sign2))) begin
+        else if (is_inf1 && is_inf2 && sign1 != sign2) begin
             result_type = ResultType_Nan;
         end
         else if (is_inf1 || is_inf2) begin
@@ -366,7 +361,7 @@ module FpAdd #(
     always_comb begin
         unique case (result_type)
         ResultType_Sum: begin
-            result[WIDTH-1] = sign;
+            result[WIDTH-1] = sign_large;
             result[WIDTH-2:FRACTION_WIDTH] = exponent_rounded[EXPONENT_WIDTH-1:0];
             result[FRACTION_WIDTH-1:0] = fraction_rounded;
         end
@@ -374,7 +369,7 @@ module FpAdd #(
             result = '0;
         end
         ResultType_Inf: begin
-            result[WIDTH-1] = sign;
+            result[WIDTH-1] = sign_large;
             result[WIDTH-2:FRACTION_WIDTH] = '1;
             result[FRACTION_WIDTH-1:0] = '0;
         end
@@ -408,6 +403,7 @@ module FpMulAdd #(
     input FpMulAddCommand command,
     input logic [WIDTH-1:0] fpSrc1,
     input logic [WIDTH-1:0] fpSrc2,
+    input logic [WIDTH-1:0] fpSrc3,
     input logic clk,
     input logic rst
 );
@@ -419,32 +415,26 @@ module FpMulAdd #(
         .roundingMode(roundingMode),
         .src1(fpSrc1),
         .src2(fpSrc2));
-    
+
     logic [WIDTH-1:0] resultAdd;
     fflags_t flagsAdd;
-    logic isSub;
+    logic useSrc3;
+    logic minus1;
+    logic minus2;
     FpAdd m_FpAdd (
         .result(resultAdd),
         .flags(flagsAdd),
-        .isSub(isSub),
         .roundingMode(roundingMode),
-        .src1(fpSrc1),
-        .src2(fpSrc2));
+        .minus1(minus1),
+        .minus2(minus2),
+        .src1(useSrc3 ? resultMul : fpSrc1),
+        .src2(useSrc3 ? fpSrc3 : fpSrc2));
 
     always_comb begin
-        isSub = command inside {FpMulAddCommand_Sub};
-
-        if (command inside {FpMulAddCommand_Mul}) begin
-            fpResult = resultMul;
-            flags = flagsMul;
-        end
-        else if (command inside {FpMulAddCommand_Add, FpMulAddCommand_Sub}) begin
-            fpResult = resultAdd;
-            flags = flagsAdd;
-        end
-        else begin
-            fpResult = '0;
-            flags = '0;
-        end
+        fpResult = command inside {FpMulAddCommand_FMUL} ? resultMul : resultAdd;
+        flags    = command inside {FpMulAddCommand_FMUL} ? flagsMul : flagsAdd;
+        useSrc3  = command inside {FpMulAddCommand_FMADD, FpMulAddCommand_FMSUB, FpMulAddCommand_FNMADD, FpMulAddCommand_FNMSUB};
+        minus1   = command inside {FpMulAddCommand_FNMADD, FpMulAddCommand_FNMSUB};
+        minus2   = command inside {FpMulAddCommand_FSUB, FpMulAddCommand_FMSUB, FpMulAddCommand_FNMADD};
     end
 endmodule

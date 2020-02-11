@@ -472,11 +472,12 @@ function automatic Op DecodeRV32A(insn_t insn);
 endfunction
 
 function automatic Op DecodeRV32F(insn_t insn);
-    logic [6:0] funct7 = insn[31:25];
-    logic [4:0] rs2 = insn[24:20];
-    logic [2:0] funct3 = insn[14:12];
-    logic [2:0] rm = insn[14:12];
-    logic [6:0] opcode = insn[6:0];
+    logic [6:0] funct7  = insn[31:25];
+    logic [1:0] funct2  = insn[26:25];
+    logic [4:0] rs2     = insn[24:20];
+    logic [2:0] funct3  = insn[14:12];
+    logic [2:0] rm      = insn[14:12];
+    logic [6:0] opcode  = insn[6:0];
 
     Op op;
 
@@ -546,21 +547,21 @@ function automatic Op DecodeRV32F(insn_t insn);
         if (funct7 == 7'b0000000) begin
             // FADD.S
             op.fpUnitType = FpUnitType_MulAdd;
-            op.fpUnitCommand.mulAdd = FpMulAddCommand_Add;
+            op.fpUnitCommand.mulAdd = FpMulAddCommand_FADD;
             op.dstRegType = RegType_Fp;
             op.regWriteEnable = 1;
         end
         else if (funct7 == 7'b0000100) begin
             // FSUB.S
             op.fpUnitType = FpUnitType_MulAdd;
-            op.fpUnitCommand.mulAdd = FpMulAddCommand_Sub;
+            op.fpUnitCommand.mulAdd = FpMulAddCommand_FSUB;
             op.dstRegType = RegType_Fp;
             op.regWriteEnable = 1;
         end
         else if (funct7 == 7'b0001000) begin
             // FMUL.S
             op.fpUnitType = FpUnitType_MulAdd;
-            op.fpUnitCommand.mulAdd = FpMulAddCommand_Mul;
+            op.fpUnitCommand.mulAdd = FpMulAddCommand_FMUL;
             op.dstRegType = RegType_Fp;
             op.regWriteEnable = 1;
         end
@@ -683,7 +684,7 @@ function automatic Op Decode(insn_t insn);
     logic [2:0] funct3 = insn[14:12];
     logic [1:0] funct2 = insn[26:25];
     logic [6:0] opcode = insn[6:0];
-    
+
     if (opcode == 7'b0110011 && funct7 == 7'b0000001) begin
         return DecodeRV32M(insn);
     end

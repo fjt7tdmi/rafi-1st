@@ -78,7 +78,7 @@ module Fp32Unit(
         .intResult(intResultCmp),
         .fpResult(fpResultCmp),
         .flags(flagsCmp),
-        .command(command.cmp),        
+        .command(command.cmp),
         .fpSrc1(fpSrc1),
         .fpSrc2(fpSrc2),
         .clk(clk),
@@ -107,6 +107,7 @@ module Fp32Unit(
         .roundingMode(roundingMode),
         .fpSrc1(fpSrc1),
         .fpSrc2(fpSrc2),
+        .fpSrc3('0),
         .clk(clk),
         .rst(rst));
 
