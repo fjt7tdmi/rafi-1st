@@ -42,6 +42,7 @@ module Fp32Unit(
     input word_t intSrc2,
     input uint32_t fpSrc1,
     input uint32_t fpSrc2,
+    input uint32_t fpSrc3,
     input logic clk,
     input logic rst
 );
@@ -78,7 +79,7 @@ module Fp32Unit(
         .intResult(intResultCmp),
         .fpResult(fpResultCmp),
         .flags(flagsCmp),
-        .command(command.cmp),        
+        .command(command.cmp),
         .fpSrc1(fpSrc1),
         .fpSrc2(fpSrc2),
         .clk(clk),
@@ -107,6 +108,7 @@ module Fp32Unit(
         .roundingMode(roundingMode),
         .fpSrc1(fpSrc1),
         .fpSrc2(fpSrc2),
+        .fpSrc3(fpSrc3),
         .clk(clk),
         .rst(rst));
 

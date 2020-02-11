@@ -56,6 +56,7 @@ module FpRegFile(
     always_comb begin
         bus.readValue1 = body[bus.readAddr1];
         bus.readValue2 = body[bus.readAddr2];
+        bus.readValue3 = body[bus.readAddr3];
     end
 
     always_ff @(posedge clk) begin

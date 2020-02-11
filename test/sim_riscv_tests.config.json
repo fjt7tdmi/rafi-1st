@@ -4,6 +4,7 @@
     { "name": "rv32uf-p-fcmp",          "host-io-addr": "0x80001000", "cycle": 10000 },
     { "name": "rv32uf-p-fcvt",          "host-io-addr": "0x80001000", "cycle": 10000 },
     { "name": "rv32uf-p-fcvt_w",        "host-io-addr": "0x80001000", "cycle": 10000 },
+    { "name": "rv32uf-p-fmadd",         "host-io-addr": "0x80001000", "cycle": 10000 },
     { "name": "rv32uf-p-fmin",          "host-io-addr": "0x80001000", "cycle": 10000 },
     { "name": "rv32uf-p-ldst",          "host-io-addr": "0x80001000", "cycle": 10000 },
     { "name": "rv32uf-p-move",          "host-io-addr": "0x80001000", "cycle": 10000 },
