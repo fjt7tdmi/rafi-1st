@@ -631,6 +631,7 @@ if (verilator_FOUND)
     #
     add_executable(rafi-vtest-fp-converter
         src/hw/fp/FpConverterTest.cpp
+        src/hw/fp/FpTest.h
     )
     verilate(rafi-vtest-fp-converter
         PREFIX VFpConverter
@@ -660,6 +661,7 @@ if (verilator_FOUND)
     #
     add_executable(rafi-vtest-fp-div
         src/hw/fp/FpDivUnitTest.cpp
+        src/hw/fp/FpTest.h
     )
     verilate(rafi-vtest-fp-div
         PREFIX VFpDivUnit
@@ -688,6 +690,7 @@ if (verilator_FOUND)
     #
     add_executable(rafi-vtest-fp-mul-add
         src/hw/fp/FpMulAddTest.cpp
+        src/hw/fp/FpTest.h
     )
     verilate(rafi-vtest-fp-mul-add
         PREFIX VFpMulAdd
