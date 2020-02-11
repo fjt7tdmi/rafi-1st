@@ -101,6 +101,7 @@ module ExecuteStage(
 
     uint64_t srcFpRegValue1;
     uint64_t srcFpRegValue2;
+    uint64_t srcFpRegValue3;
     uint64_t dstFpRegValue;
 
     word_t intResult;
@@ -149,6 +150,7 @@ module ExecuteStage(
         .intSrc2(srcIntRegValue2),
         .fpSrc1(srcFpRegValue1[31:0]),
         .fpSrc2(srcFpRegValue2[31:0]),
+        .fpSrc3(srcFpRegValue3[31:0]),
         .clk,
         .rst
     );
@@ -179,6 +181,7 @@ module ExecuteStage(
 
         srcFpRegValue1 = fpBypass.hit1 ? fpBypass.readValue1 : prevStage.srcFpRegValue1;
         srcFpRegValue2 = fpBypass.hit2 ? fpBypass.readValue2 : prevStage.srcFpRegValue2;
+        srcFpRegValue3 = fpBypass.hit3 ? fpBypass.readValue3 : prevStage.srcFpRegValue3;
 
         // aluSrc1
         unique case (op.aluSrcType1)
@@ -209,7 +212,7 @@ module ExecuteStage(
         IntResultType_Fp32:     intResult = intResultFp32;
         default:                intResult = '0;
         endcase
-    
+
         branchTaken = op.isBranch && BranchComparator(op.branchType, srcIntRegValue1, srcIntRegValue2);
         branchTarget = intResult;
     end
@@ -245,7 +248,7 @@ module ExecuteStage(
     // LoadStoreUnit
     always_comb begin
         memAddr = intResult;
-        
+
         unique case (op.storeSrcType)
         StoreSrcType_Int:   storeRegValue = srcIntRegValue2;
         StoreSrcType_Fp:    storeRegValue = srcFpRegValue2[31:0];
@@ -260,7 +263,7 @@ module ExecuteStage(
         loadStoreUnit.storeRegValue = storeRegValue;
         loadStoreUnit.command = getLoadStoreUnitCommand(op);
     end
-    
+
     // PipelineController
     always_comb begin
         ctrl.exStallReq = (enableMulDiv && !doneMulDiv) || (loadStoreUnit.enable && !loadStoreUnit.done);
@@ -290,6 +293,7 @@ module ExecuteStage(
 
         fpBypass.readAddr1 = prevStage.srcRegAddr1;
         fpBypass.readAddr2 = prevStage.srcRegAddr2;
+        fpBypass.readAddr3 = prevStage.srcRegAddr3;
         fpBypass.writeAddr = prevStage.dstRegAddr;
         fpBypass.writeValue = dstFpRegValue;
         fpBypass.writeEnable = valid && op.regWriteEnable && op.dstRegType == RegType_Fp && !ctrl.exStallReq;

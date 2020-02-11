@@ -68,23 +68,29 @@ interface FpBypassLogicIF;
 
     reg_addr_t readAddr1;
     reg_addr_t readAddr2;
+    reg_addr_t readAddr3;
     uint64_t readValue1;
     uint64_t readValue2;
+    uint64_t readValue3;
     logic hit1;
     logic hit2;
+    logic hit3;
 
     modport BypassLogic(
     output
         readValue1,
         readValue2,
+        readValue3,
         hit1,
         hit2,
+        hit3,
     input
         writeAddr,
         writeValue,
         writeEnable,
         readAddr1,
-        readAddr2
+        readAddr2,
+        readAddr3
     );
 
     modport ExecuteStage(
@@ -94,10 +100,13 @@ interface FpBypassLogicIF;
         writeEnable,
         readAddr1,
         readAddr2,
+        readAddr3,
     input
         readValue1,
         readValue2,
+        readValue3,
         hit1,
-        hit2
+        hit2,
+        hit3
     );
 endinterface

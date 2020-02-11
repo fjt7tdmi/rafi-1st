@@ -119,6 +119,8 @@ module FpBypassLogic(
     input clk,
     input rst
 );
+    parameter READ_PORT_COUNT = 3;
+
     typedef logic [$clog2(BypassDepth)-1:0] _index_t;
 
     typedef struct packed {
@@ -142,26 +144,29 @@ module FpBypassLogic(
     PipelineEntry pipeline[BypassDepth];
 
     // Wires
-    logic hit[BypassReadPortCount];
-    reg_addr_t readAddr[BypassReadPortCount];
-    word_t readValue[BypassReadPortCount];
+    logic hit[READ_PORT_COUNT];
+    reg_addr_t readAddr[READ_PORT_COUNT];
+    word_t readValue[READ_PORT_COUNT];
 
-    logic [BypassDepth-1:0] camHits[BypassReadPortCount];
-    _index_t camIndex[BypassReadPortCount];
+    logic [BypassDepth-1:0] camHits[READ_PORT_COUNT];
+    _index_t camIndex[READ_PORT_COUNT];
 
     always_comb begin
         readAddr[0] = bus.readAddr1;
         readAddr[1] = bus.readAddr2;
+        readAddr[2] = bus.readAddr3;
 
         bus.readValue1 = readValue[0];
         bus.readValue2 = readValue[1];
+        bus.readValue3 = readValue[2];
         bus.hit1 = hit[0];
         bus.hit2 = hit[1];
+        bus.hit3 = hit[2];
     end
 
     // Bypass CAM
     always_comb begin
-        for (int i = 0; i < BypassReadPortCount; i++) begin
+        for (int i = 0; i < READ_PORT_COUNT; i++) begin
             for (int j = 0; j < BypassDepth; j++) begin
                 camHits[i][j] = pipeline[j].valid && (pipeline[j].addr == readAddr[i]);
             end

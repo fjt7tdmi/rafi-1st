@@ -543,6 +543,54 @@ function automatic Op DecodeRV32F(insn_t insn);
             op.isUnknown = 1;
         end
     end
+    7'b1000011: begin
+        if (funct2 == 2'b00) begin
+            // FMADD.S
+            op.fpUnitType = FpUnitType_MulAdd;
+            op.fpUnitCommand.mulAdd = FpMulAddCommand_FMADD;
+            op.dstRegType = RegType_Fp;
+            op.regWriteEnable = 1;
+        end
+        else begin
+            op.isUnknown = 1;
+        end
+    end
+    7'b1000111: begin
+        if (funct2 == 2'b00) begin
+            // FMSUB.S
+            op.fpUnitType = FpUnitType_MulAdd;
+            op.fpUnitCommand.mulAdd = FpMulAddCommand_FMSUB;
+            op.dstRegType = RegType_Fp;
+            op.regWriteEnable = 1;
+        end
+        else begin
+            op.isUnknown = 1;
+        end
+    end
+    7'b1001011: begin
+        if (funct2 == 2'b00) begin
+            // FNMSUB.S
+            op.fpUnitType = FpUnitType_MulAdd;
+            op.fpUnitCommand.mulAdd = FpMulAddCommand_FNMSUB;
+            op.dstRegType = RegType_Fp;
+            op.regWriteEnable = 1;
+        end
+        else begin
+            op.isUnknown = 1;
+        end
+    end
+    7'b1001111: begin
+        if (funct2 == 2'b00) begin
+            // FNMSUB.S
+            op.fpUnitType = FpUnitType_MulAdd;
+            op.fpUnitCommand.mulAdd = FpMulAddCommand_FNMADD;
+            op.dstRegType = RegType_Fp;
+            op.regWriteEnable = 1;
+        end
+        else begin
+            op.isUnknown = 1;
+        end
+    end
     7'b1010011: begin
         if (funct7 == 7'b0000000) begin
             // FADD.S

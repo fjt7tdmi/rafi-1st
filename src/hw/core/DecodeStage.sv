@@ -34,6 +34,7 @@ module DecodeStage(
     csr_addr_t csrAddr;
     reg_addr_t srcRegAddr1;
     reg_addr_t srcRegAddr2;
+    reg_addr_t srcRegAddr3;
     reg_addr_t dstRegAddr;
     TrapInfo trapInfo;
 
@@ -43,6 +44,7 @@ module DecodeStage(
         csrAddr = prevStage.insn[31:20];
         srcRegAddr1 = prevStage.insn[19:15];
         srcRegAddr2 = prevStage.insn[24:20];
+        srcRegAddr3 = prevStage.insn[31:27];
         dstRegAddr = prevStage.insn[11:7];
 
         if (valid && !prevStage.trapInfo.valid && op.isUnknown) begin
@@ -64,6 +66,7 @@ module DecodeStage(
             nextStage.csrAddr <= '0;
             nextStage.srcRegAddr1 <= '0;
             nextStage.srcRegAddr2 <= '0;
+            nextStage.srcRegAddr3 <= '0;
             nextStage.dstRegAddr <= '0;
             nextStage.trapInfo <= '0;
         end
@@ -75,6 +78,7 @@ module DecodeStage(
             nextStage.csrAddr <= nextStage.csrAddr;
             nextStage.srcRegAddr1 <= nextStage.srcRegAddr1;
             nextStage.srcRegAddr2 <= nextStage.srcRegAddr2;
+            nextStage.srcRegAddr3 <= nextStage.srcRegAddr3;
             nextStage.dstRegAddr <= nextStage.dstRegAddr;
             nextStage.trapInfo <= nextStage.trapInfo;
         end
@@ -86,6 +90,7 @@ module DecodeStage(
             nextStage.csrAddr <= '0;
             nextStage.srcRegAddr1 <= '0;
             nextStage.srcRegAddr2 <= '0;
+            nextStage.srcRegAddr3 <= '0;
             nextStage.dstRegAddr <= '0;
             nextStage.trapInfo <= '0;
         end
@@ -97,6 +102,7 @@ module DecodeStage(
             nextStage.csrAddr <= csrAddr;
             nextStage.srcRegAddr1 <= srcRegAddr1;
             nextStage.srcRegAddr2 <= srcRegAddr2;
+            nextStage.srcRegAddr3 <= srcRegAddr3;
             nextStage.dstRegAddr <= dstRegAddr;
             nextStage.trapInfo <= trapInfo;
         end
