@@ -60,7 +60,7 @@ protected:
 void RunTest(FpSqrtUnitTest* pTest, uint32_t expectedFlags, uint32_t expectedResult, uint32_t src)
 {
     pTest->GetTop()->roundingMode = 0;
-    pTest->GetTop()->fpSrc = src1;
+    pTest->GetTop()->fpSrc = src;
     pTest->ProcessCycle();
 
     ASSERT_EQ(expectedFlags, pTest->GetTop()->flags);
