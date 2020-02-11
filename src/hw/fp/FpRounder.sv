@@ -17,7 +17,6 @@
 import BasicTypes::*;
 import RvTypes::*;
 import Rv32Types::*;
-import OpTypes::*;
 
 module FpRounder #(
     parameter EXPONENT_WIDTH = 8,
