@@ -43,35 +43,35 @@ class FpMulAddTest : public FpTest<VTopModule>
 public:
     void ProcessCycle()
     {
-        GetTop()->clk = 1;
-        GetTop()->eval();
-        GetTfp()->dump(m_Cycle * 10 + 5);
+        this->GetTop()->clk = 1;
+        this->GetTop()->eval();
+        this->GetTfp()->dump(this->m_Cycle * 10 + 5);
 
-        GetTop()->clk = 0;
-        GetTop()->eval();
-        GetTfp()->dump(m_Cycle * 10 + 10);
+        this->GetTop()->clk = 0;
+        this->GetTop()->eval();
+        this->GetTfp()->dump(this->m_Cycle * 10 + 10);
 
-        m_Cycle++;
+        this->m_Cycle++;
     }
 
 protected:
     virtual void SetUpModule() override
     {
-        GetTop()->command = 0;
-        GetTop()->roundingMode = 0;
-        GetTop()->fpSrc1 = 0;
-        GetTop()->fpSrc2 = 0;
-        GetTop()->fpSrc3 = 0;
+        this->GetTop()->command = 0;
+        this->GetTop()->roundingMode = 0;
+        this->GetTop()->fpSrc1 = 0;
+        this->GetTop()->fpSrc2 = 0;
+        this->GetTop()->fpSrc3 = 0;
 
         // reset
-        GetTop()->rst = 1;
-        GetTop()->clk = 0;
-        GetTop()->eval();
-        GetTfp()->dump(0);
+        this->GetTop()->rst = 1;
+        this->GetTop()->clk = 0;
+        this->GetTop()->eval();
+        this->GetTfp()->dump(0);
 
         ProcessCycle();
 
-        GetTop()->rst = 0;
+        this->GetTop()->rst = 0;
     }
 
     virtual void TearDownModule() override
