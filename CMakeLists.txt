@@ -691,30 +691,63 @@ if (verilator_FOUND)
     endif()
 
     # =========================================================================
-    # rafi-vtest-fp-div
+    # rafi-vtest-fp32-div
     #
-    add_executable(rafi-vtest-fp-div
-        src/hw/fp/FpDivUnitTest.cpp
+    add_executable(rafi-vtest-fp32-div
+        src/hw/fp/Fp32DivUnitTest.cpp
+        src/hw/fp/FpDivUnitTest.h
         src/hw/fp/FpTest.h
     )
-    verilate(rafi-vtest-fp-div
-        PREFIX VFpDivUnit
+    verilate(rafi-vtest-fp32-div
+        PREFIX VFp32DivUnit
         THREADS 1
         TRACE
         SOURCES
         src/hw/def/BasicTypes.sv
         src/hw/def/RvTypes.sv
         src/hw/def/Rv32Types.sv
+        src/hw/fp/Fp32DivUnit.sv
         src/hw/fp/FpDivUnit.sv
         src/hw/fp/FpRounder.sv
     )
-    target_link_libraries(rafi-vtest-fp-div
+    target_link_libraries(rafi-vtest-fp32-div
         PRIVATE ${GoogleTest_LIBRARIES} ${FS_LIBRARIES}
     )
 
     # disable warnings for verilator
     if (MSVC)
-        target_compile_options(rafi-vtest-fp-div
+        target_compile_options(rafi-vtest-fp32-div
+            PUBLIC /wd"4267"
+        )
+    endif()
+
+    # =========================================================================
+    # rafi-vtest-fp64-div
+    #
+    add_executable(rafi-vtest-fp64-div
+        src/hw/fp/Fp64DivUnitTest.cpp
+        src/hw/fp/FpDivUnitTest.h
+        src/hw/fp/FpTest.h
+    )
+    verilate(rafi-vtest-fp64-div
+        PREFIX VFp64DivUnit
+        THREADS 1
+        TRACE
+        SOURCES
+        src/hw/def/BasicTypes.sv
+        src/hw/def/RvTypes.sv
+        src/hw/def/Rv32Types.sv
+        src/hw/fp/Fp64DivUnit.sv
+        src/hw/fp/FpDivUnit.sv
+        src/hw/fp/FpRounder.sv
+    )
+    target_link_libraries(rafi-vtest-fp64-div
+        PRIVATE ${GoogleTest_LIBRARIES} ${FS_LIBRARIES}
+    )
+
+    # disable warnings for verilator
+    if (MSVC)
+        target_compile_options(rafi-vtest-fp64-div
             PUBLIC /wd"4267"
         )
     endif()
