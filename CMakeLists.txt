@@ -599,14 +599,15 @@ if (verilator_FOUND)
     )
 
     # =========================================================================
-    # rafi-vtest-fp-comparator
+    # rafi-vtest-fp32-comparator
     #
-    add_executable(rafi-vtest-fp-comparator
-        src/hw/fp/FpComparatorTest.cpp
+    add_executable(rafi-vtest-fp32-comparator
+        src/hw/fp/Fp32ComparatorTest.cpp
+        src/hw/fp/FpComparatorTest.h
         src/hw/fp/FpTest.h
     )
-    verilate(rafi-vtest-fp-comparator
-        PREFIX VFpComparator
+    verilate(rafi-vtest-fp32-comparator
+        PREFIX VFp32Comparator
         THREADS 1
         TRACE
         SOURCES
@@ -615,14 +616,46 @@ if (verilator_FOUND)
         src/hw/def/Rv32Types.sv
         src/hw/def/OpTypes.sv
         src/hw/fp/FpComparator.sv
+        src/hw/fp/Fp32Comparator.sv
     )
-    target_link_libraries(rafi-vtest-fp-comparator
+    target_link_libraries(rafi-vtest-fp32-comparator
         PRIVATE ${GoogleTest_LIBRARIES} ${FS_LIBRARIES}
     )
 
     # disable warnings for verilator
     if (MSVC)
-        target_compile_options(rafi-vtest-fp-comparator
+        target_compile_options(rafi-vtest-fp32-comparator
+            PUBLIC /wd"4267"
+        )
+    endif()
+
+    # =========================================================================
+    # rafi-vtest-fp64-comparator
+    #
+    add_executable(rafi-vtest-fp64-comparator
+        src/hw/fp/Fp64ComparatorTest.cpp
+        src/hw/fp/FpComparatorTest.h
+        src/hw/fp/FpTest.h
+    )
+    verilate(rafi-vtest-fp64-comparator
+        PREFIX VFp64Comparator
+        THREADS 1
+        TRACE
+        SOURCES
+        src/hw/def/BasicTypes.sv
+        src/hw/def/RvTypes.sv
+        src/hw/def/Rv32Types.sv
+        src/hw/def/OpTypes.sv
+        src/hw/fp/FpComparator.sv
+        src/hw/fp/Fp64Comparator.sv
+    )
+    target_link_libraries(rafi-vtest-fp64-comparator
+        PRIVATE ${GoogleTest_LIBRARIES} ${FS_LIBRARIES}
+    )
+
+    # disable warnings for verilator
+    if (MSVC)
+        target_compile_options(rafi-vtest-fp64-comparator
             PUBLIC /wd"4267"
         )
     endif()
@@ -658,42 +691,76 @@ if (verilator_FOUND)
     endif()
 
     # =========================================================================
-    # rafi-vtest-fp-div
+    # rafi-vtest-fp32-div
     #
-    add_executable(rafi-vtest-fp-div
-        src/hw/fp/FpDivUnitTest.cpp
+    add_executable(rafi-vtest-fp32-div
+        src/hw/fp/Fp32DivUnitTest.cpp
+        src/hw/fp/FpDivUnitTest.h
         src/hw/fp/FpTest.h
     )
-    verilate(rafi-vtest-fp-div
-        PREFIX VFpDivUnit
+    verilate(rafi-vtest-fp32-div
+        PREFIX VFp32DivUnit
         THREADS 1
         TRACE
         SOURCES
         src/hw/def/BasicTypes.sv
         src/hw/def/RvTypes.sv
         src/hw/def/Rv32Types.sv
+        src/hw/fp/Fp32DivUnit.sv
         src/hw/fp/FpDivUnit.sv
         src/hw/fp/FpRounder.sv
     )
-    target_link_libraries(rafi-vtest-fp-div
+    target_link_libraries(rafi-vtest-fp32-div
         PRIVATE ${GoogleTest_LIBRARIES} ${FS_LIBRARIES}
     )
 
     # disable warnings for verilator
     if (MSVC)
-        target_compile_options(rafi-vtest-fp-div
+        target_compile_options(rafi-vtest-fp32-div
             PUBLIC /wd"4267"
         )
     endif()
 
     # =========================================================================
-    # rafi-vtest-fp-mul-add
+    # rafi-vtest-fp64-div
     #
-    add_executable(rafi-vtest-fp-mul-add
-        src/hw/fp/FpMulAddTest.cpp
+    add_executable(rafi-vtest-fp64-div
+        src/hw/fp/Fp64DivUnitTest.cpp
+        src/hw/fp/FpDivUnitTest.h
         src/hw/fp/FpTest.h
     )
-    verilate(rafi-vtest-fp-mul-add
+    verilate(rafi-vtest-fp64-div
+        PREFIX VFp64DivUnit
+        THREADS 1
+        TRACE
+        SOURCES
+        src/hw/def/BasicTypes.sv
+        src/hw/def/RvTypes.sv
+        src/hw/def/Rv32Types.sv
+        src/hw/fp/Fp64DivUnit.sv
+        src/hw/fp/FpDivUnit.sv
+        src/hw/fp/FpRounder.sv
+    )
+    target_link_libraries(rafi-vtest-fp64-div
+        PRIVATE ${GoogleTest_LIBRARIES} ${FS_LIBRARIES}
+    )
+
+    # disable warnings for verilator
+    if (MSVC)
+        target_compile_options(rafi-vtest-fp64-div
+            PUBLIC /wd"4267"
+        )
+    endif()
+
+    # =========================================================================
+    # rafi-vtest-fp32-mul-add
+    #
+    add_executable(rafi-vtest-fp32-mul-add
+        src/hw/fp/Fp32MulAddTest.cpp
+        src/hw/fp/FpMulAddTest.h
+        src/hw/fp/FpTest.h
+    )
+    verilate(rafi-vtest-fp32-mul-add
         PREFIX VFpMulAdd
         THREADS 1
         TRACE
@@ -702,16 +769,49 @@ if (verilator_FOUND)
         src/hw/def/RvTypes.sv
         src/hw/def/Rv32Types.sv
         src/hw/def/OpTypes.sv
+        src/hw/fp/Fp32MulAdd.sv
         src/hw/fp/FpMulAdd.sv
         src/hw/fp/FpRounder.sv
     )
-    target_link_libraries(rafi-vtest-fp-mul-add
+    target_link_libraries(rafi-vtest-fp32-mul-add
         PRIVATE ${GoogleTest_LIBRARIES} ${FS_LIBRARIES}
     )
 
     # disable warnings for verilator
     if (MSVC)
-        target_compile_options(rafi-vtest-fp-mul-add
+        target_compile_options(rafi-vtest-fp32-mul-add
+            PUBLIC /wd"4267"
+        )
+    endif()
+
+    # =========================================================================
+    # rafi-vtest-fp64-mul-add
+    #
+    add_executable(rafi-vtest-fp64-mul-add
+        src/hw/fp/Fp32MulAddTest.cpp
+        src/hw/fp/FpMulAddTest.h
+        src/hw/fp/FpTest.h
+    )
+    verilate(rafi-vtest-fp64-mul-add
+        PREFIX VFpMulAdd
+        THREADS 1
+        TRACE
+        SOURCES
+        src/hw/def/BasicTypes.sv
+        src/hw/def/RvTypes.sv
+        src/hw/def/Rv32Types.sv
+        src/hw/def/OpTypes.sv
+        src/hw/fp/Fp64MulAdd.sv
+        src/hw/fp/FpMulAdd.sv
+        src/hw/fp/FpRounder.sv
+    )
+    target_link_libraries(rafi-vtest-fp64-mul-add
+        PRIVATE ${GoogleTest_LIBRARIES} ${FS_LIBRARIES}
+    )
+
+    # disable warnings for verilator
+    if (MSVC)
+        target_compile_options(rafi-vtest-fp64-mul-add
             PUBLIC /wd"4267"
         )
     endif()

@@ -14,51 +14,16 @@
  * limitations under the License.
  */
 
-#include "VFpDivUnit.h"
-#include "FpTest.h"
+#include "FpDivUnitTest.h"
+#include "VFp32DivUnit.h"
 
 namespace rafi { namespace test {
 
-class FpDivUnitTest : public FpTest<VFpDivUnit>
+class Fp32DivUnitTest : public FpDivUnitTest<VFp32DivUnit>
 {
-public:
-    void ProcessCycle()
-    {
-        GetTop()->clk = 1;
-        GetTop()->eval();
-        GetTfp()->dump(m_Cycle * 10 + 5);
-
-        GetTop()->clk = 0;
-        GetTop()->eval();
-        GetTfp()->dump(m_Cycle * 10 + 10);
-
-        m_Cycle++;
-    }
-
-protected:
-    virtual void SetUpModule() override
-    {
-        GetTop()->roundingMode = 0;
-        GetTop()->fpSrc1 = 0;
-        GetTop()->fpSrc2 = 0;
-
-        // reset
-        GetTop()->rst = 1;        
-        GetTop()->clk = 0;
-        GetTop()->eval();
-        GetTfp()->dump(0);
-
-        ProcessCycle();
-
-        GetTop()->rst = 0;
-    }
-
-    virtual void TearDownModule() override
-    {
-    }
 };
 
-void RunTest(FpDivUnitTest* pTest, uint32_t expectedFlags, uint32_t expectedResult, uint32_t src1, uint32_t src2)
+void RunTest(Fp32DivUnitTest* pTest, uint32_t expectedFlags, uint32_t expectedResult, uint32_t src1, uint32_t src2)
 {
     pTest->GetTop()->roundingMode = 0;
     pTest->GetTop()->fpSrc1 = src1;
@@ -69,17 +34,17 @@ void RunTest(FpDivUnitTest* pTest, uint32_t expectedFlags, uint32_t expectedResu
     ASSERT_EQ(expectedResult, pTest->GetTop()->fpResult);
 };
 
-TEST_F(FpDivUnitTest, fdiv_2)
+TEST_F(Fp32DivUnitTest, fdiv_2)
 {
     RunTest(this, 1, 0x3f93eee0, 0x40490fdb, 0x402df854); // 1.1557273520668288, 3.14159265, 2.71828182
 }
 
-TEST_F(FpDivUnitTest, fdiv_3)
+TEST_F(Fp32DivUnitTest, fdiv_3)
 {
     RunTest(this, 1, 0xbf7fc5a2, 0xc49a4000, 0x449a6333); // -0.9991093838555584, -1234, 1235.1
 }
 
-TEST_F(FpDivUnitTest, fdiv_4)
+TEST_F(Fp32DivUnitTest, fdiv_4)
 {
     RunTest(this, 0, 0x40490fdb, 0x40490fdb, 0x3f800000); // 3.14159265, 3.14159265, 1.0
 }
