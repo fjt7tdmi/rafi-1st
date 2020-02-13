@@ -603,6 +603,7 @@ if (verilator_FOUND)
     #
     add_executable(rafi-vtest-fp-comparator
         src/hw/fp/FpComparatorTest.cpp
+        src/hw/fp/FpTest.h
     )
     verilate(rafi-vtest-fp-comparator
         PREFIX VFpComparator
@@ -616,7 +617,7 @@ if (verilator_FOUND)
         src/hw/fp/FpComparator.sv
     )
     target_link_libraries(rafi-vtest-fp-comparator
-        PRIVATE ${GoogleTest_LIBRARIES}
+        PRIVATE ${GoogleTest_LIBRARIES} ${FS_LIBRARIES}
     )
 
     # disable warnings for verilator
@@ -684,7 +685,7 @@ if (verilator_FOUND)
             PUBLIC /wd"4267"
         )
     endif()
-    
+
     # =========================================================================
     # rafi-vtest-fp-mul-add
     #
