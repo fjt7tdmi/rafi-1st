@@ -599,14 +599,15 @@ if (verilator_FOUND)
     )
 
     # =========================================================================
-    # rafi-vtest-fp-comparator
+    # rafi-vtest-fp32-comparator
     #
-    add_executable(rafi-vtest-fp-comparator
-        src/hw/fp/FpComparatorTest.cpp
+    add_executable(rafi-vtest-fp32-comparator
+        src/hw/fp/Fp32ComparatorTest.cpp
+        src/hw/fp/FpComparatorTest.h
         src/hw/fp/FpTest.h
     )
-    verilate(rafi-vtest-fp-comparator
-        PREFIX VFpComparator
+    verilate(rafi-vtest-fp32-comparator
+        PREFIX VFp32Comparator
         THREADS 1
         TRACE
         SOURCES
@@ -615,14 +616,46 @@ if (verilator_FOUND)
         src/hw/def/Rv32Types.sv
         src/hw/def/OpTypes.sv
         src/hw/fp/FpComparator.sv
+        src/hw/fp/Fp32Comparator.sv
     )
-    target_link_libraries(rafi-vtest-fp-comparator
+    target_link_libraries(rafi-vtest-fp32-comparator
         PRIVATE ${GoogleTest_LIBRARIES} ${FS_LIBRARIES}
     )
 
     # disable warnings for verilator
     if (MSVC)
-        target_compile_options(rafi-vtest-fp-comparator
+        target_compile_options(rafi-vtest-fp32-comparator
+            PUBLIC /wd"4267"
+        )
+    endif()
+
+    # =========================================================================
+    # rafi-vtest-fp64-comparator
+    #
+    add_executable(rafi-vtest-fp64-comparator
+        src/hw/fp/Fp64ComparatorTest.cpp
+        src/hw/fp/FpComparatorTest.h
+        src/hw/fp/FpTest.h
+    )
+    verilate(rafi-vtest-fp64-comparator
+        PREFIX VFp64Comparator
+        THREADS 1
+        TRACE
+        SOURCES
+        src/hw/def/BasicTypes.sv
+        src/hw/def/RvTypes.sv
+        src/hw/def/Rv32Types.sv
+        src/hw/def/OpTypes.sv
+        src/hw/fp/FpComparator.sv
+        src/hw/fp/Fp64Comparator.sv
+    )
+    target_link_libraries(rafi-vtest-fp64-comparator
+        PRIVATE ${GoogleTest_LIBRARIES} ${FS_LIBRARIES}
+    )
+
+    # disable warnings for verilator
+    if (MSVC)
+        target_compile_options(rafi-vtest-fp64-comparator
             PUBLIC /wd"4267"
         )
     endif()
