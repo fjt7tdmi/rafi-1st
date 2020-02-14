@@ -30,9 +30,9 @@ run_test rafi-vtest-fp-converter
 run_test rafi-vtest-fp32-comparator
 run_test rafi-vtest-fp32-mul-add
 run_test rafi-vtest-fp32-div
-# run_test rafi-vtest-fp64-comparator
+run_test rafi-vtest-fp64-comparator
 run_test rafi-vtest-fp64-mul-add
-# run_test rafi-vtest-fp64-div
+run_test rafi-vtest-fp64-div
 
 popd
 

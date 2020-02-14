@@ -36,7 +36,7 @@ void RunTest(Fp64DivUnitTest* pTest, uint32_t expectedFlags, uint64_t expectedRe
 
 TEST_F(Fp64DivUnitTest, fdiv_2)
 {
-    RunTest(this, 1, 0x3ff27ddb'f6c383ecull, 0x4005bf0a'89f1b0ddull, 0x400921fb'53c8d4f1ull); // 1.1557273520668288, 3.14159265, 2.71828182
+    RunTest(this, 1, 0x3ff27ddb'f6c383ecull, 0x400921fb'53c8d4f1ull, 0x4005bf0a'89f1b0ddull); // 1.1557273520668288, 3.14159265, 2.71828182
 }
 
 TEST_F(Fp64DivUnitTest, fdiv_3)
