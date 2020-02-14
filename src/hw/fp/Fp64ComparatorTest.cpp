@@ -188,7 +188,7 @@ TEST_F(Fp64ComparatorTest, fmin_17)
 
 TEST_F(Fp64ComparatorTest, fmin_20)
 {
-    RunTestFMIN(this, CMD_MAX, 0x3ff00000'00000000ull, 0x7ff00000'00000000ull, 0x3ff00000'00000000ull); // 1.0, sNaNf, 1.0
+    RunTestFMIN(this, CMD_MAX, 0x3ff00000'00000000ull, 0x7ff00000'00000001ull, 0x3ff00000'00000000ull); // 1.0, sNaNf, 1.0
 }
 
 TEST_F(Fp64ComparatorTest, fmin_21)
