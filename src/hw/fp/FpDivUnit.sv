@@ -31,6 +31,8 @@ module FpDivUnit #(
     input logic clk,
     input logic rst
 );
+    parameter EXPONENT_MAX = (1 << EXPONENT_WIDTH) - 2;
+
     typedef enum logic [1:0]
     {
         ResultType_Quotient = 2'h0,
@@ -93,7 +95,7 @@ module FpDivUnit #(
     logic [FRACTION_WIDTH*2+3:0] fraction_remnant;
     always_comb begin
         sign = sign1 ^ sign2;
-        exponent_sum = exponent1_extended - exponent2_extended + 127;
+        exponent_sum = exponent1_extended - exponent2_extended + (EXPONENT_MAX / 2);
 
         // TODO: Optmize
         fraction_quotient = fraction1_extended / fraction2_extended;
@@ -137,7 +139,7 @@ module FpDivUnit #(
     logic overflow;
     logic underflow;
     always_comb begin
-        overflow = exponent_rounded >= 255;
+        overflow = exponent_rounded > EXPONENT_MAX;
         underflow = exponent_rounded <= 0;
     end
 
