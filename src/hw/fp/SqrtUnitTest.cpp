@@ -111,7 +111,7 @@ TEST_F(SqrtUnitTest, basic_5)
     RunTest(this, 2, 1, 5);
 }
 
-TEST_F(SqrtUnitTest, basic81)
+TEST_F(SqrtUnitTest, basic_81)
 {
     RunTest(this, 9, 0, 81);
 }
