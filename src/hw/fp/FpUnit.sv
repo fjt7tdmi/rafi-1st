@@ -30,9 +30,13 @@ parameter FP_CLASS_POS_INF          = 32'h0080;
 parameter FP_CLASS_SIGNALING_NAN    = 32'h0100;
 parameter FP_CLASS_QUIET_NAN        = 32'h0200;
 
-module Fp32Unit(
+module FpUnit #(
+    parameter EXPONENT_WIDTH = 8,
+    parameter FRACTION_WIDTH = 23,
+    parameter FP_WIDTH = 1 + EXPONENT_WIDTH + FRACTION_WIDTH
+)(
     output word_t intResult,
-    output uint32_t fpResult,
+    output logic [FP_WIDTH-1:0] fpResult,
     output logic writeFlags,
     output fflags_t writeFlagsValue,
     output logic done,
@@ -43,21 +47,26 @@ module Fp32Unit(
     input logic [2:0] roundingMode,
     input word_t intSrc1,
     input word_t intSrc2,
-    input uint32_t fpSrc1,
-    input uint32_t fpSrc2,
-    input uint32_t fpSrc3,
+    input logic [FP_WIDTH-1:0] fpSrc1,
+    input logic [FP_WIDTH-1:0] fpSrc2,
+    input logic [FP_WIDTH-1:0] fpSrc3,
     input logic clk,
     input logic rst
 );
-    uint32_t fpResultClass;
-    FpClassifier m_FpClassifier(
+    logic [FP_WIDTH-1:0] fpResultClass;
+    FpClassifier #(
+        .EXPONENT_WIDTH(EXPONENT_WIDTH),
+        .FRACTION_WIDTH(FRACTION_WIDTH)
+    ) m_FpClassifier(
         .intResult(fpResultClass),
         .fpSrc(fpSrc1),
         .clk(clk),
         .rst(rst));
 
-    uint32_t fpResultSign;
-    FpSignUnit m_FpSignUnit (
+    logic [FP_WIDTH-1:0] fpResultSign;
+    FpSignUnit #(
+        .WIDTH(FP_WIDTH)
+    ) m_FpSignUnit (
         .fpResult(fpResultSign),
         .command(command.sign),
         .fpSrc1(fpSrc1),
@@ -66,9 +75,12 @@ module Fp32Unit(
         .rst(rst));
 
     uint32_t intResultCmp;
-    uint32_t fpResultCmp;
+    logic [FP_WIDTH-1:0] fpResultCmp;
     fflags_t flagsCmp;
-    FpComparator m_FpComparator (
+    FpComparator #(
+        .EXPONENT_WIDTH(EXPONENT_WIDTH),
+        .FRACTION_WIDTH(FRACTION_WIDTH)
+    ) m_FpComparator (
         .intResult(intResultCmp),
         .fpResult(fpResultCmp),
         .flags(flagsCmp),
@@ -78,9 +90,12 @@ module Fp32Unit(
         .clk(clk),
         .rst(rst));
 
-    uint32_t fpResultMulAdd;
+    logic [FP_WIDTH-1:0] fpResultMulAdd;
     fflags_t flagsMulAdd;
-    FpMulAdd m_FpMulAdd (
+    FpMulAdd #(
+        .EXPONENT_WIDTH(EXPONENT_WIDTH),
+        .FRACTION_WIDTH(FRACTION_WIDTH)
+    ) m_FpMulAdd (
         .fpResult(fpResultMulAdd),
         .flags(flagsMulAdd),
         .command(command.mulAdd),
@@ -91,9 +106,12 @@ module Fp32Unit(
         .clk(clk),
         .rst(rst));
 
-    uint32_t fpResultDiv;
+    logic [FP_WIDTH-1:0] fpResultDiv;
     fflags_t flagsDiv;
-    FpDivUnit m_FpDivUnit (
+    FpDivUnit #(
+        .EXPONENT_WIDTH(EXPONENT_WIDTH),
+        .FRACTION_WIDTH(FRACTION_WIDTH)
+    ) m_FpDivUnit (
         .fpResult(fpResultDiv),
         .flags(flagsDiv),
         .roundingMode(roundingMode),
@@ -102,10 +120,13 @@ module Fp32Unit(
         .clk(clk),
         .rst(rst));
 
-    uint32_t fpResultSqrt;
+    logic [FP_WIDTH-1:0] fpResultSqrt;
     fflags_t flagsSqrt;
     logic doneSqrt;
-    FpSqrtUnit m_FpSqrtUnit (
+    FpSqrtUnit #(
+        .EXPONENT_WIDTH(EXPONENT_WIDTH),
+        .FRACTION_WIDTH(FRACTION_WIDTH)
+    ) m_FpSqrtUnit (
         .fpResult(fpResultSqrt),
         .flags(flagsSqrt),
         .done(doneSqrt),

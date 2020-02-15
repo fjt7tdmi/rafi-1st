@@ -164,7 +164,10 @@ module ExecuteStage(
         .clk(clk),
         .rst(rst));
 
-    Fp32Unit m_Fp32Unit(
+    FpUnit #(
+        .EXPONENT_WIDTH(8),
+        .FRACTION_WIDTH(23)
+    ) m_Fp32Unit (
         .intResult(intResultFp32),
         .fpResult(fpResult32),
         .writeFlagsValue(fflagsValue32),
