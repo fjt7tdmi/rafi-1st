@@ -4,7 +4,6 @@ RAFI (RISCV Akifumi Fujita Implementation) is my hobby project to make a RISCV p
 This repository includes C++ emulator and SystemVerilog HDL implementation.
 
 * ![](https://github.com/fjt7tdmi/rafi-1st/workflows/run-test/badge.svg)
-* ![](https://github.com/fjt7tdmi/rafi-1st/workflows/run-verilator/badge.svg)
 
 ## Progress of implementation
 
