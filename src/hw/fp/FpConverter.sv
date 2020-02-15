@@ -19,12 +19,14 @@ import RvTypes::*;
 import Rv32Types::*;
 import OpTypes::*;
 
-module FpConverter_rounder_i33 (
-    output logic [32:0] result,
+module FpConverter_IntRounder #(
+    parameter WIDTH = 33
+)(
+    output logic [WIDTH-1:0] result,
     output logic inexact,
     output logic overflow,
     input logic [2:0] roundingMode,
-    input logic [32:0] value,
+    input logic [WIDTH-1:0] value,
     input logic g,
     input logic r,
     input logic s
@@ -32,7 +34,7 @@ module FpConverter_rounder_i33 (
     logic sign;
     logic ulp;
     always_comb begin
-        sign = value[32];
+        sign = value[WIDTH-1];
         ulp = value[0];
     end
 
@@ -59,36 +61,49 @@ module FpConverter_rounder_i33 (
     end
 
     always_comb begin
-        result = increment ? value + 33'b1 : value;
+        result = increment ? value + 1 : value;
         inexact = g | r | s;
-        overflow = result[32] && ~value[32];
+        overflow = result[WIDTH-1] && ~value[WIDTH-1];
     end
 endmodule
 
-module FpConverter_f32_to_i32 (
+module FpConverter_FpToInt32 #(
+    parameter EXPONENT_WIDTH = 8,
+    parameter FRACTION_WIDTH = 23,
+    parameter FP_WIDTH = 1 + EXPONENT_WIDTH + FRACTION_WIDTH
+)(
     output word_t result,
     output fflags_t flags,
     input logic intSigned,
     input logic [2:0] roundingMode,
-    input fp32_t src
+    input logic [FP_WIDTH-1:0] src
 );
+    logic sign;
+    logic [EXPONENT_WIDTH-1:0] exponent;
+    logic [FRACTION_WIDTH-1:0] fraction;
+    always_comb begin
+        sign = src[FP_WIDTH-1];
+        exponent = src[FP_WIDTH-2:FRACTION_WIDTH];
+        fraction = src[FRACTION_WIDTH-1:0];
+    end
+
     logic is_zero;
     logic is_nan;
     logic is_inf;
-    logic [7:0] fixed_exp32;
+    logic [EXPONENT_WIDTH-1:0] fixed_exp32;
     always_comb begin
-        is_zero = src.exponent == '0;
-        is_nan = src.exponent == '1 && src.fraction != '0;
-        is_inf = src.exponent == '1 && src.fraction == '0;
-        fixed_exp32 = src.exponent - 127;
+        is_zero = exponent == '0;
+        is_nan = exponent == '1 && fraction != '0;
+        is_inf = exponent == '1 && fraction == '0;
+        fixed_exp32 = exponent - 127;
     end
 
-    logic [55:0] shift_result;
-    logic [55:0] signed_result;
+    logic [FRACTION_WIDTH+32:0] shift_result;
+    logic [FRACTION_WIDTH+32:0] signed_result;
     always_comb begin
         /* verilator lint_off WIDTH */
-        shift_result = {1'b1, src.fraction} << fixed_exp32[4:0];
-        signed_result = src.sign ? -shift_result : shift_result;
+        shift_result = {1'b1, fraction} << fixed_exp32[4:0];
+        signed_result = sign ? -shift_result : shift_result;
     end
 
     logic inexact;
@@ -96,7 +111,9 @@ module FpConverter_f32_to_i32 (
     logic [32:0] rounder_result;
 
     // Rounder input/output is always signed
-    FpConverter_rounder_i33 rounder(
+    FpConverter_IntRounder #(
+        .WIDTH(33)
+    ) rounder (
         .inexact(inexact),
         .overflow(rounder_overflow),
         .result(rounder_result),
@@ -108,36 +125,36 @@ module FpConverter_f32_to_i32 (
 
     logic underflow;
     always_comb begin
-        underflow = fixed_exp32[7]; // fixed_exp32 < 0
+        underflow = fixed_exp32[EXPONENT_WIDTH-1]; // fixed_exp32 < 0
     end
 
     // Rounder output is i33. Check if that is representable in i32 or u32.
     logic overflow;
     always_comb begin
         if (intSigned) begin
-            overflow = ~fixed_exp32[7] && fixed_exp32 >= 31 ||
+            overflow = ~fixed_exp32[EXPONENT_WIDTH-1] && fixed_exp32 >= 31 ||
                 !underflow && (rounder_overflow || rounder_result[32] != rounder_result[31]);
         end
         else begin
-            overflow = ~fixed_exp32[7] && fixed_exp32 >= 32 ||
+            overflow = ~fixed_exp32[EXPONENT_WIDTH-1] && fixed_exp32 >= 32 ||
                 !underflow && (rounder_overflow || rounder_result[32] == 1'b1);
         end
     end
 
     always_comb begin
-        if (src.sign && is_inf) begin
+        if (sign && is_inf) begin
             result = intSigned ? 32'h8000_0000 : 32'h0000_0000;
         end
-        else if (!src.sign && is_inf || is_nan) begin
+        else if (!sign && is_inf || is_nan) begin
             result = intSigned ? 32'h7fff_ffff : 32'hffff_ffff;
         end
         else if (is_zero || underflow) begin
             result = '0;
         end
-        else if (overflow && src.sign) begin
+        else if (overflow && sign) begin
             result = intSigned ? 32'h8000_0000 : 32'h0000_0000;
         end
-        else if (overflow && !src.sign) begin
+        else if (overflow && !sign) begin
             result = intSigned ? 32'h7fff_ffff : 32'hffff_ffff;
         end
         else begin
@@ -152,8 +169,12 @@ module FpConverter_f32_to_i32 (
     end
 endmodule
 
-module FpConverter_i32_to_f32 (
-    output fp32_t result,
+module FpConverter_Int32ToFp #(
+    parameter EXPONENT_WIDTH = 8,
+    parameter FRACTION_WIDTH = 23,
+    parameter FP_WIDTH = 1 + EXPONENT_WIDTH + FRACTION_WIDTH
+)(
+    output logic [FP_WIDTH-1:0] result,
     output fflags_t flags,
     input logic intSigned,
     input logic [2:0] roundingMode,
@@ -178,26 +199,31 @@ module FpConverter_i32_to_f32 (
         abs = sign ? -extendedSrc : extendedSrc;
     end
 
-    logic [5:0] shamt;
+    logic [EXPONENT_WIDTH-1:0] shamt;
     always_comb begin
-        shamt = GetNumberOfLeadingZero(abs);
+        shamt[5:0] = GetNumberOfLeadingZero(abs);
+        shamt[EXPONENT_WIDTH-1:6] = '0;
     end
 
-    logic [32:0] shifted;
+    localparam EXPONENT_MAX = (1 << EXPONENT_WIDTH) - 2;
+    localparam SHIFTED_WIDTH = FRACTION_WIDTH + 32; // Actually, I wanted to use $max(FRACTION_WIDTH + m, 32 + n);
+
+    logic [SHIFTED_WIDTH-1:0] shifted;
     always_comb begin
-        shifted = abs << shamt;
+        shifted[SHIFTED_WIDTH-1:SHIFTED_WIDTH-33] = abs << shamt;
+        shifted[SHIFTED_WIDTH-34:0] = '0;
     end
 
-    logic [7:0] exponent;
-    logic [22:0] fraction;
+    logic [EXPONENT_WIDTH-1:0] exponent;
+    logic [FRACTION_WIDTH-1:0] fraction;
     always_comb begin
-        exponent = 8'd32 - {2'h0, shamt} + 8'd127;
-        fraction = shifted[31:9];
+        exponent = 32 - shamt + EXPONENT_MAX / 2;
+        fraction = shifted[SHIFTED_WIDTH-2:SHIFTED_WIDTH-FRACTION_WIDTH-1];
     end
 
     logic inexact;
-    logic [7:0] rounded_exponent;
-    logic [22:0] rounded_fraction;
+    logic [EXPONENT_WIDTH-1:0] rounded_exponent;
+    logic [FRACTION_WIDTH-1:0] rounded_fraction;
 
     FpRounder #(
         .EXPONENT_WIDTH(8),
@@ -210,18 +236,18 @@ module FpConverter_i32_to_f32 (
         .sign(sign),
         .exponent(exponent),
         .fraction(fraction),
-        .g(shifted[8]),
-        .r(shifted[7]),
-        .s(|shifted[6:0]));
+        .g(shifted[SHIFTED_WIDTH-FRACTION_WIDTH-2]),
+        .r(shifted[SHIFTED_WIDTH-FRACTION_WIDTH-3]),
+        .s(|shifted[SHIFTED_WIDTH-FRACTION_WIDTH-4:0]));
 
     always_comb begin
         if (src == '0) begin
             result = '0;
         end
         else begin
-            result.sign = sign;
-            result.exponent = rounded_exponent;
-            result.fraction = rounded_fraction;
+            result[FP_WIDTH-1] = sign;
+            result[FP_WIDTH-2:FRACTION_WIDTH] = rounded_exponent;
+            result[FRACTION_WIDTH-1:0] = rounded_fraction;
         end
 
         flags.NV = 0;
@@ -260,7 +286,10 @@ module FpConverter (
 
     word_t result_f32_to_i32;
     fflags_t flags_f32_to_i32;    
-    FpConverter_f32_to_i32 m_f32_to_i32(
+    FpConverter_FpToInt32 #(
+        .EXPONENT_WIDTH(8),
+        .FRACTION_WIDTH(23)
+    ) m_FpToInt32 (
         .result(result_f32_to_i32),
         .flags(flags_f32_to_i32),
         .intSigned(intSigned),
@@ -269,7 +298,10 @@ module FpConverter (
 
     fp32_t result_i32_to_f32;
     fflags_t flags_i32_to_f32;    
-    FpConverter_i32_to_f32 m_i32_to_f32(
+    FpConverter_Int32ToFp #(
+        .EXPONENT_WIDTH(8),
+        .FRACTION_WIDTH(23)
+    ) m_i32_to_f32(
         .result(result_i32_to_f32),
         .flags(flags_i32_to_f32),
         .intSigned(intSigned),
