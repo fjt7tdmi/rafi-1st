@@ -32,9 +32,9 @@ module FpSignUnit #(
 );
     always_comb begin
         unique case (command)
-        FpSignUnitCommand_Sgnj:     fpResult = {fpSrc2[31], fpSrc1[30:0]};
-        FpSignUnitCommand_Sgnjn:    fpResult = {~fpSrc2[31], fpSrc1[30:0]};
-        FpSignUnitCommand_Sgnjx:    fpResult = {fpSrc1[31] ^ fpSrc2[31], fpSrc1[30:0]};
+        FpSignUnitCommand_Sgnj:     fpResult = {fpSrc2[WIDTH-1], fpSrc1[WIDTH-2:0]};
+        FpSignUnitCommand_Sgnjn:    fpResult = {~fpSrc2[WIDTH-1], fpSrc1[WIDTH-2:0]};
+        FpSignUnitCommand_Sgnjx:    fpResult = {fpSrc1[WIDTH-1] ^ fpSrc2[WIDTH-1], fpSrc1[WIDTH-2:0]};
         default:                    fpResult = '0;
         endcase
     end

@@ -144,7 +144,6 @@ function automatic Op DecodeRV32I(insn_t insn);
     op.loadStoreType = LoadStoreType_Word;
     op.mulDivType = '0;
     op.intRegWriteSrcType = IntRegWriteSrcType_Result;
-    op.intResultType = IntResultType_Alu;
     op.storeSrcType = StoreSrcType_Int;
     op.trapOpType = TrapOpType_Ecall;
     op.trapReturnPrivilege = Privilege_User;
@@ -408,7 +407,6 @@ function automatic Op DecodeRV32M(insn_t insn);
     op.loadStoreType = '0;
     op.mulDivType = mulDivType;
     op.intRegWriteSrcType = IntRegWriteSrcType_Result;
-    op.intResultType = IntResultType_MulDiv;
     op.storeSrcType = '0;
     op.trapOpType = '0;
     op.trapReturnPrivilege = '0;
@@ -460,7 +458,6 @@ function automatic Op DecodeRV32A(insn_t insn);
     op.loadStoreType = '0;
     op.mulDivType = '0;
     op.intRegWriteSrcType = IntRegWriteSrcType_Memory;
-    op.intResultType = '0;
     op.storeSrcType = '0;
     op.trapOpType = '0;
     op.trapReturnPrivilege = '0;
@@ -503,7 +500,6 @@ function automatic Op DecodeRV32F(insn_t insn);
     op.loadStoreType = '0;
     op.mulDivType = '0;
     op.intRegWriteSrcType = '0;
-    op.intResultType = IntResultType_Fp32;
     op.storeSrcType = StoreSrcType_Fp;
     op.trapOpType = '0;
     op.trapReturnPrivilege = '0;
@@ -529,7 +525,6 @@ function automatic Op DecodeRV32F(insn_t insn);
             op.aluSrcType2 = AluSrcType2_Imm;
             op.exUnitType = ExUnitType_LoadStore;
             op.intRegWriteSrcType = IntRegWriteSrcType_Memory;
-            op.intResultType = IntResultType_Alu;
             op.loadStoreType = LoadStoreType_Word;
             op.imm = sext12(insn[31:20]);
             op.isLoad = 1;
@@ -546,7 +541,6 @@ function automatic Op DecodeRV32F(insn_t insn);
             op.aluSrcType1 = AluSrcType1_Reg;
             op.aluSrcType2 = AluSrcType2_Imm;
             op.exUnitType = ExUnitType_LoadStore;
-            op.intResultType = IntResultType_Alu;
             op.loadStoreType = LoadStoreType_Word;
             op.imm = sext12({insn[31:25], insn[11:7]});
             op.isStore = 1;
@@ -675,15 +669,15 @@ function automatic Op DecodeRV32F(insn_t insn);
         end
         else if (funct7 == 7'b1100000 && rs2 == 5'b00000) begin
             // FCVT.W.S
-            op.fpUnitType = FpUnitType_Converter;
-            op.fpUnitCommand.cvt = FpConverterCommand_W_S;
+            op.exUnitType = ExUnitType_FpConverter;
+            op.fpConverterCommand = FpConverterCommand_W_S;
             op.dstRegType = RegType_Int;
             op.regWriteEnable = 1;
         end
         else if (funct7 == 7'b1100000 && rs2 == 5'b00001) begin
             // FCVT.WU.S
-            op.fpUnitType = FpUnitType_Converter;
-            op.fpUnitCommand.cvt = FpConverterCommand_WU_S;
+            op.exUnitType = ExUnitType_FpConverter;
+            op.fpConverterCommand = FpConverterCommand_WU_S;
             op.dstRegType = RegType_Int;
             op.regWriteEnable = 1;
         end
@@ -722,15 +716,15 @@ function automatic Op DecodeRV32F(insn_t insn);
         end
         else if (funct7 == 7'b1101000 && rs2 == 5'b00000) begin
             // FCVT.S.W
-            op.fpUnitType = FpUnitType_Converter;
-            op.fpUnitCommand.cvt = FpConverterCommand_S_W;
+            op.exUnitType = ExUnitType_FpConverter;
+            op.fpConverterCommand = FpConverterCommand_S_W;
             op.dstRegType = RegType_Fp;
             op.regWriteEnable = 1;
         end
         else if (funct7 == 7'b1101000 && rs2 == 5'b00001) begin
             // FCVT.S.WU
-            op.fpUnitType = FpUnitType_Converter;
-            op.fpUnitCommand.cvt = FpConverterCommand_S_WU;
+            op.exUnitType = ExUnitType_FpConverter;
+            op.fpConverterCommand = FpConverterCommand_S_WU;
             op.dstRegType = RegType_Fp;
             op.regWriteEnable = 1;
         end
