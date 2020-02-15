@@ -219,11 +219,10 @@ module ExecuteStage(
     always_comb begin
         intResultAlu = ALU(op.aluCommand, aluSrc1, aluSrc2);
 
-        unique case (op.intResultType)
-        IntResultType_Alu:      intResult = intResultAlu;
-        IntResultType_MulDiv:   intResult = intResultMulDiv;
-        IntResultType_Fp32:     intResult = intResultFp32;
-        default:                intResult = '0;
+        unique case (op.exUnitType)
+        ExUnitType_MulDiv:  intResult = intResultMulDiv;
+        ExUnitType_Fp32:    intResult = intResultFp32;
+        default:            intResult = intResultAlu;
         endcase
 
         branchTaken = op.isBranch && BranchComparator(op.branchType, srcIntRegValue1, srcIntRegValue2);

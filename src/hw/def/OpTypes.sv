@@ -196,13 +196,6 @@ typedef enum logic [1:0]
     IntRegWriteSrcType_Csr      = 2'h3
 } IntRegWriteSrcType;
 
-typedef enum logic [1:0]
-{
-    IntResultType_Alu      = 2'h0,
-    IntResultType_MulDiv   = 2'h1,
-    IntResultType_Fp32     = 2'h2
-} IntResultType;
-
 typedef enum logic
 {
     StoreSrcType_Int    = 1'h0,
@@ -229,7 +222,6 @@ typedef struct packed
     LoadStoreType loadStoreType;
     MulDivType mulDivType;
     IntRegWriteSrcType intRegWriteSrcType;
-    IntResultType intResultType;
     StoreSrcType storeSrcType;
     TrapOpType trapOpType;
     Privilege trapReturnPrivilege;
