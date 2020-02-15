@@ -542,6 +542,7 @@ if (verilator_FOUND)
         src/hw/fp/FpSignUnit.sv
         src/hw/fp/FpSqrtUnit.sv
         src/hw/fp/FpUnit.sv
+        src/hw/fp/SqrtUnit.sv
         src/hw/mul/MulUnit.sv
         src/hw/core/BlockRam.sv
         src/hw/core/FlipFlopCam.sv
@@ -817,29 +818,65 @@ if (verilator_FOUND)
     endif()
 
     # =========================================================================
-    # rafi-vtest-fp-sqrt
+    # rafi-vtest-fp32-sqrt
     #
-    add_executable(rafi-vtest-fp-sqrt
-        src/hw/fp/FpSqrtUnitTest.cpp
+    add_executable(rafi-vtest-fp32-sqrt
+        src/hw/fp/Fp32SqrtUnitTest.cpp
+        src/hw/fp/FpSqrtUnitTest.h
         src/hw/fp/FpTest.h
     )
-    verilate(rafi-vtest-fp-sqrt
-        PREFIX VFpSqrtUnit
+    verilate(rafi-vtest-fp32-sqrt
+        PREFIX VFp32SqrtUnit
         THREADS 1
         TRACE
         SOURCES
         src/hw/def/BasicTypes.sv
         src/hw/def/RvTypes.sv
         src/hw/def/Rv32Types.sv
+        src/hw/fp/Fp32SqrtUnit.sv
+        src/hw/fp/FpRounder.sv
         src/hw/fp/FpSqrtUnit.sv
-    )
-    target_link_libraries(rafi-vtest-fp-sqrt
+        src/hw/fp/SqrtUnit.sv
+   )
+    target_link_libraries(rafi-vtest-fp32-sqrt
         PRIVATE ${GoogleTest_LIBRARIES} ${FS_LIBRARIES}
     )
 
     # disable warnings for verilator
     if (MSVC)
-        target_compile_options(rafi-vtest-fp-sqrt
+        target_compile_options(rafi-vtest-fp32-sqrt
+            PUBLIC /wd"4267"
+        )
+    endif()
+
+    # =========================================================================
+    # rafi-vtest-fp64-sqrt
+    #
+    add_executable(rafi-vtest-fp64-sqrt
+        src/hw/fp/Fp64SqrtUnitTest.cpp
+        src/hw/fp/FpSqrtUnitTest.h
+        src/hw/fp/FpTest.h
+    )
+    verilate(rafi-vtest-fp64-sqrt
+        PREFIX VFp64SqrtUnit
+        THREADS 1
+        TRACE
+        SOURCES
+        src/hw/def/BasicTypes.sv
+        src/hw/def/RvTypes.sv
+        src/hw/def/Rv32Types.sv
+        src/hw/fp/Fp64SqrtUnit.sv
+        src/hw/fp/FpRounder.sv
+        src/hw/fp/FpSqrtUnit.sv
+        src/hw/fp/SqrtUnit.sv
+   )
+    target_link_libraries(rafi-vtest-fp64-sqrt
+        PRIVATE ${GoogleTest_LIBRARIES} ${FS_LIBRARIES}
+    )
+
+    # disable warnings for verilator
+    if (MSVC)
+        target_compile_options(rafi-vtest-fp64-sqrt
             PUBLIC /wd"4267"
         )
     endif()
@@ -925,7 +962,7 @@ if (verilator_FOUND)
             PUBLIC /wd"4267"
         )
     endif()
-    
+
     # =========================================================================
     # rafi-vtest-timer
     #

@@ -125,9 +125,13 @@ module Fp32Unit(
 
     uint32_t fpResultSqrt;
     fflags_t flagsSqrt;
+    logic doneSqrt;
     FpSqrtUnit m_FpSqrtUnit (
         .fpResult(fpResultSqrt),
         .flags(flagsSqrt),
+        .done(doneSqrt),
+        .enable(unit == FpUnitType_Sqrt),
+        .flush(0),
         .roundingMode(roundingMode),
         .fpSrc(fpSrc1),
         .clk(clk),
