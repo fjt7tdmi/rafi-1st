@@ -226,8 +226,8 @@ module FpConverter_Int32ToFp #(
     logic [FRACTION_WIDTH-1:0] rounded_fraction;
 
     FpRounder #(
-        .EXPONENT_WIDTH(8),
-        .FRACTION_WIDTH(23)
+        .EXPONENT_WIDTH(EXPONENT_WIDTH),
+        .FRACTION_WIDTH(FRACTION_WIDTH)
     ) rounder (
         .inexact(inexact),
         .roundedExponent(rounded_exponent),
@@ -289,14 +289,26 @@ module FpConverter (
     FpConverter_FpToInt32 #(
         .EXPONENT_WIDTH(8),
         .FRACTION_WIDTH(23)
-    ) m_FpToInt32 (
+    ) m_Fp32ToInt32 (
         .result(result_f32_to_i32),
         .flags(flags_f32_to_i32),
         .intSigned(intSigned),
         .roundingMode(roundingMode),
         .src(fpSrc[31:0]));
 
-    fp32_t result_i32_to_f32;
+    word_t result_f64_to_i32;
+    fflags_t flags_f64_to_i32;    
+    FpConverter_FpToInt32 #(
+        .EXPONENT_WIDTH(11),
+        .FRACTION_WIDTH(52)
+    ) m_Fp64ToInt32 (
+        .result(result_f64_to_i32),
+        .flags(flags_f64_to_i32),
+        .intSigned(intSigned),
+        .roundingMode(roundingMode),
+        .src(fpSrc));
+
+    logic [31:0] result_i32_to_f32;
     fflags_t flags_i32_to_f32;    
     FpConverter_Int32ToFp #(
         .EXPONENT_WIDTH(8),
@@ -308,6 +320,18 @@ module FpConverter (
         .roundingMode(roundingMode),
         .src(intSrc));
 
+    logic [63:0] result_i32_to_f64;
+    fflags_t flags_i32_to_f64;    
+    FpConverter_Int32ToFp #(
+        .EXPONENT_WIDTH(11),
+        .FRACTION_WIDTH(52)
+    ) m_i32_to_f64(
+        .result(result_i32_to_f64),
+        .flags(flags_i32_to_f64),
+        .intSigned(intSigned),
+        .roundingMode(roundingMode),
+        .src(intSrc));
+
     always_comb begin
         if (command inside {FpConverterCommand_W_S, FpConverterCommand_WU_S})  begin
             intResult = result_f32_to_i32;
@@ -315,11 +339,23 @@ module FpConverter (
             writeFlags = 1;
             writeFlagsValue = flags_f32_to_i32;
         end
+        else if (command inside {FpConverterCommand_W_D, FpConverterCommand_WU_D})  begin
+            intResult = result_f64_to_i32;
+            fpResult = '0;
+            writeFlags = 1;
+            writeFlagsValue = flags_f64_to_i32;
+        end
         else if (command inside {FpConverterCommand_S_W, FpConverterCommand_S_WU})  begin
             intResult = '0;
             fpResult = {32'h0, result_i32_to_f32};
             writeFlags = 1;
             writeFlagsValue = flags_i32_to_f32;
+        end
+        else if (command inside {FpConverterCommand_D_W, FpConverterCommand_D_WU})  begin
+            intResult = '0;
+            fpResult = result_i32_to_f64;
+            writeFlags = 1;
+            writeFlagsValue = flags_i32_to_f64;
         end
         else begin
             intResult = '0;
