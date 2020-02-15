@@ -19,6 +19,17 @@ import RvTypes::*;
 import Rv32Types::*;
 import OpTypes::*;
 
+parameter FP_CLASS_NEG_INF          = 32'h0001;
+parameter FP_CLASS_NEG_NORMAL       = 32'h0002;
+parameter FP_CLASS_NEG_SUBNORMAL    = 32'h0004;
+parameter FP_CLASS_NEG_ZERO         = 32'h0008;
+parameter FP_CLASS_POS_ZERO         = 32'h0010;
+parameter FP_CLASS_POS_SUBNORMAL    = 32'h0020;
+parameter FP_CLASS_POS_NORMAL       = 32'h0040;
+parameter FP_CLASS_POS_INF          = 32'h0080;
+parameter FP_CLASS_SIGNALING_NAN    = 32'h0100;
+parameter FP_CLASS_QUIET_NAN        = 32'h0200;
+
 module FpClassifier #(
     parameter EXPONENT_WIDTH = 8,
     parameter FRACTION_WIDTH = 23,

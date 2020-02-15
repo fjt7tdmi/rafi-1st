@@ -19,17 +19,6 @@ import RvTypes::*;
 import Rv32Types::*;
 import OpTypes::*;
 
-parameter FP_CLASS_NEG_INF          = 32'h0001;
-parameter FP_CLASS_NEG_NORMAL       = 32'h0002;
-parameter FP_CLASS_NEG_SUBNORMAL    = 32'h0004;
-parameter FP_CLASS_NEG_ZERO         = 32'h0008;
-parameter FP_CLASS_POS_ZERO         = 32'h0010;
-parameter FP_CLASS_POS_SUBNORMAL    = 32'h0020;
-parameter FP_CLASS_POS_NORMAL       = 32'h0040;
-parameter FP_CLASS_POS_INF          = 32'h0080;
-parameter FP_CLASS_SIGNALING_NAN    = 32'h0100;
-parameter FP_CLASS_QUIET_NAN        = 32'h0200;
-
 module FpUnit #(
     parameter EXPONENT_WIDTH = 8,
     parameter FRACTION_WIDTH = 23,
@@ -53,7 +42,7 @@ module FpUnit #(
     input logic clk,
     input logic rst
 );
-    logic [FP_WIDTH-1:0] fpResultClass;
+    uint32_t fpResultClass;
     FpClassifier #(
         .EXPONENT_WIDTH(EXPONENT_WIDTH),
         .FRACTION_WIDTH(FRACTION_WIDTH)
@@ -140,8 +129,9 @@ module FpUnit #(
     always_comb begin
         unique case (unit)
         FpUnitType_Move: begin
-            intResult = fpSrc1; // FMV.X.W
-            fpResult = intSrc1; // FMV.W.X
+            intResult = fpSrc1[31:0]; // FMV.X.W
+            fpResult = '0;
+            fpResult[31:0] = intSrc1; // FMV.W.X
             done = '1;
             writeFlags = '0;
             writeFlagsValue = '0;

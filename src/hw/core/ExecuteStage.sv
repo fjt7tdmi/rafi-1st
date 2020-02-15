@@ -96,20 +96,24 @@ module ExecuteStage(
         op = prevStage.op;
     end
 
-    logic enableMulDiv;
     logic enableFp32;
+    logic enableFp64;
+    logic enableMulDiv;
     always_comb begin
-        enableMulDiv = valid && (op.exUnitType == ExUnitType_MulDiv);
         enableFp32 = valid && (op.exUnitType == ExUnitType_Fp32);
+        enableFp64 = valid && (op.exUnitType == ExUnitType_Fp64);
+        enableMulDiv = valid && (op.exUnitType == ExUnitType_MulDiv);
     end
 
     logic done;
-    logic doneMulDiv;
     logic doneFp32;
+    logic doneFp64;
+    logic doneMulDiv;
     always_comb begin
         unique case (op.exUnitType)
-        ExUnitType_MulDiv:  done = doneMulDiv;
         ExUnitType_Fp32:    done = doneFp32;
+        ExUnitType_Fp64:    done = doneFp64;
+        ExUnitType_MulDiv:  done = doneMulDiv;
         default:            done = 1;
         endcase
     end
@@ -125,18 +129,22 @@ module ExecuteStage(
 
     word_t intResult;
     word_t intResultAlu;
-    word_t intResultMulDiv;
-    word_t intResultFp32;
     word_t intResultFpCvt;
+    word_t intResultFp32;
+    word_t intResultFp64;
+    word_t intResultMulDiv;
 
-    uint32_t fpResult32;
     uint32_t fpResultCvt;
+    uint32_t fpResult32;
+    uint64_t fpResult64;
 
     logic fflagsWriteCvt;
     logic fflagsWrite32;
+    logic fflagsWrite64;
 
     fflags_t fflagsValueCvt;
     fflags_t fflagsValue32;
+    fflags_t fflagsValue64;
 
     logic branchTaken;
     addr_t branchTarget;
@@ -187,6 +195,29 @@ module ExecuteStage(
         .rst
     );
 
+    FpUnit #(
+        .EXPONENT_WIDTH(11),
+        .FRACTION_WIDTH(52)
+    ) m_Fp64Unit (
+        .intResult(intResultFp64),
+        .fpResult(fpResult64),
+        .writeFlagsValue(fflagsValue64),
+        .writeFlags(fflagsWrite64),
+        .done(doneFp64),
+        .enable(enableFp64),
+        .flush(0),
+        .unit(op.fpUnitType),
+        .command(op.fpUnitCommand),
+        .roundingMode(csr.frm),
+        .intSrc1(srcIntRegValue1),
+        .intSrc2(srcIntRegValue2),
+        .fpSrc1(srcFpRegValue1),
+        .fpSrc2(srcFpRegValue2),
+        .fpSrc3(srcFpRegValue3),
+        .clk,
+        .rst
+    );
+
     MulDivUnit m_MulDivUnit(
         .done(doneMulDiv),
         .result(intResultMulDiv),
@@ -216,6 +247,10 @@ module ExecuteStage(
         ExUnitType_Fp32: begin
             csr.write_fflags = fflagsWrite32;
             csr.write_fflags_value = fflagsValue32;
+        end
+        ExUnitType_Fp64: begin
+            csr.write_fflags = fflagsWrite64;
+            csr.write_fflags_value = fflagsValue64;
         end
         default: begin
             csr.write_fflags = '0;
@@ -259,6 +294,7 @@ module ExecuteStage(
         unique case (op.exUnitType)
         ExUnitType_FpConverter: intResult = intResultFpCvt;
         ExUnitType_Fp32:        intResult = intResultFp32;
+        ExUnitType_Fp64:        intResult = intResultFp64;
         ExUnitType_MulDiv:      intResult = intResultMulDiv;
         default:                intResult = intResultAlu;
         endcase
@@ -283,6 +319,7 @@ module ExecuteStage(
         unique case (op.exUnitType)
         ExUnitType_FpConverter: dstFpRegValue = {32'h0, fpResultCvt};
         ExUnitType_Fp32:        dstFpRegValue = {32'h0, fpResult32};
+        ExUnitType_Fp64:        dstFpRegValue = fpResult64;
         ExUnitType_LoadStore:   dstFpRegValue = {32'h0, loadStoreUnit.result};
         default:                dstFpRegValue = '0;
         endcase
