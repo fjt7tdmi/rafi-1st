@@ -10,6 +10,7 @@
     { "name": "rv32uf-p-ldst",          "host-io-addr": "0x80001000", "cycle": 10000 },
     { "name": "rv32uf-p-move",          "host-io-addr": "0x80001000", "cycle": 10000 },
     { "name": "rv32uf-p-recoding",      "host-io-addr": "0x80001000", "cycle": 10000 },
+    { "name": "rv32ud-p-fcvt_w",        "host-io-addr": "0x80001000", "cycle": 10000 },
     { "name": "rv32ui-p-add",           "host-io-addr": "0x80001000", "cycle": 10000 },
     { "name": "rv32ui-p-addi",          "host-io-addr": "0x80001000", "cycle": 10000 },
     { "name": "rv32ui-p-and",           "host-io-addr": "0x80001000", "cycle": 10000 },
