@@ -534,6 +534,7 @@ if (verilator_FOUND)
         src/hw/def/Decoder.sv
         src/hw/def/LoadStoreUnitTypes.sv
         src/hw/div/DivUnit.sv
+        src/hw/fp/FpClassifier.sv
         src/hw/fp/FpComparator.sv
         src/hw/fp/FpConverter.sv
         src/hw/fp/FpDivUnit.sv

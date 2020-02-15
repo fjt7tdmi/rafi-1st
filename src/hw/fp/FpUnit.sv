@@ -49,22 +49,12 @@ module Fp32Unit(
     input logic clk,
     input logic rst
 );
-
-    function automatic uint32_t get_class(uint32_t value);
-        fp32_t x = value;
-
-        if (x.sign == 1'h1 && x.exponent == 8'hff && x.fraction == 23'h0)               return FP_CLASS_NEG_INF;
-        else if (x.sign == 1'h1 && 8'h1 <= x.exponent && x.exponent < 8'hff)            return FP_CLASS_NEG_NORMAL;
-        else if (x.sign == 1'h1 && x.exponent == 8'h0 && x.fraction != 23'h0)           return FP_CLASS_NEG_SUBNORMAL;
-        else if (x.sign == 1'h1 && x.exponent == 8'h0 && x.fraction == 23'h0)           return FP_CLASS_NEG_ZERO;
-        else if (x.sign == 1'h0 && x.exponent == 8'h0 && x.fraction == 23'h0)           return FP_CLASS_POS_ZERO;
-        else if (x.sign == 1'h0 && x.exponent == 8'h0 && x.fraction != 23'h0)           return FP_CLASS_POS_SUBNORMAL;
-        else if (x.sign == 1'h0 && 8'h1 <= x.exponent && x.exponent < 8'hff)            return FP_CLASS_POS_NORMAL;
-        else if (x.sign == 1'h0 && x.exponent == 8'hff && x.fraction == 23'h0)          return FP_CLASS_POS_INF;
-        else if (x.exponent == 8'hff && x.fraction != 23'h0 && x.fraction[22] == 1'h0)  return FP_CLASS_SIGNALING_NAN;
-        else if (x.exponent == 8'hff && x.fraction != 23'h0 && x.fraction[22] == 1'h1)  return FP_CLASS_QUIET_NAN;
-        else                                                                            return '0;
-    endfunction
+    uint32_t fpResultClass;
+    FpClassifier m_FpClassifier(
+        .intResult(fpResultClass),
+        .fpSrc(fpSrc1),
+        .clk(clk),
+        .rst(rst));
 
     uint32_t fpResultSign;
     FpSignUnit m_FpSignUnit (
@@ -150,7 +140,7 @@ module Fp32Unit(
             writeFlagsValue = '0;
         end
         FpUnitType_Classifier: begin
-            intResult = get_class(fpSrc1);
+            intResult = fpResultClass;
             fpResult = '0;
             done = '1;
             writeFlags = '0;
