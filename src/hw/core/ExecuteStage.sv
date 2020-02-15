@@ -91,9 +91,28 @@ module ExecuteStage(
     // Wires
     logic valid;
     Op op;
+    always_comb begin
+        valid = prevStage.valid;
+        op = prevStage.op;
+    end
 
     logic enableMulDiv;
+    logic enableFp32;
+    always_comb begin
+        enableMulDiv = valid && (op.exUnitType == ExUnitType_MulDiv);
+        enableFp32 = valid && (op.exUnitType == ExUnitType_Fp32);
+    end
+
+    logic done;
     logic doneMulDiv;
+    logic doneFp32;
+    always_comb begin
+        unique case (op.exUnitType)
+        ExUnitType_MulDiv:  done = doneMulDiv;
+        ExUnitType_Fp32:    done = doneFp32;
+        default:            done = 1;
+        endcase
+    end
 
     word_t srcIntRegValue1;
     word_t srcIntRegValue2;
@@ -143,6 +162,9 @@ module ExecuteStage(
         .fpResult(fp32Result),
         .writeFlagsValue(csr.write_fflags_value),
         .writeFlags(csr.write_fflags),
+        .done(doneFp32),
+        .enable(enableFp32),
+        .flush(0),
         .unit(op.fpUnitType),
         .command(op.fpUnitCommand),
         .roundingMode(csr.frm),
@@ -154,15 +176,6 @@ module ExecuteStage(
         .clk,
         .rst
     );
-
-    always_comb begin
-        valid = prevStage.valid;
-        op = prevStage.op;
-    end
-
-    always_comb begin
-        enableMulDiv = valid && (op.intResultType == IntResultType_MulDiv);
-    end
 
     // CSR
     always_comb begin
@@ -266,7 +279,7 @@ module ExecuteStage(
 
     // PipelineController
     always_comb begin
-        ctrl.exStallReq = (enableMulDiv && !doneMulDiv) || (loadStoreUnit.enable && !loadStoreUnit.done);
+        ctrl.exStallReq = !done || (loadStoreUnit.enable && !loadStoreUnit.done);
         ctrl.flushReq = valid && !ctrl.exStallReq && (
             (op.isBranch && branchTaken) ||
             op.csrWriteEnable ||
