@@ -134,7 +134,7 @@ module ExecuteStage(
     word_t intResultFp64;
     word_t intResultMulDiv;
 
-    uint32_t fpResultCvt;
+    uint64_t fpResultCvt;
     uint32_t fpResult32;
     uint64_t fpResult64;
 
@@ -162,13 +162,13 @@ module ExecuteStage(
     // Modules
     FpConverter m_FpConverter (
         .intResult(intResultFpCvt),
-        .fp32Result(fpResultCvt),
+        .fpResult(fpResultCvt),
         .writeFlagsValue(fflagsValueCvt),
         .writeFlags(fflagsWriteCvt),
         .command(op.fpConverterCommand),
         .roundingMode(csr.frm),
         .intSrc(srcIntRegValue1),
-        .fp32Src(srcFpRegValue1[31:0]),
+        .fpSrc(srcFpRegValue1),
         .clk(clk),
         .rst(rst));
 
@@ -317,7 +317,7 @@ module ExecuteStage(
     // dstFpRegValue
     always_comb begin
         unique case (op.exUnitType)
-        ExUnitType_FpConverter: dstFpRegValue = {32'h0, fpResultCvt};
+        ExUnitType_FpConverter: dstFpRegValue = fpResultCvt;
         ExUnitType_Fp32:        dstFpRegValue = {32'h0, fpResult32};
         ExUnitType_Fp64:        dstFpRegValue = fpResult64;
         ExUnitType_LoadStore:   dstFpRegValue = {32'h0, loadStoreUnit.result};
