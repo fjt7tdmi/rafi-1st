@@ -12,7 +12,7 @@ This repository includes C++ emulator and SystemVerilog HDL implementation.
 |RV32I        |Done        |Done         |
 |RV32M        |Done        |Done         |
 |RV32A        |Done        |-            |
-|RV32F        |Done        |-            |
+|RV32F        |Done        |Done         |
 |RV32D        |Done        |-            |
 |RV32C        |Done        |-            |
 |RV32 priv.   |Done        |WIP          |
