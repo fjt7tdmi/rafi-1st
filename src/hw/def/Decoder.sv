@@ -138,6 +138,7 @@ function automatic Op DecodeRV32I(insn_t insn);
     op.atomicType = '0;
     op.branchType = BranchType_Always;
     op.fenceType = FenceType_Default;
+    op.exUnitType = '0;
     op.fpUnitType = '0;
     op.fpUnitCommand = '0;
     op.loadStoreType = LoadStoreType_Word;
@@ -208,6 +209,7 @@ function automatic Op DecodeRV32I(insn_t insn);
         // lb, lh, lw, lbu, lhu
         op.aluSrcType1 = AluSrcType1_Reg;
         op.aluSrcType2 = AluSrcType2_Imm;
+        op.exUnitType = ExUnitType_LoadStore;
         op.intRegWriteSrcType = IntRegWriteSrcType_Memory;
         op.loadStoreType = LoadStoreType'(funct3);
         op.imm = sext12(insn[31:20]);
@@ -221,6 +223,7 @@ function automatic Op DecodeRV32I(insn_t insn);
         // sb, sh, sw
         op.aluSrcType1 = AluSrcType1_Reg;
         op.aluSrcType2 = AluSrcType2_Imm;
+        op.exUnitType = ExUnitType_LoadStore;
         op.loadStoreType = LoadStoreType'(funct3);
         op.imm = sext12({insn[31:25], insn[11:7]});
         op.isStore = 1;
@@ -288,6 +291,7 @@ function automatic Op DecodeRV32I(insn_t insn);
                 op.trapReturnPrivilege = Privilege_Machine;
             end
             else if (funct7 == 7'b000_1001) begin
+                op.exUnitType = ExUnitType_LoadStore;
                 op.isFence = 1;
                 op.fenceType = FenceType_Vma;
             end
@@ -364,10 +368,14 @@ function automatic Op DecodeRV32I(insn_t insn);
     end
     7'b0001111: begin
         if (funct3 == 3'b000 && rd == 5'b00000 && rs1 == 5'b00000 && csr[11:8] == 4'b0000) begin
+            // FENCE
+            op.exUnitType = ExUnitType_LoadStore;
             op.isFence = 1;
             op.fenceType = FenceType_Default;
         end
         else if (funct3 == 3'b001 && rd == 5'b00000 && rs1 == 5'b00000 && csr == 12'h000) begin
+            // FENCE.I
+            op.exUnitType = ExUnitType_LoadStore;
             op.isFence = 1;
             op.fenceType = FenceType_I;
         end
@@ -394,6 +402,7 @@ function automatic Op DecodeRV32M(insn_t insn);
     op.atomicType = '0;
     op.branchType = '0;
     op.fenceType = '0;
+    op.exUnitType = ExUnitType_MulDiv;
     op.fpUnitType = '0;
     op.fpUnitCommand = '0;
     op.loadStoreType = '0;
@@ -445,6 +454,7 @@ function automatic Op DecodeRV32A(insn_t insn);
     op.atomicType = atomicType;
     op.branchType = '0;
     op.fenceType = '0;
+    op.exUnitType = ExUnitType_LoadStore;
     op.fpUnitType = '0;
     op.fpUnitCommand = '0;
     op.loadStoreType = '0;
@@ -488,6 +498,7 @@ function automatic Op DecodeRV32F(insn_t insn);
     op.branchType = '0;
     op.fenceType = '0;
     op.fpUnitType = '0;
+    op.exUnitType = ExUnitType_Fp32;
     op.fpUnitCommand = '0;
     op.loadStoreType = '0;
     op.mulDivType = '0;
@@ -516,6 +527,7 @@ function automatic Op DecodeRV32F(insn_t insn);
             // FLW
             op.aluSrcType1 = AluSrcType1_Reg;
             op.aluSrcType2 = AluSrcType2_Imm;
+            op.exUnitType = ExUnitType_LoadStore;
             op.intRegWriteSrcType = IntRegWriteSrcType_Memory;
             op.intResultType = IntResultType_Alu;
             op.loadStoreType = LoadStoreType_Word;
@@ -533,6 +545,7 @@ function automatic Op DecodeRV32F(insn_t insn);
             // FSW
             op.aluSrcType1 = AluSrcType1_Reg;
             op.aluSrcType2 = AluSrcType2_Imm;
+            op.exUnitType = ExUnitType_LoadStore;
             op.intResultType = IntResultType_Alu;
             op.loadStoreType = LoadStoreType_Word;
             op.imm = sext12({insn[31:25], insn[11:7]});
