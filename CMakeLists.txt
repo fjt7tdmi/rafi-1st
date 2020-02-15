@@ -899,6 +899,34 @@ if (verilator_FOUND)
     endif()
 
     # =========================================================================
+    # rafi-vtest-sqrt
+    #
+    add_executable(rafi-vtest-sqrt
+        src/hw/fp/SqrtUnitTest.cpp
+        src/hw/fp/FpTest.h
+    )
+    verilate(rafi-vtest-sqrt
+        PREFIX VSqrtUnit
+        THREADS 1
+        TRACE
+        SOURCES
+        src/hw/def/BasicTypes.sv
+        src/hw/def/RvTypes.sv
+        src/hw/def/Rv32Types.sv
+        src/hw/fp/SqrtUnit.sv
+    )
+    target_link_libraries(rafi-vtest-sqrt
+        PRIVATE ${GoogleTest_LIBRARIES} ${FS_LIBRARIES}
+    )
+
+    # disable warnings for verilator
+    if (MSVC)
+        target_compile_options(rafi-vtest-sqrt
+            PUBLIC /wd"4267"
+        )
+    endif()
+    
+    # =========================================================================
     # rafi-vtest-timer
     #
     add_executable(rafi-vtest-timer

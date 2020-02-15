@@ -25,6 +25,7 @@ function run_test() {
 
 run_test rafi-vtest-mul
 # run_test rafi-vtest-div
+# run_test rafi-vtest-sqrt
 run_test rafi-vtest-timer
 run_test rafi-vtest-fp-converter
 run_test rafi-vtest-fp32-comparator
