@@ -69,7 +69,7 @@ protected:
         GetTop()->command = 0;
         GetTop()->roundingMode = 0;
         GetTop()->intSrc = 0;
-        GetTop()->fp32Src = 0;
+        GetTop()->fpSrc = 0;
 
         // reset
         GetTop()->rst = 1;        
@@ -92,10 +92,10 @@ void RunTest_FCVT(FpConverterTest* pTest, int command, uint32_t expectedResult, 
     pTest->GetTop()->command = command;
     pTest->GetTop()->roundingMode = 0;
     pTest->GetTop()->intSrc = intSrc;
-    pTest->GetTop()->fp32Src = 0;
+    pTest->GetTop()->fpSrc = 0;
     pTest->ProcessCycle();
 
-    ASSERT_EQ(expectedResult, pTest->GetTop()->fp32Result);
+    ASSERT_EQ(expectedResult, pTest->GetTop()->fpResult);
 };
 
 TEST_F(FpConverterTest, fcvt_2)
@@ -118,12 +118,12 @@ TEST_F(FpConverterTest, fcvt_5)
     RunTest_FCVT(this, CMD_S_WU, 0x4f800000, 0xfffffffe); // 4.2949673e9, 2^32-2
 }
 
-void RunTest_FCVT_W_WithFlags(FpConverterTest* pTest, int command, uint32_t expectedFlags, uint32_t expectedResult, uint32_t fp32Src, int roundingMode)
+void RunTest_FCVT_W_WithFlags(FpConverterTest* pTest, int command, uint32_t expectedFlags, uint32_t expectedResult, uint32_t fpSrc, int roundingMode)
 {
     pTest->GetTop()->command = command;
     pTest->GetTop()->roundingMode = roundingMode;
     pTest->GetTop()->intSrc = 0;
-    pTest->GetTop()->fp32Src = fp32Src;
+    pTest->GetTop()->fpSrc = fpSrc;
     pTest->ProcessCycle();
 
     ASSERT_EQ(expectedFlags, pTest->GetTop()->writeFlagsValue);
@@ -210,12 +210,12 @@ TEST_F(FpConverterTest, fcvt_w_19)
     RunTest_FCVT_W_WithFlags(this, CMD_WU_S, 0x00, 0xb2d05e00, 0x4f32d05e, FRM_RTZ); // 300000000, 3e9
 }
 
-void RunTest_FCVT_W(FpConverterTest* pTest, int command, uint32_t expectedResult, uint32_t fp32Src)
+void RunTest_FCVT_W(FpConverterTest* pTest, int command, uint32_t expectedResult, uint32_t fpSrc)
 {
     pTest->GetTop()->command = command;
     pTest->GetTop()->roundingMode = 0;
     pTest->GetTop()->intSrc = 0;
-    pTest->GetTop()->fp32Src = fp32Src;
+    pTest->GetTop()->fpSrc = fpSrc;
     pTest->ProcessCycle();
 
     ASSERT_EQ(expectedResult, pTest->GetTop()->intResult);
