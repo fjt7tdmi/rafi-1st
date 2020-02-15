@@ -834,6 +834,7 @@ if (verilator_FOUND)
         src/hw/def/RvTypes.sv
         src/hw/def/Rv32Types.sv
         src/hw/fp/Fp32SqrtUnit.sv
+        src/hw/fp/FpRounder.sv
         src/hw/fp/FpSqrtUnit.sv
         src/hw/fp/SqrtUnit.sv
    )
@@ -865,6 +866,7 @@ if (verilator_FOUND)
         src/hw/def/RvTypes.sv
         src/hw/def/Rv32Types.sv
         src/hw/fp/Fp64SqrtUnit.sv
+        src/hw/fp/FpRounder.sv
         src/hw/fp/FpSqrtUnit.sv
         src/hw/fp/SqrtUnit.sv
    )

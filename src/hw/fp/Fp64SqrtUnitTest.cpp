@@ -20,7 +20,7 @@
 namespace rafi { namespace test {
 
 namespace {
-    const int MaxCycle = 50;
+    const int MaxCycle = 100;
 }
 
 class Fp64SqrtUnitTest : public FpSqrtUnitTest<VFp64SqrtUnit>
@@ -60,7 +60,7 @@ TEST_F(Fp64SqrtUnitTest, fdiv_6)
 
 TEST_F(Fp64SqrtUnitTest, fdiv_16)
 {
-    RunTest(this, 0x10, 0x7ff80000'00000000ull, 0x40c38800'00000000ull); // NaN, -1.0
+    RunTest(this, 0x10, 0x7ff80000'00000000ull, 0xbff00000'00000000ull); // NaN, -1.0
 }
 
 TEST_F(Fp64SqrtUnitTest, fdiv_7)
