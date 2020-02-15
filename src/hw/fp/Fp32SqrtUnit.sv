@@ -18,20 +18,19 @@ import BasicTypes::*;
 import RvTypes::*;
 import Rv32Types::*;
 
-module FpSqrtUnit #(
-    parameter EXPONENT_WIDTH = 8,
-    parameter FRACTION_WIDTH = 23,
-    parameter WIDTH = 1 + EXPONENT_WIDTH + FRACTION_WIDTH
-)(
-    output logic [WIDTH-1:0] fpResult,
+module Fp32SqrtUnit(
+    output logic [31:0] fpResult,
     output fflags_t flags,
     output logic done,
     input logic enable,
     input logic flush,
     input logic [2:0] roundingMode,
-    input logic [WIDTH-1:0] fpSrc,
+    input logic [31:0] fpSrc,
     input logic clk,
     input logic rst
 );
-
+    FpSqrtUnit #(
+        .EXPONENT_WIDTH(8),
+        .FRACTION_WIDTH(23)
+    ) body (.*);
 endmodule
