@@ -542,6 +542,7 @@ if (verilator_FOUND)
         src/hw/fp/FpSignUnit.sv
         src/hw/fp/FpSqrtUnit.sv
         src/hw/fp/FpUnit.sv
+        src/hw/fp/SqrtUnit.sv
         src/hw/mul/MulUnit.sv
         src/hw/core/BlockRam.sv
         src/hw/core/FlipFlopCam.sv
@@ -834,6 +835,7 @@ if (verilator_FOUND)
         src/hw/def/Rv32Types.sv
         src/hw/fp/Fp32SqrtUnit.sv
         src/hw/fp/FpSqrtUnit.sv
+        src/hw/fp/SqrtUnit.sv
    )
     target_link_libraries(rafi-vtest-fp32-sqrt
         PRIVATE ${GoogleTest_LIBRARIES} ${FS_LIBRARIES}
@@ -864,6 +866,7 @@ if (verilator_FOUND)
         src/hw/def/Rv32Types.sv
         src/hw/fp/Fp64SqrtUnit.sv
         src/hw/fp/FpSqrtUnit.sv
+        src/hw/fp/SqrtUnit.sv
    )
     target_link_libraries(rafi-vtest-fp64-sqrt
         PRIVATE ${GoogleTest_LIBRARIES} ${FS_LIBRARIES}
