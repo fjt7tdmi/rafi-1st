@@ -235,7 +235,8 @@ endmodule
 module FpConverter (
     output word_t intResult,
     output uint32_t fp32Result,
-    output fflags_t flags,
+    output logic writeFlags,
+    output fflags_t writeFlagsValue,
     input FpConverterCommand command,
     input logic [2:0] roundingMode,
     input word_t intSrc,
@@ -279,17 +280,20 @@ module FpConverter (
         if (command inside {FpConverterCommand_W_S, FpConverterCommand_WU_S})  begin
             intResult = result_f32_to_i32;
             fp32Result = '0;
-            flags = flags_f32_to_i32;
+            writeFlags = 1;
+            writeFlagsValue = flags_f32_to_i32;
         end
         else if (command inside {FpConverterCommand_S_W, FpConverterCommand_S_WU})  begin
             intResult = '0;
             fp32Result = result_i32_to_f32;
-            flags = flags_i32_to_f32;
+            writeFlags = 1;
+            writeFlagsValue = flags_i32_to_f32;
         end
         else begin
             intResult = '0;
             fp32Result = '0;
-            flags = '0;
+            writeFlags = '0;
+            writeFlagsValue = '0;
         end
     end
 endmodule

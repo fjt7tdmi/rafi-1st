@@ -94,10 +94,11 @@ typedef enum logic [1:0]
 typedef enum logic [2:0]
 {
     ExUnitType_None         = 3'h0,
-    ExUnitType_MulDiv       = 3'h1,
+    ExUnitType_FpConverter  = 3'h1,
     ExUnitType_Fp32         = 3'h2,
     ExUnitType_Fp64         = 3'h3,
-    ExUnitType_LoadStore    = 3'h4
+    ExUnitType_LoadStore    = 3'h4,
+    ExUnitType_MulDiv       = 3'h5
 } ExUnitType;
 
 typedef enum logic [2:0]
@@ -163,7 +164,6 @@ typedef union packed
 {
     FpComparatorCommand cmp;
     FpSignUnitCommand sign;
-    FpConverterCommand cvt;
     FpMulAddCommand mulAdd;
 } FpUnitCommand;
 
@@ -217,6 +217,7 @@ typedef struct packed
     BranchType branchType;
     FenceType fenceType;
     ExUnitType exUnitType;
+    FpConverterCommand fpConverterCommand;
     FpUnitType fpUnitType;
     FpUnitCommand fpUnitCommand;
     LoadStoreType loadStoreType;

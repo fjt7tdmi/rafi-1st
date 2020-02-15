@@ -126,7 +126,7 @@ void RunTest_FCVT_W_WithFlags(FpConverterTest* pTest, int command, uint32_t expe
     pTest->GetTop()->fp32Src = fp32Src;
     pTest->ProcessCycle();
 
-    ASSERT_EQ(expectedFlags, pTest->GetTop()->flags);
+    ASSERT_EQ(expectedFlags, pTest->GetTop()->writeFlagsValue);
     ASSERT_EQ(expectedResult, pTest->GetTop()->intResult);
 }
 

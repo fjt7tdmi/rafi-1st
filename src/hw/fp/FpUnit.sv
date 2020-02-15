@@ -78,20 +78,6 @@ module Fp32Unit(
         .clk(clk),
         .rst(rst));
 
-    uint32_t intResultCvt;
-    uint32_t fpResultCvt;
-    fflags_t flagsCvt;
-    FpConverter m_FpConverter (
-        .intResult(intResultCvt),
-        .fp32Result(fpResultCvt),
-        .flags(flagsCvt),
-        .command(command.cvt),
-        .roundingMode(roundingMode),
-        .intSrc(intSrc1),
-        .fp32Src(fpSrc1),
-        .clk(clk),
-        .rst(rst));
-
     uint32_t fpResultMulAdd;
     fflags_t flagsMulAdd;
     FpMulAdd m_FpMulAdd (
@@ -159,13 +145,6 @@ module Fp32Unit(
             done = '1;
             writeFlags = '1;
             writeFlagsValue = flagsCmp;
-        end
-        FpUnitType_Converter: begin
-            intResult = intResultCvt;
-            fpResult = fpResultCvt;
-            done = '1;
-            writeFlags = '1;
-            writeFlagsValue = flagsCvt;
         end
         FpUnitType_MulAdd: begin
             intResult = '0;

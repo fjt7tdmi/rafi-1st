@@ -127,8 +127,16 @@ module ExecuteStage(
     word_t intResultAlu;
     word_t intResultMulDiv;
     word_t intResultFp32;
+    word_t intResultFpCvt;
 
-    uint32_t fp32Result;
+    uint32_t fpResult32;
+    uint32_t fpResultCvt;
+
+    logic fflagsWriteCvt;
+    logic fflagsWrite32;
+
+    fflags_t fflagsValueCvt;
+    fflags_t fflagsValue32;
 
     logic branchTaken;
     addr_t branchTarget;
@@ -144,24 +152,23 @@ module ExecuteStage(
     logic invalidateTlb;
 
     // Modules
-    MulDivUnit m_MulDivUnit(
-        .done(doneMulDiv),
-        .result(intResultMulDiv),
-        .mulDivType(op.mulDivType),
-        .src1(srcIntRegValue1),
-        .src2(srcIntRegValue2),
-        .enable(enableMulDiv),
-        .stall(0),
-        .flush(0),
-        .clk,
-        .rst
-    );
+    FpConverter m_FpConverter (
+        .intResult(intResultFpCvt),
+        .fp32Result(fpResultCvt),
+        .writeFlagsValue(fflagsValueCvt),
+        .writeFlags(fflagsWriteCvt),
+        .command(op.fpConverterCommand),
+        .roundingMode(csr.frm),
+        .intSrc(srcIntRegValue1),
+        .fp32Src(srcFpRegValue1[31:0]),
+        .clk(clk),
+        .rst(rst));
 
     Fp32Unit m_Fp32Unit(
         .intResult(intResultFp32),
-        .fpResult(fp32Result),
-        .writeFlagsValue(csr.write_fflags_value),
-        .writeFlags(csr.write_fflags),
+        .fpResult(fpResult32),
+        .writeFlagsValue(fflagsValue32),
+        .writeFlags(fflagsWrite32),
         .done(doneFp32),
         .enable(enableFp32),
         .flush(0),
@@ -177,14 +184,41 @@ module ExecuteStage(
         .rst
     );
 
+    MulDivUnit m_MulDivUnit(
+        .done(doneMulDiv),
+        .result(intResultMulDiv),
+        .mulDivType(op.mulDivType),
+        .src1(srcIntRegValue1),
+        .src2(srcIntRegValue2),
+        .enable(enableMulDiv),
+        .stall(0),
+        .flush(0),
+        .clk,
+        .rst
+    );
+
     // CSR
     always_comb begin
         csr.readAddr = prevStage.csrAddr;
         csr.readEnable = op.csrReadEnable;
-
         csr.writeEnable = valid && !trapInfo.valid && op.csrWriteEnable;
         csr.writeAddr = prevStage.csrAddr;
         csr.writeValue = intResult;
+
+        unique case (op.exUnitType)
+        ExUnitType_FpConverter: begin
+            csr.write_fflags = fflagsWriteCvt;
+            csr.write_fflags_value = fflagsValueCvt;
+        end
+        ExUnitType_Fp32: begin
+            csr.write_fflags = fflagsWrite32;
+            csr.write_fflags_value = fflagsValue32;
+        end
+        default: begin
+            csr.write_fflags = '0;
+            csr.write_fflags_value = '0;
+        end
+        endcase
     end
 
     // src
@@ -220,9 +254,10 @@ module ExecuteStage(
         intResultAlu = ALU(op.aluCommand, aluSrc1, aluSrc2);
 
         unique case (op.exUnitType)
-        ExUnitType_MulDiv:  intResult = intResultMulDiv;
-        ExUnitType_Fp32:    intResult = intResultFp32;
-        default:            intResult = intResultAlu;
+        ExUnitType_FpConverter: intResult = intResultFpCvt;
+        ExUnitType_Fp32:        intResult = intResultFp32;
+        ExUnitType_MulDiv:      intResult = intResultMulDiv;
+        default:                intResult = intResultAlu;
         endcase
 
         branchTaken = op.isBranch && BranchComparator(op.branchType, srcIntRegValue1, srcIntRegValue2);
@@ -242,9 +277,12 @@ module ExecuteStage(
 
     // dstFpRegValue
     always_comb begin
-        dstFpRegValue = op.isLoad
-            ? {32'h0, loadStoreUnit.result}
-            : {32'h0, fp32Result};
+        unique case (op.exUnitType)
+        ExUnitType_FpConverter: dstFpRegValue = {32'h0, fpResultCvt};
+        ExUnitType_Fp32:        dstFpRegValue = {32'h0, fpResult32};
+        ExUnitType_LoadStore:   dstFpRegValue = {32'h0, loadStoreUnit.result};
+        default:                dstFpRegValue = '0;
+        endcase
     end
 
     // FetchUnit
