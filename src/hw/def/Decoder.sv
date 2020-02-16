@@ -965,28 +965,28 @@ function automatic Op DecodeRV32D(insn_t insn);
         else if (funct7 == 7'b1100001 && rs2 == 5'b00000) begin
             // FCVT.W.D
             op.exUnitType = ExUnitType_FpConverter;
-            op.fpConverterCommand = FpConverterCommand_W_S;
+            op.fpConverterCommand = FpConverterCommand_W_D;
             op.dstRegType = RegType_Int;
             op.regWriteEnable = 1;
         end
         else if (funct7 == 7'b1100001 && rs2 == 5'b00001) begin
             // FCVT.WU.D
             op.exUnitType = ExUnitType_FpConverter;
-            op.fpConverterCommand = FpConverterCommand_WU_S;
+            op.fpConverterCommand = FpConverterCommand_WU_D;
             op.dstRegType = RegType_Int;
             op.regWriteEnable = 1;
         end
         else if (funct7 == 7'b1101001 && rs2 == 5'b00000) begin
             // FCVT.D.W
             op.exUnitType = ExUnitType_FpConverter;
-            op.fpConverterCommand = FpConverterCommand_S_W;
+            op.fpConverterCommand = FpConverterCommand_D_W;
             op.dstRegType = RegType_Fp;
             op.regWriteEnable = 1;
         end
         else if (funct7 == 7'b1101001 && rs2 == 5'b00001) begin
             // FCVT.D.WU
             op.exUnitType = ExUnitType_FpConverter;
-            op.fpConverterCommand = FpConverterCommand_S_WU;
+            op.fpConverterCommand = FpConverterCommand_D_WU;
             op.dstRegType = RegType_Fp;
             op.regWriteEnable = 1;
         end
