@@ -33,7 +33,7 @@ module FpSqrtUnit #(
     input logic clk,
     input logic rst
 );
-    parameter EXPONENT_MAX = (1 << EXPONENT_WIDTH) - 2;
+    localparam EXPONENT_MAX = (1 << EXPONENT_WIDTH) - 2;
 
     typedef enum logic [1:0]
     {

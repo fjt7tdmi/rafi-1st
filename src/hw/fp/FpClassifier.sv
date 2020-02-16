@@ -40,7 +40,7 @@ module FpClassifier #(
     input logic clk,
     input logic rst
 );
-    parameter EXPONENT_MAX = (1 << EXPONENT_WIDTH) - 2;
+    localparam EXPONENT_MAX = (1 << EXPONENT_WIDTH) - 2;
 
     logic sign;
     logic [EXPONENT_WIDTH-1:0] exponent;

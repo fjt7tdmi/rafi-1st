@@ -30,18 +30,18 @@ module FetchUnit (
     input logic clk,
     input logic rst
 );
-    parameter LineSize = ICacheLineSize;
-    parameter LineWidth = ICacheLineWidth;
-    parameter IndexWidth = ICacheIndexWidth;
-    parameter TagWidth = ICacheTagWidth;
+    localparam LineSize = ICacheLineSize;
+    localparam LineWidth = ICacheLineWidth;
+    localparam IndexWidth = ICacheIndexWidth;
+    localparam TagWidth = ICacheTagWidth;
 
-    parameter IndexLsb = $clog2(LineSize);
-    parameter IndexMsb = IndexLsb + IndexWidth - 1;
-    parameter TagLsb = IndexLsb + IndexWidth;
-    parameter TagMsb = PhysicalAddrWidth - 1;
+    localparam IndexLsb = $clog2(LineSize);
+    localparam IndexMsb = IndexLsb + IndexWidth - 1;
+    localparam TagLsb = IndexLsb + IndexWidth;
+    localparam TagMsb = PhysicalAddrWidth - 1;
 
     // Wait 2-cycle after pipeline flush
-    parameter StallCycleAfterFlush = 2;
+    localparam StallCycleAfterFlush = 2;
 
     typedef logic [TagWidth-1:0] _tag_t;
     typedef logic [IndexWidth-1:0] _index_t;
