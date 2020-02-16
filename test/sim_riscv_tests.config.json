@@ -1,4 +1,13 @@
 [
+    { "name": "rv32ua-p-amoadd_w",      "host-io-addr": "0x80001000", "cycle": 10000 },
+    { "name": "rv32ua-p-amoand_w",      "host-io-addr": "0x80001000", "cycle": 10000 },
+    { "name": "rv32ua-p-amomax_w",      "host-io-addr": "0x80001000", "cycle": 10000 },
+    { "name": "rv32ua-p-amomaxu_w",     "host-io-addr": "0x80001000", "cycle": 10000 },
+    { "name": "rv32ua-p-amomin_w",      "host-io-addr": "0x80001000", "cycle": 10000 },
+    { "name": "rv32ua-p-amominu_w",     "host-io-addr": "0x80001000", "cycle": 10000 },
+    { "name": "rv32ua-p-amoor_w",       "host-io-addr": "0x80001000", "cycle": 10000 },
+    { "name": "rv32ua-p-amoswap_w",     "host-io-addr": "0x80001000", "cycle": 10000 },
+    { "name": "rv32ua-p-amoxor_w",      "host-io-addr": "0x80001000", "cycle": 10000 },
     { "name": "rv32uf-p-fadd",          "host-io-addr": "0x80001000", "cycle": 10000 },
     { "name": "rv32uf-p-fclass",        "host-io-addr": "0x80001000", "cycle": 10000 },
     { "name": "rv32uf-p-fcmp",          "host-io-addr": "0x80001000", "cycle": 10000 },
