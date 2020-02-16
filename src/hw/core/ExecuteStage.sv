@@ -318,7 +318,7 @@ module ExecuteStage(
     always_comb begin
         unique case (op.exUnitType)
         ExUnitType_FpConverter: dstFpRegValue = fpResultCvt;
-        ExUnitType_Fp32:        dstFpRegValue = {32'h0, fpResult32};
+        ExUnitType_Fp32:        dstFpRegValue = {32'hffff_ffff, fpResult32};
         ExUnitType_Fp64:        dstFpRegValue = fpResult64;
         ExUnitType_LoadStore:   dstFpRegValue = loadStoreUnit.result;
         default:                dstFpRegValue = '0;

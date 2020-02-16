@@ -115,7 +115,7 @@ module LoadStoreUnit (
         else if (loadStoreType inside {LoadStoreType_HalfWord, LoadStoreType_UnsignedHalfWord}) begin
             mask = 8'b0000_0011;
         end
-        else if (loadStoreType inside {LoadStoreType_Word, LoadStoreType_UnsignedWord}) begin
+        else if (loadStoreType inside {LoadStoreType_Word, LoadStoreType_UnsignedWord, LoadStoreType_FpWord}) begin
             mask = 8'b0000_1111;
         end
         else if (loadStoreType inside {LoadStoreType_DoubleWord}) begin
@@ -165,6 +165,9 @@ module LoadStoreUnit (
         end
         LoadStoreType_UnsignedWord: begin
             return {32'h0000_0000, value[31:0]};
+        end
+        LoadStoreType_FpWord: begin
+            return {32'hffff_ffff, value[31:0]};
         end
         default: return '0;
         endcase
