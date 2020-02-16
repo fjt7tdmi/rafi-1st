@@ -23,7 +23,7 @@ class Fp64MulAddTest : public FpMulAddTest<VFpMulAdd>
 {
 };
 
-void RunTest(Fp64MulAddTest* pTest, int command, uint32_t expectedFlags, uint32_t expectedResult, uint32_t src1, uint32_t src2, uint32_t src3 = 0)
+void RunTest(Fp64MulAddTest* pTest, int command, uint32_t expectedFlags, uint64_t expectedResult, uint64_t src1, uint64_t src2, uint64_t src3 = 0)
 {
     pTest->GetTop()->command = command;
     pTest->GetTop()->roundingMode = 0;

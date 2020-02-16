@@ -797,7 +797,7 @@ if (verilator_FOUND)
     # rafi-vtest-fp64-mul-add
     #
     add_executable(rafi-vtest-fp64-mul-add
-        src/hw/fp/Fp32MulAddTest.cpp
+        src/hw/fp/Fp64MulAddTest.cpp
         src/hw/fp/FpMulAddTest.h
         src/hw/fp/FpTest.h
     )
