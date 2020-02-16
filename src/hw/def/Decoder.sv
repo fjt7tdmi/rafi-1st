@@ -455,7 +455,7 @@ function automatic Op DecodeRV32A(insn_t insn);
     op.exUnitType = ExUnitType_LoadStore;
     op.fpUnitType = '0;
     op.fpUnitCommand = '0;
-    op.loadStoreType = '0;
+    op.loadStoreType = LoadStoreType_UnsignedWord;
     op.mulDivType = '0;
     op.intRegWriteSrcType = IntRegWriteSrcType_Memory;
     op.storeSrcType = '0;
