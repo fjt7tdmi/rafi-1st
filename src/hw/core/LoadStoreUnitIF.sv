@@ -30,8 +30,8 @@ interface LoadStoreUnitIF;
     LoadStoreUnitCommand command;
     LoadStoreType loadStoreType;
     AtomicType atomicType;
-    word_t result;
-    word_t storeRegValue;
+    uint64_t result;
+    uint64_t storeRegValue;
 
     modport ExecuteStage(
     output

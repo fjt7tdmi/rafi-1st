@@ -155,7 +155,7 @@ module ExecuteStage(
     logic trapReturn;
 
     addr_t memAddr;
-    word_t storeRegValue;
+    uint64_t storeRegValue;
     logic invalidateICache;
     logic invalidateTlb;
 
@@ -308,7 +308,7 @@ module ExecuteStage(
         unique case (op.intRegWriteSrcType)
         IntRegWriteSrcType_Result:  dstIntRegValue = intResult;
         IntRegWriteSrcType_NextPc:  dstIntRegValue = prevStage.pc + InsnSize;
-        IntRegWriteSrcType_Memory:  dstIntRegValue = loadStoreUnit.result;
+        IntRegWriteSrcType_Memory:  dstIntRegValue = loadStoreUnit.result[31:0];
         IntRegWriteSrcType_Csr:     dstIntRegValue = csr.readValue;
         default: dstIntRegValue = '0;
         endcase
@@ -320,7 +320,7 @@ module ExecuteStage(
         ExUnitType_FpConverter: dstFpRegValue = fpResultCvt;
         ExUnitType_Fp32:        dstFpRegValue = {32'h0, fpResult32};
         ExUnitType_Fp64:        dstFpRegValue = fpResult64;
-        ExUnitType_LoadStore:   dstFpRegValue = {32'h0, loadStoreUnit.result};
+        ExUnitType_LoadStore:   dstFpRegValue = loadStoreUnit.result;
         default:                dstFpRegValue = '0;
         endcase
     end
@@ -340,8 +340,8 @@ module ExecuteStage(
         memAddr = intResult;
 
         unique case (op.storeSrcType)
-        StoreSrcType_Int:   storeRegValue = srcIntRegValue2;
-        StoreSrcType_Fp:    storeRegValue = srcFpRegValue2[31:0];
+        StoreSrcType_Int:   storeRegValue = {32'h0, srcIntRegValue2};
+        StoreSrcType_Fp:    storeRegValue = srcFpRegValue2;
         default:            storeRegValue = '0;
         endcase
 

@@ -68,13 +68,13 @@ module LoadStoreUnit (
     } TagArrayEntry;
 
     // Functions
-    function automatic word_t rightShift(_line_t value, _shift_amount_t shift);
+    function automatic uint64_t rightShift(_line_t value, _shift_amount_t shift);
         int8_t [LineSize-1:0] bytes;
-        int8_t [WordSize-1:0] shiftedBytes;
+        int8_t [7:0] shiftedBytes;
 
         bytes = value;
 
-        for (int i = 0; i < WordSize; i++) begin
+        for (int i = 0; i < 8; i++) begin
             /* verilator lint_off WIDTH */
             if (shift + i < LineSize) begin
                 shiftedBytes[i] = bytes[shift + i];
@@ -87,8 +87,8 @@ module LoadStoreUnit (
         return shiftedBytes;
     endfunction
 
-    function automatic _line_t leftShift(word_t value, _shift_amount_t shift);
-        int8_t [WordSize-1:0] bytes;
+    function automatic _line_t leftShift(uint64_t value, _shift_amount_t shift);
+        int8_t [7:0] bytes;
         int8_t [LineSize-1:0] shiftedBytes;
 
         bytes = value;
@@ -109,56 +109,62 @@ module LoadStoreUnit (
         _write_mask_t mask;
 
         /* verilator lint_off WIDTH */
-        unique case(loadStoreType)
-        LoadStoreType_Word: begin
-            mask = 4'b1111;
+        if (loadStoreType inside {LoadStoreType_Byte, LoadStoreType_UnsignedByte}) begin
+            mask = 8'b0000_0001;
         end
-        LoadStoreType_UnsignedHalfWord: begin
-            mask = 4'b0011;
+        else if (loadStoreType inside {LoadStoreType_HalfWord, LoadStoreType_UnsignedHalfWord}) begin
+            mask = 8'b0000_0011;
         end
-        LoadStoreType_UnsignedByte: begin
-            mask = 4'b0001;
+        else if (loadStoreType inside {LoadStoreType_Word, LoadStoreType_UnsignedWord}) begin
+            mask = 8'b0000_1111;
         end
-        LoadStoreType_HalfWord: begin
-            mask = 4'b0011;
+        else if (loadStoreType inside {LoadStoreType_DoubleWord}) begin
+            mask = 8'b1111_1111;
         end
-        LoadStoreType_Byte: begin
-            mask = 4'b0001;
-        end
-        default: begin
+        else begin
             mask = '0;
         end
-        endcase
 
         return mask << shift;
     endfunction
 
-    function automatic word_t extend(word_t value, LoadStoreType loadStoreType);
+    function automatic uint64_t extend(uint64_t value, LoadStoreType loadStoreType);
         unique case(loadStoreType)
-        LoadStoreType_Word: begin
-            return value;
-        end
-        LoadStoreType_UnsignedHalfWord: begin
-            return {16'h0000, value[15:0]};
-        end
-        LoadStoreType_UnsignedByte: begin
-            return {24'h000000, value[7:0]};
+        LoadStoreType_Byte: begin
+            if (value[7]) begin
+                return {56'hffff_ffff_ffff_ff, value[7:0]};
+            end
+            else begin
+                return {56'h0000_0000_0000_00, value[7:0]};
+            end
         end
         LoadStoreType_HalfWord: begin
             if (value[15]) begin
-                return {16'hffff, value[15:0]};
+                return {48'hffff_ffff_ffff, value[15:0]};
             end
             else begin
-                return {16'h0000, value[15:0]};
+                return {48'h0000_0000_0000, value[15:0]};
             end
         end
-        LoadStoreType_Byte: begin
-            if (value[7]) begin
-                return {24'hffffff, value[7:0]};
+        LoadStoreType_Word: begin
+            if (value[31]) begin
+                return {32'hffff_ffff, value[31:0]};
             end
             else begin
-                return {24'h000000, value[7:0]};
+                return {32'h0000_0000, value[31:0]};
             end
+        end
+        LoadStoreType_DoubleWord: begin
+            return value;
+        end
+        LoadStoreType_UnsignedByte: begin
+            return {56'h0000_0000_0000_00, value[7:0]};
+        end
+        LoadStoreType_UnsignedHalfWord: begin
+            return {48'h0000_0000_0000, value[15:0]};
+        end
+        LoadStoreType_UnsignedWord: begin
+            return {32'h0000_0000, value[31:0]};
         end
         default: return '0;
         endcase
@@ -188,8 +194,8 @@ module LoadStoreUnit (
     logic r_TlbMiss;
     MemoryAccessType r_AccessType;
     LoadStoreType r_LoadStoreType;
-    word_t r_LoadResult;
-    word_t r_StoreRegValue;
+    uint64_t r_LoadResult;
+    uint64_t r_StoreRegValue;
     word_t r_HostIoValue; // special register for debug
 
     // Wires
@@ -201,17 +207,17 @@ module LoadStoreUnit (
     logic nextTlbMiss;
     MemoryAccessType nextAccessType;
     LoadStoreType nextLoadStoreType;
-    word_t nextLoadResult;
-    word_t nextStoreRegValue;
+    uint64_t nextLoadResult;
+    uint64_t nextStoreRegValue;
     word_t nextHostIoValue;
 
     MemoryAccessType accessType;
     logic cacheMiss;
-    word_t shiftedReadData;
+    uint64_t shiftedReadData;
     CacheCommand command;
     dcache_mem_addr_t commandAddr;
-    word_t loadResult;
-    word_t storeValue;
+    uint64_t loadResult;
+    uint64_t storeValue;
     word_t storeAluValue;
     logic storeConditionFlag;
 
@@ -374,7 +380,7 @@ module LoadStoreUnit (
     end
 
     always_comb begin
-        storeAluValue = atomicAlu(bus.atomicType, r_StoreRegValue, loadResult);
+        storeAluValue = atomicAlu(bus.atomicType, r_StoreRegValue[31:0], loadResult[31:0]);
         storeValue = (bus.command == LoadStoreUnitCommand_AtomicMemOp)
             ? storeAluValue
             : r_StoreRegValue;
@@ -547,7 +553,7 @@ module LoadStoreUnit (
 
     always_comb begin
         nextHostIoValue = (r_State == State_WriteThrough) && cacheReplacerDone && (nextPhysicalAddr == HostIoAddr) ?
-            r_StoreRegValue :
+            r_StoreRegValue[31:0] :
             r_HostIoValue;
     end
 
