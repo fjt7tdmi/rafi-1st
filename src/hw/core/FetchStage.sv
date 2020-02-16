@@ -29,8 +29,8 @@ module FetchStage(
     input   logic clk,
     input   logic rst
 );
-    parameter InsnCountInLine = ICacheLineWidth / InsnWidth;
-    parameter IndexWidth = $clog2(InsnCountInLine);
+    localparam InsnCountInLine = ICacheLineWidth / InsnWidth;
+    localparam IndexWidth = $clog2(InsnCountInLine);
 
     // Wires
     logic [IndexWidth-1:0] index;

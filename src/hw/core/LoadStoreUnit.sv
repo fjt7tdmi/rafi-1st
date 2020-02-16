@@ -32,15 +32,15 @@ module LoadStoreUnit (
     input   logic clk,
     input   logic rst
 );
-    parameter LineSize = DCacheLineSize;
-    parameter LineWidth = DCacheLineWidth;
-    parameter IndexWidth = DCacheIndexWidth;
-    parameter TagWidth = DCacheTagWidth;
+    localparam LineSize = DCacheLineSize;
+    localparam LineWidth = DCacheLineWidth;
+    localparam IndexWidth = DCacheIndexWidth;
+    localparam TagWidth = DCacheTagWidth;
 
-    parameter IndexLsb = $clog2(LineSize);
-    parameter IndexMsb = IndexLsb + IndexWidth - 1;
-    parameter TagLsb = IndexLsb + IndexWidth;
-    parameter TagMsb = PhysicalAddrWidth - 1;
+    localparam IndexLsb = $clog2(LineSize);
+    localparam IndexMsb = IndexLsb + IndexWidth - 1;
+    localparam TagLsb = IndexLsb + IndexWidth;
+    localparam TagMsb = PhysicalAddrWidth - 1;
 
     typedef logic unsigned [TagWidth-1:0] _tag_t;
     typedef logic unsigned [IndexWidth-1:0] _index_t;
