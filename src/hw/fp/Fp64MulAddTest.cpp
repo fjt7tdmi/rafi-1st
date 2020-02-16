@@ -108,7 +108,7 @@ TEST_F(Fp64MulAddTest, fmadd_5)
 
 TEST_F(Fp64MulAddTest, fmadd_6)
 {
-    RunTest(this, CMD_FNMADD, 1, 0x409350cc'ccccccccull, 0xbff00000'00000000ull, 0xc0934c66'66666666ull, 0x3ff19999'9999999aull); // 1236.2, -1.0, -1235.1, 1.1
+    RunTest(this, CMD_FNMADD, 1, 0xc09350cc'ccccccccull, 0xbff00000'00000000ull, 0xc0934c66'66666666ull, 0x3ff19999'9999999aull); // 1236.2, -1.0, -1235.1, 1.1
 }
 
 TEST_F(Fp64MulAddTest, fmadd_7)
@@ -138,7 +138,7 @@ TEST_F(Fp64MulAddTest, fmadd_11)
 
 TEST_F(Fp64MulAddTest, fmadd_12)
 {
-    RunTest(this, CMD_FNMSUB, 1, 0x40934800'00000000ull, 0xbff00000'00000000ull, 0xc0934c66'66666666ull, 0x3ff19999'9999999aull); // -1234, -1.0, -1235.1, 1.1
+    RunTest(this, CMD_FNMSUB, 1, 0xc0934800'00000000ull, 0xbff00000'00000000ull, 0xc0934c66'66666666ull, 0x3ff19999'9999999aull); // -1234, -1.0, -1235.1, 1.1
 }
 
 TEST_F(Fp64MulAddTest, fmadd_13)
