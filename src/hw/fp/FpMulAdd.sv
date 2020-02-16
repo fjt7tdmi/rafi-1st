@@ -30,6 +30,8 @@ module FpMul #(
     input logic [WIDTH-1:0] src1,
     input logic [WIDTH-1:0] src2
 );
+    localparam EXPONENT_MAX = (1 << EXPONENT_WIDTH) - 2;
+
     typedef enum logic [1:0]
     {
         ResultType_Production = 2'h0,
@@ -86,7 +88,7 @@ module FpMul #(
     logic [FRACTION_WIDTH*2+1:0] fraction_prod;
     always_comb begin
         sign = sign1 ^ sign2;
-        exponent_sum = exponent1_extended + exponent2_extended - 127;
+        exponent_sum = exponent1_extended + exponent2_extended - EXPONENT_MAX / 2;
         fraction_prod = fraction1_extended * fraction2_extended;
     end
 
@@ -127,7 +129,7 @@ module FpMul #(
     logic overflow;
     logic underflow;
     always_comb begin
-        overflow = exponent_rounded >= 255;
+        overflow = exponent_rounded > EXPONENT_MAX;
         underflow = exponent_rounded <= 0;
     end
 
@@ -197,7 +199,7 @@ module FpAdd #(
     input logic [WIDTH-1:0] src1,
     input logic [WIDTH-1:0] src2
 );
-    parameter EXPONENT_MAX = (1 << EXPONENT_WIDTH) - 2;
+    localparam EXPONENT_MAX = (1 << EXPONENT_WIDTH) - 2;
 
     typedef enum logic [1:0]
     {
@@ -409,7 +411,10 @@ module FpMulAdd #(
 );
     logic [WIDTH-1:0] resultMul;
     fflags_t flagsMul;
-    FpMul m_FpMul (
+    FpMul #(
+        .EXPONENT_WIDTH(EXPONENT_WIDTH),
+        .FRACTION_WIDTH(FRACTION_WIDTH)
+    ) m_FpMul (
         .result(resultMul),
         .flags(flagsMul),
         .roundingMode(roundingMode),
@@ -421,7 +426,10 @@ module FpMulAdd #(
     logic useSrc3;
     logic minus1;
     logic minus2;
-    FpAdd m_FpAdd (
+    FpAdd #(
+        .EXPONENT_WIDTH(EXPONENT_WIDTH),
+        .FRACTION_WIDTH(FRACTION_WIDTH)
+    ) m_FpAdd (
         .result(resultAdd),
         .flags(flagsAdd),
         .roundingMode(roundingMode),
