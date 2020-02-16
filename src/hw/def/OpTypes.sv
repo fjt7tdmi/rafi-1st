@@ -129,24 +129,26 @@ typedef enum logic [3:0]
     FpSignUnitCommand_Sgnjx = 4'h3
 } FpSignUnitCommand;
 
-typedef enum logic [3:0]
+typedef enum logic [4:0]
 {
-    FpConverterCommand_W_S  = 4'h0,
-    FpConverterCommand_WU_S = 4'h1,
-    FpConverterCommand_L_S  = 4'h2,
-    FpConverterCommand_LU_S = 4'h3,
-    FpConverterCommand_W_D  = 4'h4,
-    FpConverterCommand_WU_D = 4'h5,
-    FpConverterCommand_L_D  = 4'h6,
-    FpConverterCommand_LU_D = 4'h7,
-    FpConverterCommand_S_W  = 4'h8,
-    FpConverterCommand_S_WU = 4'h9,
-    FpConverterCommand_S_L  = 4'ha,
-    FpConverterCommand_S_LU = 4'hb,
-    FpConverterCommand_D_W  = 4'hc,
-    FpConverterCommand_D_WU = 4'hd,
-    FpConverterCommand_D_L  = 4'he,
-    FpConverterCommand_D_LU = 4'hf
+    FpConverterCommand_W_S  = 5'h00,
+    FpConverterCommand_WU_S = 5'h01,
+    FpConverterCommand_L_S  = 5'h02,
+    FpConverterCommand_LU_S = 5'h03,
+    FpConverterCommand_W_D  = 5'h04,
+    FpConverterCommand_WU_D = 5'h05,
+    FpConverterCommand_L_D  = 5'h06,
+    FpConverterCommand_LU_D = 5'h07,
+    FpConverterCommand_S_W  = 5'h08,
+    FpConverterCommand_S_WU = 5'h09,
+    FpConverterCommand_S_L  = 5'h0a,
+    FpConverterCommand_S_LU = 5'h0b,
+    FpConverterCommand_D_W  = 5'h0c,
+    FpConverterCommand_D_WU = 5'h0d,
+    FpConverterCommand_D_L  = 5'h0e,
+    FpConverterCommand_D_LU = 5'h0f,
+    FpConverterCommand_S_D  = 5'h10,
+    FpConverterCommand_D_S  = 5'h11
 } FpConverterCommand;
 
 typedef enum logic [3:0]

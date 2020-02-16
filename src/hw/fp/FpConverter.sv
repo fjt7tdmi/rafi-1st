@@ -258,6 +258,137 @@ module FpConverter_Int32ToFp #(
     end
 endmodule
 
+module FpConverter_Fp32ToFp64(
+    output uint64_t result,
+    output fflags_t flags,
+    input logic [2:0] roundingMode,
+    input uint32_t src
+);
+    logic sign;
+    logic [7:0] exponent;
+    logic [22:0] fraction;
+    always_comb begin
+        sign = src[31];
+        exponent = src[30:23];
+        fraction = src[22:0];
+    end
+
+    logic is_zero;
+    logic is_nan;
+    logic is_inf;
+    logic signed [10:0] exponent_converted;
+    always_comb begin
+        is_zero = exponent == '0;
+        is_nan = exponent == '1 && fraction != '0;
+        is_inf = exponent == '1 && fraction == '0;
+        exponent_converted = {3'h0, exponent} - 127 + 1023;
+    end
+
+    always_comb begin
+        if (is_zero) begin
+            result = '0;
+        end
+        else if (is_inf) begin
+            result[63] = sign;
+            result[62:52] = '1;
+            result[51:0] = '0;
+        end
+        else if (is_nan) begin
+            result[63] = 0;
+            result[62:51] = '1;
+            result[50:0] = '0;
+        end
+        else begin
+            result[63] = sign;
+            result[62:52] = exponent_converted;
+            result[51:29] = fraction;
+            result[28:0] = '0;
+        end
+
+        flags = '0;
+    end
+endmodule
+
+module FpConverter_Fp64ToFp32(
+    output uint32_t result,
+    output fflags_t flags,
+    input logic [2:0] roundingMode,
+    input uint64_t src
+);
+    logic sign;
+    logic [10:0] exponent;
+    logic [51:0] fraction;
+    always_comb begin
+        sign = src[63];
+        exponent = src[62:52];
+        fraction = src[51:0];
+    end
+
+    logic is_zero;
+    logic is_nan;
+    logic is_inf;
+    logic signed [10:0] exponent_converted;
+    always_comb begin
+        is_zero = exponent == '0;
+        is_nan = exponent == '1 && fraction != '0;
+        is_inf = exponent == '1 && fraction == '0;
+        exponent_converted = exponent - 1023 + 127;
+    end
+
+    logic inexact;
+    logic [7:0] rounded_exponent;
+    logic [22:0] rounded_fraction;
+
+    FpRounder #(
+        .EXPONENT_WIDTH(8),
+        .FRACTION_WIDTH(23)
+    ) rounder (
+        .inexact(inexact),
+        .roundedExponent(rounded_exponent),
+        .roundedFraction(rounded_fraction),
+        .roundingMode(roundingMode),
+        .sign(sign),
+        .exponent(exponent_converted[7:0]),
+        .fraction(fraction[51:29]),
+        .g(src[28]),
+        .r(src[27]),
+        .s(|src[26:0]));
+
+    logic overflow;
+    logic underflow;
+    always_comb begin
+        overflow = exponent_converted > 254;
+        underflow = exponent_converted < 1;
+    end    
+
+    always_comb begin
+        if (is_nan) begin
+            result[31] = 0;
+            result[30:22] = '1;
+            result[21:0] = '0;
+        end
+        else if (is_inf || overflow) begin
+            result[31] = sign;
+            result[30:23] = '1;
+            result[22:0] = '0;
+        end
+        else if (is_zero || underflow) begin
+            result = '0;
+        end
+        else begin
+            result[31] = sign;
+            result[30:23] = rounded_exponent;
+            result[22:0] = rounded_fraction;
+        end
+
+        flags.NV = 0;
+        flags.DZ = 0;
+        flags.OF = 0;
+        flags.UF = 0;
+        flags.NX = !is_zero && (inexact || underflow);
+    end
+endmodule
+
 module FpConverter (
     output word_t intResult,
     output uint64_t fpResult,
@@ -332,6 +463,22 @@ module FpConverter (
         .roundingMode(roundingMode),
         .src(intSrc));
 
+    logic [63:0] result_f32_to_f64;
+    fflags_t flags_f32_to_f64;
+    FpConverter_Fp32ToFp64 m_f32_to_f64(
+        .result(result_f32_to_f64),
+        .flags(flags_f32_to_f64),
+        .roundingMode(roundingMode),
+        .src(fpSrc[31:0]));
+
+    logic [31:0] result_f64_to_f32;
+    fflags_t flags_f64_to_f32;
+    FpConverter_Fp64ToFp32 m_f64_to_f32(
+        .result(result_f64_to_f32),
+        .flags(flags_f64_to_f32),
+        .roundingMode(roundingMode),
+        .src(fpSrc));
+
     always_comb begin
         if (command inside {FpConverterCommand_W_S, FpConverterCommand_WU_S})  begin
             intResult = result_f32_to_i32;
@@ -347,7 +494,7 @@ module FpConverter (
         end
         else if (command inside {FpConverterCommand_S_W, FpConverterCommand_S_WU})  begin
             intResult = '0;
-            fpResult = {32'h0, result_i32_to_f32};
+            fpResult = {32'hffff_ffff, result_i32_to_f32};
             writeFlags = 1;
             writeFlagsValue = flags_i32_to_f32;
         end
@@ -356,6 +503,18 @@ module FpConverter (
             fpResult = result_i32_to_f64;
             writeFlags = 1;
             writeFlagsValue = flags_i32_to_f64;
+        end
+        else if (command inside {FpConverterCommand_D_S})  begin
+            intResult = '0;
+            fpResult = result_f32_to_f64;
+            writeFlags = 1;
+            writeFlagsValue = flags_f32_to_f64;
+        end
+        else if (command inside {FpConverterCommand_S_D})  begin
+            intResult = '0;
+            fpResult = {32'hffff_ffff, result_f64_to_f32};
+            writeFlags = 1;
+            writeFlagsValue = flags_f64_to_f32;
         end
         else begin
             intResult = '0;

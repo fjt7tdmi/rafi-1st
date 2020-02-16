@@ -935,6 +935,20 @@ function automatic Op DecodeRV32D(insn_t insn);
             op.dstRegType = RegType_Fp;
             op.regWriteEnable = 1;
         end
+        else if (funct7 == 7'b0100000 && rs2 == 5'b00001) begin
+            // FCVT.S.D
+            op.exUnitType = ExUnitType_FpConverter;
+            op.fpConverterCommand = FpConverterCommand_S_D;
+            op.dstRegType = RegType_Fp;
+            op.regWriteEnable = 1;
+        end
+        else if (funct7 == 7'b0100001 && rs2 == 5'b00000) begin
+            // FCVT.D.S
+            op.exUnitType = ExUnitType_FpConverter;
+            op.fpConverterCommand = FpConverterCommand_D_S;
+            op.dstRegType = RegType_Fp;
+            op.regWriteEnable = 1;
+        end
         else if (funct7 == 7'b1010001 && rm == 3'b010) begin
             // FEQ.D
             op.fpUnitType = FpUnitType_Comparator;
