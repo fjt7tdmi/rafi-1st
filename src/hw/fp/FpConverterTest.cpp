@@ -87,7 +87,38 @@ protected:
     }
 };
 
-void RunTest_FCVT(FpConverterTest* pTest, int command, uint64_t expectedResult, uint32_t intSrc)
+void RunTest_FCVT_FP32(FpConverterTest* pTest, int command, uint32_t expectedResult, uint32_t intSrc)
+{
+    pTest->GetTop()->command = command;
+    pTest->GetTop()->roundingMode = 0;
+    pTest->GetTop()->intSrc = intSrc;
+    pTest->GetTop()->fpSrc = 0;
+    pTest->ProcessCycle();
+
+    ASSERT_EQ(expectedResult, static_cast<uint32_t>(pTest->GetTop()->fpResult));
+};
+
+TEST_F(FpConverterTest, fcvt_f2)
+{
+    RunTest_FCVT_FP32(this, CMD_S_W, 0x40000000, 0x00000002); //  2.0,  2
+}
+
+TEST_F(FpConverterTest, fcvt_f3)
+{
+    RunTest_FCVT_FP32(this, CMD_S_W, 0xc0000000, 0xfffffffe); // -2.0, -2
+}
+
+TEST_F(FpConverterTest, fcvt_f4)
+{
+    RunTest_FCVT_FP32(this, CMD_S_WU, 0x40000000, 0x00000002); // 2.0,  2
+}
+
+TEST_F(FpConverterTest, fcvt_f5)
+{
+    RunTest_FCVT_FP32(this, CMD_S_WU, 0x4f800000, 0xfffffffe); // 4.2949673e9, 2^32-2
+}
+
+void RunTest_FCVT_FP64(FpConverterTest* pTest, int command, uint64_t expectedResult, uint32_t intSrc)
 {
     pTest->GetTop()->command = command;
     pTest->GetTop()->roundingMode = 0;
@@ -98,44 +129,24 @@ void RunTest_FCVT(FpConverterTest* pTest, int command, uint64_t expectedResult, 
     ASSERT_EQ(expectedResult, pTest->GetTop()->fpResult);
 };
 
-TEST_F(FpConverterTest, fcvt_f2)
-{
-    RunTest_FCVT(this, CMD_S_W, 0x40000000, 0x00000002); //  2.0,  2
-}
-
-TEST_F(FpConverterTest, fcvt_f3)
-{
-    RunTest_FCVT(this, CMD_S_W, 0xc0000000, 0xfffffffe); // -2.0, -2
-}
-
-TEST_F(FpConverterTest, fcvt_f4)
-{
-    RunTest_FCVT(this, CMD_S_WU, 0x40000000, 0x00000002); // 2.0,  2
-}
-
-TEST_F(FpConverterTest, fcvt_f5)
-{
-    RunTest_FCVT(this, CMD_S_WU, 0x4f800000, 0xfffffffe); // 4.2949673e9, 2^32-2
-}
-
 TEST_F(FpConverterTest, fcvt_d2)
 {
-    RunTest_FCVT(this, CMD_D_W, 0x40000000'00000000ull, 0x00000002); //  2.0,  2
+    RunTest_FCVT_FP64(this, CMD_D_W, 0x40000000'00000000ull, 0x00000002); //  2.0,  2
 }
 
 TEST_F(FpConverterTest, fcvt_d3)
 {
-    RunTest_FCVT(this, CMD_D_W, 0xc0000000'00000000ull, 0xfffffffe); // -2.0, -2
+    RunTest_FCVT_FP64(this, CMD_D_W, 0xc0000000'00000000ull, 0xfffffffe); // -2.0, -2
 }
 
 TEST_F(FpConverterTest, fcvt_d4)
 {
-    RunTest_FCVT(this, CMD_D_WU, 0x40000000'00000000ull, 0x00000002); // 2.0,  2
+    RunTest_FCVT_FP64(this, CMD_D_WU, 0x40000000'00000000ull, 0x00000002); // 2.0,  2
 }
 
 TEST_F(FpConverterTest, fcvt_d5)
 {
-    RunTest_FCVT(this, CMD_D_WU, 0x41efffff'ffc00000ull, 0xfffffffe); // 4.2949673e9, 2^32-2
+    RunTest_FCVT_FP64(this, CMD_D_WU, 0x41efffff'ffc00000ull, 0xfffffffe); // 4.2949673e9, 2^32-2
 }
 
 void RunTest_FCVT_W_WithFlags(FpConverterTest* pTest, int command, uint32_t expectedFlags, uint32_t expectedResult, uint64_t fpSrc, int roundingMode)

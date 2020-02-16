@@ -525,7 +525,7 @@ function automatic Op DecodeRV32F(insn_t insn);
             op.aluSrcType2 = AluSrcType2_Imm;
             op.exUnitType = ExUnitType_LoadStore;
             op.intRegWriteSrcType = IntRegWriteSrcType_Memory;
-            op.loadStoreType = LoadStoreType_Word;
+            op.loadStoreType = LoadStoreType_FpWord;
             op.imm = sext12(insn[31:20]);
             op.isLoad = 1;
             op.regWriteEnable = 1;
@@ -541,7 +541,7 @@ function automatic Op DecodeRV32F(insn_t insn);
             op.aluSrcType1 = AluSrcType1_Reg;
             op.aluSrcType2 = AluSrcType2_Imm;
             op.exUnitType = ExUnitType_LoadStore;
-            op.loadStoreType = LoadStoreType_Word;
+            op.loadStoreType = LoadStoreType_FpWord;
             op.imm = sext12({insn[31:25], insn[11:7]});
             op.isStore = 1;
             op.dstRegType = RegType_Fp;
@@ -935,6 +935,20 @@ function automatic Op DecodeRV32D(insn_t insn);
             op.dstRegType = RegType_Fp;
             op.regWriteEnable = 1;
         end
+        else if (funct7 == 7'b0100000 && rs2 == 5'b00001) begin
+            // FCVT.S.D
+            op.exUnitType = ExUnitType_FpConverter;
+            op.fpConverterCommand = FpConverterCommand_S_D;
+            op.dstRegType = RegType_Fp;
+            op.regWriteEnable = 1;
+        end
+        else if (funct7 == 7'b0100001 && rs2 == 5'b00000) begin
+            // FCVT.D.S
+            op.exUnitType = ExUnitType_FpConverter;
+            op.fpConverterCommand = FpConverterCommand_D_S;
+            op.dstRegType = RegType_Fp;
+            op.regWriteEnable = 1;
+        end
         else if (funct7 == 7'b1010001 && rm == 3'b010) begin
             // FEQ.D
             op.fpUnitType = FpUnitType_Comparator;
@@ -965,28 +979,28 @@ function automatic Op DecodeRV32D(insn_t insn);
         else if (funct7 == 7'b1100001 && rs2 == 5'b00000) begin
             // FCVT.W.D
             op.exUnitType = ExUnitType_FpConverter;
-            op.fpConverterCommand = FpConverterCommand_W_S;
+            op.fpConverterCommand = FpConverterCommand_W_D;
             op.dstRegType = RegType_Int;
             op.regWriteEnable = 1;
         end
         else if (funct7 == 7'b1100001 && rs2 == 5'b00001) begin
             // FCVT.WU.D
             op.exUnitType = ExUnitType_FpConverter;
-            op.fpConverterCommand = FpConverterCommand_WU_S;
+            op.fpConverterCommand = FpConverterCommand_WU_D;
             op.dstRegType = RegType_Int;
             op.regWriteEnable = 1;
         end
         else if (funct7 == 7'b1101001 && rs2 == 5'b00000) begin
             // FCVT.D.W
             op.exUnitType = ExUnitType_FpConverter;
-            op.fpConverterCommand = FpConverterCommand_S_W;
+            op.fpConverterCommand = FpConverterCommand_D_W;
             op.dstRegType = RegType_Fp;
             op.regWriteEnable = 1;
         end
         else if (funct7 == 7'b1101001 && rs2 == 5'b00001) begin
             // FCVT.D.WU
             op.exUnitType = ExUnitType_FpConverter;
-            op.fpConverterCommand = FpConverterCommand_S_WU;
+            op.fpConverterCommand = FpConverterCommand_D_WU;
             op.dstRegType = RegType_Fp;
             op.regWriteEnable = 1;
         end

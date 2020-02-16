@@ -522,6 +522,7 @@ if (verilator_FOUND)
         PREFIX VCore
         THREADS 1
         TRACE
+        VERILATOR_ARGS --trace-structs
         SOURCES
         src/hw/def/BasicTypes.sv
         src/hw/def/Rv32Types.sv
@@ -612,6 +613,7 @@ if (verilator_FOUND)
         PREFIX VFp32Comparator
         THREADS 1
         TRACE
+        VERILATOR_ARGS --trace-structs
         SOURCES
         src/hw/def/BasicTypes.sv
         src/hw/def/RvTypes.sv
@@ -643,6 +645,7 @@ if (verilator_FOUND)
         PREFIX VFp64Comparator
         THREADS 1
         TRACE
+        VERILATOR_ARGS --trace-structs
         SOURCES
         src/hw/def/BasicTypes.sv
         src/hw/def/RvTypes.sv
@@ -673,6 +676,7 @@ if (verilator_FOUND)
         PREFIX VFpConverter
         THREADS 1
         TRACE
+        VERILATOR_ARGS --trace-structs
         SOURCES
         src/hw/def/BasicTypes.sv
         src/hw/def/RvTypes.sv
@@ -704,6 +708,7 @@ if (verilator_FOUND)
         PREFIX VFp32DivUnit
         THREADS 1
         TRACE
+        VERILATOR_ARGS --trace-structs
         SOURCES
         src/hw/def/BasicTypes.sv
         src/hw/def/RvTypes.sv
@@ -735,6 +740,7 @@ if (verilator_FOUND)
         PREFIX VFp64DivUnit
         THREADS 1
         TRACE
+        VERILATOR_ARGS --trace-structs
         SOURCES
         src/hw/def/BasicTypes.sv
         src/hw/def/RvTypes.sv
@@ -766,6 +772,7 @@ if (verilator_FOUND)
         PREFIX VFpMulAdd
         THREADS 1
         TRACE
+        VERILATOR_ARGS --trace-structs
         SOURCES
         src/hw/def/BasicTypes.sv
         src/hw/def/RvTypes.sv
@@ -790,7 +797,7 @@ if (verilator_FOUND)
     # rafi-vtest-fp64-mul-add
     #
     add_executable(rafi-vtest-fp64-mul-add
-        src/hw/fp/Fp32MulAddTest.cpp
+        src/hw/fp/Fp64MulAddTest.cpp
         src/hw/fp/FpMulAddTest.h
         src/hw/fp/FpTest.h
     )
@@ -798,6 +805,7 @@ if (verilator_FOUND)
         PREFIX VFpMulAdd
         THREADS 1
         TRACE
+        VERILATOR_ARGS --trace-structs
         SOURCES
         src/hw/def/BasicTypes.sv
         src/hw/def/RvTypes.sv
@@ -830,6 +838,7 @@ if (verilator_FOUND)
         PREFIX VFp32SqrtUnit
         THREADS 1
         TRACE
+        VERILATOR_ARGS --trace-structs
         SOURCES
         src/hw/def/BasicTypes.sv
         src/hw/def/RvTypes.sv
@@ -862,6 +871,7 @@ if (verilator_FOUND)
         PREFIX VFp64SqrtUnit
         THREADS 1
         TRACE
+        VERILATOR_ARGS --trace-structs
         SOURCES
         src/hw/def/BasicTypes.sv
         src/hw/def/RvTypes.sv
@@ -892,6 +902,7 @@ if (verilator_FOUND)
         PREFIX VMulUnit
         THREADS 1
         TRACE
+        VERILATOR_ARGS --trace-structs
         SOURCES
         src/hw/def/BasicTypes.sv
         src/hw/def/RvTypes.sv
@@ -919,6 +930,7 @@ if (verilator_FOUND)
         PREFIX VDivUnit
         THREADS 1
         TRACE
+        VERILATOR_ARGS --trace-structs
         SOURCES
         src/hw/def/BasicTypes.sv
         src/hw/def/RvTypes.sv
@@ -947,6 +959,7 @@ if (verilator_FOUND)
         PREFIX VSqrtUnit
         THREADS 1
         TRACE
+        VERILATOR_ARGS --trace-structs
         SOURCES
         src/hw/def/BasicTypes.sv
         src/hw/def/RvTypes.sv
