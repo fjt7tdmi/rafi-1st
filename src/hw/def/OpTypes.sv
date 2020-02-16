@@ -172,8 +172,10 @@ typedef enum logic [2:0]
     LoadStoreType_Byte              = 3'b000,
     LoadStoreType_HalfWord          = 3'b001,
     LoadStoreType_Word              = 3'b010,
+    LoadStoreType_DoubleWord        = 3'b011,
     LoadStoreType_UnsignedByte      = 3'b100,
-    LoadStoreType_UnsignedHalfWord  = 3'b101
+    LoadStoreType_UnsignedHalfWord  = 3'b101,
+    LoadStoreType_UnsignedWord      = 3'b110
 } LoadStoreType;
 
 typedef enum logic [2:0]
