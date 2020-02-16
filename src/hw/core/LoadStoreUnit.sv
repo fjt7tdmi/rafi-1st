@@ -570,9 +570,18 @@ module LoadStoreUnit (
             tagArrayWriteEnable = cacheReplacerArrayWriteEnable;
         end
         else if (r_State == State_Reserve) begin
-            tagArrayIndex = cacheReplacerArrayIndex;
+            // Set 'reserved' field.
+            tagArrayIndex = nextPhysicalAddr[IndexMsb:IndexLsb];
             tagArrayWriteValue.valid = tagArrayReadValue.valid;
             tagArrayWriteValue.reserved = 1;
+            tagArrayWriteValue.tag = tagArrayReadValue.tag;
+            tagArrayWriteEnable = 1;
+        end
+        else if (r_State == State_Store) begin
+            // Reset 'reserved' field.
+            tagArrayIndex = nextPhysicalAddr[IndexMsb:IndexLsb];
+            tagArrayWriteValue.valid = tagArrayReadValue.valid;
+            tagArrayWriteValue.reserved = 0;
             tagArrayWriteValue.tag = tagArrayReadValue.tag;
             tagArrayWriteEnable = 1;
         end
