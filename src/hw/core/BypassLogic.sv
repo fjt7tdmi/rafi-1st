@@ -126,7 +126,7 @@ module FpBypassLogic(
     typedef struct packed {
         logic valid;
         reg_addr_t addr;
-        word_t value;
+        uint64_t value;
     } PipelineEntry;
 
     // Functions
@@ -146,7 +146,7 @@ module FpBypassLogic(
     // Wires
     logic hit[READ_PORT_COUNT];
     reg_addr_t readAddr[READ_PORT_COUNT];
-    word_t readValue[READ_PORT_COUNT];
+    uint64_t readValue[READ_PORT_COUNT];
 
     logic [BypassDepth-1:0] camHits[READ_PORT_COUNT];
     _index_t camIndex[READ_PORT_COUNT];
