@@ -29,7 +29,7 @@ module FetchStage(
     input   logic clk,
     input   logic rst
 );
-    localparam InsnCountInLine = ICacheLineWidth / InsnWidth;
+    localparam InsnCountInLine = ICacheLineWidth / INSN_WIDTH;
     localparam IndexWidth = $clog2(InsnCountInLine);
 
     // Wires
@@ -38,7 +38,7 @@ module FetchStage(
     insn_t insn;
 
     always_comb begin
-        index = fetchUnit.pc[IndexWidth+$clog2(InsnSize)-1:$clog2(InsnSize)];
+        index = fetchUnit.pc[IndexWidth+$clog2(INSN_SIZE)-1:$clog2(INSN_SIZE)];
         insns = fetchUnit.iCacheLine;
         insn = insns[index];
     end

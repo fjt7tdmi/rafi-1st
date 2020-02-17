@@ -24,7 +24,7 @@ package RvTypes;
 // parameter
 
 // CSR
-parameter CsrAddrWidth = 12;
+parameter CSR_ADDR_WIDTH = 12;
 
 // FP rouning mode
 parameter FRM_RNE = 3'b000; // Round to Nearest, ties to Even
@@ -85,7 +85,7 @@ typedef enum logic [1:0]
     Privilege_Machine      = 2'b11
 } Privilege;
 
-typedef logic unsigned  [CsrAddrWidth-1:0] csr_addr_t;
+typedef logic unsigned  [CSR_ADDR_WIDTH-1:0] csr_addr_t;
 
 typedef logic unsigned  [3:0] exception_code_t;
 

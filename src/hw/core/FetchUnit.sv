@@ -38,7 +38,7 @@ module FetchUnit (
     localparam IndexLsb = $clog2(LineSize);
     localparam IndexMsb = IndexLsb + IndexWidth - 1;
     localparam TagLsb = IndexLsb + IndexWidth;
-    localparam TagMsb = PhysicalAddrWidth - 1;
+    localparam TagMsb = PADDR_WIDTH - 1;
 
     // Wait 2-cycle after pipeline flush
     localparam StallCycleAfterFlush = 2;
@@ -209,7 +209,7 @@ module FetchUnit (
         .miss(cacheMiss),
         .done(cacheReplacerDone),
         .enable(cacheReplacerEnable),
-        .missAddr(r_PhysicalPc[PhysicalAddrWidth-1:IndexLsb]),
+        .missAddr(r_PhysicalPc[PADDR_WIDTH-1:IndexLsb]),
         .clk,
         .rst
     );
@@ -232,14 +232,14 @@ module FetchUnit (
         .done(tlbReplacerDone),
         .enable(tlbReplacerEnable),
         .missMemoryAccessType(MemoryAccessType_Instruction),
-        .missPage(r_Pc[VirtualAddrWidth-1:PageOffsetWidth]),
+        .missPage(r_Pc[VADDR_WIDTH-1:PAGE_OFFSET_WIDTH]),
         .clk,
         .rst
     );
 
     // Wires
     always_comb begin
-        tlbReadKey = nextPc[VirtualAddrWidth-1:PageOffsetWidth];
+        tlbReadKey = nextPc[VADDR_WIDTH-1:PAGE_OFFSET_WIDTH];
     end
 
     always_comb begin
@@ -311,7 +311,7 @@ module FetchUnit (
             nextPc = r_Pc;
         end
         else begin
-            nextPc = r_Pc + InsnSize;
+            nextPc = r_Pc + INSN_SIZE;
         end
     end
 
@@ -367,7 +367,7 @@ module FetchUnit (
 
     // Next register values
     always_comb begin
-        nextPhysicalPc = {tlbReadValue, nextPc[PageOffsetWidth-1:0]};
+        nextPhysicalPc = {tlbReadValue, nextPc[PAGE_OFFSET_WIDTH-1:0]};
         nextICacheRead = (r_State == State_Default && !ctrl.flush && !stall && !waitInvalidate);
         nextTlbMiss = nextICacheRead && !tlbHit;
         nextFault = nextICacheRead && tlbHit && tlbFault;
@@ -383,7 +383,7 @@ module FetchUnit (
     always_ff @(posedge clk) begin
         if (rst) begin
             r_State <= State_Default;
-            r_Pc <= InitialProgramCounter;
+            r_Pc <= INITIAL_PC;
             r_PhysicalPc <= '0;
             r_ICacheRead <= '0;
             r_TlbMiss <= '0;

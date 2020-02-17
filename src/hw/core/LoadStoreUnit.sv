@@ -40,7 +40,7 @@ module LoadStoreUnit (
     localparam IndexLsb = $clog2(LineSize);
     localparam IndexMsb = IndexLsb + IndexWidth - 1;
     localparam TagLsb = IndexLsb + IndexWidth;
-    localparam TagMsb = PhysicalAddrWidth - 1;
+    localparam TagMsb = PADDR_WIDTH - 1;
 
     typedef logic unsigned [TagWidth-1:0] _tag_t;
     typedef logic unsigned [IndexWidth-1:0] _index_t;
@@ -275,7 +275,7 @@ module LoadStoreUnit (
     );
 
     MultiBankBlockRam #(
-        .DataWidthPerBank(ByteWidth),
+        .DataWidthPerBank(BYTE_WIDTH),
         .BankCount(LineSize),
         .IndexWidth(IndexWidth)
     ) m_DataArray (
@@ -293,7 +293,7 @@ module LoadStoreUnit (
         .fault(tlbFault),
         .readValue(tlbReadValue),
         .readEnable(tlbReadEnable),
-        .readKey(nextAddr[VirtualAddrWidth-1:PageOffsetWidth]),
+        .readKey(nextAddr[VADDR_WIDTH-1:PAGE_OFFSET_WIDTH]),
         .readAccessType(accessType),
         .writeEnable(tlbWriteEnable),
         .writeKey(tlbWriteKey),
@@ -353,7 +353,7 @@ module LoadStoreUnit (
         .done(tlbReplacerDone),
         .enable(tlbReplacerEnable),
         .missMemoryAccessType(r_AccessType),
-        .missPage(r_Addr[VirtualAddrWidth-1:PageOffsetWidth]),
+        .missPage(r_Addr[VADDR_WIDTH-1:PAGE_OFFSET_WIDTH]),
         .clk,
         .rst
     );
@@ -375,7 +375,7 @@ module LoadStoreUnit (
     end
 
     always_comb begin
-        commandAddr = r_PhysicalAddr[PhysicalAddrWidth-1:IndexLsb];
+        commandAddr = r_PhysicalAddr[PADDR_WIDTH-1:IndexLsb];
     end
 
     always_comb begin
@@ -544,7 +544,7 @@ module LoadStoreUnit (
     always_comb begin
         nextDCacheRead = (r_State == State_Default) && bus.enable;
         nextTlbMiss = nextDCacheRead && !tlbHit;
-        nextPhysicalAddr = {tlbReadValue, nextAddr[PageOffsetWidth-1:0]};
+        nextPhysicalAddr = {tlbReadValue, nextAddr[PAGE_OFFSET_WIDTH-1:0]};
 
         if (bus.done) begin
             nextTlbFault = 0;
@@ -555,7 +555,7 @@ module LoadStoreUnit (
     end
 
     always_comb begin
-        nextHostIoValue = (r_State == State_WriteThrough) && cacheReplacerDone && (nextPhysicalAddr == HostIoAddr) ?
+        nextHostIoValue = (r_State == State_WriteThrough) && cacheReplacerDone && (nextPhysicalAddr == HOST_IO_ADDR) ?
             r_StoreRegValue[31:0] :
             r_HostIoValue;
     end

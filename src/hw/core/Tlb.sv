@@ -47,7 +47,7 @@ module Tlb  #(
     input   logic clk,
     input   logic rst
 );
-    localparam ExtWidth = PhysicalAddrWidth - VirtualAddrWidth;
+    localparam EXT_WIDTH = PADDR_WIDTH - VADDR_WIDTH;
 
     typedef logic [TlbIndexWidth-1:0] _tlb_index_t;
 
@@ -97,13 +97,13 @@ module Tlb  #(
     logic readEntryFault;
     logic readEntryNeedsUpdate;
 
-    logic [ExtWidth-1:0] ext;
+    logic [EXT_WIDTH-1:0] ext;
     logic camHit;
     TlbEntry camReadValue;
 
     // Modules
     FlipFlopCam #(
-        .KeyWidth(VirtualPageNumberWidth),
+        .KeyWidth(VIRTUAL_PAGE_NUMBER_WIDTH),
         .ValueWidth($bits(TlbEntry)),
         .IndexWidth(TlbIndexWidth)
     ) body (
