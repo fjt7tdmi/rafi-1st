@@ -25,12 +25,12 @@ function automatic word_t ALU(AluCommand command, word_t src1, word_t src2);
     unique case(command)
     AluCommand_Add: return src1 + src2;
     AluCommand_Sub: return src1 - src2;
-    AluCommand_Sll: return src1 << $unsigned(src2[XLenLog2:0]);
+    AluCommand_Sll: return src1 << $unsigned(src2[XLEN_LOG2:0]);
     AluCommand_Slt: return ($signed(src1) < $signed(src2)) ? 1 : 0;
     AluCommand_Sltu: return ($unsigned(src1) < $unsigned(src2)) ? 1 : 0;
     AluCommand_Xor: return src1 ^ src2;
-    AluCommand_Srl: return src1 >> $unsigned(src2[XLenLog2:0]);
-    AluCommand_Sra: return src1 >>> $unsigned(src2[XLenLog2:0]);
+    AluCommand_Srl: return src1 >> $unsigned(src2[XLEN_LOG2:0]);
+    AluCommand_Sra: return src1 >>> $unsigned(src2[XLEN_LOG2:0]);
     AluCommand_Or: return src1 | src2;
     AluCommand_And: return src1 & src2;
     AluCommand_Clear1: return src1 & ~src2;
@@ -307,7 +307,7 @@ module ExecuteStage(
     always_comb begin
         unique case (op.intRegWriteSrcType)
         IntRegWriteSrcType_Result:  dstIntRegValue = intResult;
-        IntRegWriteSrcType_NextPc:  dstIntRegValue = prevStage.pc + InsnSize;
+        IntRegWriteSrcType_NextPc:  dstIntRegValue = prevStage.pc + INSN_SIZE;
         IntRegWriteSrcType_Memory:  dstIntRegValue = loadStoreUnit.result[31:0];
         IntRegWriteSrcType_Csr:     dstIntRegValue = csr.readValue;
         default: dstIntRegValue = '0;
@@ -369,7 +369,7 @@ module ExecuteStage(
             ctrl.nextPc = branchTarget;
         end
         else begin
-            ctrl.nextPc = prevStage.pc + InsnSize;
+            ctrl.nextPc = prevStage.pc + INSN_SIZE;
         end
     end
 

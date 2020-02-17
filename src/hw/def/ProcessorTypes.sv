@@ -28,25 +28,25 @@ import Rv32Types::*;
 // parameter
 
 // Program Counter
-parameter InitialProgramCounter = 32'h80000000;
+parameter INITIAL_PC = 32'h80000000;
 
 // Insn
-parameter InsnWidth = 32;
-parameter InsnSize = 4;
+parameter INSN_WIDTH = 32;
+parameter INSN_SIZE = 4;
 
 // Register File
-parameter RegAddrWidth = 5;
-parameter RegFileSize = 32; // Number of registers in register files
+parameter REG_ADDR_WIDTH = 5;
+parameter REG_FILE_SIZE = 32; // Number of registers in register files
 
 // Bypass Logic
-parameter BypassDepth = 2;
-parameter BypassReadPortCount = 2;
+parameter BYPASS_DEPTH = 2;
+parameter BYPASS_READ_PORT_COUNT = 2;
 
 // ----------------------------------------------------------------------------
 // typedef
 
-typedef logic unsigned  [InsnWidth-1:0] insn_t;
-typedef logic unsigned  [RegAddrWidth-1:0] reg_addr_t;
+typedef logic unsigned  [INSN_WIDTH-1:0] insn_t;
+typedef logic unsigned  [REG_ADDR_WIDTH-1:0] reg_addr_t;
 
 // Privilege
 typedef struct packed

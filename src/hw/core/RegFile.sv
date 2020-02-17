@@ -25,7 +25,7 @@ module IntRegFile(
     input logic clk,
     input logic rst
 );
-    word_t body[RegFileSize] /* verilator public */;
+    word_t body[REG_FILE_SIZE] /* verilator public */;
 
     always_comb begin
         bus.readValue1 = body[bus.readAddr1];
@@ -34,7 +34,7 @@ module IntRegFile(
 
     always_ff @(posedge clk) begin
         if (rst) begin
-            for (int i = 0; i < RegFileSize; i++) begin
+            for (int i = 0; i < REG_FILE_SIZE; i++) begin
                 body[i] <= 0;
             end
         end
@@ -51,7 +51,7 @@ module FpRegFile(
     input logic clk,
     input logic rst
 );
-    uint64_t body[RegFileSize] /* verilator public */;
+    uint64_t body[REG_FILE_SIZE] /* verilator public */;
 
     always_comb begin
         bus.readValue1 = body[bus.readAddr1];
@@ -61,7 +61,7 @@ module FpRegFile(
 
     always_ff @(posedge clk) begin
         if (rst) begin
-            for (int i = 0; i < RegFileSize; i++) begin
+            for (int i = 0; i < REG_FILE_SIZE; i++) begin
                 body[i] <= 0;
             end
         end

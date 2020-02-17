@@ -25,17 +25,17 @@ import Rv32Types::*;
 
 // Direct Map D$ parameter
 parameter DCacheLineSize = 16; // bytes
-parameter DCacheLineWidth = DCacheLineSize * ByteWidth;
+parameter DCacheLineWidth = DCacheLineSize * BYTE_WIDTH;
 
-parameter DCacheMemAddrWidth = PhysicalAddrWidth - $clog2(DCacheLineSize);
+parameter DCacheMemAddrWidth = PADDR_WIDTH - $clog2(DCacheLineSize);
 parameter DCacheIndexWidth = 4;
 parameter DCacheTagWidth = DCacheMemAddrWidth - DCacheIndexWidth;
 
 // Direct Map I$ parameter
 parameter ICacheLineSize = 16; // bytes
-parameter ICacheLineWidth = DCacheLineSize * ByteWidth;
+parameter ICacheLineWidth = DCacheLineSize * BYTE_WIDTH;
 
-parameter ICacheMemAddrWidth = PhysicalAddrWidth - $clog2(ICacheLineSize);
+parameter ICacheMemAddrWidth = PADDR_WIDTH - $clog2(ICacheLineSize);
 parameter ICacheIndexWidth = 4;
 parameter ICacheTagWidth = ICacheMemAddrWidth - ICacheIndexWidth;
 

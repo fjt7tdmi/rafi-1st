@@ -21,9 +21,6 @@ import RvTypes::*;
 import Rv32Types::*;
 
 // parameter
-parameter UartAddr      = 34'h040000000;
-parameter HostIoAddr    = 34'h080001000;
+parameter HOST_IO_ADDR    = 34'h080001000;
 
-parameter MemoryAddrBegin   = 34'h080000000;
-parameter MemoryAddrEnd     = 34'h100000000;
 endpackage

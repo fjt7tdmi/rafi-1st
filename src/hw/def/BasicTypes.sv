@@ -17,7 +17,7 @@
 package BasicTypes;
 
 // Bit width
-parameter ByteWidth = 8;
+parameter BYTE_WIDTH = 8;
 
 // typedef
 typedef logic signed    [7:0]   int8_t;

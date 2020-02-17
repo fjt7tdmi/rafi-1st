@@ -26,7 +26,7 @@ module IntBypassLogic(
     input clk,
     input rst
 );
-    typedef logic [$clog2(BypassDepth)-1:0] _index_t;
+    typedef logic [$clog2(BYPASS_DEPTH)-1:0] _index_t;
 
     typedef struct packed {
         logic valid;
@@ -35,9 +35,9 @@ module IntBypassLogic(
     } PipelineEntry;
 
     // Functions
-    function automatic _index_t encodeIndex(logic [BypassDepth-1:0] depth);
+    function automatic _index_t encodeIndex(logic [BYPASS_DEPTH-1:0] depth);
         /* verilator lint_off WIDTH */
-        for (int i = 0; i < BypassDepth; i++) begin
+        for (int i = 0; i < BYPASS_DEPTH; i++) begin
             if (depth[i]) begin
                 return i;
             end
@@ -46,15 +46,15 @@ module IntBypassLogic(
     endfunction
 
     // Registers
-    PipelineEntry pipeline[BypassDepth];
+    PipelineEntry pipeline[BYPASS_DEPTH];
 
     // Wires
-    logic hit[BypassReadPortCount];
-    reg_addr_t readAddr[BypassReadPortCount];
-    word_t readValue[BypassReadPortCount];
+    logic hit[BYPASS_READ_PORT_COUNT];
+    reg_addr_t readAddr[BYPASS_READ_PORT_COUNT];
+    word_t readValue[BYPASS_READ_PORT_COUNT];
 
-    logic [BypassDepth-1:0] camHits[BypassReadPortCount];
-    _index_t camIndex[BypassReadPortCount];
+    logic [BYPASS_DEPTH-1:0] camHits[BYPASS_READ_PORT_COUNT];
+    _index_t camIndex[BYPASS_READ_PORT_COUNT];
 
     always_comb begin
         readAddr[0] = bus.readAddr1;
@@ -68,8 +68,8 @@ module IntBypassLogic(
 
     // Bypass CAM
     always_comb begin
-        for (int i = 0; i < BypassReadPortCount; i++) begin
-            for (int j = 0; j < BypassDepth; j++) begin
+        for (int i = 0; i < BYPASS_READ_PORT_COUNT; i++) begin
+            for (int j = 0; j < BYPASS_DEPTH; j++) begin
                 camHits[i][j] = pipeline[j].valid && (pipeline[j].addr == readAddr[i]);
             end
             camIndex[i] = encodeIndex(camHits[i]);
@@ -92,12 +92,12 @@ module IntBypassLogic(
     // Bypass Pipeline
     always_ff @(posedge clk) begin
         if (rst || ctrl.flush) begin
-            for (int i = 0; i < BypassDepth; i++) begin
+            for (int i = 0; i < BYPASS_DEPTH; i++) begin
                 pipeline[i] <= '0;
             end
         end
         else if (ctrl.bypassStall) begin
-            for (int i = 0; i < BypassDepth; i++) begin
+            for (int i = 0; i < BYPASS_DEPTH; i++) begin
                 pipeline[i] <= pipeline[i];
             end
         end
@@ -106,7 +106,7 @@ module IntBypassLogic(
             pipeline[0].addr <= bus.writeAddr;
             pipeline[0].value <= bus.writeValue;
 
-            for (int i = 1; i < BypassDepth; i++) begin
+            for (int i = 1; i < BYPASS_DEPTH; i++) begin
                 pipeline[i] <= pipeline[i-1];
             end
         end
@@ -121,7 +121,7 @@ module FpBypassLogic(
 );
     parameter READ_PORT_COUNT = 3;
 
-    typedef logic [$clog2(BypassDepth)-1:0] _index_t;
+    typedef logic [$clog2(BYPASS_DEPTH)-1:0] _index_t;
 
     typedef struct packed {
         logic valid;
@@ -130,9 +130,9 @@ module FpBypassLogic(
     } PipelineEntry;
 
     // Functions
-    function automatic _index_t encodeIndex(logic [BypassDepth-1:0] depth);
+    function automatic _index_t encodeIndex(logic [BYPASS_DEPTH-1:0] depth);
         /* verilator lint_off WIDTH */
-        for (int i = 0; i < BypassDepth; i++) begin
+        for (int i = 0; i < BYPASS_DEPTH; i++) begin
             if (depth[i]) begin
                 return i;
             end
@@ -141,14 +141,14 @@ module FpBypassLogic(
     endfunction
 
     // Registers
-    PipelineEntry pipeline[BypassDepth];
+    PipelineEntry pipeline[BYPASS_DEPTH];
 
     // Wires
     logic hit[READ_PORT_COUNT];
     reg_addr_t readAddr[READ_PORT_COUNT];
     uint64_t readValue[READ_PORT_COUNT];
 
-    logic [BypassDepth-1:0] camHits[READ_PORT_COUNT];
+    logic [BYPASS_DEPTH-1:0] camHits[READ_PORT_COUNT];
     _index_t camIndex[READ_PORT_COUNT];
 
     always_comb begin
@@ -167,7 +167,7 @@ module FpBypassLogic(
     // Bypass CAM
     always_comb begin
         for (int i = 0; i < READ_PORT_COUNT; i++) begin
-            for (int j = 0; j < BypassDepth; j++) begin
+            for (int j = 0; j < BYPASS_DEPTH; j++) begin
                 camHits[i][j] = pipeline[j].valid && (pipeline[j].addr == readAddr[i]);
             end
             camIndex[i] = encodeIndex(camHits[i]);
@@ -186,12 +186,12 @@ module FpBypassLogic(
     // Bypass Pipeline
     always_ff @(posedge clk) begin
         if (rst || ctrl.flush) begin
-            for (int i = 0; i < BypassDepth; i++) begin
+            for (int i = 0; i < BYPASS_DEPTH; i++) begin
                 pipeline[i] <= '0;
             end
         end
         else if (ctrl.bypassStall) begin
-            for (int i = 0; i < BypassDepth; i++) begin
+            for (int i = 0; i < BYPASS_DEPTH; i++) begin
                 pipeline[i] <= pipeline[i];
             end
         end
@@ -200,7 +200,7 @@ module FpBypassLogic(
             pipeline[0].addr <= bus.writeAddr;
             pipeline[0].value <= bus.writeValue;
 
-            for (int i = 1; i < BypassDepth; i++) begin
+            for (int i = 1; i < BYPASS_DEPTH; i++) begin
                 pipeline[i] <= pipeline[i-1];
             end
         end

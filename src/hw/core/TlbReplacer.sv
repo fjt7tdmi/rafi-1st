@@ -51,7 +51,7 @@ module TlbReplacer #(
     input logic clk,
     input logic rst
 );
-    localparam EntryCountInLine = LineWidth / PageTableEntryWidth;
+    localparam EntryCountInLine = LineWidth / PAGE_TABLE_ENTRY_WIDTH;
     localparam EntryIndexInLineWidth = $clog2(EntryCountInLine);
 
     typedef logic [LineWidth-1:0] _line_t;
@@ -80,7 +80,7 @@ module TlbReplacer #(
     endfunction
 
     function automatic _entry_index_t getEntryIndex(paddr_t entryAddr);
-        return entryAddr[$clog2(PageTableEntrySize) + EntryIndexInLineWidth - 1 : $clog2(PageTableEntrySize)];
+        return entryAddr[$clog2(PAGE_TABLE_ENTRY_SIZE) + EntryIndexInLineWidth - 1 : $clog2(PAGE_TABLE_ENTRY_SIZE)];
     endfunction
 
     function automatic PageTableEntry readEntry(_line_t memValue, _entry_index_t entryIndex);
@@ -252,8 +252,8 @@ module TlbReplacer #(
     // Memory access
     always_comb begin
         memAddr = (r_State == State_PageTableRead1 || r_State == State_PageTableDecode1 || r_State == State_PageTableWrite1) ?
-            entryAddr1[PhysicalAddrWidth - 1 : PhysicalAddrWidth - MemAddrWidth] :
-            entryAddr0[PhysicalAddrWidth - 1 : PhysicalAddrWidth - MemAddrWidth];
+            entryAddr1[PADDR_WIDTH - 1 : PADDR_WIDTH - MemAddrWidth] :
+            entryAddr0[PADDR_WIDTH - 1 : PADDR_WIDTH - MemAddrWidth];
 
         memReadEnable = (r_State == State_PageTableRead1 || r_State == State_PageTableRead0);
         memWriteEnable = (r_State == State_PageTableWrite1 || r_State == State_PageTableWrite0);

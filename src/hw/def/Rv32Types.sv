@@ -25,30 +25,30 @@ import BasicTypes::*;
 // ----------------------------------------------------------------------------
 // parameter
 
-parameter XLen = 32;
-parameter XLenLog2 = 5;
+parameter XLEN = 32;
+parameter XLEN_LOG2 = 5;
 
-parameter WordWidth = XLen;
-parameter WordSize = WordWidth / ByteWidth;
+parameter WORD_WIDTH = XLEN;
+parameter WORD_SIZE = WORD_WIDTH / BYTE_WIDTH;
 
 // Address
-parameter VirtualAddrWidth = 32;
-parameter PhysicalAddrWidth = 34;
+parameter VADDR_WIDTH = 32;
+parameter PADDR_WIDTH = 34;
 
-parameter PageOffsetWidth = 12;
+parameter PAGE_OFFSET_WIDTH = 12;
 
-parameter VirtualPageNumberWidth = VirtualAddrWidth - PageOffsetWidth;
-parameter PhysicalPageNumberWidth = PhysicalAddrWidth - PageOffsetWidth;
+parameter VIRTUAL_PAGE_NUMBER_WIDTH = VADDR_WIDTH - PAGE_OFFSET_WIDTH;
+parameter PHYSICAL_PAGE_NUMBER_WIDTH = PADDR_WIDTH - PAGE_OFFSET_WIDTH;
 
-parameter PageTableEntrySize = 4;
-parameter PageTableEntryWidth = PageTableEntrySize * ByteWidth;
+parameter PAGE_TABLE_ENTRY_SIZE = 4;
+parameter PAGE_TABLE_ENTRY_WIDTH = PAGE_TABLE_ENTRY_SIZE * BYTE_WIDTH;
 
 // ----------------------------------------------------------------------------
 // typedef
 
-typedef logic signed    [XLen-1:0] word_t;
-typedef logic signed    [VirtualAddrWidth-1:0] addr_t;
-typedef logic signed    [PhysicalAddrWidth-1:0] paddr_t;
+typedef logic signed    [XLEN-1:0] word_t;
+typedef logic signed    [VADDR_WIDTH-1:0] addr_t;
+typedef logic signed    [PADDR_WIDTH-1:0] paddr_t;
 
 typedef struct packed
 {
@@ -122,7 +122,7 @@ typedef struct packed {
 
 // mtvec, stvec, utvec
 typedef struct packed {
-    logic [XLen-1:2] base;
+    logic [XLEN-1:2] base;
     TrapVectorMode mode;
 } csr_xtvec_t;
 
