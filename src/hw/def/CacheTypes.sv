@@ -24,48 +24,48 @@ import Rv32Types::*;
 // parameter
 
 // Direct Map D$ parameter
-parameter DCacheLineSize = 16; // bytes
-parameter DCacheLineWidth = DCacheLineSize * BYTE_WIDTH;
+parameter DCACHE_LINE_SIZE = 16; // bytes
+parameter DCACHE_LINE_WIDTH = DCACHE_LINE_SIZE * BYTE_WIDTH;
 
-parameter DCacheMemAddrWidth = PADDR_WIDTH - $clog2(DCacheLineSize);
-parameter DCacheIndexWidth = 4;
-parameter DCacheTagWidth = DCacheMemAddrWidth - DCacheIndexWidth;
+parameter DCACHE_MEM_ADDR_WIDTH = PADDR_WIDTH - $clog2(DCACHE_LINE_SIZE);
+parameter DCACHE_INDEX_WIDTH = 4;
+parameter DCACHE_TAG_WIDTH = DCACHE_MEM_ADDR_WIDTH - DCACHE_INDEX_WIDTH;
 
 // Direct Map I$ parameter
-parameter ICacheLineSize = 16; // bytes
-parameter ICacheLineWidth = DCacheLineSize * BYTE_WIDTH;
+parameter ICACHE_LINE_SIZE = 16; // bytes
+parameter ICACHE_LINE_WIDTH = DCACHE_LINE_SIZE * BYTE_WIDTH;
 
-parameter ICacheMemAddrWidth = PADDR_WIDTH - $clog2(ICacheLineSize);
-parameter ICacheIndexWidth = 4;
-parameter ICacheTagWidth = ICacheMemAddrWidth - ICacheIndexWidth;
+parameter ICACHE_MEM_ADDR_WIDTH = PADDR_WIDTH - $clog2(ICACHE_LINE_SIZE);
+parameter ICACHE_INDEX_WIDTH = 4;
+parameter ICACHE_TAG_WIDTH = ICACHE_MEM_ADDR_WIDTH - ICACHE_INDEX_WIDTH;
 
 // DTLB parameter
-parameter DTlbIndexWidth = 3;
+parameter DTLB_INDEX_WIDTH = 3;
 
 // ITLB parameter
-parameter ITlbIndexWidth = 3;
+parameter ITLB_INDEX_WIDTH = 3;
 
 // Reset cycle
-parameter CacheResetCycle = (DCacheIndexWidth > ICacheIndexWidth) ?
-    (1 << DCacheIndexWidth) :
-    (1 << ICacheIndexWidth);
+parameter CACHE_RESET_CYCLE = (DCACHE_INDEX_WIDTH > ICACHE_INDEX_WIDTH) ?
+    (1 << DCACHE_INDEX_WIDTH) :
+    (1 << ICACHE_INDEX_WIDTH);
 
 // ----------------------------------------------------------------------------
 // typedef
 
-typedef logic [DCacheLineWidth-1:0] dcache_line_t;
-typedef logic [DCacheMemAddrWidth-1:0] dcache_mem_addr_t;
-typedef logic [DCacheIndexWidth-1:0] dcache_index_t;
-typedef logic [DCacheTagWidth-1:0] dcache_tag_t;
+typedef logic [DCACHE_LINE_WIDTH-1:0] dcache_line_t;
+typedef logic [DCACHE_MEM_ADDR_WIDTH-1:0] dcache_mem_addr_t;
+typedef logic [DCACHE_INDEX_WIDTH-1:0] dcache_index_t;
+typedef logic [DCACHE_TAG_WIDTH-1:0] dcache_tag_t;
 
-typedef logic [ICacheLineWidth-1:0] icache_line_t;
-typedef logic [ICacheMemAddrWidth-1:0] icache_mem_addr_t;
-typedef logic [ICacheIndexWidth-1:0] icache_index_t;
-typedef logic [ICacheTagWidth-1:0] icache_tag_t;
+typedef logic [ICACHE_LINE_WIDTH-1:0] icache_line_t;
+typedef logic [ICACHE_MEM_ADDR_WIDTH-1:0] icache_mem_addr_t;
+typedef logic [ICACHE_INDEX_WIDTH-1:0] icache_index_t;
+typedef logic [ICACHE_TAG_WIDTH-1:0] icache_tag_t;
 
-typedef logic [DTlbIndexWidth-1:0] dtlb_index_t;
+typedef logic [DTLB_INDEX_WIDTH-1:0] dtlb_index_t;
 
-typedef logic [ITlbIndexWidth-1:0] itlb_index_t;
+typedef logic [ITLB_INDEX_WIDTH-1:0] itlb_index_t;
 
 typedef enum logic [1:0]
 {

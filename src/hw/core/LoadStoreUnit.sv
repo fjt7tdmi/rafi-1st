@@ -32,21 +32,21 @@ module LoadStoreUnit (
     input   logic clk,
     input   logic rst
 );
-    localparam LineSize = DCacheLineSize;
-    localparam LineWidth = DCacheLineWidth;
-    localparam IndexWidth = DCacheIndexWidth;
-    localparam TagWidth = DCacheTagWidth;
+    localparam LINE_SIZE = DCACHE_LINE_SIZE;
+    localparam LINE_WIDTH = DCACHE_LINE_WIDTH;
+    localparam INDEX_WIDTH = DCACHE_INDEX_WIDTH;
+    localparam TAG_WIDTH = DCACHE_TAG_WIDTH;
 
-    localparam IndexLsb = $clog2(LineSize);
-    localparam IndexMsb = IndexLsb + IndexWidth - 1;
-    localparam TagLsb = IndexLsb + IndexWidth;
-    localparam TagMsb = PADDR_WIDTH - 1;
+    localparam INDEX_LSB = $clog2(LINE_SIZE);
+    localparam INDEX_MSB = INDEX_LSB + INDEX_WIDTH - 1;
+    localparam TAG_LSB = INDEX_LSB + INDEX_WIDTH;
+    localparam TAG_MSB = PADDR_WIDTH - 1;
 
-    typedef logic unsigned [TagWidth-1:0] _tag_t;
-    typedef logic unsigned [IndexWidth-1:0] _index_t;
-    typedef logic unsigned [LineWidth-1:0] _line_t;
-    typedef logic unsigned [$clog2(LineSize)-1:0] _shift_amount_t;
-    typedef logic unsigned [LineSize-1:0] _write_mask_t;
+    typedef logic unsigned [TAG_WIDTH-1:0] _tag_t;
+    typedef logic unsigned [INDEX_WIDTH-1:0] _index_t;
+    typedef logic unsigned [LINE_WIDTH-1:0] _line_t;
+    typedef logic unsigned [$clog2(LINE_SIZE)-1:0] _shift_amount_t;
+    typedef logic unsigned [LINE_SIZE-1:0] _write_mask_t;
 
     typedef enum logic [2:0]
     {
@@ -69,14 +69,14 @@ module LoadStoreUnit (
 
     // Functions
     function automatic uint64_t rightShift(_line_t value, _shift_amount_t shift);
-        int8_t [LineSize-1:0] bytes;
+        int8_t [LINE_SIZE-1:0] bytes;
         int8_t [7:0] shiftedBytes;
 
         bytes = value;
 
         for (int i = 0; i < 8; i++) begin
             /* verilator lint_off WIDTH */
-            if (shift + i < LineSize) begin
+            if (shift + i < LINE_SIZE) begin
                 shiftedBytes[i] = bytes[shift + i];
             end
             else begin
@@ -89,11 +89,11 @@ module LoadStoreUnit (
 
     function automatic _line_t leftShift(uint64_t value, _shift_amount_t shift);
         int8_t [7:0] bytes;
-        int8_t [LineSize-1:0] shiftedBytes;
+        int8_t [LINE_SIZE-1:0] shiftedBytes;
 
         bytes = value;
 
-        for (int i = 0; i < LineSize; i++) begin
+        for (int i = 0; i < LINE_SIZE; i++) begin
             if (shift <= i) begin
                 shiftedBytes[i] = bytes[i - shift];
             end
@@ -230,8 +230,8 @@ module LoadStoreUnit (
     logic           tagArrayWriteEnable;
 
     _index_t                dataArrayIndex;
-    logic [LineWidth-1:0]   dataArrayReadValue;
-    logic [LineWidth-1:0]   dataArrayWriteValue;
+    logic [LINE_WIDTH-1:0]   dataArrayReadValue;
+    logic [LINE_WIDTH-1:0]   dataArrayWriteValue;
     _write_mask_t           dataArrayWriteMask;
 
     logic                   tlbHit;
@@ -263,8 +263,8 @@ module LoadStoreUnit (
 
     // Modules
     BlockRamWithReset #(
-        .DataWidth($bits(TagArrayEntry)),
-        .IndexWidth(IndexWidth)
+        .DATA_WIDTH($bits(TagArrayEntry)),
+        .INDEX_WIDTH(INDEX_WIDTH)
     ) m_ValidTagArray (
         .readValue(tagArrayReadValue),
         .index(tagArrayIndex),
@@ -275,9 +275,9 @@ module LoadStoreUnit (
     );
 
     MultiBankBlockRam #(
-        .DataWidthPerBank(BYTE_WIDTH),
-        .BankCount(LineSize),
-        .IndexWidth(IndexWidth)
+        .DATA_WIDTH_PER_BANK(BYTE_WIDTH),
+        .BANK_COUNT(LINE_SIZE),
+        .INDEX_WIDTH(INDEX_WIDTH)
     ) m_DataArray (
         .readValue(dataArrayReadValue),
         .index(dataArrayIndex),
@@ -287,7 +287,7 @@ module LoadStoreUnit (
     );
 
     Tlb #(
-        .TlbIndexWidth(ITlbIndexWidth)
+        .TLB_INDEX_WIDTH(ITLB_INDEX_WIDTH)
     ) m_Tlb (
         .hit(tlbHit),
         .fault(tlbFault),
@@ -308,9 +308,9 @@ module LoadStoreUnit (
     );
 
     DCacheReplacer #(
-        .LineWidth(LineWidth),
-        .TagWidth(TagWidth),
-        .IndexWidth(IndexWidth)
+        .LINE_WIDTH(LINE_WIDTH),
+        .TAG_WIDTH(TAG_WIDTH),
+        .INDEX_WIDTH(INDEX_WIDTH)
     ) m_CacheReplacer (
         .arrayWriteEnable(cacheReplacerArrayWriteEnable),
         .arrayIndex(cacheReplacerArrayIndex),
@@ -336,8 +336,8 @@ module LoadStoreUnit (
     );
 
     TlbReplacer #(
-        .MemAddrWidth(DCacheMemAddrWidth),
-        .LineWidth(DCacheLineWidth)
+        .MEM_ADDR_WIDTH(DCACHE_MEM_ADDR_WIDTH),
+        .LINE_WIDTH(DCACHE_LINE_WIDTH)
     ) m_TlbReplacer (
         .tlbWriteEnable,
         .tlbWriteKey,
@@ -367,15 +367,15 @@ module LoadStoreUnit (
 
     always_comb begin
         cacheMiss = r_DCacheRead && !r_TlbMiss &&
-            (!tagArrayReadValue.valid || r_PhysicalAddr[TagMsb:TagLsb] != tagArrayReadValue.tag);
+            (!tagArrayReadValue.valid || r_PhysicalAddr[TAG_MSB:TAG_LSB] != tagArrayReadValue.tag);
     end
 
     always_comb begin
-        shiftedReadData = rightShift(dataArrayReadValue, r_Addr[$clog2(LineSize)-1:0]);
+        shiftedReadData = rightShift(dataArrayReadValue, r_Addr[$clog2(LINE_SIZE)-1:0]);
     end
 
     always_comb begin
-        commandAddr = r_PhysicalAddr[PADDR_WIDTH-1:IndexLsb];
+        commandAddr = r_PhysicalAddr[PADDR_WIDTH-1:INDEX_LSB];
     end
 
     always_comb begin
@@ -571,7 +571,7 @@ module LoadStoreUnit (
         end
         else if (r_State == State_Reserve) begin
             // Set 'reserved' field.
-            tagArrayIndex = nextPhysicalAddr[IndexMsb:IndexLsb];
+            tagArrayIndex = nextPhysicalAddr[INDEX_MSB:INDEX_LSB];
             tagArrayWriteValue.valid = tagArrayReadValue.valid;
             tagArrayWriteValue.reserved = 1;
             tagArrayWriteValue.tag = tagArrayReadValue.tag;
@@ -579,14 +579,14 @@ module LoadStoreUnit (
         end
         else if (r_State == State_Store) begin
             // Reset 'reserved' field.
-            tagArrayIndex = nextPhysicalAddr[IndexMsb:IndexLsb];
+            tagArrayIndex = nextPhysicalAddr[INDEX_MSB:INDEX_LSB];
             tagArrayWriteValue.valid = tagArrayReadValue.valid;
             tagArrayWriteValue.reserved = 0;
             tagArrayWriteValue.tag = tagArrayReadValue.tag;
             tagArrayWriteEnable = 1;
         end
         else begin
-            tagArrayIndex = nextPhysicalAddr[IndexMsb:IndexLsb];
+            tagArrayIndex = nextPhysicalAddr[INDEX_MSB:INDEX_LSB];
             tagArrayWriteValue.valid = '0;
             tagArrayWriteValue.reserved = '0;
             tagArrayWriteValue.tag = '0;
@@ -598,7 +598,7 @@ module LoadStoreUnit (
             dataArrayIndex = cacheReplacerArrayIndex;
         end
         else begin
-            dataArrayIndex = nextPhysicalAddr[IndexMsb:IndexLsb];
+            dataArrayIndex = nextPhysicalAddr[INDEX_MSB:INDEX_LSB];
         end
 
         unique case (r_State)
@@ -608,9 +608,9 @@ module LoadStoreUnit (
         end
         State_Store: begin
             dataArrayWriteMask = (!r_TlbMiss && !cacheMiss && !tlbFault) ?
-                makeWriteMask(nextPhysicalAddr[$clog2(DCacheLineSize)-1:0], nextLoadStoreType) :
+                makeWriteMask(nextPhysicalAddr[$clog2(DCACHE_LINE_SIZE)-1:0], nextLoadStoreType) :
                 '0;
-            dataArrayWriteValue = leftShift(storeValue, r_Addr[$clog2(LineSize)-1:0]);
+            dataArrayWriteValue = leftShift(storeValue, r_Addr[$clog2(LINE_SIZE)-1:0]);
         end
         default: begin
             dataArrayWriteMask = '0;

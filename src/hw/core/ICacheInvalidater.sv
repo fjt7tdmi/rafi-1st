@@ -19,15 +19,15 @@ import RvTypes::*;
 import Rv32Types::*;
 
 module ICacheInvalidater #(
-    parameter LineSize,
-    parameter IndexWidth,
-    parameter TagWidth
+    parameter LINE_SIZE,
+    parameter INDEX_WIDTH,
+    parameter TAG_WIDTH
 )(
     // Cache array access
     output logic arrayWriteEnable,
-    output logic [IndexWidth-1:0] arrayIndex,
+    output logic [INDEX_WIDTH-1:0] arrayIndex,
     output logic arrayWriteValid,
-    output logic [TagWidth-1:0] arrayWriteTag,
+    output logic [TAG_WIDTH-1:0] arrayWriteTag,
 
     // TLB access
     output logic tlbInvalidate,
@@ -43,10 +43,10 @@ module ICacheInvalidater #(
     input logic clk,
     input logic rst
 );
-    localparam IndexLsb = $clog2(LineSize);
-    localparam IndexMsb = IndexLsb + IndexWidth - 1;
+    localparam IndexLsb = $clog2(LINE_SIZE);
+    localparam IndexMsb = IndexLsb + INDEX_WIDTH - 1;
 
-    typedef logic [IndexWidth-1:0] _index_t;
+    typedef logic [INDEX_WIDTH-1:0] _index_t;
 
     typedef enum logic
     {

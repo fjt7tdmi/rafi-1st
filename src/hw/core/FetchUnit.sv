@@ -30,22 +30,22 @@ module FetchUnit (
     input logic clk,
     input logic rst
 );
-    localparam LineSize = ICacheLineSize;
-    localparam LineWidth = ICacheLineWidth;
-    localparam IndexWidth = ICacheIndexWidth;
-    localparam TagWidth = ICacheTagWidth;
+    localparam LINE_SIZE = ICACHE_LINE_SIZE;
+    localparam LINE_WIDTH = ICACHE_LINE_WIDTH;
+    localparam INDEX_WIDTH = ICACHE_INDEX_WIDTH;
+    localparam TAG_WIDTH = ICACHE_TAG_WIDTH;
 
-    localparam IndexLsb = $clog2(LineSize);
-    localparam IndexMsb = IndexLsb + IndexWidth - 1;
-    localparam TagLsb = IndexLsb + IndexWidth;
-    localparam TagMsb = PADDR_WIDTH - 1;
+    localparam INDEX_LSB = $clog2(LINE_SIZE);
+    localparam INDEX_MSB = INDEX_LSB + INDEX_WIDTH - 1;
+    localparam TAG_LSB = INDEX_LSB + INDEX_WIDTH;
+    localparam TAG_MSB = PADDR_WIDTH - 1;
 
     // Wait 2-cycle after pipeline flush
     localparam StallCycleAfterFlush = 2;
 
-    typedef logic [TagWidth-1:0] _tag_t;
-    typedef logic [IndexWidth-1:0] _index_t;
-    typedef logic [LineWidth-1:0] _line_t;
+    typedef logic [TAG_WIDTH-1:0] _tag_t;
+    typedef logic [INDEX_WIDTH-1:0] _index_t;
+    typedef logic [LINE_WIDTH-1:0] _line_t;
     typedef logic [$clog2(StallCycleAfterFlush):0] _stall_cycle_t;
 
     typedef enum logic [1:0]
@@ -89,8 +89,8 @@ module FetchUnit (
     logic               validTagArrayWriteEnable;
 
     _index_t                dataArrayIndex;
-    logic [LineWidth-1:0]   dataArrayReadValue;
-    logic [LineWidth-1:0]   dataArrayWriteValue;
+    logic [LINE_WIDTH-1:0]   dataArrayReadValue;
+    logic [LINE_WIDTH-1:0]   dataArrayWriteValue;
     logic                   dataArrayWriteEnable;
 
     logic                   tlbHit;
@@ -128,8 +128,8 @@ module FetchUnit (
 
     // Modules
     BlockRamWithReset #(
-        .DataWidth($bits(ValidTagArrayEntry)),
-        .IndexWidth(IndexWidth)
+        .DATA_WIDTH($bits(ValidTagArrayEntry)),
+        .INDEX_WIDTH(INDEX_WIDTH)
     ) m_ValidTagArray (
         .readValue(validTagArrayReadValue),
         .index(validTagArrayIndex),
@@ -140,8 +140,8 @@ module FetchUnit (
     );
 
     BlockRam #(
-        .DataWidth(LineWidth),
-        .IndexWidth(IndexWidth)
+        .DATA_WIDTH(LINE_WIDTH),
+        .INDEX_WIDTH(INDEX_WIDTH)
     ) m_DataArray (
         .readValue(dataArrayReadValue),
         .index(dataArrayIndex),
@@ -151,7 +151,7 @@ module FetchUnit (
     );
 
     Tlb #(
-        .TlbIndexWidth(ITlbIndexWidth)
+        .TLB_INDEX_WIDTH(ITLB_INDEX_WIDTH)
     ) m_Tlb (
         .hit(tlbHit),
         .fault(tlbFault),
@@ -172,9 +172,9 @@ module FetchUnit (
     );
 
     ICacheInvalidater #(
-        .LineSize(LineSize),
-        .IndexWidth(IndexWidth),
-        .TagWidth(TagWidth)
+        .LINE_SIZE(LINE_SIZE),
+        .INDEX_WIDTH(INDEX_WIDTH),
+        .TAG_WIDTH(TAG_WIDTH)
     ) m_Invalidater (
         .arrayWriteEnable(invalidaterArrayWriteEnable),
         .arrayIndex(invalidaterArrayIndex),
@@ -191,9 +191,9 @@ module FetchUnit (
     );
 
     ICacheReplacer #(
-        .LineWidth(LineWidth),
-        .TagWidth(TagWidth),
-        .IndexWidth(IndexWidth)
+        .LINE_WIDTH(LINE_WIDTH),
+        .TAG_WIDTH(TAG_WIDTH),
+        .INDEX_WIDTH(INDEX_WIDTH)
     ) m_CacheReplacer (
         .arrayWriteEnable(cacheReplacerArrayWriteEnable),
         .arrayIndex(cacheReplacerArrayIndex),
@@ -209,14 +209,14 @@ module FetchUnit (
         .miss(cacheMiss),
         .done(cacheReplacerDone),
         .enable(cacheReplacerEnable),
-        .missAddr(r_PhysicalPc[PADDR_WIDTH-1:IndexLsb]),
+        .missAddr(r_PhysicalPc[PADDR_WIDTH-1:INDEX_LSB]),
         .clk,
         .rst
     );
 
     TlbReplacer #(
-        .MemAddrWidth(ICacheMemAddrWidth),
-        .LineWidth(ICacheLineWidth)
+        .MEM_ADDR_WIDTH(ICACHE_MEM_ADDR_WIDTH),
+        .LINE_WIDTH(ICACHE_LINE_WIDTH)
     ) m_TlbReplacer (
         .tlbWriteEnable,
         .tlbWriteKey,
@@ -245,7 +245,7 @@ module FetchUnit (
     always_comb begin
         // Wires
         cacheMiss = r_ICacheRead && !r_TlbMiss &&
-            (!validTagArrayReadValue.valid || r_PhysicalPc[TagMsb:TagLsb] != validTagArrayReadValue.tag);
+            (!validTagArrayReadValue.valid || r_PhysicalPc[TAG_MSB:TAG_LSB] != validTagArrayReadValue.tag);
         stall = ctrl.ifStall || (r_StallCounter != '0);
 
         // Module port
@@ -276,7 +276,7 @@ module FetchUnit (
             validTagArrayWriteEnable = cacheReplacerArrayWriteEnable;
         end
         default: begin
-            validTagArrayIndex = nextPhysicalPc[IndexMsb:IndexLsb];
+            validTagArrayIndex = nextPhysicalPc[INDEX_MSB:INDEX_LSB];
             validTagArrayWriteValue = '0;
             validTagArrayWriteEnable = 0;
         end
@@ -288,7 +288,7 @@ module FetchUnit (
             dataArrayWriteEnable = cacheReplacerArrayWriteEnable;
         end
         else begin
-            dataArrayIndex = nextPhysicalPc[IndexMsb:IndexLsb];
+            dataArrayIndex = nextPhysicalPc[INDEX_MSB:INDEX_LSB];
             dataArrayWriteEnable = 0;
         end
 

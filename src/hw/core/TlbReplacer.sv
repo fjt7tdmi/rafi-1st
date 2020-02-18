@@ -21,8 +21,8 @@ import Rv32Types::*;
 import TlbTypes::*;
 
 module TlbReplacer #(
-    parameter LineWidth,
-    parameter MemAddrWidth
+    parameter LINE_WIDTH,
+    parameter MEM_ADDR_WIDTH
 )(
     // TLB access
     output logic tlbWriteEnable,
@@ -30,13 +30,13 @@ module TlbReplacer #(
     output TlbEntry tlbWriteValue,
 
     // Memory access
-    output logic [MemAddrWidth-1:0] memAddr,
+    output logic [MEM_ADDR_WIDTH-1:0] memAddr,
     output logic memReadEnable,
     output logic memWriteEnable,
-    output logic [LineWidth-1:0] memWriteValue,
+    output logic [LINE_WIDTH-1:0] memWriteValue,
     input logic memReadDone,
     input logic memWriteDone,
-    input logic [LineWidth-1:0] memReadValue,
+    input logic [LINE_WIDTH-1:0] memReadValue,
 
     // CSR
     input csr_satp_t csrSatp,
@@ -51,11 +51,11 @@ module TlbReplacer #(
     input logic clk,
     input logic rst
 );
-    localparam EntryCountInLine = LineWidth / PAGE_TABLE_ENTRY_WIDTH;
-    localparam EntryIndexInLineWidth = $clog2(EntryCountInLine);
+    localparam EntryCountInLine = LINE_WIDTH / PAGE_TABLE_ENTRY_WIDTH;
+    localparam EntryIndexInLINE_WIDTH = $clog2(EntryCountInLine);
 
-    typedef logic [LineWidth-1:0] _line_t;
-    typedef logic [EntryIndexInLineWidth-1:0] _entry_index_t;
+    typedef logic [LINE_WIDTH-1:0] _line_t;
+    typedef logic [EntryIndexInLINE_WIDTH-1:0] _entry_index_t;
 
     typedef enum logic [3:0]
     {
@@ -80,7 +80,7 @@ module TlbReplacer #(
     endfunction
 
     function automatic _entry_index_t getEntryIndex(paddr_t entryAddr);
-        return entryAddr[$clog2(PAGE_TABLE_ENTRY_SIZE) + EntryIndexInLineWidth - 1 : $clog2(PAGE_TABLE_ENTRY_SIZE)];
+        return entryAddr[$clog2(PAGE_TABLE_ENTRY_SIZE) + EntryIndexInLINE_WIDTH - 1 : $clog2(PAGE_TABLE_ENTRY_SIZE)];
     endfunction
 
     function automatic PageTableEntry readEntry(_line_t memValue, _entry_index_t entryIndex);
@@ -252,8 +252,8 @@ module TlbReplacer #(
     // Memory access
     always_comb begin
         memAddr = (r_State == State_PageTableRead1 || r_State == State_PageTableDecode1 || r_State == State_PageTableWrite1) ?
-            entryAddr1[PADDR_WIDTH - 1 : PADDR_WIDTH - MemAddrWidth] :
-            entryAddr0[PADDR_WIDTH - 1 : PADDR_WIDTH - MemAddrWidth];
+            entryAddr1[PADDR_WIDTH - 1 : PADDR_WIDTH - MEM_ADDR_WIDTH] :
+            entryAddr0[PADDR_WIDTH - 1 : PADDR_WIDTH - MEM_ADDR_WIDTH];
 
         memReadEnable = (r_State == State_PageTableRead1 || r_State == State_PageTableRead0);
         memWriteEnable = (r_State == State_PageTableWrite1 || r_State == State_PageTableWrite0);

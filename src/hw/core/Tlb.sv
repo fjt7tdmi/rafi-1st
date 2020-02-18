@@ -21,7 +21,7 @@ import Rv32Types::*;
 import TlbTypes::*;
 
 module Tlb  #(
-    parameter TlbIndexWidth
+    parameter TLB_INDEX_WIDTH
 )(
     output  logic hit,
     output  logic fault,
@@ -49,7 +49,7 @@ module Tlb  #(
 );
     localparam EXT_WIDTH = PADDR_WIDTH - VADDR_WIDTH;
 
-    typedef logic [TlbIndexWidth-1:0] _tlb_index_t;
+    typedef logic [TLB_INDEX_WIDTH-1:0] _tlb_index_t;
 
     // Functions
     function automatic logic isValid(TlbEntry entry);
@@ -103,9 +103,9 @@ module Tlb  #(
 
     // Modules
     FlipFlopCam #(
-        .KeyWidth(VIRTUAL_PAGE_NUMBER_WIDTH),
-        .ValueWidth($bits(TlbEntry)),
-        .IndexWidth(TlbIndexWidth)
+        .KEY_WIDTH(VIRTUAL_PAGE_NUMBER_WIDTH),
+        .VALUE_WIDTH($bits(TlbEntry)),
+        .INDEX_WIDTH(TLB_INDEX_WIDTH)
     ) body (
         .hit(camHit),
         .readValue(camReadValue),

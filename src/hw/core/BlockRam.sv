@@ -20,19 +20,19 @@
  * Block RAM will be used for FPGA.
  */
 module BlockRam #(
-    parameter DataWidth,
-    parameter IndexWidth
+    parameter DATA_WIDTH,
+    parameter INDEX_WIDTH
 )(
-    output logic [DataWidth-1:0] readValue,
-    input logic [IndexWidth-1:0] index,
-    input logic [DataWidth-1:0] writeValue,
+    output logic [DATA_WIDTH-1:0] readValue,
+    input logic [INDEX_WIDTH-1:0] index,
+    input logic [DATA_WIDTH-1:0] writeValue,
     input logic writeEnable,
     input logic clk
 );
-    localparam EntryCount = 1 << IndexWidth;
+    localparam EntryCount = 1 << INDEX_WIDTH;
 
     // RAM
-    logic [DataWidth-1:0] body[EntryCount];
+    logic [DATA_WIDTH-1:0] body[EntryCount];
 
     always_ff @(posedge clk) begin
         readValue <= body[index];
@@ -50,29 +50,29 @@ endmodule
  * Reset sequence takes ${EntryCount} cycle.
  */
 module BlockRamWithReset #(
-    parameter DataWidth,
-    parameter IndexWidth
+    parameter DATA_WIDTH,
+    parameter INDEX_WIDTH
 )(
-    output logic [DataWidth-1:0] readValue,
-    input logic [IndexWidth-1:0] index,
-    input logic [DataWidth-1:0] writeValue,
+    output logic [DATA_WIDTH-1:0] readValue,
+    input logic [INDEX_WIDTH-1:0] index,
+    input logic [DATA_WIDTH-1:0] writeValue,
     input logic writeEnable,
     input logic clk,
     input logic rst
 );
-    localparam EntryCount = 1 << IndexWidth;
+    localparam EntryCount = 1 << INDEX_WIDTH;
 
     // RAM
-    logic [DataWidth-1:0] body[EntryCount];
+    logic [DATA_WIDTH-1:0] body[EntryCount];
 
     // Registers
-    logic [IndexWidth-1:0] r_ResetIndex;
+    logic [INDEX_WIDTH-1:0] r_ResetIndex;
 
     // Wires
     logic bodyWriteEnable;
-    logic [DataWidth-1:0] bodyWriteValue;
-    logic [IndexWidth-1:0] bodyWriteIndex;
-    logic [IndexWidth-1:0] nextResetIndex;
+    logic [DATA_WIDTH-1:0] bodyWriteValue;
+    logic [INDEX_WIDTH-1:0] bodyWriteIndex;
+    logic [INDEX_WIDTH-1:0] nextResetIndex;
 
 
     always_comb begin
@@ -108,23 +108,23 @@ endmodule
  * Block RAM will be used for FPGA.
  */
 module MultiBankBlockRam #(
-    parameter DataWidthPerBank,
-    parameter BankCount,
-    parameter IndexWidth
+    parameter DATA_WIDTH_PER_BANK,
+    parameter BANK_COUNT,
+    parameter INDEX_WIDTH
 )(
-    output  logic [BankCount-1:0][DataWidthPerBank-1:0] readValue,
-    input   logic [IndexWidth-1:0] index,
-    input   logic [BankCount-1:0][DataWidthPerBank-1:0] writeValue,
-    input   logic [BankCount-1:0] writeMask,
+    output  logic [BANK_COUNT-1:0][DATA_WIDTH_PER_BANK-1:0] readValue,
+    input   logic [INDEX_WIDTH-1:0] index,
+    input   logic [BANK_COUNT-1:0][DATA_WIDTH_PER_BANK-1:0] writeValue,
+    input   logic [BANK_COUNT-1:0] writeMask,
     input   logic clk
 );
     genvar i;
     generate
         // Data array instance
-        for (i = 0; i < BankCount; i++) begin : banks
+        for (i = 0; i < BANK_COUNT; i++) begin : banks
             BlockRam #(
-                .DataWidth(DataWidthPerBank),
-                .IndexWidth(IndexWidth)
+                .DATA_WIDTH(DATA_WIDTH_PER_BANK),
+                .INDEX_WIDTH(INDEX_WIDTH)
             ) body (
                 .readValue(readValue[i]),
                 .index(index),
