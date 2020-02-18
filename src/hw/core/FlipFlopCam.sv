@@ -22,27 +22,27 @@
  * D-FF will be used for FPGA.
  */
 module FlipFlopCam #(
-    parameter KeyWidth,
-    parameter ValueWidth,
-    parameter IndexWidth
+    parameter KEY_WIDTH,
+    parameter VALUE_WIDTH,
+    parameter INDEX_WIDTH
 )(
     output  logic                   hit,
-    output  logic [ValueWidth-1:0]  readValue,
-    output  logic [IndexWidth-1:0]  readIndex,
-    input   logic [KeyWidth-1:0]    readKey,
+    output  logic [VALUE_WIDTH-1:0]  readValue,
+    output  logic [INDEX_WIDTH-1:0]  readIndex,
+    input   logic [KEY_WIDTH-1:0]    readKey,
     input   logic                   writeEnable,
-    input   logic [IndexWidth-1:0]  writeIndex,
-    input   logic [KeyWidth-1:0]    writeKey,
-    input   logic [ValueWidth-1:0]  writeValue,
+    input   logic [INDEX_WIDTH-1:0]  writeIndex,
+    input   logic [KEY_WIDTH-1:0]    writeKey,
+    input   logic [VALUE_WIDTH-1:0]  writeValue,
     input   logic                   clear,
     input   logic                   clk,
     input   logic                   rst
 );
-    localparam EntryCount = 1 << IndexWidth;
+    localparam EntryCount = 1 << INDEX_WIDTH;
 
-    typedef logic [KeyWidth-1:0]    _key_t;
-    typedef logic [ValueWidth-1:0]  _value_t;
-    typedef logic [IndexWidth-1:0]  _index_t;
+    typedef logic [KEY_WIDTH-1:0]    _key_t;
+    typedef logic [VALUE_WIDTH-1:0]  _value_t;
+    typedef logic [INDEX_WIDTH-1:0]  _index_t;
 
     // Functions
     function automatic _index_t encodeIndex(logic [EntryCount-1:0] value);
@@ -57,8 +57,8 @@ module FlipFlopCam #(
 
     // Registers
     logic                   valid[EntryCount];
-    logic [KeyWidth-1:0]    key[EntryCount];
-    logic [ValueWidth-1:0]  value[EntryCount];
+    logic [KEY_WIDTH-1:0]    key[EntryCount];
+    logic [VALUE_WIDTH-1:0]  value[EntryCount];
 
     // Wires
     logic [EntryCount-1:0]  hits;

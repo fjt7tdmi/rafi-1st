@@ -16,29 +16,29 @@
 
 /*
  * Module to assure asserting rst for specific cycles.
- * When rstIn is triggerd, rstOut is asserted for ${ResetCycle} cycles.
+ * When rstIn is triggerd, rstOut is asserted for ${RESET_CYCLE} cycles.
  */
 module ResetSequencer #(
-    parameter ResetCycle
+    parameter RESET_CYCLE
 )(
     output logic rstOut,
     input logic rstIn,
     input logic clk
 );
-    localparam CounterWidth = $clog2(ResetCycle + 1);
-    localparam CounterMax = ResetCycle[CounterWidth-1:0];
+    localparam COUNTER_WIDTH = $clog2(RESET_CYCLE + 1);
+    localparam COUNTER_MAX = RESET_CYCLE[COUNTER_WIDTH-1:0];
 
     // Registers
-    logic [CounterWidth-1:0] r_Counter;
+    logic [COUNTER_WIDTH-1:0] r_Counter;
 
     // Wires
-    logic [CounterWidth-1:0] nextCounter;
+    logic [COUNTER_WIDTH-1:0] nextCounter;
 
     always_comb begin
         rstOut = (r_Counter != '0);
 
         if (rstIn) begin
-            nextCounter = CounterMax;
+            nextCounter = COUNTER_MAX;
         end
         else if (r_Counter != '0) begin
             nextCounter = r_Counter - 1;

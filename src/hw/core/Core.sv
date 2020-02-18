@@ -56,7 +56,7 @@ module Core (
     BusAccessUnitIF m_BusAccessUnitIF();
 
     ResetSequencer #(
-        .ResetCycle(CacheResetCycle)
+        .RESET_CYCLE(CACHE_RESET_CYCLE)
     ) m_ResetSequencer (
         .rstOut(rstInternal),
         .rstIn(rst),

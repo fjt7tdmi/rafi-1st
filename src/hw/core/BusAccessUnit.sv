@@ -28,11 +28,11 @@ module BusAccessUnit (
     input   logic clk,
     input   logic rst
 );
-    localparam DCacheWordCount = DCacheLineSize / 4;
-    localparam ICacheWordCount = ICacheLineSize / 4;
+    localparam DCACHE_WORD_COUNT = DCACHE_LINE_SIZE / 4;
+    localparam ICACHE_WORD_COUNT = ICACHE_LINE_SIZE / 4;
 
-    typedef logic [$clog2(DCacheWordCount)-1:0] _dcache_word_index_t;
-    typedef logic [$clog2(ICacheWordCount)-1:0] _icache_word_index_t;
+    typedef logic [$clog2(DCACHE_WORD_COUNT)-1:0] _dcache_word_index_t;
+    typedef logic [$clog2(ICACHE_WORD_COUNT)-1:0] _icache_word_index_t;
 
     typedef enum logic [2:0]
     {
@@ -59,8 +59,8 @@ module BusAccessUnit (
     logic done;
     _dcache_word_index_t dcWordIndex;
     _icache_word_index_t icWordIndex;
-    int32_t [DCacheWordCount-1:0] dcValue;
-    int32_t [ICacheWordCount-1:0] icValue;
+    int32_t [DCACHE_WORD_COUNT-1:0] dcValue;
+    int32_t [ICACHE_WORD_COUNT-1:0] icValue;
 
     // Wires
     logic rdataValid;
@@ -70,8 +70,8 @@ module BusAccessUnit (
     logic nextDone;
     _dcache_word_index_t nextDcWordIndex;
     _icache_word_index_t nextIcWordIndex;
-    int32_t [DCacheWordCount-1:0] nextDcValue;
-    int32_t [ICacheWordCount-1:0] nextIcValue;
+    int32_t [DCACHE_WORD_COUNT-1:0] nextDcValue;
+    int32_t [ICACHE_WORD_COUNT-1:0] nextIcValue;
 
     // D$
     always_comb begin
@@ -153,10 +153,10 @@ module BusAccessUnit (
 
     always_comb begin
         if (state == State_DCacheRead || state == State_DCacheWrite) begin
-            nextDone = rdataValid && (dcWordIndex == _dcache_word_index_t'(DCacheWordCount - 1));
+            nextDone = rdataValid && (dcWordIndex == _dcache_word_index_t'(DCACHE_WORD_COUNT - 1));
         end
         else if (state == State_ICacheRead || state == State_ICacheWrite) begin
-            nextDone = rdataValid && (icWordIndex == _icache_word_index_t'(ICacheWordCount - 1));
+            nextDone = rdataValid && (icWordIndex == _icache_word_index_t'(ICACHE_WORD_COUNT - 1));
         end
         else begin
             nextDone = 1'b0;
@@ -185,7 +185,7 @@ module BusAccessUnit (
                 nextDcValue = (core.dcWriteReq) ? core.dcWriteValue : '0;
             end
             State_DCacheRead: begin
-                for (int i = 0; i < DCacheWordCount; i++) begin
+                for (int i = 0; i < DCACHE_WORD_COUNT; i++) begin
                     nextDcValue[i] = (_dcache_word_index_t'(i) == dcWordIndex && rdataValid) ? rdata : dcValue[i];
                 end
             end
@@ -204,7 +204,7 @@ module BusAccessUnit (
                 nextIcValue = (core.icWriteReq) ? core.icWriteValue : '0;
             end
             State_ICacheRead: begin
-                for (int i = 0; i < ICacheWordCount; i++) begin
+                for (int i = 0; i < ICACHE_WORD_COUNT; i++) begin
                     nextIcValue[i] = (_icache_word_index_t'(i) == icWordIndex && rdataValid) ? rdata : icValue[i];
                 end
             end

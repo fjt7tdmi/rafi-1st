@@ -21,45 +21,45 @@ import Rv32Types::*;
 import CacheTypes::*;
 
 module DCacheReplacer #(
-    parameter LineWidth,
-    parameter TagWidth,
-    parameter IndexWidth,
-    parameter MemAddrWidth = TagWidth + IndexWidth
+    parameter LINE_WIDTH,
+    parameter TAG_WIDTH,
+    parameter INDEX_WIDTH,
+    parameter MEM_ADDR_WIDTH = TAG_WIDTH + INDEX_WIDTH
 )(
     // Cache array access
     output logic arrayWriteEnable,
-    output logic [IndexWidth-1:0] arrayIndex,
+    output logic [INDEX_WIDTH-1:0] arrayIndex,
     output logic arrayWriteValid,
-    output logic [TagWidth-1:0] arrayWriteTag,
-    output logic [LineWidth-1:0] arrayWriteData,
+    output logic [TAG_WIDTH-1:0] arrayWriteTag,
+    output logic [LINE_WIDTH-1:0] arrayWriteData,
     input logic arrayReadValid,
-    input logic [TagWidth-1:0] arrayReadTag,
-    input logic [LineWidth-1:0] arrayReadData,
+    input logic [TAG_WIDTH-1:0] arrayReadTag,
+    input logic [LINE_WIDTH-1:0] arrayReadData,
 
     // Memory access
-    output logic [MemAddrWidth-1:0] memAddr,
+    output logic [MEM_ADDR_WIDTH-1:0] memAddr,
     output logic memReadEnable,
     output logic memWriteEnable,
-    output logic [LineWidth-1:0] memWriteValue,
+    output logic [LINE_WIDTH-1:0] memWriteValue,
     input logic memReadDone,
     input logic memWriteDone,
-    input logic [LineWidth-1:0] memReadValue,
+    input logic [LINE_WIDTH-1:0] memReadValue,
 
     // Control
     output logic done,
     input logic enable,
     input CacheCommand command,
-    input logic [MemAddrWidth-1:0] commandAddr,
+    input logic [MEM_ADDR_WIDTH-1:0] commandAddr,
 
     // clk & rst
     input logic clk,
     input logic rst
 );
     // Internal types
-    typedef logic [MemAddrWidth-1:0] _mem_addr_t;
-    typedef logic [TagWidth-1:0] _tag_t;
-    typedef logic [IndexWidth-1:0] _index_t;
-    typedef logic [LineWidth-1:0] _line_t;
+    typedef logic [MEM_ADDR_WIDTH-1:0] _mem_addr_t;
+    typedef logic [TAG_WIDTH-1:0] _tag_t;
+    typedef logic [INDEX_WIDTH-1:0] _index_t;
+    typedef logic [LINE_WIDTH-1:0] _line_t;
 
     typedef enum logic [2:0]
     {
@@ -78,11 +78,11 @@ module DCacheReplacer #(
     endfunction
 
     function automatic _tag_t makeTag(_mem_addr_t addr);
-        return addr[MemAddrWidth-1:IndexWidth];
+        return addr[MEM_ADDR_WIDTH-1:INDEX_WIDTH];
     endfunction
 
     function automatic _index_t makeIndex(_mem_addr_t addr);
-        return addr[IndexWidth-1:0];
+        return addr[INDEX_WIDTH-1:0];
     endfunction
 
     // Registers
