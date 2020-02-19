@@ -116,24 +116,24 @@ module TlbReplacer #(
     endfunction
 
     // Registers
-    State r_State;
-    MemoryAccessType r_AccessType;
-    virtual_page_number_t r_VirtualPageNumber;
-    physical_page_number_t r_PhysicalPageNumber;
-    PageTableEntry r_PageTableEntry1;
-    PageTableEntry r_PageTableEntry0;
-    TlbEntryFlags r_Flags;
-    _line_t r_Line;
+    State reg_state;
+    MemoryAccessType reg_access_type;
+    virtual_page_number_t reg_virtual_page_number;
+    physical_page_number_t reg_physical_page_number;
+    PageTableEntry reg_page_table_entry1;
+    PageTableEntry reg_page_table_entry0;
+    TlbEntryFlags reg_flags;
+    _line_t reg_line;
 
     // Wires
-    State nextState;
-    MemoryAccessType nextAccessType;
-    virtual_page_number_t nextVirtualPageNumber;
-    physical_page_number_t nextPhysicalPageNumber;
-    PageTableEntry nextPageTableEntry1;
-    PageTableEntry nextPageTableEntry0;
-    TlbEntryFlags nextFlags;
-    _line_t nextLine;
+    State next_state;
+    MemoryAccessType next_access_type;
+    virtual_page_number_t next_virtual_page_number;
+    physical_page_number_t next_physical_page_number;
+    PageTableEntry next_page_table_entry1;
+    PageTableEntry next_page_table_entry0;
+    TlbEntryFlags next_flags;
+    _line_t next_line;
 
     PageTableEntry writePageTableEntry1;
     PageTableEntry writePageTableEntry0;
@@ -142,100 +142,100 @@ module TlbReplacer #(
 
     // Wires
     always_comb begin
-        writePageTableEntry1 = makeEntryForWrite(r_PageTableEntry1, r_AccessType);
-        writePageTableEntry0 = makeEntryForWrite(r_PageTableEntry0, r_AccessType);
-        entryAddr1 = {csrSatp.ppn, r_VirtualPageNumber.vpn1, 2'b00};
-        entryAddr0 = {r_PageTableEntry1.ppn1, r_PageTableEntry1.ppn0, r_VirtualPageNumber.vpn0, 2'b00};
+        writePageTableEntry1 = makeEntryForWrite(reg_page_table_entry1, reg_access_type);
+        writePageTableEntry0 = makeEntryForWrite(reg_page_table_entry0, reg_access_type);
+        entryAddr1 = {csrSatp.ppn, reg_virtual_page_number.vpn1, 2'b00};
+        entryAddr0 = {reg_page_table_entry1.ppn1, reg_page_table_entry1.ppn0, reg_virtual_page_number.vpn0, 2'b00};
     end
 
     always_comb begin
-        unique case(r_State)
+        unique case(reg_state)
         State_Default: begin
-            nextState = enable ? State_PageTableRead1 : State_Default;
+            next_state = enable ? State_PageTableRead1 : State_Default;
         end
         State_PageTableRead1: begin
-            nextState = memReadDone ? State_PageTableDecode1 : State_PageTableRead1;
+            next_state = memReadDone ? State_PageTableDecode1 : State_PageTableRead1;
         end
         State_PageTableDecode1: begin
-            if (isLeafEntry(r_PageTableEntry1)) begin
-                nextState = State_PageTableWrite1;
+            if (isLeafEntry(reg_page_table_entry1)) begin
+                next_state = State_PageTableWrite1;
             end
             else begin
-                nextState = isFault(r_PageTableEntry1) ? State_TlbWriteForFault : State_PageTableRead0;
+                next_state = isFault(reg_page_table_entry1) ? State_TlbWriteForFault : State_PageTableRead0;
             end
         end
         State_PageTableWrite1: begin
-            nextState = memWriteDone ? State_TlbWrite : State_PageTableWrite1;
+            next_state = memWriteDone ? State_TlbWrite : State_PageTableWrite1;
         end
         State_PageTableRead0: begin
-            nextState = memReadDone ? State_PageTableDecode0 : State_PageTableRead0;
+            next_state = memReadDone ? State_PageTableDecode0 : State_PageTableRead0;
         end
         State_PageTableDecode0: begin
-            if (isLeafEntry(r_PageTableEntry0)) begin
-                nextState = State_PageTableWrite0;
+            if (isLeafEntry(reg_page_table_entry0)) begin
+                next_state = State_PageTableWrite0;
             end
             else begin
                 // Cannot find leaf page table entry
-                nextState = State_TlbWriteForFault;
+                next_state = State_TlbWriteForFault;
             end
         end
         State_PageTableWrite0: begin
-            nextState = memWriteDone ? State_TlbWrite : State_PageTableWrite0;
+            next_state = memWriteDone ? State_TlbWrite : State_PageTableWrite0;
         end
         default: begin
             // State_TlbWrite, State_TlbWriteForFault
-            nextState = State_Default;
+            next_state = State_Default;
         end
         endcase
 
-        nextAccessType = missMemoryAccessType;
+        next_access_type = missMemoryAccessType;
 
-        nextVirtualPageNumber = (r_State == State_Default && enable) ?
+        next_virtual_page_number = (reg_state == State_Default && enable) ?
             missPage :
-            r_VirtualPageNumber;
+            reg_virtual_page_number;
 
-        unique case (r_State)
+        unique case (reg_state)
         State_PageTableDecode1: begin
-            nextPhysicalPageNumber = {writePageTableEntry1.ppn1, r_VirtualPageNumber[$bits(writePageTableEntry1.ppn0)-1:0]};
-            nextFlags.dirty = writePageTableEntry1.dirty;
-            nextFlags.user = writePageTableEntry1.user;
-            nextFlags.execute = writePageTableEntry1.execute;
-            nextFlags.write = writePageTableEntry1.write;
-            nextFlags.read = writePageTableEntry1.read;
+            next_physical_page_number = {writePageTableEntry1.ppn1, reg_virtual_page_number[$bits(writePageTableEntry1.ppn0)-1:0]};
+            next_flags.dirty = writePageTableEntry1.dirty;
+            next_flags.user = writePageTableEntry1.user;
+            next_flags.execute = writePageTableEntry1.execute;
+            next_flags.write = writePageTableEntry1.write;
+            next_flags.read = writePageTableEntry1.read;
         end
         State_PageTableDecode0: begin
-            nextPhysicalPageNumber = {writePageTableEntry0.ppn1, writePageTableEntry0.ppn0};
-            nextFlags.dirty = writePageTableEntry0.dirty;
-            nextFlags.user = writePageTableEntry0.user;
-            nextFlags.execute = writePageTableEntry0.execute;
-            nextFlags.write = writePageTableEntry0.write;
-            nextFlags.read = writePageTableEntry0.read;
+            next_physical_page_number = {writePageTableEntry0.ppn1, writePageTableEntry0.ppn0};
+            next_flags.dirty = writePageTableEntry0.dirty;
+            next_flags.user = writePageTableEntry0.user;
+            next_flags.execute = writePageTableEntry0.execute;
+            next_flags.write = writePageTableEntry0.write;
+            next_flags.read = writePageTableEntry0.read;
         end
         default: begin
-            nextPhysicalPageNumber = r_PhysicalPageNumber;
-            nextFlags = r_Flags;
+            next_physical_page_number = reg_physical_page_number;
+            next_flags = reg_flags;
         end
         endcase
 
-        nextPageTableEntry1 = (r_State == State_PageTableRead1 && memReadDone) ?
+        next_page_table_entry1 = (reg_state == State_PageTableRead1 && memReadDone) ?
             readEntry(memReadValue, getEntryIndex(entryAddr1)) :
-            r_PageTableEntry1;
+            reg_page_table_entry1;
 
-        nextPageTableEntry0 = (r_State == State_PageTableRead0 && memReadDone) ?
+        next_page_table_entry0 = (reg_state == State_PageTableRead0 && memReadDone) ?
             readEntry(memReadValue, getEntryIndex(entryAddr0)) :
-            r_PageTableEntry0;
+            reg_page_table_entry0;
 
-        nextLine = (r_State == State_PageTableRead1 || r_State == State_PageTableRead0) && memReadDone ?
+        next_line = (reg_state == State_PageTableRead1 || reg_state == State_PageTableRead0) && memReadDone ?
             memReadValue :
-            r_Line;
+            reg_line;
     end
 
     // TLB access
     always_comb begin
-        tlbWriteEnable = (r_State == State_TlbWrite || r_State == State_TlbWriteForFault);
-        tlbWriteKey = r_VirtualPageNumber;
+        tlbWriteEnable = (reg_state == State_TlbWrite || reg_state == State_TlbWriteForFault);
+        tlbWriteKey = reg_virtual_page_number;
 
-        if (r_State == State_TlbWriteForFault) begin
+        if (reg_state == State_TlbWriteForFault) begin
             tlbWriteValue.valid = 1;
             tlbWriteValue.fault = 1;
             tlbWriteValue.pageNumber = '0;
@@ -244,26 +244,26 @@ module TlbReplacer #(
         else begin
             tlbWriteValue.valid = 1;
             tlbWriteValue.fault = 0;
-            tlbWriteValue.pageNumber = r_PhysicalPageNumber;
-            tlbWriteValue.flags = r_Flags;
+            tlbWriteValue.pageNumber = reg_physical_page_number;
+            tlbWriteValue.flags = reg_flags;
         end
     end
 
     // Memory access
     always_comb begin
-        memAddr = (r_State == State_PageTableRead1 || r_State == State_PageTableDecode1 || r_State == State_PageTableWrite1) ?
+        memAddr = (reg_state == State_PageTableRead1 || reg_state == State_PageTableDecode1 || reg_state == State_PageTableWrite1) ?
             entryAddr1[PADDR_WIDTH - 1 : PADDR_WIDTH - MEM_ADDR_WIDTH] :
             entryAddr0[PADDR_WIDTH - 1 : PADDR_WIDTH - MEM_ADDR_WIDTH];
 
-        memReadEnable = (r_State == State_PageTableRead1 || r_State == State_PageTableRead0);
-        memWriteEnable = (r_State == State_PageTableWrite1 || r_State == State_PageTableWrite0);
+        memReadEnable = (reg_state == State_PageTableRead1 || reg_state == State_PageTableRead0);
+        memWriteEnable = (reg_state == State_PageTableWrite1 || reg_state == State_PageTableWrite0);
 
-        unique case (r_State)
+        unique case (reg_state)
         State_PageTableWrite1: begin
-            memWriteValue = writeEntry(r_Line, writePageTableEntry1, getEntryIndex(entryAddr1));
+            memWriteValue = writeEntry(reg_line, writePageTableEntry1, getEntryIndex(entryAddr1));
         end
         State_PageTableWrite0: begin
-            memWriteValue = writeEntry(r_Line, writePageTableEntry0, getEntryIndex(entryAddr0));
+            memWriteValue = writeEntry(reg_line, writePageTableEntry0, getEntryIndex(entryAddr0));
         end
         default: begin
             memWriteValue = '0;
@@ -273,29 +273,29 @@ module TlbReplacer #(
 
     // Control
     always_comb begin
-        done = (r_State == State_TlbWrite || r_State == State_TlbWriteForFault);
+        done = (reg_state == State_TlbWrite || reg_state == State_TlbWriteForFault);
     end
 
     always_ff @(posedge clk) begin
         if (rst) begin
-            r_State <= State_Default;
-            r_AccessType <= MemoryAccessType_Instruction;
-            r_VirtualPageNumber <= '0;
-            r_PhysicalPageNumber <= '0;
-            r_PageTableEntry1 <= '0;
-            r_PageTableEntry0 <= '0;
-            r_Flags <= '0;
-            r_Line <= '0;
+            reg_state <= State_Default;
+            reg_access_type <= MemoryAccessType_Instruction;
+            reg_virtual_page_number <= '0;
+            reg_physical_page_number <= '0;
+            reg_page_table_entry1 <= '0;
+            reg_page_table_entry0 <= '0;
+            reg_flags <= '0;
+            reg_line <= '0;
         end
         else begin
-            r_State <= nextState;
-            r_AccessType <= nextAccessType;
-            r_VirtualPageNumber <= nextVirtualPageNumber;
-            r_PhysicalPageNumber <= nextPhysicalPageNumber;
-            r_PageTableEntry1 <= nextPageTableEntry1;
-            r_PageTableEntry0 <= nextPageTableEntry0;
-            r_Flags <= nextFlags;
-            r_Line <= nextLine;
+            reg_state <= next_state;
+            reg_access_type <= next_access_type;
+            reg_virtual_page_number <= next_virtual_page_number;
+            reg_physical_page_number <= next_physical_page_number;
+            reg_page_table_entry1 <= next_page_table_entry1;
+            reg_page_table_entry0 <= next_page_table_entry0;
+            reg_flags <= next_flags;
+            reg_line <= next_line;
         end
     end
 endmodule

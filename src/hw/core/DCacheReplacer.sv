@@ -86,98 +86,98 @@ module DCacheReplacer #(
     endfunction
 
     // Registers
-    State r_State;
-    _line_t r_Line;
+    State reg_state;
+    _line_t reg_line;
 
     // Wires
-    State nextState;
-    _line_t nextLine;
+    State next_state;
+    _line_t next_line;
 
     // Cache array access
     always_comb begin
-        arrayWriteEnable = (r_State == State_Invalidate) || (r_State == State_WriteCache);
+        arrayWriteEnable = (reg_state == State_Invalidate) || (reg_state == State_WriteCache);
         arrayIndex = makeIndex(commandAddr);
-        arrayWriteValid = (r_State == State_Invalidate) ? 0 : 1;
+        arrayWriteValid = (reg_state == State_Invalidate) ? 0 : 1;
         arrayWriteTag = makeTag(commandAddr);
-        arrayWriteData = r_Line;
+        arrayWriteData = reg_line;
     end
 
     // Memory accses
     always_comb begin
         memAddr = commandAddr;
-        memReadEnable = (r_State == State_ReadMemory);
-        memWriteEnable = (r_State == State_WriteMemory);
-        memWriteValue = r_Line;
+        memReadEnable = (reg_state == State_ReadMemory);
+        memWriteEnable = (reg_state == State_WriteMemory);
+        memWriteValue = reg_line;
     end
 
     // Control
     always_comb begin
-        done = (r_State == State_WriteMemory && memWriteDone) ||
-            (r_State == State_WriteCache) ||
-            (r_State == State_Invalidate);
+        done = (reg_state == State_WriteMemory && memWriteDone) ||
+            (reg_state == State_WriteCache) ||
+            (reg_state == State_Invalidate);
     end
 
     // Wires
     always_comb begin
-        unique case (r_State)
+        unique case (reg_state)
         State_None: begin
             if (enable && command == CacheCommand_WriteThrough) begin
-                nextState = State_ReadCache;
+                next_state = State_ReadCache;
             end
             else if (enable && command == CacheCommand_Replace) begin
-                nextState = State_InvalidateForReplace;
+                next_state = State_InvalidateForReplace;
             end
             else if (enable && command == CacheCommand_Invalidate) begin
-                nextState = State_Invalidate;
+                next_state = State_Invalidate;
             end
             else begin
-                nextState = r_State;
+                next_state = reg_state;
             end
         end
         State_ReadCache: begin
-            nextState = State_WriteMemory;
+            next_state = State_WriteMemory;
         end
         State_WriteMemory: begin
-            nextState = (memWriteDone) ? State_None : r_State;
+            next_state = (memWriteDone) ? State_None : reg_state;
         end
         State_InvalidateForReplace: begin
-            nextState = State_ReadMemory;
+            next_state = State_ReadMemory;
         end
         State_ReadMemory: begin
-            nextState = (memReadDone) ? State_WriteCache : r_State;
+            next_state = (memReadDone) ? State_WriteCache : reg_state;
         end
         State_WriteCache: begin
-            nextState = State_None;
+            next_state = State_None;
         end
         State_Invalidate: begin
-            nextState = State_None;
+            next_state = State_None;
         end
         default: begin
-            nextState = State_None;
+            next_state = State_None;
         end
         endcase
 
-        unique case (r_State)
+        unique case (reg_state)
         State_ReadCache: begin
-            nextLine = arrayReadData;
+            next_line = arrayReadData;
         end
         State_ReadMemory: begin
-            nextLine = memReadValue;
+            next_line = memReadValue;
         end
         default: begin
-            nextLine = r_Line;
+            next_line = reg_line;
         end
         endcase
     end
 
     always_ff @(posedge clk) begin
         if (rst) begin
-            r_State <= State_None;
-            r_Line <= '0;
+            reg_state <= State_None;
+            reg_line <= '0;
         end
         else begin
-            r_State <= nextState;
-            r_Line <= nextLine;
+            reg_state <= next_state;
+            reg_line <= next_line;
         end
     end
 endmodule
