@@ -63,22 +63,22 @@ module FetchUnit (
     } ValidTagArrayEntry;
 
     // Registers
-    State r_State;
-    addr_t r_Pc;
-    paddr_t r_PhysicalPc;
-    logic r_ICacheRead;
-    logic r_TlbMiss;
-    logic r_Fault;
-    _stall_cycle_t r_StallCounter;
+    State reg_state;
+    addr_t reg_pc;
+    paddr_t reg_physical_pc;
+    logic reg_icache_read;
+    logic reg_tlb_miss;
+    logic reg_fault;
+    _stall_cycle_t reg_stall_counter;
 
     // Wires
-    State nextState;
-    addr_t nextPc;
-    paddr_t nextPhysicalPc;
-    logic nextICacheRead;
-    logic nextTlbMiss;
-    logic nextFault;
-    _stall_cycle_t nextStallCounter;
+    State next_state;
+    addr_t next_pc;
+    paddr_t next_physical_pc;
+    logic next_icache_read;
+    logic next_tlb_miss;
+    logic next_fault;
+    _stall_cycle_t next_stall_counter;
 
     logic cacheMiss;
     logic stall;
@@ -209,7 +209,7 @@ module FetchUnit (
         .miss(cacheMiss),
         .done(cacheReplacerDone),
         .enable(cacheReplacerEnable),
-        .missAddr(r_PhysicalPc[PADDR_WIDTH-1:INDEX_LSB]),
+        .missAddr(reg_physical_pc[PADDR_WIDTH-1:INDEX_LSB]),
         .clk,
         .rst
     );
@@ -232,29 +232,29 @@ module FetchUnit (
         .done(tlbReplacerDone),
         .enable(tlbReplacerEnable),
         .missMemoryAccessType(MemoryAccessType_Instruction),
-        .missPage(r_Pc[VADDR_WIDTH-1:PAGE_OFFSET_WIDTH]),
+        .missPage(reg_pc[VADDR_WIDTH-1:PAGE_OFFSET_WIDTH]),
         .clk,
         .rst
     );
 
     // Wires
     always_comb begin
-        tlbReadKey = nextPc[VADDR_WIDTH-1:PAGE_OFFSET_WIDTH];
+        tlbReadKey = next_pc[VADDR_WIDTH-1:PAGE_OFFSET_WIDTH];
     end
 
     always_comb begin
         // Wires
-        cacheMiss = r_ICacheRead && !r_TlbMiss &&
-            (!validTagArrayReadValue.valid || r_PhysicalPc[TAG_MSB:TAG_LSB] != validTagArrayReadValue.tag);
-        stall = ctrl.ifStall || (r_StallCounter != '0);
+        cacheMiss = reg_icache_read && !reg_tlb_miss &&
+            (!validTagArrayReadValue.valid || reg_physical_pc[TAG_MSB:TAG_LSB] != validTagArrayReadValue.tag);
+        stall = ctrl.ifStall || (reg_stall_counter != '0);
 
         // Module port
-        bus.valid = (r_ICacheRead && !r_TlbMiss && !cacheMiss) || r_Fault;
-        bus.fault = r_Fault;
-        bus.pc = r_Pc;
+        bus.valid = (reg_icache_read && !reg_tlb_miss && !cacheMiss) || reg_fault;
+        bus.fault = reg_fault;
+        bus.pc = reg_pc;
         bus.iCacheLine = dataArrayReadValue;
 
-        if (r_State == State_ReplaceTlb) begin
+        if (reg_state == State_ReplaceTlb) begin
             mem.icAddr = tlbReplacerMemAddr;
             mem.icReadReq = tlbReplacerMemReadEnable;
         end
@@ -264,7 +264,7 @@ module FetchUnit (
         end
 
         // Valid & tag array input signals
-        unique case (r_State)
+        unique case (reg_state)
         State_Invalidate: begin
             validTagArrayIndex = invalidaterArrayIndex;
             validTagArrayWriteValue = {invalidaterArrayWriteValid, invalidaterArrayWriteTag};
@@ -276,90 +276,90 @@ module FetchUnit (
             validTagArrayWriteEnable = cacheReplacerArrayWriteEnable;
         end
         default: begin
-            validTagArrayIndex = nextPhysicalPc[INDEX_MSB:INDEX_LSB];
+            validTagArrayIndex = next_physical_pc[INDEX_MSB:INDEX_LSB];
             validTagArrayWriteValue = '0;
             validTagArrayWriteEnable = 0;
         end
         endcase
 
         // Data array input signals
-        if (r_State == State_ReplaceCache) begin
+        if (reg_state == State_ReplaceCache) begin
             dataArrayIndex = cacheReplacerArrayIndex;
             dataArrayWriteEnable = cacheReplacerArrayWriteEnable;
         end
         else begin
-            dataArrayIndex = nextPhysicalPc[INDEX_MSB:INDEX_LSB];
+            dataArrayIndex = next_physical_pc[INDEX_MSB:INDEX_LSB];
             dataArrayWriteEnable = 0;
         end
 
         // Module enable signals
-        tlbReadEnable = (r_State == State_Default);
-        invalidaterEnable = (r_State == State_Invalidate);
-        cacheReplacerEnable = (r_State == State_ReplaceCache);
-        tlbReplacerEnable = (r_State == State_ReplaceTlb);
+        tlbReadEnable = (reg_state == State_Default);
+        invalidaterEnable = (reg_state == State_Invalidate);
+        cacheReplacerEnable = (reg_state == State_ReplaceCache);
+        tlbReplacerEnable = (reg_state == State_ReplaceTlb);
     end
 
-    // nextPc
+    // next_pc
     always_comb begin
         if (csr.trapInfo.valid || csr.trapReturn) begin
-            nextPc = csr.nextPc;
+            next_pc = csr.nextPc;
         end
         else if (ctrl.flush) begin
-            nextPc = ctrl.nextPc;
+            next_pc = ctrl.nextPc;
         end
-        else if (stall || !bus.valid || r_State != State_Default) begin
-            nextPc = r_Pc;
+        else if (stall || !bus.valid || reg_state != State_Default) begin
+            next_pc = reg_pc;
         end
         else begin
-            nextPc = r_Pc + INSN_SIZE;
+            next_pc = reg_pc + INSN_SIZE;
         end
     end
 
-    // nextState
+    // next_state
     always_comb begin
-        unique case (r_State)
+        unique case (reg_state)
         State_Invalidate: begin
             if (invalidaterDone && !waitInvalidate) begin
-                nextState = State_Default;
+                next_state = State_Default;
             end
             else begin
-                nextState = State_Invalidate;
+                next_state = State_Invalidate;
             end
         end
         State_ReplaceCache: begin
             if (!cacheReplacerDone) begin
-                nextState = State_ReplaceCache;
+                next_state = State_ReplaceCache;
             end
             else if (waitInvalidate) begin
-                nextState = State_Invalidate;
+                next_state = State_Invalidate;
             end
             else begin
-                nextState = State_Default;
+                next_state = State_Default;
             end
         end
         State_ReplaceTlb: begin
             if (!tlbReplacerDone) begin
-                nextState = State_ReplaceTlb;
+                next_state = State_ReplaceTlb;
             end
             else if (waitInvalidate) begin
-                nextState = State_Invalidate;
+                next_state = State_Invalidate;
             end
             else begin
-                nextState = State_Default;
+                next_state = State_Default;
             end
         end
         default: begin
             if (waitInvalidate) begin
-                nextState = State_Invalidate;
+                next_state = State_Invalidate;
             end
-            else if (r_TlbMiss) begin
-                nextState = State_ReplaceTlb;
+            else if (reg_tlb_miss) begin
+                next_state = State_ReplaceTlb;
             end
             else if (cacheMiss) begin
-                nextState = State_ReplaceCache;
+                next_state = State_ReplaceCache;
             end
             else begin
-                nextState = State_Default;
+                next_state = State_Default;
             end
         end
         endcase
@@ -367,37 +367,37 @@ module FetchUnit (
 
     // Next register values
     always_comb begin
-        nextPhysicalPc = {tlbReadValue, nextPc[PAGE_OFFSET_WIDTH-1:0]};
-        nextICacheRead = (r_State == State_Default && !ctrl.flush && !stall && !waitInvalidate);
-        nextTlbMiss = nextICacheRead && !tlbHit;
-        nextFault = nextICacheRead && tlbHit && tlbFault;
+        next_physical_pc = {tlbReadValue, next_pc[PAGE_OFFSET_WIDTH-1:0]};
+        next_icache_read = (reg_state == State_Default && !ctrl.flush && !stall && !waitInvalidate);
+        next_tlb_miss = next_icache_read && !tlbHit;
+        next_fault = next_icache_read && tlbHit && tlbFault;
 
         if (ctrl.flush) begin
-            nextStallCounter = StallCycleAfterFlush;
+            next_stall_counter = StallCycleAfterFlush;
         end
         else begin
-            nextStallCounter = (r_StallCounter != '0) ? r_StallCounter - 1 : '0;
+            next_stall_counter = (reg_stall_counter != '0) ? reg_stall_counter - 1 : '0;
         end
     end
 
     always_ff @(posedge clk) begin
         if (rst) begin
-            r_State <= State_Default;
-            r_Pc <= INITIAL_PC;
-            r_PhysicalPc <= '0;
-            r_ICacheRead <= '0;
-            r_TlbMiss <= '0;
-            r_Fault <= '0;
-            r_StallCounter <= '0;
+            reg_state <= State_Default;
+            reg_pc <= INITIAL_PC;
+            reg_physical_pc <= '0;
+            reg_icache_read <= '0;
+            reg_tlb_miss <= '0;
+            reg_fault <= '0;
+            reg_stall_counter <= '0;
         end
         else begin
-            r_State <= nextState;
-            r_Pc <= nextPc;
-            r_PhysicalPc <= nextPhysicalPc;
-            r_ICacheRead <= nextICacheRead;
-            r_TlbMiss <= nextTlbMiss;
-            r_Fault <= nextFault;
-            r_StallCounter <= nextStallCounter;
+            reg_state <= next_state;
+            reg_pc <= next_pc;
+            reg_physical_pc <= next_physical_pc;
+            reg_icache_read <= next_icache_read;
+            reg_tlb_miss <= next_tlb_miss;
+            reg_fault <= next_fault;
+            reg_stall_counter <= next_stall_counter;
         end
     end
 endmodule

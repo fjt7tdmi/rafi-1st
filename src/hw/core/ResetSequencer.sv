@@ -29,26 +29,26 @@ module ResetSequencer #(
     localparam COUNTER_MAX = RESET_CYCLE[COUNTER_WIDTH-1:0];
 
     // Registers
-    logic [COUNTER_WIDTH-1:0] r_Counter;
+    logic [COUNTER_WIDTH-1:0] reg_counter;
 
     // Wires
-    logic [COUNTER_WIDTH-1:0] nextCounter;
+    logic [COUNTER_WIDTH-1:0] next_counter;
 
     always_comb begin
-        rstOut = (r_Counter != '0);
+        rstOut = (reg_counter != '0);
 
         if (rstIn) begin
-            nextCounter = COUNTER_MAX;
+            next_counter = COUNTER_MAX;
         end
-        else if (r_Counter != '0) begin
-            nextCounter = r_Counter - 1;
+        else if (reg_counter != '0) begin
+            next_counter = reg_counter - 1;
         end
         else begin
-            nextCounter = '0;
+            next_counter = '0;
         end
     end
 
     always_ff @(posedge clk) begin
-        r_Counter <= nextCounter;
+        reg_counter <= next_counter;
     end
 endmodule

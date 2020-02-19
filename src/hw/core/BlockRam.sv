@@ -66,39 +66,39 @@ module BlockRamWithReset #(
     logic [DATA_WIDTH-1:0] body[EntryCount];
 
     // Registers
-    logic [INDEX_WIDTH-1:0] r_ResetIndex;
+    logic [INDEX_WIDTH-1:0] reg_reset_index;
 
     // Wires
-    logic bodyWriteEnable;
-    logic [DATA_WIDTH-1:0] bodyWriteValue;
-    logic [INDEX_WIDTH-1:0] bodyWriteIndex;
-    logic [INDEX_WIDTH-1:0] nextResetIndex;
+    logic body_write_enable;
+    logic [DATA_WIDTH-1:0] body_write_value;
+    logic [INDEX_WIDTH-1:0] body_write_index;
+    logic [INDEX_WIDTH-1:0] next_reset_index;
 
 
     always_comb begin
         if (rst) begin
-            bodyWriteEnable = 1;
-            bodyWriteValue = '0;
-            bodyWriteIndex = r_ResetIndex;
-            nextResetIndex = r_ResetIndex + 1;
+            body_write_enable = 1;
+            body_write_value = '0;
+            body_write_index = reg_reset_index;
+            next_reset_index = reg_reset_index + 1;
         end
         else begin
-            bodyWriteEnable = writeEnable;
-            bodyWriteValue = writeValue;
-            bodyWriteIndex = index;
-            nextResetIndex = '0;
+            body_write_enable = writeEnable;
+            body_write_value = writeValue;
+            body_write_index = index;
+            next_reset_index = '0;
         end
     end
 
     always_ff @(posedge clk) begin
         // RAM
         readValue <= body[index];
-        if (bodyWriteEnable) begin
-            body[bodyWriteIndex] <= bodyWriteValue;
+        if (body_write_enable) begin
+            body[body_write_index] <= body_write_value;
         end
 
         // Registers
-        r_ResetIndex <= nextResetIndex;
+        reg_reset_index <= next_reset_index;
     end
 endmodule
 

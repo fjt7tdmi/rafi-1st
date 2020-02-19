@@ -86,10 +86,10 @@ module Tlb  #(
     endfunction
 
     // Registers
-    _tlb_index_t r_WriteIndex;
+    _tlb_index_t reg_write_index;
 
     // Wires
-    _tlb_index_t nextWriteIndex;
+    _tlb_index_t next_write_index;
 
     _tlb_index_t readIndex;
 
@@ -112,7 +112,7 @@ module Tlb  #(
         .readKey,
         .readIndex,
         .writeEnable,
-        .writeIndex(r_WriteIndex),
+        .writeIndex(reg_write_index),
         .writeKey,
         .writeValue,
         .clear(invalidate),
@@ -140,23 +140,23 @@ module Tlb  #(
         // TODO: refactor
         if (readEnable && readEntryValid && readEntryNeedsUpdate) begin
             // Prepare to replace
-            nextWriteIndex = readIndex;
+            next_write_index = readIndex;
         end
         else if (writeEnable) begin
             // increment for round-robin
-            nextWriteIndex = r_WriteIndex + 1;
+            next_write_index = reg_write_index + 1;
         end
         else begin
-            nextWriteIndex = r_WriteIndex;
+            next_write_index = reg_write_index;
         end
     end
 
     always_ff @(posedge clk) begin
         if (rst) begin
-            r_WriteIndex <= '0;
+            reg_write_index <= '0;
         end
         else begin
-            r_WriteIndex <= nextWriteIndex;
+            reg_write_index <= next_write_index;
         end
     end
 

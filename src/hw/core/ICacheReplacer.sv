@@ -77,69 +77,69 @@ module ICacheReplacer #(
     endfunction
 
     // Registers
-    State r_State;
-    _line_t r_Line;
-    _mem_addr_t r_MissAddr;
+    State reg_state;
+    _line_t reg_line;
+    _mem_addr_t reg_miss_addr;
 
     // Wires
-    State nextState;
-    _line_t nextLine;
+    State next_state;
+    _line_t next_line;
 
         // Cache array access
     always_comb begin
-        arrayWriteEnable = (r_State == State_WriteCache);
-        arrayIndex = makeIndex(r_MissAddr);
+        arrayWriteEnable = (reg_state == State_WriteCache);
+        arrayIndex = makeIndex(reg_miss_addr);
         arrayWriteValid = 1;
-        arrayWriteTag = makeTag(r_MissAddr);
-        arrayWriteData = r_Line;
+        arrayWriteTag = makeTag(reg_miss_addr);
+        arrayWriteData = reg_line;
     end
 
     // Memory accses
     always_comb begin
-        memAddr = r_MissAddr;
-        memReadEnable = (r_State == State_ReadMemory);
+        memAddr = reg_miss_addr;
+        memReadEnable = (reg_state == State_ReadMemory);
     end
 
     // Control
     always_comb begin
-        done = (r_State == State_WriteCache);
+        done = (reg_state == State_WriteCache);
     end
 
     // Wires
     always_comb begin
-        unique case (r_State)
+        unique case (reg_state)
         State_None: begin
-            nextState = (enable) ? State_InvalidateCache : r_State;
+            next_state = (enable) ? State_InvalidateCache : reg_state;
         end
         State_InvalidateCache: begin
-            nextState = State_ReadMemory;
+            next_state = State_ReadMemory;
         end
         State_ReadMemory: begin
-            nextState = (memReadDone) ? State_WriteCache : r_State;
+            next_state = (memReadDone) ? State_WriteCache : reg_state;
         end
         State_WriteCache: begin
-            nextState = State_None;
+            next_state = State_None;
         end
         default: begin
-            nextState = State_None;
+            next_state = State_None;
         end
         endcase
 
-        nextLine = (r_State == State_ReadMemory && memReadDone)
+        next_line = (reg_state == State_ReadMemory && memReadDone)
             ? memReadValue
-            : r_Line;
+            : reg_line;
     end
 
     always_ff @(posedge clk) begin
         if (rst) begin
-            r_State <= State_None;
-            r_Line <= '0;
-            r_MissAddr <= '0;
+            reg_state <= State_None;
+            reg_line <= '0;
+            reg_miss_addr <= '0;
         end
         else begin
-            r_State <= nextState;
-            r_Line <= nextLine;
-            r_MissAddr <= miss ? missAddr : r_MissAddr;
+            reg_state <= next_state;
+            reg_line <= next_line;
+            reg_miss_addr <= miss ? missAddr : reg_miss_addr;
         end
     end
 endmodule

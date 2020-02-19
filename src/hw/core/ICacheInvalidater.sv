@@ -55,88 +55,88 @@ module ICacheInvalidater #(
     } State;
 
     // Registers
-    State r_State;
-    _index_t r_Index;
+    State reg_state;
+    _index_t reg_index;
 
-    logic r_WaitICacheInvalidate;
-    logic r_WaitTlbInvalidate;
+    logic reg_wait_icahce_invalidate;
+    logic reg_wait_tlb_invalidate;
 
-    logic r_DoICacheInvalidate;
-    logic r_DoTlbInvalidate;
+    logic reg_do_icahe_invalidate;
+    logic reg_do_tlb_invalidate;
 
     // Wires
-    State nextState;
-    _index_t nextIndex;
+    State next_state;
+    _index_t next_index;
 
-    logic nextWaitICacheInvalidate;
-    logic nextWaitTlbInvalidate;
+    logic next_wait_icache_invalidate;
+    logic next_wait_tlb_invalidate;
 
-    logic nextDoICacheInvalidate;
-    logic nextDoTlbInvalidate;
+    logic next_do_icache_invalidate;
+    logic next_do_tlb_invalidate;
 
     always_comb begin
         // Cache array access
-        arrayWriteEnable = (r_State == State_Invalidate);
-        arrayIndex = r_Index;
-        arrayWriteValid = r_DoICacheInvalidate;
+        arrayWriteEnable = (reg_state == State_Invalidate);
+        arrayIndex = reg_index;
+        arrayWriteValid = reg_do_icahe_invalidate;
         arrayWriteTag = '0;
 
         // TLB access
-        tlbInvalidate = r_DoTlbInvalidate;
+        tlbInvalidate = reg_do_tlb_invalidate;
 
         // Wires
-        if (r_State == State_Invalidate) begin
-            nextIndex = r_Index + 1;
-            nextState = (nextIndex == '0) ? State_None : State_Invalidate;
+        if (reg_state == State_Invalidate) begin
+            next_index = reg_index + 1;
+            next_state = (next_index == '0) ? State_None : State_Invalidate;
         end
         else begin
-            nextIndex = '0;
-            nextState = enable ? State_Invalidate : State_None;
+            next_index = '0;
+            next_state = enable ? State_Invalidate : State_None;
         end
 
-        if (r_State == State_None && nextState == State_Invalidate) begin
-            nextWaitICacheInvalidate = '0;
-            nextWaitTlbInvalidate = '0;
+        if (reg_state == State_None && next_state == State_Invalidate) begin
+            next_wait_icache_invalidate = '0;
+            next_wait_tlb_invalidate = '0;
         end
         else begin
-            nextWaitICacheInvalidate = r_WaitICacheInvalidate || invalidateICacheReq;
-            nextWaitTlbInvalidate = r_WaitTlbInvalidate || invalidateTlbReq;
+            next_wait_icache_invalidate = reg_wait_icahce_invalidate || invalidateICacheReq;
+            next_wait_tlb_invalidate = reg_wait_tlb_invalidate || invalidateTlbReq;
         end
 
-        if (r_State == State_None && nextState == State_Invalidate) begin
-            nextDoICacheInvalidate = r_WaitICacheInvalidate || invalidateICacheReq;
-            nextDoTlbInvalidate = r_WaitTlbInvalidate || invalidateTlbReq;
+        if (reg_state == State_None && next_state == State_Invalidate) begin
+            next_do_icache_invalidate = reg_wait_icahce_invalidate || invalidateICacheReq;
+            next_do_tlb_invalidate = reg_wait_tlb_invalidate || invalidateTlbReq;
         end
-        else if (r_State == State_Invalidate && nextState == State_None) begin
-            nextDoICacheInvalidate = '0;
-            nextDoTlbInvalidate = '0;
+        else if (reg_state == State_Invalidate && next_state == State_None) begin
+            next_do_icache_invalidate = '0;
+            next_do_tlb_invalidate = '0;
         end
         else begin
-            nextDoICacheInvalidate = r_DoICacheInvalidate;
-            nextDoTlbInvalidate = r_DoTlbInvalidate;
+            next_do_icache_invalidate = reg_do_icahe_invalidate;
+            next_do_tlb_invalidate = reg_do_tlb_invalidate;
         end
 
         // Control
-        waitInvalidate = r_WaitICacheInvalidate || r_WaitTlbInvalidate;
-        done = (r_State == State_Invalidate && nextState == State_None);
+        waitInvalidate = reg_wait_icahce_invalidate || reg_wait_tlb_invalidate;
+        done = (reg_state == State_Invalidate && next_state == State_None);
     end
 
     always_ff @(posedge clk) begin
         if (rst) begin
-            r_State <= State_None;
-            r_Index <= '0;
-            r_WaitICacheInvalidate <= '0;
-            r_WaitTlbInvalidate <= '0;
-            r_DoICacheInvalidate <= '0;
-            r_DoTlbInvalidate <= '0;
+            reg_state <= State_None;
+            reg_index <= '0;
+            reg_wait_icahce_invalidate <= '0;
+            reg_wait_tlb_invalidate <= '0;
+            reg_do_icahe_invalidate <= '0;
+            reg_do_tlb_invalidate <= '0;
         end
         else begin
-            r_State <= nextState;
-            r_Index <= nextIndex;
-            r_WaitICacheInvalidate <= nextWaitICacheInvalidate;
-            r_WaitTlbInvalidate <= nextWaitTlbInvalidate;
-            r_DoICacheInvalidate <= nextDoICacheInvalidate;
-            r_DoTlbInvalidate <= nextDoTlbInvalidate;
+            reg_state <= next_state;
+            reg_index <= next_index;
+            reg_wait_icahce_invalidate <= next_wait_icache_invalidate;
+            reg_wait_tlb_invalidate <= next_wait_tlb_invalidate;
+            reg_do_icahe_invalidate <= next_do_icache_invalidate;
+            reg_do_tlb_invalidate <= next_do_tlb_invalidate;
         end
     end
 endmodule
