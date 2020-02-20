@@ -165,7 +165,7 @@ module ExecuteStage(
         .fpResult(fpResultCvt),
         .writeFlagsValue(fflagsValueCvt),
         .writeFlags(fflagsWriteCvt),
-        .command(op.fpConverterCommand),
+        .command(op.command.fpConverter),
         .roundingMode(csr.frm),
         .intSrc(srcIntRegValue1),
         .fpSrc(srcFpRegValue1),
@@ -184,7 +184,7 @@ module ExecuteStage(
         .enable(enableFp32),
         .flush(0),
         .unit(op.fpUnitType),
-        .command(op.fpUnitCommand),
+        .command(op.command.fp),
         .roundingMode(csr.frm),
         .intSrc1(srcIntRegValue1),
         .intSrc2(srcIntRegValue2),
@@ -207,7 +207,7 @@ module ExecuteStage(
         .enable(enableFp64),
         .flush(0),
         .unit(op.fpUnitType),
-        .command(op.fpUnitCommand),
+        .command(op.command.fp),
         .roundingMode(csr.frm),
         .intSrc1(srcIntRegValue1),
         .intSrc2(srcIntRegValue2),
@@ -221,7 +221,7 @@ module ExecuteStage(
     MulDivUnit m_MulDivUnit(
         .done(doneMulDiv),
         .result(intResultMulDiv),
-        .mulDivType(op.mulDivType),
+        .mulDivType(op.command.mulDiv),
         .src1(srcIntRegValue1),
         .src2(srcIntRegValue2),
         .enable(enableMulDiv),
@@ -348,7 +348,7 @@ module ExecuteStage(
         loadStoreUnit.addr = memAddr;
         loadStoreUnit.enable = valid && (op.isLoad || op.isStore || op.isFence || op.isAtomic) && !prevStage.trapInfo.valid;
         loadStoreUnit.invalidateTlb = valid && op.isFence && op.fenceType == FenceType_Vma;
-        loadStoreUnit.loadStoreType = op.loadStoreType;
+        loadStoreUnit.loadStoreType = op.command.loadStore;
         loadStoreUnit.atomicType = op.atomicType;
         loadStoreUnit.storeRegValue = storeRegValue;
         loadStoreUnit.command = getLoadStoreUnitCommand(op);

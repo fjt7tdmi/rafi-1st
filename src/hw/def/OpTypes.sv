@@ -193,6 +193,14 @@ typedef enum logic [2:0]
     MulDivType_Remu     = 3'h7
 } MulDivType;
 
+typedef union packed
+{
+    FpConverterCommand fpConverter;
+    FpUnitCommand fp;
+    LoadStoreType loadStore;
+    MulDivType mulDiv;
+} CommandUnion;
+
 typedef enum logic [1:0]
 {
     IntRegWriteSrcType_Result   = 2'h0,
@@ -222,11 +230,8 @@ typedef struct packed
     BranchType branchType;
     FenceType fenceType;
     ExUnitType exUnitType;
-    FpConverterCommand fpConverterCommand;
     FpUnitType fpUnitType;
-    FpUnitCommand fpUnitCommand;
-    LoadStoreType loadStoreType;
-    MulDivType mulDivType;
+    CommandUnion command;
     IntRegWriteSrcType intRegWriteSrcType;
     StoreSrcType storeSrcType;
     TrapOpType trapOpType;
