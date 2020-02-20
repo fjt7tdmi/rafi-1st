@@ -23,37 +23,61 @@ import Decoder::*;
 import ProcessorTypes::*;
 
 module DecodeStage(
-    FetchStageIF.NextStage prevStage,
+    InsnBufferIF.DecodeStage insnBuffer,
     DecodeStageIF.ThisStage nextStage,
     PipelineControllerIF.DecodeStage ctrl,
     input logic clk,
     input logic rst
 );
     logic valid;
+    addr_t pc;
+    logic [31:0] insn;
+    always_comb begin
+        valid = insnBuffer.readableEntryCount >= 2;
+        pc = insnBuffer.readEntryLow.pc;
+        insn = {insnBuffer.readEntryHigh.insn, insnBuffer.readEntryLow.insn};
+    end
+
     Op op;
     csr_addr_t csrAddr;
     reg_addr_t srcRegAddr1;
     reg_addr_t srcRegAddr2;
     reg_addr_t srcRegAddr3;
     reg_addr_t dstRegAddr;
-    TrapInfo trapInfo;
-
     always_comb begin
-        valid = prevStage.valid;
-        op = Decode(prevStage.insn);
-        csrAddr = prevStage.insn[31:20];
-        srcRegAddr1 = prevStage.insn[19:15];
-        srcRegAddr2 = prevStage.insn[24:20];
-        srcRegAddr3 = prevStage.insn[31:27];
-        dstRegAddr = prevStage.insn[11:7];
+        op = Decode(insn);
+        csrAddr = insn[31:20];
+        srcRegAddr1 = insn[19:15];
+        srcRegAddr2 = insn[24:20];
+        srcRegAddr3 = insn[31:27];
+        dstRegAddr = insn[11:7];
+    end
 
-        if (valid && !prevStage.trapInfo.valid && op.isUnknown) begin
+    TrapInfo trapInfo;
+    always_comb begin
+        if (valid && insnBuffer.readEntryLow.fault) begin
+            trapInfo.valid = '1;
+            trapInfo.cause = ExceptionCode_InsnPageFault;
+            trapInfo.value = pc;
+        end
+        else if (valid && op.isUnknown) begin
             trapInfo.valid = 1;
             trapInfo.cause = ExceptionCode_IllegalInsn;
-            trapInfo.value = prevStage.insn;
+            trapInfo.value = insn;
         end
         else begin
-            trapInfo = prevStage.trapInfo;
+            trapInfo = '0;
+        end
+    end
+
+    always_comb begin
+        if (ctrl.idStall) begin
+            insnBuffer.readLow = '0;
+            insnBuffer.readHigh = '0;
+        end
+        else begin
+            insnBuffer.readLow = valid;
+            insnBuffer.readHigh = valid;
         end
     end
 
@@ -95,10 +119,10 @@ module DecodeStage(
             nextStage.trapInfo <= '0;
         end
         else begin
-            nextStage.valid <= prevStage.valid;
-            nextStage.pc <= prevStage.pc;
+            nextStage.valid <= valid;
+            nextStage.pc <= pc;
             nextStage.op <= op;
-            nextStage.insn <= prevStage.insn;
+            nextStage.insn <= insn;
             nextStage.csrAddr <= csrAddr;
             nextStage.srcRegAddr1 <= srcRegAddr1;
             nextStage.srcRegAddr2 <= srcRegAddr2;

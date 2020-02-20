@@ -41,12 +41,11 @@ module Core (
 );
     logic rstInternal;
 
-    FetchStageIF m_FetchStageIF();
+    InsnBufferIF m_InsnBufferIF();
     DecodeStageIF m_DecodeStageIF();
     RegReadStageIF m_RegReadStageIF();
     ExecuteStageIF m_ExecuteStageIF();
     PipelineControllerIF m_PipelineControllerIF();
-    InsnBufferIF m_InsnBufferIF();
     IntRegFileIF m_IntRegFileIF();
     FpRegFileIF m_FpRegFileIF();
     IntBypassLogicIF m_IntBypassLogicIF();
@@ -65,15 +64,21 @@ module Core (
     );
 
     FetchStage m_FetchStage(
-        .nextStage(m_FetchStageIF.ThisStage),
+        .insnBuffer(m_InsnBufferIF.FetchStage),
         .fetchUnit(m_FetchUnitIF.FetchStage),
         .ctrl(m_PipelineControllerIF.FetchStage),
         .csr(m_CsrIF.FetchStage),
         .clk,
         .rst(rstInternal)
     );
+    InsnBuffer m_InsnBuffer(
+        .bus(m_InsnBufferIF.InsnBuffer),
+        .ctrl(m_PipelineControllerIF.InsnBuffer),
+        .clk,
+        .rst(rstInternal)
+    );
     DecodeStage m_DecodeStage(
-        .prevStage(m_FetchStageIF.NextStage),
+        .insnBuffer(m_InsnBufferIF.InsnBuffer),
         .nextStage(m_DecodeStageIF.ThisStage),
         .ctrl(m_PipelineControllerIF.DecodeStage),
         .clk,
@@ -142,12 +147,6 @@ module Core (
         .rst(rstInternal)
     );
 
-    InsnBuffer m_InsnBuffer(
-        .bus(m_InsnBufferIF.InsnBuffer),
-        .ctrl(m_PipelineControllerIF.InsnBuffer),
-        .clk,
-        .rst(rstInternal)
-    );
     FetchUnit m_FetchUnit(
         .bus(m_FetchUnitIF.FetchUnit),
         .mem(m_BusAccessUnitIF.FetchUnit),
