@@ -22,7 +22,7 @@ import CacheTypes::*;
 import ProcessorTypes::*;
 
 module FetchStage(
-    FetchStageIF.ThisStage nextStage,
+    InsnBufferIF.FetchStage insnBuffer,
     FetchUnitIF.FetchStage fetchUnit,
     PipelineControllerIF.FetchStage ctrl,
     CsrIF.FetchStage csr,
@@ -36,39 +36,25 @@ module FetchStage(
     logic [INDEX_WIDTH-1:0] index;
     insn_t [INSN_COUNT_IN_LINE-1:0] insns;
     insn_t insn;
+    logic stall;
 
     always_comb begin
         index = fetchUnit.pc[INDEX_WIDTH+$clog2(INSN_SIZE)-1:$clog2(INSN_SIZE)];
         insns = fetchUnit.iCacheLine;
         insn = insns[index];
+        stall = ctrl.ifStall || insnBuffer.writableEntryCount < 2;
     end
 
-    always_ff @(posedge clk) begin
-        if (rst || ctrl.flush) begin
-            nextStage.valid <= '0;
-            nextStage.pc <= '0;
-            nextStage.insn <= '0;
-            nextStage.trapInfo <= '0;
-        end
-        else if (ctrl.ifStall) begin
-            nextStage.valid <= nextStage.valid;
-            nextStage.pc <= nextStage.pc;
-            nextStage.insn <= nextStage.insn;
-            nextStage.trapInfo <= nextStage.trapInfo;
-        end
-        else if (fetchUnit.fault) begin
-            nextStage.valid <= fetchUnit.valid;
-            nextStage.pc <= fetchUnit.pc;
-            nextStage.insn <= '0;
-            nextStage.trapInfo.valid <= '1;
-            nextStage.trapInfo.cause <= ExceptionCode_InsnPageFault;
-            nextStage.trapInfo.value <= fetchUnit.pc;
-        end
-        else begin
-            nextStage.valid <= fetchUnit.valid;
-            nextStage.pc <= fetchUnit.pc;
-            nextStage.insn <= insn;
-            nextStage.trapInfo <= '0;
-        end
+    always_comb begin
+        insnBuffer.writeLow = !stall && fetchUnit.valid;
+        insnBuffer.writeHigh = !stall && fetchUnit.valid;
+
+        insnBuffer.writeEntryLow.pc = fetchUnit.pc;
+        insnBuffer.writeEntryLow.fault = fetchUnit.fault;
+        insnBuffer.writeEntryLow.insn = insn[15:0];
+
+        insnBuffer.writeEntryHigh.pc = fetchUnit.pc + 2;
+        insnBuffer.writeEntryHigh.fault = fetchUnit.fault;
+        insnBuffer.writeEntryHigh.insn = insn[31:16];
     end
 endmodule
