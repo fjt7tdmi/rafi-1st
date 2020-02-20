@@ -183,22 +183,22 @@ typedef enum logic [2:0]
 
 typedef enum logic [2:0]
 {
-    MulDivType_Mul      = 3'h0,
-    MulDivType_Mulh     = 3'h1,
-    MulDivType_Mulhsu   = 3'h2,
-    MulDivType_Mulhu    = 3'h3,
-    MulDivType_Div      = 3'h4,
-    MulDivType_Divu     = 3'h5,
-    MulDivType_Rem      = 3'h6,
-    MulDivType_Remu     = 3'h7
-} MulDivType;
+    MulDivCommand_Mul      = 3'h0,
+    MulDivCommand_Mulh     = 3'h1,
+    MulDivCommand_Mulhsu   = 3'h2,
+    MulDivCommand_Mulhu    = 3'h3,
+    MulDivCommand_Div      = 3'h4,
+    MulDivCommand_Divu     = 3'h5,
+    MulDivCommand_Rem      = 3'h6,
+    MulDivCommand_Remu     = 3'h7
+} MulDivCommand;
 
 typedef union packed
 {
     FpConverterCommand fpConverter;
     FpCommandUnion fp;
     LoadStoreType loadStore;
-    MulDivType mulDiv;
+    MulDivCommand mulDiv;
 } CommandUnion;
 
 typedef enum logic [1:0]

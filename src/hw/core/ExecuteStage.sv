@@ -221,7 +221,7 @@ module ExecuteStage(
     MulDivUnit m_MulDivUnit(
         .done(doneMulDiv),
         .result(intResultMulDiv),
-        .mulDivType(op.command.mulDiv),
+        .command(op.command.mulDiv),
         .src1(srcIntRegValue1),
         .src2(srcIntRegValue2),
         .enable(enableMulDiv),

@@ -391,8 +391,6 @@ endfunction
 function automatic Op DecodeRV32M(insn_t insn);
     Op op;
 
-    MulDivType mulDivType = MulDivType'(insn[14:12]);
-
     op.aluCommand = '0;
     op.aluSrcType1 = '0;
     op.aluSrcType2 = '0;
@@ -400,7 +398,7 @@ function automatic Op DecodeRV32M(insn_t insn);
     op.branchType = '0;
     op.fenceType = '0;
     op.exUnitType = ExUnitType_MulDiv;
-    op.command.mulDiv = mulDivType;
+    op.command.mulDiv = MulDivCommand'(insn[14:12]);
     op.fpUnitType = '0;
     op.intRegWriteSrcType = IntRegWriteSrcType_Result;
     op.storeSrcType = '0;

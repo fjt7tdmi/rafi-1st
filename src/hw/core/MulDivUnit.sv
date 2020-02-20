@@ -24,7 +24,7 @@ import ProcessorTypes::*;
 module MulDivUnit(
     output logic done,
     output logic [31:0] result,
-    input MulDivType mulDivType,
+    input MulDivCommand command,
     input logic [31:0] src1,
     input logic [31:0] src2,
     input logic enable,
@@ -78,18 +78,18 @@ module MulDivUnit(
     );
 
     always_comb begin
-        mulHigh = (mulDivType == MulDivType_Mulh || mulDivType == MulDivType_Mulhsu || mulDivType == MulDivType_Mulhu);
-        mulSrcSigned1 = (mulDivType == MulDivType_Mulh || mulDivType == MulDivType_Mulhsu);
-        mulSrcSigned2 = (mulDivType == MulDivType_Mulh);
-        divSigned = (mulDivType == MulDivType_Div || mulDivType == MulDivType_Rem);
+        mulHigh = (command == MulDivCommand_Mulh || command == MulDivCommand_Mulhsu || command == MulDivCommand_Mulhu);
+        mulSrcSigned1 = (command == MulDivCommand_Mulh || command == MulDivCommand_Mulhsu);
+        mulSrcSigned2 = (command == MulDivCommand_Mulh);
+        divSigned = (command == MulDivCommand_Div || command == MulDivCommand_Rem);
     end
 
     always_comb begin
-        if (mulDivType == MulDivType_Mul || mulDivType == MulDivType_Mulh || mulDivType == MulDivType_Mulhsu || mulDivType == MulDivType_Mulhu) begin
+        if (command == MulDivCommand_Mul || command == MulDivCommand_Mulh || command == MulDivCommand_Mulhsu || command == MulDivCommand_Mulhu) begin
             done = mulDone;
             result = mulResult;
         end
-        else if (mulDivType == MulDivType_Div || mulDivType == MulDivType_Divu) begin
+        else if (command == MulDivCommand_Div || command == MulDivCommand_Divu) begin
             done = divDone;
             result = quotient;
         end
