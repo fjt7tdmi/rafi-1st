@@ -58,21 +58,6 @@ typedef enum logic [1:0]
     AluSrcType2_Csr     = 2'h3
 } AluSrcType2;
 
-typedef enum logic [4:0]
-{
-    AtomicType_LoadReserved     = 5'b00010,
-    AtomicType_StoreConditional = 5'b00011,
-    AtomicType_Swap             = 5'b00001,
-    AtomicType_Add              = 5'b00000,
-    AtomicType_Xor              = 5'b00100,
-    AtomicType_And              = 5'b01100,
-    AtomicType_Or               = 5'b01000,
-    AtomicType_Min              = 5'b10000,
-    AtomicType_Max              = 5'b10100,
-    AtomicType_Minu             = 5'b11000,
-    AtomicType_Maxu             = 5'b11100
-} AtomicType;
-
 typedef enum logic [3:0]
 {
     BranchType_Equal                = 4'b0000,
@@ -167,7 +152,22 @@ typedef union packed
     FpComparatorCommand cmp;
     FpSignUnitCommand sign;
     FpMulAddCommand mulAdd;
-} FpUnitCommand;
+} FpCommandUnion;
+
+typedef enum logic [4:0]
+{
+    AtomicType_LoadReserved     = 5'b00010,
+    AtomicType_StoreConditional = 5'b00011,
+    AtomicType_Swap             = 5'b00001,
+    AtomicType_Add              = 5'b00000,
+    AtomicType_Xor              = 5'b00100,
+    AtomicType_And              = 5'b01100,
+    AtomicType_Or               = 5'b01000,
+    AtomicType_Min              = 5'b10000,
+    AtomicType_Max              = 5'b10100,
+    AtomicType_Minu             = 5'b11000,
+    AtomicType_Maxu             = 5'b11100
+} AtomicType;
 
 typedef enum logic [2:0]
 {
@@ -181,17 +181,38 @@ typedef enum logic [2:0]
     LoadStoreType_FpWord            = 3'b111
 } LoadStoreType;
 
+typedef enum logic
+{
+    StoreSrcType_Int    = 1'h0,
+    StoreSrcType_Fp     = 1'h1
+} StoreSrcType;
+
+typedef struct packed
+{
+    AtomicType atomic;
+    LoadStoreType loadStoreType;
+    StoreSrcType storeSrc;
+} MemUnitCommand;
+
 typedef enum logic [2:0]
 {
-    MulDivType_Mul      = 3'h0,
-    MulDivType_Mulh     = 3'h1,
-    MulDivType_Mulhsu   = 3'h2,
-    MulDivType_Mulhu    = 3'h3,
-    MulDivType_Div      = 3'h4,
-    MulDivType_Divu     = 3'h5,
-    MulDivType_Rem      = 3'h6,
-    MulDivType_Remu     = 3'h7
-} MulDivType;
+    MulDivCommand_Mul      = 3'h0,
+    MulDivCommand_Mulh     = 3'h1,
+    MulDivCommand_Mulhsu   = 3'h2,
+    MulDivCommand_Mulhu    = 3'h3,
+    MulDivCommand_Div      = 3'h4,
+    MulDivCommand_Divu     = 3'h5,
+    MulDivCommand_Rem      = 3'h6,
+    MulDivCommand_Remu     = 3'h7
+} MulDivCommand;
+
+typedef union packed
+{
+    FpConverterCommand fpConverter;
+    FpCommandUnion fp;
+    MemUnitCommand mem;
+    MulDivCommand mulDiv;
+} CommandUnion;
 
 typedef enum logic [1:0]
 {
@@ -200,12 +221,6 @@ typedef enum logic [1:0]
     IntRegWriteSrcType_Memory   = 2'h2,
     IntRegWriteSrcType_Csr      = 2'h3
 } IntRegWriteSrcType;
-
-typedef enum logic
-{
-    StoreSrcType_Int    = 1'h0,
-    StoreSrcType_Fp     = 1'h1
-} StoreSrcType;
 
 typedef enum logic
 {
@@ -218,17 +233,12 @@ typedef struct packed
     AluCommand aluCommand;
     AluSrcType1 aluSrcType1;
     AluSrcType2 aluSrcType2;
-    AtomicType atomicType;
     BranchType branchType;
     FenceType fenceType;
     ExUnitType exUnitType;
-    FpConverterCommand fpConverterCommand;
     FpUnitType fpUnitType;
-    FpUnitCommand fpUnitCommand;
-    LoadStoreType loadStoreType;
-    MulDivType mulDivType;
+    CommandUnion command;
     IntRegWriteSrcType intRegWriteSrcType;
-    StoreSrcType storeSrcType;
     TrapOpType trapOpType;
     Privilege trapReturnPrivilege;
     RegType dstRegType;

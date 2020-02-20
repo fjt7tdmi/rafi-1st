@@ -62,10 +62,10 @@ function automatic LoadStoreUnitCommand getLoadStoreUnitCommand(Op op);
     else if (op.isFence && (op.fenceType == FenceType_I || op.fenceType == FenceType_Vma)) begin
         return LoadStoreUnitCommand_Invalidate;
     end
-    else if (op.isAtomic && op.atomicType == AtomicType_LoadReserved) begin
+    else if (op.isAtomic && op.command.mem.atomic == AtomicType_LoadReserved) begin
         return LoadStoreUnitCommand_LoadReserved;
     end
-    else if (op.isAtomic && op.atomicType == AtomicType_StoreConditional) begin
+    else if (op.isAtomic && op.command.mem.atomic == AtomicType_StoreConditional) begin
         return LoadStoreUnitCommand_StoreConditional;
     end
     else if (op.isAtomic) begin
@@ -165,7 +165,7 @@ module ExecuteStage(
         .fpResult(fpResultCvt),
         .writeFlagsValue(fflagsValueCvt),
         .writeFlags(fflagsWriteCvt),
-        .command(op.fpConverterCommand),
+        .command(op.command.fpConverter),
         .roundingMode(csr.frm),
         .intSrc(srcIntRegValue1),
         .fpSrc(srcFpRegValue1),
@@ -184,7 +184,7 @@ module ExecuteStage(
         .enable(enableFp32),
         .flush(0),
         .unit(op.fpUnitType),
-        .command(op.fpUnitCommand),
+        .command(op.command.fp),
         .roundingMode(csr.frm),
         .intSrc1(srcIntRegValue1),
         .intSrc2(srcIntRegValue2),
@@ -207,7 +207,7 @@ module ExecuteStage(
         .enable(enableFp64),
         .flush(0),
         .unit(op.fpUnitType),
-        .command(op.fpUnitCommand),
+        .command(op.command.fp),
         .roundingMode(csr.frm),
         .intSrc1(srcIntRegValue1),
         .intSrc2(srcIntRegValue2),
@@ -221,7 +221,7 @@ module ExecuteStage(
     MulDivUnit m_MulDivUnit(
         .done(doneMulDiv),
         .result(intResultMulDiv),
-        .mulDivType(op.mulDivType),
+        .command(op.command.mulDiv),
         .src1(srcIntRegValue1),
         .src2(srcIntRegValue2),
         .enable(enableMulDiv),
@@ -339,7 +339,7 @@ module ExecuteStage(
     always_comb begin
         memAddr = intResult;
 
-        unique case (op.storeSrcType)
+        unique case (op.command.mem.storeSrc)
         StoreSrcType_Int:   storeRegValue = {32'h0, srcIntRegValue2};
         StoreSrcType_Fp:    storeRegValue = srcFpRegValue2;
         default:            storeRegValue = '0;
@@ -348,8 +348,8 @@ module ExecuteStage(
         loadStoreUnit.addr = memAddr;
         loadStoreUnit.enable = valid && (op.isLoad || op.isStore || op.isFence || op.isAtomic) && !prevStage.trapInfo.valid;
         loadStoreUnit.invalidateTlb = valid && op.isFence && op.fenceType == FenceType_Vma;
-        loadStoreUnit.loadStoreType = op.loadStoreType;
-        loadStoreUnit.atomicType = op.atomicType;
+        loadStoreUnit.loadStoreType = op.command.mem.loadStoreType;
+        loadStoreUnit.atomicType = op.command.mem.atomic;
         loadStoreUnit.storeRegValue = storeRegValue;
         loadStoreUnit.command = getLoadStoreUnitCommand(op);
     end
