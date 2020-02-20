@@ -555,6 +555,8 @@ if (verilator_FOUND)
         src/hw/core/FetchUnitIF.sv
         src/hw/core/ICacheInvalidater.sv
         src/hw/core/ICacheReplacer.sv
+        src/hw/core/InsnBufferIF.sv
+        src/hw/core/InsnBuffer.sv
         src/hw/core/DCacheReplacer.sv
         src/hw/core/LoadStoreUnitIF.sv
         src/hw/core/LoadStoreUnit.sv

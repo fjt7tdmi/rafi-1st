@@ -46,6 +46,7 @@ module Core (
     RegReadStageIF m_RegReadStageIF();
     ExecuteStageIF m_ExecuteStageIF();
     PipelineControllerIF m_PipelineControllerIF();
+    InsnBufferIF m_InsnBufferIF();
     IntRegFileIF m_IntRegFileIF();
     FpRegFileIF m_FpRegFileIF();
     IntBypassLogicIF m_IntBypassLogicIF();
@@ -141,6 +142,12 @@ module Core (
         .rst(rstInternal)
     );
 
+    InsnBuffer m_InsnBuffer(
+        .bus(m_InsnBufferIF.InsnBuffer),
+        .ctrl(m_PipelineControllerIF.InsnBuffer),
+        .clk,
+        .rst(rstInternal)
+    );
     FetchUnit m_FetchUnit(
         .bus(m_FetchUnitIF.FetchUnit),
         .mem(m_BusAccessUnitIF.FetchUnit),

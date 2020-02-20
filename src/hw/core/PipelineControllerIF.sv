@@ -69,6 +69,11 @@ interface PipelineControllerIF;
         nextPc
     );
 
+    modport InsnBuffer(
+    input
+        flush
+    );
+
     modport PipelineController(
     output
         bypassStall,
