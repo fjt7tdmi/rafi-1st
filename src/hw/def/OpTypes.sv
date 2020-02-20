@@ -167,7 +167,7 @@ typedef union packed
     FpComparatorCommand cmp;
     FpSignUnitCommand sign;
     FpMulAddCommand mulAdd;
-} FpUnitCommand;
+} FpCommandUnion;
 
 typedef enum logic [2:0]
 {
@@ -196,7 +196,7 @@ typedef enum logic [2:0]
 typedef union packed
 {
     FpConverterCommand fpConverter;
-    FpUnitCommand fp;
+    FpCommandUnion fp;
     LoadStoreType loadStore;
     MulDivType mulDiv;
 } CommandUnion;

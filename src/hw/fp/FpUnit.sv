@@ -32,7 +32,7 @@ module FpUnit #(
     input logic enable,
     input logic flush,
     input FpUnitType unit,
-    input FpUnitCommand command,
+    input FpCommandUnion command,
     input logic [2:0] roundingMode,
     input word_t intSrc1,
     input word_t intSrc2,
