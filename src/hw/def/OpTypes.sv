@@ -154,6 +154,12 @@ typedef union packed
     FpMulAddCommand mulAdd;
 } FpCommandUnion;
 
+typedef struct packed
+{
+    FpSubUnitType unit;
+    FpCommandUnion command;
+} FpCommand;
+
 typedef enum logic [4:0]
 {
     AtomicType_LoadReserved     = 5'b00010,
@@ -214,7 +220,7 @@ typedef enum logic [2:0]
 typedef union packed
 {
     FpConverterCommand fpConverter;
-    FpCommandUnion fp;
+    FpCommand fp;
     MemUnitCommand mem;
     MulDivCommand mulDiv;
 } CommandUnion;
@@ -241,7 +247,6 @@ typedef struct packed
     AluSrcType1 aluSrcType1;
     AluSrcType2 aluSrcType2;
     BranchType branchType;
-    FpSubUnitType fpSubUnitType;
     IntRegWriteSrcType intRegWriteSrcType;
     TrapOpType trapOpType;
     Privilege trapReturnPrivilege;
