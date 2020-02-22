@@ -52,11 +52,11 @@ module RegWriteStage(
         csr.trapReturn = commit && prevStage.trapReturn;
         csr.trapReturnPrivilege = op.trapReturnPrivilege;
 
-        intRegFile.writeEnable = commit && op.regWriteEnable && op.dstRegType == RegType_Int;
+        intRegFile.writeEnable = commit && op.intRegWriteEnable;
         intRegFile.writeAddr = prevStage.dstRegAddr;
         intRegFile.writeValue = prevStage.dstIntRegValue;
 
-        fpRegFile.writeEnable = commit && op.regWriteEnable && op.dstRegType == RegType_Fp;
+        fpRegFile.writeEnable = commit && op.fpRegWriteEnable;
         fpRegFile.writeAddr = prevStage.dstRegAddr;
         fpRegFile.writeValue = prevStage.dstFpRegValue;
     end

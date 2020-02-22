@@ -241,7 +241,6 @@ typedef struct packed
     IntRegWriteSrcType intRegWriteSrcType;
     TrapOpType trapOpType;
     Privilege trapReturnPrivilege;
-    RegType dstRegType;
     word_t imm;
     logic isAtomic;
     logic isBranch;
@@ -253,7 +252,8 @@ typedef struct packed
     logic isUnknown;
     logic csrReadEnable;
     logic csrWriteEnable;
-    logic regWriteEnable;
+    logic fpRegWriteEnable;
+    logic intRegWriteEnable;
 } Op;
 
 endpackage

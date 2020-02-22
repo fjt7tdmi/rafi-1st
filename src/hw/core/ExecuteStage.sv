@@ -379,14 +379,14 @@ module ExecuteStage(
         intBypass.readAddr2 = prevStage.srcRegAddr2;
         intBypass.writeAddr = prevStage.dstRegAddr;
         intBypass.writeValue = dstIntRegValue;
-        intBypass.writeEnable = valid && op.regWriteEnable && op.dstRegType == RegType_Int && !ctrl.exStallReq;
+        intBypass.writeEnable = valid && op.intRegWriteEnable && !ctrl.exStallReq;
 
         fpBypass.readAddr1 = prevStage.srcRegAddr1;
         fpBypass.readAddr2 = prevStage.srcRegAddr2;
         fpBypass.readAddr3 = prevStage.srcRegAddr3;
         fpBypass.writeAddr = prevStage.dstRegAddr;
         fpBypass.writeValue = dstFpRegValue;
-        fpBypass.writeEnable = valid && op.regWriteEnable && op.dstRegType == RegType_Fp && !ctrl.exStallReq;
+        fpBypass.writeEnable = valid && op.fpRegWriteEnable && !ctrl.exStallReq;
     end
 
     // trapInfo
