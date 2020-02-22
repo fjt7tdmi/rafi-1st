@@ -18,9 +18,8 @@ import BasicTypes::*;
 import RvTypes::*;
 import Rv32Types::*;
 
-import CacheTypes::*;
 import RafiTypes::*;
-import TlbTypes::*;
+import CacheTypes::*;
 
 module FetchUnit (
     FetchUnitIF.FetchUnit bus,

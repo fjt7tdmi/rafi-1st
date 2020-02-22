@@ -75,6 +75,23 @@ typedef enum logic [1:0]
     CacheCommand_Invalidate = 2'h3
 } CacheCommand;
 
+typedef struct packed
+{
+    logic dirty;    // D flag of page table entry
+    logic user;     // U flag of page table entry
+    logic execute;  // E flag of page table entry
+    logic write;    // W flag of page table entry
+    logic read;     // R flag of page table entry
+} TlbEntryFlags;
+
+typedef struct packed
+{
+    logic valid;    // TLB entry valid flag. (valid == 0) will cause tlb miss.
+    logic fault;    // Fault flag written by TlbReplacer
+    physical_page_number_t pageNumber;
+    TlbEntryFlags flags;
+} TlbEntry;
+
 // ----------------------------------------------------------------------------
 
 endpackage

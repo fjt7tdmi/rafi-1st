@@ -527,7 +527,6 @@ if (verilator_FOUND)
         src/hw/def/BasicTypes.sv
         src/hw/def/Rv32Types.sv
         src/hw/def/RvTypes.sv
-        src/hw/def/TlbTypes.sv
         src/hw/def/RafiTypes.sv
         src/hw/def/CacheTypes.sv
         src/hw/def/OpTypes.sv
