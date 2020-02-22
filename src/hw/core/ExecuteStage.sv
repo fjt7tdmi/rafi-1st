@@ -19,7 +19,7 @@ import RvTypes::*;
 import Rv32Types::*;
 
 import OpTypes::*;
-import ProcessorTypes::*;
+import RafiTypes::*;
 
 function automatic word_t ALU(AluCommand command, word_t src1, word_t src2);
     unique case(command)

@@ -18,11 +18,8 @@ import BasicTypes::*;
 import RvTypes::*;
 import Rv32Types::*;
 
-import CacheTypes::*;
-import MemoryTypes::*;
 import OpTypes::*;
-import LoadStoreUnitTypes::*;
-import TlbTypes::*;
+import CacheTypes::*;
 
 module LoadStoreUnit (
     LoadStoreUnitIF.LoadStoreUnit bus,

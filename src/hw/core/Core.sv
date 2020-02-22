@@ -20,7 +20,7 @@ import Rv32Types::*;
 
 import CacheTypes::*;
 import OpTypes::*;
-import ProcessorTypes::*;
+import RafiTypes::*;
 
 module Core (
     // Debug signals

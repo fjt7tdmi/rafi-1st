@@ -18,7 +18,7 @@ import BasicTypes::*;
 import RvTypes::*;
 import Rv32Types::*;
 
-import ProcessorTypes::*;
+import RafiTypes::*;
 
 typedef logic [$clog2(INSN_BUFFER_ENTRY_COUNT)-1:0] insn_buffer_index_t;
 

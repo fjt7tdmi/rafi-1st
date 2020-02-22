@@ -19,7 +19,6 @@ import RvTypes::*;
 import Rv32Types::*;
 
 import OpTypes::*;
-import LoadStoreUnitTypes::*;
 
 interface LoadStoreUnitIF;
     addr_t addr;

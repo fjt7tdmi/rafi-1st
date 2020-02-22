@@ -18,7 +18,7 @@ import BasicTypes::*;
 import RvTypes::*;
 import Rv32Types::*;
 
-import ProcessorTypes::*;
+import RafiTypes::*;
 
 module IntRegFile(
     IntRegFileIF.RegFile bus,

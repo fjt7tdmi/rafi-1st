@@ -20,11 +20,16 @@ import BasicTypes::*;
 import RvTypes::*;
 import Rv32Types::*;
 
-typedef enum logic
+typedef enum logic [2:0]
 {
-    RegType_Int = 1'h0,
-    RegType_Fp  = 1'h1
-} RegType;
+    LoadStoreUnitCommand_None               = 3'h0,
+    LoadStoreUnitCommand_Load               = 3'h1,
+    LoadStoreUnitCommand_Store              = 3'h2,
+    LoadStoreUnitCommand_Invalidate         = 3'h3,
+    LoadStoreUnitCommand_AtomicMemOp        = 3'h4,
+    LoadStoreUnitCommand_LoadReserved       = 3'h5,
+    LoadStoreUnitCommand_StoreConditional   = 3'h6
+} LoadStoreUnitCommand;
 
 typedef enum logic [3:0]
 {

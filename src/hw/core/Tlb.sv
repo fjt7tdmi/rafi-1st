@@ -18,7 +18,7 @@ import BasicTypes::*;
 import RvTypes::*;
 import Rv32Types::*;
 
-import TlbTypes::*;
+import CacheTypes::*;
 
 module Tlb  #(
     parameter TLB_INDEX_WIDTH
