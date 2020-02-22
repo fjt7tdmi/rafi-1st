@@ -533,7 +533,6 @@ if (verilator_FOUND)
         src/hw/def/MemoryTypes.sv
         src/hw/def/OpTypes.sv
         src/hw/def/Decoder.sv
-        src/hw/def/LoadStoreUnitTypes.sv
         src/hw/div/DivUnit.sv
         src/hw/fp/FpClassifier.sv
         src/hw/fp/FpComparator.sv

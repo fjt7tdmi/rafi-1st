@@ -21,7 +21,6 @@ import Rv32Types::*;
 import CacheTypes::*;
 import MemoryTypes::*;
 import OpTypes::*;
-import LoadStoreUnitTypes::*;
 import TlbTypes::*;
 
 module LoadStoreUnit (
