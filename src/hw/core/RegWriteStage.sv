@@ -41,7 +41,7 @@ module RegWriteStage(
         commit = valid && !prevStage.trapInfo.valid;
         op = prevStage.op;
         debugPc = prevStage.pc;
-        debugInsn = prevStage.debugInsn;
+        debugInsn = prevStage.insn;
     end
 
     always_comb begin
@@ -53,11 +53,11 @@ module RegWriteStage(
         csr.trapReturnPrivilege = op.trapReturnPrivilege;
 
         intRegFile.writeEnable = commit && op.intRegWriteEnable;
-        intRegFile.writeAddr = prevStage.dstRegAddr;
+        intRegFile.writeAddr = op.rd;
         intRegFile.writeValue = prevStage.dstIntRegValue;
 
         fpRegFile.writeEnable = commit && op.fpRegWriteEnable;
-        fpRegFile.writeAddr = prevStage.dstRegAddr;
+        fpRegFile.writeAddr = op.rd;
         fpRegFile.writeValue = prevStage.dstFpRegValue;
     end
 endmodule

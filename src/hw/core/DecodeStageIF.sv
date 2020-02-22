@@ -27,10 +27,6 @@ interface DecodeStageIF;
     insn_t insn;
     Op op;
     csr_addr_t csrAddr;
-    reg_addr_t srcRegAddr1;
-    reg_addr_t srcRegAddr2;
-    reg_addr_t srcRegAddr3;
-    reg_addr_t dstRegAddr;
     TrapInfo trapInfo;
 
     modport ThisStage(
@@ -40,10 +36,6 @@ interface DecodeStageIF;
         insn,
         op,
         csrAddr,
-        srcRegAddr1,
-        srcRegAddr2,
-        srcRegAddr3,
-        dstRegAddr,
         trapInfo
     );
 
@@ -54,10 +46,6 @@ interface DecodeStageIF;
         insn,
         op,
         csrAddr,
-        srcRegAddr1,
-        srcRegAddr2,
-        srcRegAddr3,
-        dstRegAddr,
         trapInfo
     );
 endinterface

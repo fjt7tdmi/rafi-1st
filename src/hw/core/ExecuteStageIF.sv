@@ -24,10 +24,9 @@ import ProcessorTypes::*;
 interface ExecuteStageIF;
     logic valid;
     addr_t pc;
+    insn_t insn;
     Op op;
 
-    csr_addr_t csrAddr;
-    reg_addr_t dstRegAddr;
     word_t dstIntRegValue;
     uint64_t dstFpRegValue;
 
@@ -37,37 +36,31 @@ interface ExecuteStageIF;
     TrapInfo trapInfo;
     logic trapReturn;
 
-    insn_t debugInsn;
-
     modport ThisStage(
     output
         valid,
         pc,
+        insn,
         op,
-        csrAddr,
-        dstRegAddr,
         dstIntRegValue,
         dstFpRegValue,
         branchTaken,
         branchTarget,
         trapInfo,
-        trapReturn,
-        debugInsn
+        trapReturn
     );
 
     modport NextStage(
     input
         valid,
         pc,
+        insn,
         op,
-        csrAddr,
-        dstRegAddr,
         dstIntRegValue,
         dstFpRegValue,
         branchTaken,
         branchTarget,
         trapInfo,
-        trapReturn,
-        debugInsn
+        trapReturn
     );
 endinterface

@@ -381,16 +381,16 @@ module ExecuteStage(
 
     // Bypass
     always_comb begin
-        intBypass.readAddr1 = prevStage.srcRegAddr1;
-        intBypass.readAddr2 = prevStage.srcRegAddr2;
-        intBypass.writeAddr = prevStage.dstRegAddr;
+        intBypass.readAddr1 = op.rs1;
+        intBypass.readAddr2 = op.rs2;
+        intBypass.writeAddr = op.rd;
         intBypass.writeValue = dstIntRegValue;
         intBypass.writeEnable = valid && op.intRegWriteEnable && !ctrl.exStallReq;
 
-        fpBypass.readAddr1 = prevStage.srcRegAddr1;
-        fpBypass.readAddr2 = prevStage.srcRegAddr2;
-        fpBypass.readAddr3 = prevStage.srcRegAddr3;
-        fpBypass.writeAddr = prevStage.dstRegAddr;
+        fpBypass.readAddr1 = op.rs1;
+        fpBypass.readAddr2 = op.rs2;
+        fpBypass.readAddr3 = op.rs3;
+        fpBypass.writeAddr = op.rd;
         fpBypass.writeValue = dstFpRegValue;
         fpBypass.writeEnable = valid && op.fpRegWriteEnable && !ctrl.exStallReq;
     end
@@ -445,31 +445,27 @@ module ExecuteStage(
     always_ff @(posedge clk) begin
         if (rst || ctrl.exStallReq) begin
             nextStage.valid <= '0;
-            nextStage.op <= '0;
             nextStage.pc <= '0;
-            nextStage.csrAddr <= '0;
-            nextStage.dstRegAddr <= '0;
+            nextStage.insn <= '0;
+            nextStage.op <= '0;
             nextStage.dstIntRegValue <= '0;
             nextStage.dstFpRegValue <= '0;
             nextStage.branchTaken <= '0;
             nextStage.branchTarget <= '0;
             nextStage.trapInfo <= '0;
             nextStage.trapReturn <= '0;
-            nextStage.debugInsn <= '0;
         end
         else begin
             nextStage.valid <= prevStage.valid;
-            nextStage.op <= prevStage.op;
+            nextStage.insn <= prevStage.insn;
             nextStage.pc <= prevStage.pc;
-            nextStage.csrAddr <= prevStage.csrAddr;
-            nextStage.dstRegAddr <= prevStage.dstRegAddr;
+            nextStage.op <= prevStage.op;
             nextStage.dstIntRegValue <= dstIntRegValue;
             nextStage.dstFpRegValue <= dstFpRegValue;
             nextStage.branchTaken <= branchTaken;
             nextStage.branchTarget <= branchTarget;
             nextStage.trapInfo <= trapInfo;
             nextStage.trapReturn <= trapReturn;
-            nextStage.debugInsn <= prevStage.insn;
          end
     end
 

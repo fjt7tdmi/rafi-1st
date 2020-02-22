@@ -259,6 +259,10 @@ typedef struct packed
     logic csrWriteEnable;
     logic fpRegWriteEnable;
     logic intRegWriteEnable;
+    reg_addr_t rs1;
+    reg_addr_t rs2;
+    reg_addr_t rs3;
+    reg_addr_t rd;
 } Op;
 
 endpackage

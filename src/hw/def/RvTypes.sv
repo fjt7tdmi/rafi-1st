@@ -23,6 +23,9 @@ package RvTypes;
 // ----------------------------------------------------------------------------
 // parameter
 
+// Register File
+parameter REG_ADDR_WIDTH = 5;
+
 // CSR
 parameter CSR_ADDR_WIDTH = 12;
 
@@ -85,9 +88,11 @@ typedef enum logic [1:0]
     Privilege_Machine      = 2'b11
 } Privilege;
 
-typedef logic unsigned  [CSR_ADDR_WIDTH-1:0] csr_addr_t;
+typedef logic [REG_ADDR_WIDTH-1:0] reg_addr_t;
 
-typedef logic unsigned  [3:0] exception_code_t;
+typedef logic [CSR_ADDR_WIDTH-1:0] csr_addr_t;
+
+typedef logic [3:0] exception_code_t;
 
 typedef struct packed {
     logic NV;   // Invalid Operation

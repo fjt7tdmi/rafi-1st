@@ -23,14 +23,10 @@ import ProcessorTypes::*;
 
 interface RegReadStageIF;
     logic valid;
-    Op op;
     addr_t pc;
     insn_t insn;
+    Op op;
     csr_addr_t csrAddr;
-    reg_addr_t srcRegAddr1;
-    reg_addr_t srcRegAddr2;
-    reg_addr_t srcRegAddr3;
-    reg_addr_t dstRegAddr;
     word_t srcIntRegValue1;
     word_t srcIntRegValue2;
     uint64_t srcFpRegValue1;
@@ -41,38 +37,30 @@ interface RegReadStageIF;
     modport ThisStage(
     output
         valid,
-        op,
         pc,
         insn,
+        op,
         csrAddr,
-        srcRegAddr1,
-        srcRegAddr2,
-        srcRegAddr3,
         srcIntRegValue1,
         srcIntRegValue2,
         srcFpRegValue1,
         srcFpRegValue2,
         srcFpRegValue3,
-        dstRegAddr,
         trapInfo
     );
 
     modport NextStage(
     input
         valid,
-        op,
         pc,
         insn,
+        op,
         csrAddr,
-        srcRegAddr1,
-        srcRegAddr2,
-        srcRegAddr3,
         srcIntRegValue1,
         srcIntRegValue2,
         srcFpRegValue1,
         srcFpRegValue2,
         srcFpRegValue3,
-        dstRegAddr,
         trapInfo
     );
 endinterface

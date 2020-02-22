@@ -38,7 +38,6 @@ parameter INSN_SIZE = 4;
 parameter INSN_BUFFER_ENTRY_COUNT = 4;
 
 // Register File
-parameter REG_ADDR_WIDTH = 5;
 parameter REG_FILE_SIZE = 32; // Number of registers in register files
 
 // Bypass Logic
@@ -50,7 +49,6 @@ parameter BYPASS_READ_PORT_COUNT = 2;
 
 typedef logic [INSN_WIDTH-1:0] insn_t;
 typedef logic [$clog2(INSN_BUFFER_ENTRY_COUNT):0] insn_buffer_entry_count_t;
-typedef logic [REG_ADDR_WIDTH-1:0] reg_addr_t;
 
 // ----------------------------------------------------------------------------
 // struct
