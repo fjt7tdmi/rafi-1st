@@ -25,13 +25,15 @@ interface LoadStoreUnitIF;
     addr_t addr;
     logic done;
     logic enable;
-    logic fault;
     logic invalidateTlb;
     LoadStoreUnitCommand command;
     LoadStoreType loadStoreType;
     AtomicType atomicType;
     uint64_t result;
     uint64_t storeRegValue;
+
+    logic loadPagefault;
+    logic storePagefault;
 
     modport ExecuteStage(
     output
@@ -44,14 +46,16 @@ interface LoadStoreUnitIF;
         storeRegValue,
     input
         done,
-        fault,
+        loadPagefault,
+        storePagefault,
         result
     );
 
     modport LoadStoreUnit(
     output
         done,
-        fault,
+        loadPagefault,
+        storePagefault,
         result,
     input
         addr,

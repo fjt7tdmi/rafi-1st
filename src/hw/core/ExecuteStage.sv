@@ -53,23 +53,30 @@ function automatic logic BranchComparator(BranchType branchType, word_t src1, wo
 endfunction
 
 function automatic LoadStoreUnitCommand getLoadStoreUnitCommand(Op op);
-    if (op.isLoad) begin
-        return LoadStoreUnitCommand_Load;
-    end
-    else if (op.isStore) begin
-        return LoadStoreUnitCommand_Store;
-    end
-    else if (op.isFence && (op.fenceType == FenceType_I || op.fenceType == FenceType_Vma)) begin
-        return LoadStoreUnitCommand_Invalidate;
-    end
-    else if (op.isAtomic && op.command.mem.atomic == AtomicType_LoadReserved) begin
-        return LoadStoreUnitCommand_LoadReserved;
-    end
-    else if (op.isAtomic && op.command.mem.atomic == AtomicType_StoreConditional) begin
-        return LoadStoreUnitCommand_StoreConditional;
-    end
-    else if (op.isAtomic) begin
-        return LoadStoreUnitCommand_AtomicMemOp;
+    MemUnitCommand cmd = op.command.mem;
+
+    if (op.unit == ExecuteUnitType_LoadStore) begin
+        if (cmd.isLoad) begin
+            return LoadStoreUnitCommand_Load;
+        end
+        else if (cmd.isStore) begin
+            return LoadStoreUnitCommand_Store;
+        end
+        else if (cmd.isFence && cmd.fence inside {FenceType_I, FenceType_Vma}) begin
+            return LoadStoreUnitCommand_Invalidate;
+        end
+        else if (cmd.isAtomic && cmd.atomic == AtomicType_LoadReserved) begin
+            return LoadStoreUnitCommand_LoadReserved;
+        end
+        else if (cmd.isAtomic && cmd.atomic == AtomicType_StoreConditional) begin
+            return LoadStoreUnitCommand_StoreConditional;
+        end
+        else if (cmd.isAtomic) begin
+            return LoadStoreUnitCommand_AtomicMemOp;
+        end
+        else begin
+            return LoadStoreUnitCommand_None;
+        end
     end
     else begin
         return LoadStoreUnitCommand_None;
@@ -100,9 +107,9 @@ module ExecuteStage(
     logic enableFp64;
     logic enableMulDiv;
     always_comb begin
-        enableFp32 = valid && (op.exUnitType == ExUnitType_Fp32);
-        enableFp64 = valid && (op.exUnitType == ExUnitType_Fp64);
-        enableMulDiv = valid && (op.exUnitType == ExUnitType_MulDiv);
+        enableFp32 = valid && (op.unit == ExecuteUnitType_Fp32);
+        enableFp64 = valid && (op.unit == ExecuteUnitType_Fp64);
+        enableMulDiv = valid && (op.unit == ExecuteUnitType_MulDiv);
     end
 
     logic done;
@@ -110,10 +117,10 @@ module ExecuteStage(
     logic doneFp64;
     logic doneMulDiv;
     always_comb begin
-        unique case (op.exUnitType)
-        ExUnitType_Fp32:    done = doneFp32;
-        ExUnitType_Fp64:    done = doneFp64;
-        ExUnitType_MulDiv:  done = doneMulDiv;
+        unique case (op.unit)
+        ExecuteUnitType_Fp32:    done = doneFp32;
+        ExecuteUnitType_Fp64:    done = doneFp64;
+        ExecuteUnitType_MulDiv:  done = doneMulDiv;
         default:            done = 1;
         endcase
     end
@@ -183,8 +190,8 @@ module ExecuteStage(
         .done(doneFp32),
         .enable(enableFp32),
         .flush(0),
-        .unit(op.fpUnitType),
-        .command(op.command.fp),
+        .unit(op.command.fp.unit),
+        .command(op.command.fp.command),
         .roundingMode(csr.frm),
         .intSrc1(srcIntRegValue1),
         .intSrc2(srcIntRegValue2),
@@ -206,8 +213,8 @@ module ExecuteStage(
         .done(doneFp64),
         .enable(enableFp64),
         .flush(0),
-        .unit(op.fpUnitType),
-        .command(op.command.fp),
+        .unit(op.command.fp.unit),
+        .command(op.command.fp.command),
         .roundingMode(csr.frm),
         .intSrc1(srcIntRegValue1),
         .intSrc2(srcIntRegValue2),
@@ -239,16 +246,16 @@ module ExecuteStage(
         csr.writeAddr = prevStage.csrAddr;
         csr.writeValue = intResult;
 
-        unique case (op.exUnitType)
-        ExUnitType_FpConverter: begin
+        unique case (op.unit)
+        ExecuteUnitType_FpConverter: begin
             csr.write_fflags = fflagsWriteCvt;
             csr.write_fflags_value = fflagsValueCvt;
         end
-        ExUnitType_Fp32: begin
+        ExecuteUnitType_Fp32: begin
             csr.write_fflags = fflagsWrite32;
             csr.write_fflags_value = fflagsValue32;
         end
-        ExUnitType_Fp64: begin
+        ExecuteUnitType_Fp64: begin
             csr.write_fflags = fflagsWrite64;
             csr.write_fflags_value = fflagsValue64;
         end
@@ -291,11 +298,11 @@ module ExecuteStage(
     always_comb begin
         intResultAlu = ALU(op.aluCommand, aluSrc1, aluSrc2);
 
-        unique case (op.exUnitType)
-        ExUnitType_FpConverter: intResult = intResultFpCvt;
-        ExUnitType_Fp32:        intResult = intResultFp32;
-        ExUnitType_Fp64:        intResult = intResultFp64;
-        ExUnitType_MulDiv:      intResult = intResultMulDiv;
+        unique case (op.unit)
+        ExecuteUnitType_FpConverter: intResult = intResultFpCvt;
+        ExecuteUnitType_Fp32:        intResult = intResultFp32;
+        ExecuteUnitType_Fp64:        intResult = intResultFp64;
+        ExecuteUnitType_MulDiv:      intResult = intResultMulDiv;
         default:                intResult = intResultAlu;
         endcase
 
@@ -316,20 +323,19 @@ module ExecuteStage(
 
     // dstFpRegValue
     always_comb begin
-        unique case (op.exUnitType)
-        ExUnitType_FpConverter: dstFpRegValue = fpResultCvt;
-        ExUnitType_Fp32:        dstFpRegValue = {32'hffff_ffff, fpResult32};
-        ExUnitType_Fp64:        dstFpRegValue = fpResult64;
-        ExUnitType_LoadStore:   dstFpRegValue = loadStoreUnit.result;
+        unique case (op.unit)
+        ExecuteUnitType_FpConverter: dstFpRegValue = fpResultCvt;
+        ExecuteUnitType_Fp32:        dstFpRegValue = {32'hffff_ffff, fpResult32};
+        ExecuteUnitType_Fp64:        dstFpRegValue = fpResult64;
+        ExecuteUnitType_LoadStore:   dstFpRegValue = loadStoreUnit.result;
         default:                dstFpRegValue = '0;
         endcase
     end
 
     // FetchUnit
     always_comb begin
-        invalidateICache = valid && op.isFence &&
-            (op.fenceType == FenceType_I || op.fenceType == FenceType_Vma);
-        invalidateTlb = valid && op.isFence && op.fenceType == FenceType_Vma;
+        invalidateICache = valid && op.unit == ExecuteUnitType_LoadStore && op.command.mem.isFence && op.command.mem.fence inside {FenceType_I, FenceType_Vma};
+        invalidateTlb = valid && op.unit == ExecuteUnitType_LoadStore && op.command.mem.isFence && op.command.mem.fence == FenceType_Vma;
 
         fetchUnit.invalidateICache = invalidateICache;
         fetchUnit.invalidateTlb = invalidateTlb;
@@ -346,8 +352,8 @@ module ExecuteStage(
         endcase
 
         loadStoreUnit.addr = memAddr;
-        loadStoreUnit.enable = valid && (op.isLoad || op.isStore || op.isFence || op.isAtomic) && !prevStage.trapInfo.valid;
-        loadStoreUnit.invalidateTlb = valid && op.isFence && op.fenceType == FenceType_Vma;
+        loadStoreUnit.enable = valid && op.unit == ExecuteUnitType_LoadStore && !prevStage.trapInfo.valid;
+        loadStoreUnit.invalidateTlb = valid && op.unit == ExecuteUnitType_LoadStore && op.command.mem.isFence && op.command.mem.fence == FenceType_Vma;
         loadStoreUnit.loadStoreType = op.command.mem.loadStoreType;
         loadStoreUnit.atomicType = op.command.mem.atomic;
         loadStoreUnit.storeRegValue = storeRegValue;
@@ -379,14 +385,14 @@ module ExecuteStage(
         intBypass.readAddr2 = prevStage.srcRegAddr2;
         intBypass.writeAddr = prevStage.dstRegAddr;
         intBypass.writeValue = dstIntRegValue;
-        intBypass.writeEnable = valid && op.regWriteEnable && op.dstRegType == RegType_Int && !ctrl.exStallReq;
+        intBypass.writeEnable = valid && op.intRegWriteEnable && !ctrl.exStallReq;
 
         fpBypass.readAddr1 = prevStage.srcRegAddr1;
         fpBypass.readAddr2 = prevStage.srcRegAddr2;
         fpBypass.readAddr3 = prevStage.srcRegAddr3;
         fpBypass.writeAddr = prevStage.dstRegAddr;
         fpBypass.writeValue = dstFpRegValue;
-        fpBypass.writeEnable = valid && op.regWriteEnable && op.dstRegType == RegType_Fp && !ctrl.exStallReq;
+        fpBypass.writeEnable = valid && op.fpRegWriteEnable && !ctrl.exStallReq;
     end
 
     // trapInfo
@@ -419,10 +425,15 @@ module ExecuteStage(
             trapInfo.value = prevStage.insn;
             trapInfo.cause = ExceptionCode_IllegalInsn;
         end
-        else if (valid && loadStoreUnit.fault) begin
+        else if (valid && loadStoreUnit.loadPagefault) begin
             trapInfo.valid = 1;
             trapInfo.value = memAddr;
-            trapInfo.cause = op.isStore ? ExceptionCode_StorePageFault : ExceptionCode_LoadPageFault;
+            trapInfo.cause = ExceptionCode_LoadPageFault;
+        end
+        else if (valid && loadStoreUnit.storePagefault) begin
+            trapInfo.valid = 1;
+            trapInfo.value = memAddr;
+            trapInfo.cause = ExceptionCode_StorePageFault;
         end
         else begin
             trapInfo = '0;

@@ -78,25 +78,25 @@ typedef enum logic [1:0]
 
 typedef enum logic [2:0]
 {
-    ExUnitType_None         = 3'h0,
-    ExUnitType_FpConverter  = 3'h1,
-    ExUnitType_Fp32         = 3'h2,
-    ExUnitType_Fp64         = 3'h3,
-    ExUnitType_LoadStore    = 3'h4,
-    ExUnitType_MulDiv       = 3'h5
-} ExUnitType;
+    ExecuteUnitType_None         = 3'h0,
+    ExecuteUnitType_FpConverter  = 3'h1,
+    ExecuteUnitType_Fp32         = 3'h2,
+    ExecuteUnitType_Fp64         = 3'h3,
+    ExecuteUnitType_LoadStore    = 3'h4,
+    ExecuteUnitType_MulDiv       = 3'h5
+} ExecuteUnitType;
 
 typedef enum logic [2:0]
 {
-    FpUnitType_Move         = 3'h0,
-    FpUnitType_Classifier   = 3'h1,
-    FpUnitType_Sign         = 3'h2,
-    FpUnitType_Comparator   = 3'h3,
-    FpUnitType_Converter    = 3'h4,
-    FpUnitType_MulAdd       = 3'h5,
-    FpUnitType_Div          = 3'h6,
-    FpUnitType_Sqrt         = 3'h7
-} FpUnitType;
+    FpSubUnitType_Move         = 3'h0,
+    FpSubUnitType_Classifier   = 3'h1,
+    FpSubUnitType_Sign         = 3'h2,
+    FpSubUnitType_Comparator   = 3'h3,
+    FpSubUnitType_Converter    = 3'h4,
+    FpSubUnitType_MulAdd       = 3'h5,
+    FpSubUnitType_Div          = 3'h6,
+    FpSubUnitType_Sqrt         = 3'h7
+} FpSubUnitType;
 
 typedef enum logic [3:0]
 {
@@ -154,6 +154,12 @@ typedef union packed
     FpMulAddCommand mulAdd;
 } FpCommandUnion;
 
+typedef struct packed
+{
+    FpSubUnitType unit;
+    FpCommandUnion command;
+} FpCommand;
+
 typedef enum logic [4:0]
 {
     AtomicType_LoadReserved     = 5'b00010,
@@ -189,7 +195,12 @@ typedef enum logic
 
 typedef struct packed
 {
+    logic isAtomic;
+    logic isFence;
+    logic isLoad;
+    logic isStore;
     AtomicType atomic;
+    FenceType fence;
     LoadStoreType loadStoreType;
     StoreSrcType storeSrc;
 } MemUnitCommand;
@@ -209,7 +220,7 @@ typedef enum logic [2:0]
 typedef union packed
 {
     FpConverterCommand fpConverter;
-    FpCommandUnion fp;
+    FpCommand fp;
     MemUnitCommand mem;
     MulDivCommand mulDiv;
 } CommandUnion;
@@ -230,30 +241,24 @@ typedef enum logic
 
 typedef struct packed
 {
+    ExecuteUnitType unit;
+    CommandUnion command;
     AluCommand aluCommand;
     AluSrcType1 aluSrcType1;
     AluSrcType2 aluSrcType2;
     BranchType branchType;
-    FenceType fenceType;
-    ExUnitType exUnitType;
-    FpUnitType fpUnitType;
-    CommandUnion command;
     IntRegWriteSrcType intRegWriteSrcType;
     TrapOpType trapOpType;
     Privilege trapReturnPrivilege;
-    RegType dstRegType;
     word_t imm;
-    logic isAtomic;
     logic isBranch;
-    logic isFence;
-    logic isLoad;
-    logic isStore;
     logic isTrap;
     logic isTrapReturn;
     logic isUnknown;
     logic csrReadEnable;
     logic csrWriteEnable;
-    logic regWriteEnable;
+    logic fpRegWriteEnable;
+    logic intRegWriteEnable;
 } Op;
 
 endpackage

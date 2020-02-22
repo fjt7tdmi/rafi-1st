@@ -136,40 +136,34 @@ function automatic Op DecodeRV32I(insn_t insn);
     op.aluSrcType1 = AluSrcType1_Zero;
     op.aluSrcType2 = AluSrcType2_Zero;
     op.branchType = BranchType_Always;
-    op.fenceType = FenceType_Default;
-    op.exUnitType = '0;
-    op.fpUnitType = '0;
+    op.unit = '0;
     op.command = '0;
     op.intRegWriteSrcType = IntRegWriteSrcType_Result;
     op.trapOpType = TrapOpType_Ecall;
     op.trapReturnPrivilege = Privilege_User;
-    op.dstRegType = RegType_Int;
     op.imm = '0;
-    op.isAtomic = 0;
     op.isBranch = 0;
-    op.isFence = 0;
-    op.isLoad = 0;
-    op.isStore = 0;
     op.isTrap = 0;
     op.isTrapReturn = 0;
     op.isUnknown = 0;
     op.csrReadEnable = 0;
     op.csrWriteEnable = 0;
-    op.regWriteEnable = 0;
+    op.fpRegWriteEnable = 0;
+    op.intRegWriteEnable = 0;
 
     unique case (opcode)
     7'b0110111: begin
         // lui
         op.aluSrcType2 = AluSrcType2_Imm;
         op.imm = sext32({insn[31:12], 12'b0000_0000_0000});
-        op.regWriteEnable = 1;
+        op.intRegWriteEnable = 1;
     end
     7'b0010111: begin
         // auipc
         op.aluSrcType1 = AluSrcType1_Pc;
         op.aluSrcType2 = AluSrcType2_Imm;
         op.imm = sext32({insn[31:12], 12'b0000_0000_0000});
-        op.regWriteEnable = 1;
+        op.intRegWriteEnable = 1;
     end
     7'b1101111: begin
         // jal
@@ -178,7 +172,7 @@ function automatic Op DecodeRV32I(insn_t insn);
         op.intRegWriteSrcType = IntRegWriteSrcType_NextPc;
         op.imm = sext21({insn[31], insn[19:12], insn[20], insn[30:21], 1'b0});
         op.isBranch = 1;
-        op.regWriteEnable = 1;
+        op.intRegWriteEnable = 1;
     end
     7'b1100111: begin
         // jalr
@@ -187,7 +181,7 @@ function automatic Op DecodeRV32I(insn_t insn);
         op.intRegWriteSrcType = IntRegWriteSrcType_NextPc;
         op.imm = sext12(insn[31:20]);
         op.isBranch = 1;
-        op.regWriteEnable = 1;
+        op.intRegWriteEnable = 1;
     end
     7'b1100011: begin
         // beq, bne, blt, bge, bltu, bgeu
@@ -204,14 +198,18 @@ function automatic Op DecodeRV32I(insn_t insn);
         // lb, lh, lw, lbu, lhu
         op.aluSrcType1 = AluSrcType1_Reg;
         op.aluSrcType2 = AluSrcType2_Imm;
-        op.exUnitType = ExUnitType_LoadStore;
+        op.unit = ExecuteUnitType_LoadStore;
+        op.command.mem.isAtomic = 0;
+        op.command.mem.isFence = 0;
+        op.command.mem.isLoad = 1;
+        op.command.mem.isStore = 0;
         op.command.mem.atomic = '0;
+        op.command.mem.fence = '0;
         op.command.mem.loadStoreType = LoadStoreType'(funct3);
         op.command.mem.storeSrc = StoreSrcType_Int;
         op.intRegWriteSrcType = IntRegWriteSrcType_Memory;
         op.imm = sext12(insn[31:20]);
-        op.isLoad = 1;
-        op.regWriteEnable = 1;
+        op.intRegWriteEnable = 1;
         if (!IsValidLoadType(op.command.mem.loadStoreType)) begin
             op.isUnknown = 1;
         end
@@ -220,12 +218,16 @@ function automatic Op DecodeRV32I(insn_t insn);
         // sb, sh, sw
         op.aluSrcType1 = AluSrcType1_Reg;
         op.aluSrcType2 = AluSrcType2_Imm;
-        op.exUnitType = ExUnitType_LoadStore;
+        op.unit = ExecuteUnitType_LoadStore;
+        op.command.mem.isAtomic = 0;
+        op.command.mem.isFence = 0;
+        op.command.mem.isLoad = 0;
+        op.command.mem.isStore = 1;
         op.command.mem.atomic = '0;
+        op.command.mem.fence = '0;
         op.command.mem.loadStoreType = LoadStoreType'(funct3);
         op.command.mem.storeSrc = StoreSrcType_Int;
         op.imm = sext12({insn[31:25], insn[11:7]});
-        op.isStore = 1;
         if (!IsValidStoreType(op.command.mem.loadStoreType)) begin
             op.isUnknown = 1;
         end
@@ -254,13 +256,13 @@ function automatic Op DecodeRV32I(insn_t insn);
         end
         op.aluSrcType1 = AluSrcType1_Reg;
         op.aluSrcType2 = AluSrcType2_Imm;
-        op.regWriteEnable = 1;
+        op.intRegWriteEnable = 1;
     end
     7'b0110011: begin
         op.aluCommand = AluCommand'({funct7[5], funct3});
         op.aluSrcType1 = AluSrcType1_Reg;
         op.aluSrcType2 = AluSrcType2_Reg;
-        op.regWriteEnable = 1;
+        op.intRegWriteEnable = 1;
         if (!IsValidAluCommand(op.aluCommand)) begin
             op.isUnknown = 1;
         end
@@ -290,9 +292,15 @@ function automatic Op DecodeRV32I(insn_t insn);
                 op.trapReturnPrivilege = Privilege_Machine;
             end
             else if (funct7 == 7'b000_1001) begin
-                op.exUnitType = ExUnitType_LoadStore;
-                op.isFence = 1;
-                op.fenceType = FenceType_Vma;
+                op.unit = ExecuteUnitType_LoadStore;
+                op.command.mem.isFence = 1;
+                op.command.mem.isAtomic = 0;
+                op.command.mem.isLoad = 0;
+                op.command.mem.isStore = 0;
+                op.command.mem.atomic = '0;
+                op.command.mem.fence = FenceType_Vma;
+                op.command.mem.loadStoreType = '0;
+                op.command.mem.storeSrc = '0;
             end
             else begin
                 op.isUnknown = 1;
@@ -302,7 +310,7 @@ function automatic Op DecodeRV32I(insn_t insn);
             // csrrw
             op.csrReadEnable = 1;
             op.csrWriteEnable = 1;
-            op.regWriteEnable = 1;
+            op.intRegWriteEnable = 1;
             op.intRegWriteSrcType = IntRegWriteSrcType_Csr;
             op.aluCommand = AluCommand_Add;
             op.aluSrcType1 = AluSrcType1_Reg;
@@ -312,7 +320,7 @@ function automatic Op DecodeRV32I(insn_t insn);
             // csrrs
             op.csrReadEnable = 1;
             op.csrWriteEnable = 1;
-            op.regWriteEnable = 1;
+            op.intRegWriteEnable = 1;
             op.intRegWriteSrcType = IntRegWriteSrcType_Csr;
             op.aluCommand = AluCommand_Or;
             op.aluSrcType1 = AluSrcType1_Reg;
@@ -322,7 +330,7 @@ function automatic Op DecodeRV32I(insn_t insn);
             // csrrc
             op.csrReadEnable = 1;
             op.csrWriteEnable = 1;
-            op.regWriteEnable = 1;
+            op.intRegWriteEnable = 1;
             op.intRegWriteSrcType = IntRegWriteSrcType_Csr;
             op.aluCommand = AluCommand_Clear2;
             op.aluSrcType1 = AluSrcType1_Reg;
@@ -332,7 +340,7 @@ function automatic Op DecodeRV32I(insn_t insn);
             // csrrwi
             op.csrReadEnable = 1;
             op.csrWriteEnable = 1;
-            op.regWriteEnable = 1;
+            op.intRegWriteEnable = 1;
             op.intRegWriteSrcType = IntRegWriteSrcType_Csr;
             op.imm = zext5(zimm);
             op.aluCommand = AluCommand_Add;
@@ -343,7 +351,7 @@ function automatic Op DecodeRV32I(insn_t insn);
             // csrrsi
             op.csrReadEnable = 1;
             op.csrWriteEnable = (rs1 == 5'b00000) ? 0 : 1;
-            op.regWriteEnable = 1;
+            op.intRegWriteEnable = 1;
             op.intRegWriteSrcType = IntRegWriteSrcType_Csr;
             op.imm = zext5(zimm);
             op.aluCommand = AluCommand_Or;
@@ -354,7 +362,7 @@ function automatic Op DecodeRV32I(insn_t insn);
             // csrrci
             op.csrReadEnable = 1;
             op.csrWriteEnable = (rs1 == 5'b00000) ? 0 : 1;
-            op.regWriteEnable = 1;
+            op.intRegWriteEnable = 1;
             op.intRegWriteSrcType = IntRegWriteSrcType_Csr;
             op.imm = zext5(zimm);
             op.aluCommand = AluCommand_Clear1;
@@ -368,15 +376,27 @@ function automatic Op DecodeRV32I(insn_t insn);
     7'b0001111: begin
         if (funct3 == 3'b000 && rd == 5'b00000 && rs1 == 5'b00000 && csr[11:8] == 4'b0000) begin
             // FENCE
-            op.exUnitType = ExUnitType_LoadStore;
-            op.isFence = 1;
-            op.fenceType = FenceType_Default;
+            op.unit = ExecuteUnitType_LoadStore;
+            op.command.mem.isFence = 1;
+            op.command.mem.isAtomic = 0;
+            op.command.mem.isLoad = 0;
+            op.command.mem.isStore = 0;
+            op.command.mem.atomic = '0;
+            op.command.mem.fence = FenceType_Default;
+            op.command.mem.loadStoreType = '0;
+            op.command.mem.storeSrc = '0;
         end
         else if (funct3 == 3'b001 && rd == 5'b00000 && rs1 == 5'b00000 && csr == 12'h000) begin
             // FENCE.I
-            op.exUnitType = ExUnitType_LoadStore;
-            op.isFence = 1;
-            op.fenceType = FenceType_I;
+            op.unit = ExecuteUnitType_LoadStore;
+            op.command.mem.isFence = 1;
+            op.command.mem.isAtomic = 0;
+            op.command.mem.isLoad = 0;
+            op.command.mem.isStore = 0;
+            op.command.mem.atomic = '0;
+            op.command.mem.fence = FenceType_I;
+            op.command.mem.loadStoreType = '0;
+            op.command.mem.storeSrc = '0;
         end
         else begin
             op.isUnknown = 1;
@@ -397,26 +417,20 @@ function automatic Op DecodeRV32M(insn_t insn);
     op.aluSrcType1 = '0;
     op.aluSrcType2 = '0;
     op.branchType = '0;
-    op.fenceType = '0;
-    op.exUnitType = ExUnitType_MulDiv;
+    op.unit = ExecuteUnitType_MulDiv;
     op.command.mulDiv = MulDivCommand'(insn[14:12]);
-    op.fpUnitType = '0;
     op.intRegWriteSrcType = IntRegWriteSrcType_Result;
     op.trapOpType = '0;
     op.trapReturnPrivilege = '0;
-    op.dstRegType = RegType_Int;
     op.imm = '0;
-    op.isAtomic = 0;
     op.isBranch = 0;
-    op.isFence = 0;
-    op.isLoad = 0;
-    op.isStore = 0;
     op.isTrap = 0;
     op.isTrapReturn = 0;
     op.isUnknown = 0;
     op.csrReadEnable = 0;
     op.csrWriteEnable = 0;
-    op.regWriteEnable = 1;
+    op.fpRegWriteEnable = 0;
+    op.intRegWriteEnable = 1;
 
     return op;
 endfunction
@@ -444,28 +458,27 @@ function automatic Op DecodeRV32A(insn_t insn);
     op.aluSrcType1 = AluSrcType1_Reg;           // for address calculation
     op.aluSrcType2 = AluSrcType2_Zero;          // for address calculation
     op.branchType = '0;
-    op.fenceType = '0;
-    op.exUnitType = ExUnitType_LoadStore;
+    op.unit = ExecuteUnitType_LoadStore;
+    op.command.mem.isAtomic = 1;
+    op.command.mem.isFence = 0;
+    op.command.mem.isLoad = 0;
+    op.command.mem.isStore = 0;
     op.command.mem.atomic = atomicType;
+    op.command.mem.fence = '0;
     op.command.mem.loadStoreType = LoadStoreType_UnsignedWord;
     op.command.mem.storeSrc = '0;
-    op.fpUnitType = '0;
     op.intRegWriteSrcType = IntRegWriteSrcType_Memory;
     op.trapOpType = '0;
     op.trapReturnPrivilege = '0;
-    op.dstRegType = RegType_Int;
     op.imm = '0;
-    op.isAtomic = 1;
     op.isBranch = 0;
-    op.isFence = 0;
-    op.isLoad = 0;
-    op.isStore = 0;
     op.isTrap = 0;
     op.isTrapReturn = 0;
     op.isUnknown = !isSupportedAtomicOp;
     op.csrReadEnable = 0;
     op.csrWriteEnable = 0;
-    op.regWriteEnable = 1;
+    op.fpRegWriteEnable = 0;
+    op.intRegWriteEnable = 1;
 
     return op;
 endfunction
@@ -484,26 +497,20 @@ function automatic Op DecodeRV32F(insn_t insn);
     op.aluSrcType1 = '0;
     op.aluSrcType2 = '0;
     op.branchType = '0;
-    op.fenceType = '0;
-    op.fpUnitType = '0;
-    op.exUnitType = ExUnitType_Fp32;
+    op.unit = ExecuteUnitType_Fp32;
     op.command = '0;
     op.intRegWriteSrcType = '0;
     op.trapOpType = '0;
     op.trapReturnPrivilege = '0;
-    op.dstRegType = '0;
     op.imm = '0;
-    op.isAtomic = 0;
     op.isBranch = 0;
-    op.isFence = 0;
-    op.isLoad = 0;
-    op.isStore = 0;
     op.isTrap = 0;
     op.isTrapReturn = 0;
     op.isUnknown = '0;
     op.csrReadEnable = 0;
     op.csrWriteEnable = 0;
-    op.regWriteEnable = 0;
+    op.fpRegWriteEnable = 0;
+    op.intRegWriteEnable = 0;
 
     unique case (opcode)
     7'b0000111: begin
@@ -511,15 +518,18 @@ function automatic Op DecodeRV32F(insn_t insn);
             // FLW
             op.aluSrcType1 = AluSrcType1_Reg;
             op.aluSrcType2 = AluSrcType2_Imm;
-            op.exUnitType = ExUnitType_LoadStore;
+            op.unit = ExecuteUnitType_LoadStore;
+            op.command.mem.isAtomic = 0;
+            op.command.mem.isFence = 0;
+            op.command.mem.isLoad = 1;
+            op.command.mem.isStore = 0;
             op.command.mem.atomic ='0;
+            op.command.mem.fence = '0;
             op.command.mem.loadStoreType = LoadStoreType_FpWord;
             op.command.mem.storeSrc = StoreSrcType_Fp;
             op.intRegWriteSrcType = IntRegWriteSrcType_Memory;
             op.imm = sext12(insn[31:20]);
-            op.isLoad = 1;
-            op.regWriteEnable = 1;
-            op.dstRegType = RegType_Fp;
+            op.fpRegWriteEnable = 1;
         end
         else begin
             op.isUnknown = 1;
@@ -530,13 +540,16 @@ function automatic Op DecodeRV32F(insn_t insn);
             // FSW
             op.aluSrcType1 = AluSrcType1_Reg;
             op.aluSrcType2 = AluSrcType2_Imm;
-            op.exUnitType = ExUnitType_LoadStore;
+            op.unit = ExecuteUnitType_LoadStore;
+            op.command.mem.isAtomic = 0;
+            op.command.mem.isFence = 0;
+            op.command.mem.isLoad = 0;
+            op.command.mem.isStore = 1;
             op.command.mem.atomic ='0;
+            op.command.mem.fence = '0;
             op.command.mem.loadStoreType = LoadStoreType_FpWord;
             op.command.mem.storeSrc = StoreSrcType_Fp;
             op.imm = sext12({insn[31:25], insn[11:7]});
-            op.isStore = 1;
-            op.dstRegType = RegType_Fp;
         end
         else begin
             op.isUnknown = 1;
@@ -545,10 +558,9 @@ function automatic Op DecodeRV32F(insn_t insn);
     7'b1000011: begin
         if (funct2 == 2'b00) begin
             // FMADD.S
-            op.fpUnitType = FpUnitType_MulAdd;
-            op.command.fp.mulAdd = FpMulAddCommand_FMADD;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_MulAdd;
+            op.command.fp.command.mulAdd = FpMulAddCommand_FMADD;
+            op.fpRegWriteEnable = 1;
         end
         else begin
             op.isUnknown = 1;
@@ -557,10 +569,9 @@ function automatic Op DecodeRV32F(insn_t insn);
     7'b1000111: begin
         if (funct2 == 2'b00) begin
             // FMSUB.S
-            op.fpUnitType = FpUnitType_MulAdd;
-            op.command.fp.mulAdd = FpMulAddCommand_FMSUB;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_MulAdd;
+            op.command.fp.command.mulAdd = FpMulAddCommand_FMSUB;
+            op.fpRegWriteEnable = 1;
         end
         else begin
             op.isUnknown = 1;
@@ -569,10 +580,9 @@ function automatic Op DecodeRV32F(insn_t insn);
     7'b1001011: begin
         if (funct2 == 2'b00) begin
             // FNMSUB.S
-            op.fpUnitType = FpUnitType_MulAdd;
-            op.command.fp.mulAdd = FpMulAddCommand_FNMSUB;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_MulAdd;
+            op.command.fp.command.mulAdd = FpMulAddCommand_FNMSUB;
+            op.fpRegWriteEnable = 1;
         end
         else begin
             op.isUnknown = 1;
@@ -581,10 +591,9 @@ function automatic Op DecodeRV32F(insn_t insn);
     7'b1001111: begin
         if (funct2 == 2'b00) begin
             // FNMSUB.S
-            op.fpUnitType = FpUnitType_MulAdd;
-            op.command.fp.mulAdd = FpMulAddCommand_FNMADD;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_MulAdd;
+            op.command.fp.command.mulAdd = FpMulAddCommand_FNMADD;
+            op.fpRegWriteEnable = 1;
         end
         else begin
             op.isUnknown = 1;
@@ -593,138 +602,118 @@ function automatic Op DecodeRV32F(insn_t insn);
     7'b1010011: begin
         if (funct7 == 7'b0000000) begin
             // FADD.S
-            op.fpUnitType = FpUnitType_MulAdd;
-            op.command.fp.mulAdd = FpMulAddCommand_FADD;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_MulAdd;
+            op.command.fp.command.mulAdd = FpMulAddCommand_FADD;
+            op.fpRegWriteEnable = 1;
         end
         else if (funct7 == 7'b0000100) begin
             // FSUB.S
-            op.fpUnitType = FpUnitType_MulAdd;
-            op.command.fp.mulAdd = FpMulAddCommand_FSUB;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_MulAdd;
+            op.command.fp.command.mulAdd = FpMulAddCommand_FSUB;
+            op.fpRegWriteEnable = 1;
         end
         else if (funct7 == 7'b0001000) begin
             // FMUL.S
-            op.fpUnitType = FpUnitType_MulAdd;
-            op.command.fp.mulAdd = FpMulAddCommand_FMUL;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_MulAdd;
+            op.command.fp.command.mulAdd = FpMulAddCommand_FMUL;
+            op.fpRegWriteEnable = 1;
         end
         else if (funct7 == 7'b0001100) begin
             // FDIV.S
-            op.fpUnitType = FpUnitType_Div;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_Div;
+            op.fpRegWriteEnable = 1;
         end
         else if (funct7 == 7'b0101100 && rs2 == 5'b00000) begin
             // FSQRT.S
-            op.fpUnitType = FpUnitType_Sqrt;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_Sqrt;
+            op.fpRegWriteEnable = 1;
         end
         else if (funct7 == 7'b0010000 && rm == 3'b000) begin
             // FSGNJ.S
-            op.fpUnitType = FpUnitType_Sign;
-            op.command.fp.sign = FpSignUnitCommand_Sgnj;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_Sign;
+            op.command.fp.command.sign = FpSignUnitCommand_Sgnj;
+            op.fpRegWriteEnable = 1;
         end
         else if (funct7 == 7'b0010000 && rm == 3'b001) begin
             // FSGNJN.S
-            op.fpUnitType = FpUnitType_Sign;
-            op.command.fp.sign = FpSignUnitCommand_Sgnjn;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_Sign;
+            op.command.fp.command.sign = FpSignUnitCommand_Sgnjn;
+            op.fpRegWriteEnable = 1;
         end
         else if (funct7 == 7'b0010000 && rm == 3'b010) begin
             // FSGNJX.S
-            op.fpUnitType = FpUnitType_Sign;
-            op.command.fp.sign = FpSignUnitCommand_Sgnjx;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_Sign;
+            op.command.fp.command.sign = FpSignUnitCommand_Sgnjx;
+            op.fpRegWriteEnable = 1;
         end
         else if (funct7 == 7'b0010100 && rm == 3'b000) begin
             // FMIN.S
-            op.fpUnitType = FpUnitType_Comparator;
-            op.command.fp.cmp = FpComparatorCommand_Min;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_Comparator;
+            op.command.fp.command.cmp = FpComparatorCommand_Min;
+            op.fpRegWriteEnable = 1;
         end
         else if (funct7 == 7'b0010100 && rm == 3'b001) begin
             // FMAX.S
-            op.fpUnitType = FpUnitType_Comparator;
-            op.command.fp.cmp = FpComparatorCommand_Max;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_Comparator;
+            op.command.fp.command.cmp = FpComparatorCommand_Max;
+            op.fpRegWriteEnable = 1;
         end
         else if (funct7 == 7'b1100000 && rs2 == 5'b00000) begin
             // FCVT.W.S
-            op.exUnitType = ExUnitType_FpConverter;
+            op.unit = ExecuteUnitType_FpConverter;
             op.command.fpConverter = FpConverterCommand_W_S;
-            op.dstRegType = RegType_Int;
-            op.regWriteEnable = 1;
+            op.intRegWriteEnable = 1;
         end
         else if (funct7 == 7'b1100000 && rs2 == 5'b00001) begin
             // FCVT.WU.S
-            op.exUnitType = ExUnitType_FpConverter;
+            op.unit = ExecuteUnitType_FpConverter;
             op.command.fpConverter = FpConverterCommand_WU_S;
-            op.dstRegType = RegType_Int;
-            op.regWriteEnable = 1;
-        end
+            op.intRegWriteEnable = 1;
+         end
         else if (funct7 == 7'b1110000 && rs2 == 5'b00000 && rm == 3'b000) begin
             // FMV.X.W
-            op.fpUnitType = FpUnitType_Move;
-            op.dstRegType = RegType_Int;
-            op.regWriteEnable = 1;
-        end
+            op.command.fp.unit = FpSubUnitType_Move;
+            op.intRegWriteEnable = 1;
+         end
         else if (funct7 == 7'b1010000 && rm == 3'b010) begin
             // FEQ.S
-            op.fpUnitType = FpUnitType_Comparator;
-            op.command.fp.cmp = FpComparatorCommand_Eq;
-            op.dstRegType = RegType_Int;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_Comparator;
+            op.command.fp.command.cmp = FpComparatorCommand_Eq;
+             op.intRegWriteEnable = 1;
         end
         else if (funct7 == 7'b1010000 && rm == 3'b001) begin
             // FLT.S
-            op.fpUnitType = FpUnitType_Comparator;
-            op.command.fp.cmp = FpComparatorCommand_Lt;
-            op.dstRegType = RegType_Int;
-            op.regWriteEnable = 1;
-        end
+            op.command.fp.unit = FpSubUnitType_Comparator;
+            op.command.fp.command.cmp = FpComparatorCommand_Lt;
+            op.intRegWriteEnable = 1;
+         end
         else if (funct7 == 7'b1010000 && rm == 3'b000) begin
             // FLE.S
-            op.fpUnitType = FpUnitType_Comparator;
-            op.command.fp.cmp = FpComparatorCommand_Le;
-            op.dstRegType = RegType_Int;
-            op.regWriteEnable = 1;
-        end
+            op.command.fp.unit = FpSubUnitType_Comparator;
+            op.command.fp.command.cmp = FpComparatorCommand_Le;
+            op.intRegWriteEnable = 1;
+         end
         else if (funct7 == 7'b1110000 && rs2 == 5'b00000 && rm == 3'b001) begin
             // FCLASS.S
-            op.fpUnitType = FpUnitType_Classifier;
-            op.dstRegType = RegType_Int;
-            op.regWriteEnable = 1;
-        end
+            op.command.fp.unit = FpSubUnitType_Classifier;
+            op.intRegWriteEnable = 1;
+         end
         else if (funct7 == 7'b1101000 && rs2 == 5'b00000) begin
             // FCVT.S.W
-            op.exUnitType = ExUnitType_FpConverter;
+            op.unit = ExecuteUnitType_FpConverter;
             op.command.fpConverter = FpConverterCommand_S_W;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
-        end
+            op.fpRegWriteEnable = 1;
+         end
         else if (funct7 == 7'b1101000 && rs2 == 5'b00001) begin
             // FCVT.S.WU
-            op.exUnitType = ExUnitType_FpConverter;
+            op.unit = ExecuteUnitType_FpConverter;
             op.command.fpConverter = FpConverterCommand_S_WU;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.fpRegWriteEnable = 1;
         end
         else if (funct7 == 7'b1111000 && rs2 == 5'b00000 && rm == 3'b000) begin
             // FMV.W.X
-            op.fpUnitType = FpUnitType_Move;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_Move;
+            op.fpRegWriteEnable = 1;
         end
         else begin
             op.isUnknown = 1;
@@ -752,26 +741,21 @@ function automatic Op DecodeRV32D(insn_t insn);
     op.aluSrcType1 = '0;
     op.aluSrcType2 = '0;
     op.branchType = '0;
-    op.fenceType = '0;
-    op.fpUnitType = '0;
-    op.exUnitType = ExUnitType_Fp64;
+    op.command.fp.unit = '0;
+    op.unit = ExecuteUnitType_Fp64;
     op.command = '0;
     op.intRegWriteSrcType = '0;
     op.trapOpType = '0;
     op.trapReturnPrivilege = '0;
-    op.dstRegType = '0;
     op.imm = '0;
-    op.isAtomic = 0;
     op.isBranch = 0;
-    op.isFence = 0;
-    op.isLoad = 0;
-    op.isStore = 0;
     op.isTrap = 0;
     op.isTrapReturn = 0;
     op.isUnknown = '0;
     op.csrReadEnable = 0;
     op.csrWriteEnable = 0;
-    op.regWriteEnable = 0;
+    op.intRegWriteEnable = 0;
+    op.fpRegWriteEnable = 0;
 
     unique case (opcode)
     7'b0000111: begin
@@ -779,15 +763,18 @@ function automatic Op DecodeRV32D(insn_t insn);
             // FLD
             op.aluSrcType1 = AluSrcType1_Reg;
             op.aluSrcType2 = AluSrcType2_Imm;
-            op.exUnitType = ExUnitType_LoadStore;
+            op.unit = ExecuteUnitType_LoadStore;
+            op.command.mem.isAtomic = 0;
+            op.command.mem.isFence = 0;
+            op.command.mem.isLoad = 1;
+            op.command.mem.isStore = 0;
             op.command.mem.atomic = '0;
+            op.command.mem.fence = '0;
             op.command.mem.loadStoreType = LoadStoreType_DoubleWord;
             op.command.mem.storeSrc = StoreSrcType_Fp;
             op.intRegWriteSrcType = IntRegWriteSrcType_Memory;
             op.imm = sext12(insn[31:20]);
-            op.isLoad = 1;
-            op.regWriteEnable = 1;
-            op.dstRegType = RegType_Fp;
+            op.fpRegWriteEnable = 1;
         end
         else begin
             op.isUnknown = 1;
@@ -798,13 +785,16 @@ function automatic Op DecodeRV32D(insn_t insn);
             // FSD
             op.aluSrcType1 = AluSrcType1_Reg;
             op.aluSrcType2 = AluSrcType2_Imm;
-            op.exUnitType = ExUnitType_LoadStore;
+            op.unit = ExecuteUnitType_LoadStore;
+            op.command.mem.isAtomic = 0;
+            op.command.mem.isFence = 0;
+            op.command.mem.isLoad = 0;
+            op.command.mem.isStore = 1;
             op.command.mem.atomic = '0;
+            op.command.mem.fence = '0;
             op.command.mem.loadStoreType = LoadStoreType_DoubleWord;
             op.command.mem.storeSrc = StoreSrcType_Fp;
             op.imm = sext12({insn[31:25], insn[11:7]});
-            op.isStore = 1;
-            op.dstRegType = RegType_Fp;
         end
         else begin
             op.isUnknown = 1;
@@ -813,10 +803,9 @@ function automatic Op DecodeRV32D(insn_t insn);
     7'b1000011: begin
         if (funct2 == 2'b01) begin
             // FMADD.D
-            op.fpUnitType = FpUnitType_MulAdd;
-            op.command.fp.mulAdd = FpMulAddCommand_FMADD;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_MulAdd;
+            op.command.fp.command.mulAdd = FpMulAddCommand_FMADD;
+            op.fpRegWriteEnable = 1;
         end
         else begin
             op.isUnknown = 1;
@@ -825,10 +814,9 @@ function automatic Op DecodeRV32D(insn_t insn);
     7'b1000111: begin
         if (funct2 == 2'b01) begin
             // FMSUB.D
-            op.fpUnitType = FpUnitType_MulAdd;
-            op.command.fp.mulAdd = FpMulAddCommand_FMSUB;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_MulAdd;
+            op.command.fp.command.mulAdd = FpMulAddCommand_FMSUB;
+            op.fpRegWriteEnable = 1;
         end
         else begin
             op.isUnknown = 1;
@@ -837,10 +825,9 @@ function automatic Op DecodeRV32D(insn_t insn);
     7'b1001011: begin
         if (funct2 == 2'b01) begin
             // FNMSUB.D
-            op.fpUnitType = FpUnitType_MulAdd;
-            op.command.fp.mulAdd = FpMulAddCommand_FNMSUB;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_MulAdd;
+            op.command.fp.command.mulAdd = FpMulAddCommand_FNMSUB;
+            op.fpRegWriteEnable = 1;
         end
         else begin
             op.isUnknown = 1;
@@ -849,10 +836,9 @@ function automatic Op DecodeRV32D(insn_t insn);
     7'b1001111: begin
         if (funct2 == 2'b01) begin
             // FNMSUB.D
-            op.fpUnitType = FpUnitType_MulAdd;
-            op.command.fp.mulAdd = FpMulAddCommand_FNMADD;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_MulAdd;
+            op.command.fp.command.mulAdd = FpMulAddCommand_FNMADD;
+            op.fpRegWriteEnable = 1;
         end
         else begin
             op.isUnknown = 1;
@@ -861,140 +847,120 @@ function automatic Op DecodeRV32D(insn_t insn);
     7'b1010011: begin
         if (funct7 == 7'b0000001) begin
             // FADD.D
-            op.fpUnitType = FpUnitType_MulAdd;
-            op.command.fp.mulAdd = FpMulAddCommand_FADD;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_MulAdd;
+            op.command.fp.command.mulAdd = FpMulAddCommand_FADD;
+            op.fpRegWriteEnable = 1;
         end
         else if (funct7 == 7'b0000101) begin
             // FSUB.D
-            op.fpUnitType = FpUnitType_MulAdd;
-            op.command.fp.mulAdd = FpMulAddCommand_FSUB;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_MulAdd;
+            op.command.fp.command.mulAdd = FpMulAddCommand_FSUB;
+            op.fpRegWriteEnable = 1;
         end
         else if (funct7 == 7'b0001001) begin
             // FMUL.D
-            op.fpUnitType = FpUnitType_MulAdd;
-            op.command.fp.mulAdd = FpMulAddCommand_FMUL;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_MulAdd;
+            op.command.fp.command.mulAdd = FpMulAddCommand_FMUL;
+            op.fpRegWriteEnable = 1;
         end
         else if (funct7 == 7'b0001101) begin
             // FDIV.D
-            op.fpUnitType = FpUnitType_Div;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_Div;
+            op.fpRegWriteEnable = 1;
         end
         else if (funct7 == 7'b0101101 && rs2 == 5'b00000) begin
             // FSQRT.D
-            op.fpUnitType = FpUnitType_Sqrt;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_Sqrt;
+            op.fpRegWriteEnable = 1;
         end
         else if (funct7 == 7'b0010001 && rm == 3'b000) begin
             // FSGNJ.D
-            op.fpUnitType = FpUnitType_Sign;
-            op.command.fp.sign = FpSignUnitCommand_Sgnj;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_Sign;
+            op.command.fp.command.sign = FpSignUnitCommand_Sgnj;
+            op.fpRegWriteEnable = 1;
         end
         else if (funct7 == 7'b0010001 && rm == 3'b001) begin
             // FSGNJN.D
-            op.fpUnitType = FpUnitType_Sign;
-            op.command.fp.sign = FpSignUnitCommand_Sgnjn;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_Sign;
+            op.command.fp.command.sign = FpSignUnitCommand_Sgnjn;
+            op.fpRegWriteEnable = 1;
         end
         else if (funct7 == 7'b0010001 && rm == 3'b010) begin
             // FSGNJX.D
-            op.fpUnitType = FpUnitType_Sign;
-            op.command.fp.sign = FpSignUnitCommand_Sgnjx;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_Sign;
+            op.command.fp.command.sign = FpSignUnitCommand_Sgnjx;
+            op.fpRegWriteEnable = 1;
         end
         else if (funct7 == 7'b0010101 && rm == 3'b000) begin
             // FMIN.D
-            op.fpUnitType = FpUnitType_Comparator;
-            op.command.fp.cmp = FpComparatorCommand_Min;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_Comparator;
+            op.command.fp.command.cmp = FpComparatorCommand_Min;
+            op.fpRegWriteEnable = 1;
         end
         else if (funct7 == 7'b0010101 && rm == 3'b001) begin
             // FMAX.D
-            op.fpUnitType = FpUnitType_Comparator;
-            op.command.fp.cmp = FpComparatorCommand_Max;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_Comparator;
+            op.command.fp.command.cmp = FpComparatorCommand_Max;
+            op.fpRegWriteEnable = 1;
         end
         else if (funct7 == 7'b0100000 && rs2 == 5'b00001) begin
             // FCVT.S.D
-            op.exUnitType = ExUnitType_FpConverter;
+            op.unit = ExecuteUnitType_FpConverter;
             op.command.fpConverter = FpConverterCommand_S_D;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.fpRegWriteEnable = 1;
         end
         else if (funct7 == 7'b0100001 && rs2 == 5'b00000) begin
             // FCVT.D.S
-            op.exUnitType = ExUnitType_FpConverter;
+            op.unit = ExecuteUnitType_FpConverter;
             op.command.fpConverter = FpConverterCommand_D_S;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.fpRegWriteEnable = 1;
         end
         else if (funct7 == 7'b1010001 && rm == 3'b010) begin
             // FEQ.D
-            op.fpUnitType = FpUnitType_Comparator;
-            op.command.fp.cmp = FpComparatorCommand_Eq;
-            op.dstRegType = RegType_Int;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_Comparator;
+            op.command.fp.command.cmp = FpComparatorCommand_Eq;
+            op.intRegWriteEnable = 1;
         end
         else if (funct7 == 7'b1010001 && rm == 3'b001) begin
             // FLT.S
-            op.fpUnitType = FpUnitType_Comparator;
-            op.command.fp.cmp = FpComparatorCommand_Lt;
-            op.dstRegType = RegType_Int;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_Comparator;
+            op.command.fp.command.cmp = FpComparatorCommand_Lt;
+            op.intRegWriteEnable = 1;
         end
         else if (funct7 == 7'b1010001 && rm == 3'b000) begin
             // FLE.D
-            op.fpUnitType = FpUnitType_Comparator;
-            op.command.fp.cmp = FpComparatorCommand_Le;
-            op.dstRegType = RegType_Int;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_Comparator;
+            op.command.fp.command.cmp = FpComparatorCommand_Le;
+            op.intRegWriteEnable = 1;
         end
         else if (funct7 == 7'b1110001 && rs2 == 5'b00000 && rm == 3'b001) begin
             // FCLASS.D
-            op.fpUnitType = FpUnitType_Classifier;
-            op.dstRegType = RegType_Int;
-            op.regWriteEnable = 1;
+            op.command.fp.unit = FpSubUnitType_Classifier;
+            op.intRegWriteEnable = 1;
         end
         else if (funct7 == 7'b1100001 && rs2 == 5'b00000) begin
             // FCVT.W.D
-            op.exUnitType = ExUnitType_FpConverter;
+            op.unit = ExecuteUnitType_FpConverter;
             op.command.fpConverter = FpConverterCommand_W_D;
-            op.dstRegType = RegType_Int;
-            op.regWriteEnable = 1;
+            op.intRegWriteEnable = 1;
         end
         else if (funct7 == 7'b1100001 && rs2 == 5'b00001) begin
             // FCVT.WU.D
-            op.exUnitType = ExUnitType_FpConverter;
+            op.unit = ExecuteUnitType_FpConverter;
             op.command.fpConverter = FpConverterCommand_WU_D;
-            op.dstRegType = RegType_Int;
-            op.regWriteEnable = 1;
+            op.intRegWriteEnable = 1;
         end
         else if (funct7 == 7'b1101001 && rs2 == 5'b00000) begin
             // FCVT.D.W
-            op.exUnitType = ExUnitType_FpConverter;
+            op.unit = ExecuteUnitType_FpConverter;
             op.command.fpConverter = FpConverterCommand_D_W;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.fpRegWriteEnable = 1;
         end
         else if (funct7 == 7'b1101001 && rs2 == 5'b00001) begin
             // FCVT.D.WU
-            op.exUnitType = ExUnitType_FpConverter;
+            op.unit = ExecuteUnitType_FpConverter;
             op.command.fpConverter = FpConverterCommand_D_WU;
-            op.dstRegType = RegType_Fp;
-            op.regWriteEnable = 1;
+            op.fpRegWriteEnable = 1;
         end
         else begin
             op.isUnknown = 1;
