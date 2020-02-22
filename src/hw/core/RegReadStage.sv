@@ -32,11 +32,11 @@ module RegReadStage(
 );
 
     always_comb begin
-        intRegFile.readAddr1 = prevStage.srcRegAddr1;
-        intRegFile.readAddr2 = prevStage.srcRegAddr2;
-        fpRegFile.readAddr1 = prevStage.srcRegAddr1;
-        fpRegFile.readAddr2 = prevStage.srcRegAddr2;
-        fpRegFile.readAddr3 = prevStage.srcRegAddr3;
+        intRegFile.readAddr1 = prevStage.op.rs1;
+        intRegFile.readAddr2 = prevStage.op.rs2;
+        fpRegFile.readAddr1 = prevStage.op.rs1;
+        fpRegFile.readAddr2 = prevStage.op.rs2;
+        fpRegFile.readAddr3 = prevStage.op.rs3;
     end
 
     always_ff @(posedge clk) begin
@@ -46,15 +46,11 @@ module RegReadStage(
             nextStage.pc <= '0;
             nextStage.insn <= '0;
             nextStage.csrAddr <= '0;
-            nextStage.srcRegAddr1 <= '0;
-            nextStage.srcRegAddr2 <= '0;
-            nextStage.srcRegAddr3 <= '0;
             nextStage.srcIntRegValue1 <= '0;
             nextStage.srcIntRegValue2 <= '0;
             nextStage.srcFpRegValue1 <= '0;
             nextStage.srcFpRegValue2 <= '0;
             nextStage.srcFpRegValue3 <= '0;
-            nextStage.dstRegAddr <= '0;
             nextStage.trapInfo <= '0;
         end
         else if (ctrl.rrStall) begin
@@ -63,15 +59,11 @@ module RegReadStage(
             nextStage.pc <= nextStage.pc;
             nextStage.insn <= nextStage.insn;
             nextStage.csrAddr <= nextStage.csrAddr;
-            nextStage.srcRegAddr1 <= nextStage.srcRegAddr1;
-            nextStage.srcRegAddr2 <= nextStage.srcRegAddr2;
-            nextStage.srcRegAddr3 <= nextStage.srcRegAddr3;
             nextStage.srcIntRegValue1 <= nextStage.srcIntRegValue1;
             nextStage.srcIntRegValue2 <= nextStage.srcIntRegValue2;
             nextStage.srcFpRegValue1 <= nextStage.srcFpRegValue1;
             nextStage.srcFpRegValue2 <= nextStage.srcFpRegValue2;
             nextStage.srcFpRegValue3 <= nextStage.srcFpRegValue3;
-            nextStage.dstRegAddr <= nextStage.dstRegAddr;
             nextStage.trapInfo <= nextStage.trapInfo;
         end
         else begin
@@ -80,10 +72,6 @@ module RegReadStage(
             nextStage.pc <= prevStage.pc;
             nextStage.insn <= prevStage.insn;
             nextStage.csrAddr <= prevStage.csrAddr;
-            nextStage.srcRegAddr1 <= prevStage.srcRegAddr1;
-            nextStage.srcRegAddr2 <= prevStage.srcRegAddr2;
-            nextStage.srcRegAddr3 <= prevStage.srcRegAddr3;
-            nextStage.dstRegAddr <= prevStage.dstRegAddr;
             nextStage.srcIntRegValue1 <= intRegFile.readValue1;
             nextStage.srcIntRegValue2 <= intRegFile.readValue2;
             nextStage.srcFpRegValue1 <= fpRegFile.readValue1;

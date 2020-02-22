@@ -122,7 +122,6 @@ function automatic Op DecodeRV32I(insn_t insn);
     Op op;
 
     logic [11:0] csr = insn[31:20];
-
     logic [6:0] funct7 = insn[31:25];
     logic [4:0] shamt = insn[24:20];
     logic [4:0] zimm = insn[19:15];
@@ -150,6 +149,10 @@ function automatic Op DecodeRV32I(insn_t insn);
     op.csrWriteEnable = 0;
     op.fpRegWriteEnable = 0;
     op.intRegWriteEnable = 0;
+    op.rs1 = insn[19:15];
+    op.rs2 = insn[24:20];
+    op.rs3 = insn[31:27];
+    op.rd = insn[11:7];
 
     unique case (opcode)
     7'b0110111: begin
@@ -431,6 +434,10 @@ function automatic Op DecodeRV32M(insn_t insn);
     op.csrWriteEnable = 0;
     op.fpRegWriteEnable = 0;
     op.intRegWriteEnable = 1;
+    op.rs1 = insn[19:15];
+    op.rs2 = insn[24:20];
+    op.rs3 = insn[31:27];
+    op.rd = insn[11:7];
 
     return op;
 endfunction
@@ -479,11 +486,17 @@ function automatic Op DecodeRV32A(insn_t insn);
     op.csrWriteEnable = 0;
     op.fpRegWriteEnable = 0;
     op.intRegWriteEnable = 1;
+    op.rs1 = insn[19:15];
+    op.rs2 = insn[24:20];
+    op.rs3 = insn[31:27];
+    op.rd = insn[11:7];
 
     return op;
 endfunction
 
 function automatic Op DecodeRV32F(insn_t insn);
+    Op op;
+
     logic [6:0] funct7  = insn[31:25];
     logic [1:0] funct2  = insn[26:25];
     logic [4:0] rs2     = insn[24:20];
@@ -491,8 +504,7 @@ function automatic Op DecodeRV32F(insn_t insn);
     logic [2:0] rm      = insn[14:12];
     logic [6:0] opcode  = insn[6:0];
 
-    Op op;
-
+    // default
     op.aluCommand = '0;
     op.aluSrcType1 = '0;
     op.aluSrcType2 = '0;
@@ -511,6 +523,10 @@ function automatic Op DecodeRV32F(insn_t insn);
     op.csrWriteEnable = 0;
     op.fpRegWriteEnable = 0;
     op.intRegWriteEnable = 0;
+    op.rs1 = insn[19:15];
+    op.rs2 = insn[24:20];
+    op.rs3 = insn[31:27];
+    op.rd = insn[11:7];
 
     unique case (opcode)
     7'b0000111: begin
@@ -728,14 +744,14 @@ function automatic Op DecodeRV32F(insn_t insn);
 endfunction
 
 function automatic Op DecodeRV32D(insn_t insn);
+    Op op;
+
     logic [6:0] funct7  = insn[31:25];
     logic [1:0] funct2  = insn[26:25];
     logic [4:0] rs2     = insn[24:20];
     logic [2:0] funct3  = insn[14:12];
     logic [2:0] rm      = insn[14:12];
     logic [6:0] opcode  = insn[6:0];
-
-    Op op;
 
     op.aluCommand = '0;
     op.aluSrcType1 = '0;
@@ -756,6 +772,10 @@ function automatic Op DecodeRV32D(insn_t insn);
     op.csrWriteEnable = 0;
     op.intRegWriteEnable = 0;
     op.fpRegWriteEnable = 0;
+    op.rs1 = insn[19:15];
+    op.rs2 = insn[24:20];
+    op.rs3 = insn[31:27];
+    op.rd = insn[11:7];
 
     unique case (opcode)
     7'b0000111: begin

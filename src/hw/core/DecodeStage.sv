@@ -40,17 +40,9 @@ module DecodeStage(
 
     Op op;
     csr_addr_t csrAddr;
-    reg_addr_t srcRegAddr1;
-    reg_addr_t srcRegAddr2;
-    reg_addr_t srcRegAddr3;
-    reg_addr_t dstRegAddr;
     always_comb begin
         op = Decode(insn);
         csrAddr = insn[31:20];
-        srcRegAddr1 = insn[19:15];
-        srcRegAddr2 = insn[24:20];
-        srcRegAddr3 = insn[31:27];
-        dstRegAddr = insn[11:7];
     end
 
     TrapInfo trapInfo;
@@ -88,10 +80,6 @@ module DecodeStage(
             nextStage.op <= '0;
             nextStage.insn <= '0;
             nextStage.csrAddr <= '0;
-            nextStage.srcRegAddr1 <= '0;
-            nextStage.srcRegAddr2 <= '0;
-            nextStage.srcRegAddr3 <= '0;
-            nextStage.dstRegAddr <= '0;
             nextStage.trapInfo <= '0;
         end
         else if (ctrl.idStall) begin
@@ -100,10 +88,6 @@ module DecodeStage(
             nextStage.op <= nextStage.op;
             nextStage.insn <= nextStage.insn;
             nextStage.csrAddr <= nextStage.csrAddr;
-            nextStage.srcRegAddr1 <= nextStage.srcRegAddr1;
-            nextStage.srcRegAddr2 <= nextStage.srcRegAddr2;
-            nextStage.srcRegAddr3 <= nextStage.srcRegAddr3;
-            nextStage.dstRegAddr <= nextStage.dstRegAddr;
             nextStage.trapInfo <= nextStage.trapInfo;
         end
         else if (!valid) begin
@@ -112,10 +96,6 @@ module DecodeStage(
             nextStage.op <= '0;
             nextStage.insn <= '0;
             nextStage.csrAddr <= '0;
-            nextStage.srcRegAddr1 <= '0;
-            nextStage.srcRegAddr2 <= '0;
-            nextStage.srcRegAddr3 <= '0;
-            nextStage.dstRegAddr <= '0;
             nextStage.trapInfo <= '0;
         end
         else begin
@@ -124,10 +104,6 @@ module DecodeStage(
             nextStage.op <= op;
             nextStage.insn <= insn;
             nextStage.csrAddr <= csrAddr;
-            nextStage.srcRegAddr1 <= srcRegAddr1;
-            nextStage.srcRegAddr2 <= srcRegAddr2;
-            nextStage.srcRegAddr3 <= srcRegAddr3;
-            nextStage.dstRegAddr <= dstRegAddr;
             nextStage.trapInfo <= trapInfo;
         end
     end
