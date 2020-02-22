@@ -190,6 +190,7 @@ typedef enum logic
 typedef struct packed
 {
     AtomicType atomic;
+    FenceType fence;
     LoadStoreType loadStoreType;
     StoreSrcType storeSrc;
 } MemUnitCommand;
@@ -234,7 +235,6 @@ typedef struct packed
     AluSrcType1 aluSrcType1;
     AluSrcType2 aluSrcType2;
     BranchType branchType;
-    FenceType fenceType;
     ExUnitType exUnitType;
     FpSubUnitType fpSubUnitType;
     CommandUnion command;
