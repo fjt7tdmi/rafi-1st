@@ -44,6 +44,9 @@ parameter REG_FILE_SIZE = 32; // Number of registers in register files
 parameter BYPASS_DEPTH = 2;
 parameter BYPASS_READ_PORT_COUNT = 2;
 
+// Host IO
+parameter HOST_IO_ADDR    = 34'h080001000;
+
 // ----------------------------------------------------------------------------
 // typedef
 

@@ -19,7 +19,6 @@ import RvTypes::*;
 import Rv32Types::*;
 
 import CacheTypes::*;
-import MemoryTypes::*;
 import OpTypes::*;
 import TlbTypes::*;
 
