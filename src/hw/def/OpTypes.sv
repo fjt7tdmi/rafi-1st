@@ -78,13 +78,13 @@ typedef enum logic [1:0]
 
 typedef enum logic [2:0]
 {
-    ExUnitType_None         = 3'h0,
-    ExUnitType_FpConverter  = 3'h1,
-    ExUnitType_Fp32         = 3'h2,
-    ExUnitType_Fp64         = 3'h3,
-    ExUnitType_LoadStore    = 3'h4,
-    ExUnitType_MulDiv       = 3'h5
-} ExUnitType;
+    ExecuteUnitType_None         = 3'h0,
+    ExecuteUnitType_FpConverter  = 3'h1,
+    ExecuteUnitType_Fp32         = 3'h2,
+    ExecuteUnitType_Fp64         = 3'h3,
+    ExecuteUnitType_LoadStore    = 3'h4,
+    ExecuteUnitType_MulDiv       = 3'h5
+} ExecuteUnitType;
 
 typedef enum logic [2:0]
 {
@@ -235,13 +235,13 @@ typedef enum logic
 
 typedef struct packed
 {
+    ExecuteUnitType unit;
+    CommandUnion command;
     AluCommand aluCommand;
     AluSrcType1 aluSrcType1;
     AluSrcType2 aluSrcType2;
     BranchType branchType;
-    ExUnitType exUnitType;
     FpSubUnitType fpSubUnitType;
-    CommandUnion command;
     IntRegWriteSrcType intRegWriteSrcType;
     TrapOpType trapOpType;
     Privilege trapReturnPrivilege;

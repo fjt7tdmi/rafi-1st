@@ -55,7 +55,7 @@ endfunction
 function automatic LoadStoreUnitCommand getLoadStoreUnitCommand(Op op);
     MemUnitCommand cmd = op.command.mem;
 
-    if (op.exUnitType == ExUnitType_LoadStore) begin
+    if (op.unit == ExecuteUnitType_LoadStore) begin
         if (cmd.isLoad) begin
             return LoadStoreUnitCommand_Load;
         end
@@ -107,9 +107,9 @@ module ExecuteStage(
     logic enableFp64;
     logic enableMulDiv;
     always_comb begin
-        enableFp32 = valid && (op.exUnitType == ExUnitType_Fp32);
-        enableFp64 = valid && (op.exUnitType == ExUnitType_Fp64);
-        enableMulDiv = valid && (op.exUnitType == ExUnitType_MulDiv);
+        enableFp32 = valid && (op.unit == ExecuteUnitType_Fp32);
+        enableFp64 = valid && (op.unit == ExecuteUnitType_Fp64);
+        enableMulDiv = valid && (op.unit == ExecuteUnitType_MulDiv);
     end
 
     logic done;
@@ -117,10 +117,10 @@ module ExecuteStage(
     logic doneFp64;
     logic doneMulDiv;
     always_comb begin
-        unique case (op.exUnitType)
-        ExUnitType_Fp32:    done = doneFp32;
-        ExUnitType_Fp64:    done = doneFp64;
-        ExUnitType_MulDiv:  done = doneMulDiv;
+        unique case (op.unit)
+        ExecuteUnitType_Fp32:    done = doneFp32;
+        ExecuteUnitType_Fp64:    done = doneFp64;
+        ExecuteUnitType_MulDiv:  done = doneMulDiv;
         default:            done = 1;
         endcase
     end
@@ -246,16 +246,16 @@ module ExecuteStage(
         csr.writeAddr = prevStage.csrAddr;
         csr.writeValue = intResult;
 
-        unique case (op.exUnitType)
-        ExUnitType_FpConverter: begin
+        unique case (op.unit)
+        ExecuteUnitType_FpConverter: begin
             csr.write_fflags = fflagsWriteCvt;
             csr.write_fflags_value = fflagsValueCvt;
         end
-        ExUnitType_Fp32: begin
+        ExecuteUnitType_Fp32: begin
             csr.write_fflags = fflagsWrite32;
             csr.write_fflags_value = fflagsValue32;
         end
-        ExUnitType_Fp64: begin
+        ExecuteUnitType_Fp64: begin
             csr.write_fflags = fflagsWrite64;
             csr.write_fflags_value = fflagsValue64;
         end
@@ -298,11 +298,11 @@ module ExecuteStage(
     always_comb begin
         intResultAlu = ALU(op.aluCommand, aluSrc1, aluSrc2);
 
-        unique case (op.exUnitType)
-        ExUnitType_FpConverter: intResult = intResultFpCvt;
-        ExUnitType_Fp32:        intResult = intResultFp32;
-        ExUnitType_Fp64:        intResult = intResultFp64;
-        ExUnitType_MulDiv:      intResult = intResultMulDiv;
+        unique case (op.unit)
+        ExecuteUnitType_FpConverter: intResult = intResultFpCvt;
+        ExecuteUnitType_Fp32:        intResult = intResultFp32;
+        ExecuteUnitType_Fp64:        intResult = intResultFp64;
+        ExecuteUnitType_MulDiv:      intResult = intResultMulDiv;
         default:                intResult = intResultAlu;
         endcase
 
@@ -323,19 +323,19 @@ module ExecuteStage(
 
     // dstFpRegValue
     always_comb begin
-        unique case (op.exUnitType)
-        ExUnitType_FpConverter: dstFpRegValue = fpResultCvt;
-        ExUnitType_Fp32:        dstFpRegValue = {32'hffff_ffff, fpResult32};
-        ExUnitType_Fp64:        dstFpRegValue = fpResult64;
-        ExUnitType_LoadStore:   dstFpRegValue = loadStoreUnit.result;
+        unique case (op.unit)
+        ExecuteUnitType_FpConverter: dstFpRegValue = fpResultCvt;
+        ExecuteUnitType_Fp32:        dstFpRegValue = {32'hffff_ffff, fpResult32};
+        ExecuteUnitType_Fp64:        dstFpRegValue = fpResult64;
+        ExecuteUnitType_LoadStore:   dstFpRegValue = loadStoreUnit.result;
         default:                dstFpRegValue = '0;
         endcase
     end
 
     // FetchUnit
     always_comb begin
-        invalidateICache = valid && op.exUnitType == ExUnitType_LoadStore && op.command.mem.isFence && op.command.mem.fence inside {FenceType_I, FenceType_Vma};
-        invalidateTlb = valid && op.exUnitType == ExUnitType_LoadStore && op.command.mem.isFence && op.command.mem.fence == FenceType_Vma;
+        invalidateICache = valid && op.unit == ExecuteUnitType_LoadStore && op.command.mem.isFence && op.command.mem.fence inside {FenceType_I, FenceType_Vma};
+        invalidateTlb = valid && op.unit == ExecuteUnitType_LoadStore && op.command.mem.isFence && op.command.mem.fence == FenceType_Vma;
 
         fetchUnit.invalidateICache = invalidateICache;
         fetchUnit.invalidateTlb = invalidateTlb;
@@ -352,8 +352,8 @@ module ExecuteStage(
         endcase
 
         loadStoreUnit.addr = memAddr;
-        loadStoreUnit.enable = valid && op.exUnitType == ExUnitType_LoadStore && !prevStage.trapInfo.valid;
-        loadStoreUnit.invalidateTlb = valid && op.exUnitType == ExUnitType_LoadStore && op.command.mem.isFence && op.command.mem.fence == FenceType_Vma;
+        loadStoreUnit.enable = valid && op.unit == ExecuteUnitType_LoadStore && !prevStage.trapInfo.valid;
+        loadStoreUnit.invalidateTlb = valid && op.unit == ExecuteUnitType_LoadStore && op.command.mem.isFence && op.command.mem.fence == FenceType_Vma;
         loadStoreUnit.loadStoreType = op.command.mem.loadStoreType;
         loadStoreUnit.atomicType = op.command.mem.atomic;
         loadStoreUnit.storeRegValue = storeRegValue;
