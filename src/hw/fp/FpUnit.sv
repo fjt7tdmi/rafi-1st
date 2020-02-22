@@ -31,7 +31,7 @@ module FpUnit #(
     output logic done,
     input logic enable,
     input logic flush,
-    input FpUnitType unit,
+    input FpSubUnitType unit,
     input FpCommandUnion command,
     input logic [2:0] roundingMode,
     input word_t intSrc1,
@@ -119,7 +119,7 @@ module FpUnit #(
         .fpResult(fpResultSqrt),
         .flags(flagsSqrt),
         .done(doneSqrt),
-        .enable(enable && unit == FpUnitType_Sqrt),
+        .enable(enable && unit == FpSubUnitType_Sqrt),
         .flush(flush),
         .roundingMode(roundingMode),
         .fpSrc(fpSrc1),
@@ -128,7 +128,7 @@ module FpUnit #(
 
     always_comb begin
         unique case (unit)
-        FpUnitType_Move: begin
+        FpSubUnitType_Move: begin
             intResult = fpSrc1[31:0]; // FMV.X.W
             fpResult = '0;
             fpResult[31:0] = intSrc1; // FMV.W.X
@@ -136,42 +136,42 @@ module FpUnit #(
             writeFlags = '0;
             writeFlagsValue = '0;
         end
-        FpUnitType_Classifier: begin
+        FpSubUnitType_Classifier: begin
             intResult = fpResultClass;
             fpResult = '0;
             done = '1;
             writeFlags = '0;
             writeFlagsValue = '0;
         end
-        FpUnitType_Sign: begin
+        FpSubUnitType_Sign: begin
             intResult = '0;
             fpResult = fpResultSign;
             done = '1;
             writeFlags = '0;
             writeFlagsValue = '0;
         end
-        FpUnitType_Comparator: begin
+        FpSubUnitType_Comparator: begin
             intResult = intResultCmp;
             fpResult = fpResultCmp;
             done = '1;
             writeFlags = '1;
             writeFlagsValue = flagsCmp;
         end
-        FpUnitType_MulAdd: begin
+        FpSubUnitType_MulAdd: begin
             intResult = '0;
             fpResult = fpResultMulAdd;
             done = '1;
             writeFlags = '1;
             writeFlagsValue = flagsMulAdd;
         end
-        FpUnitType_Div: begin
+        FpSubUnitType_Div: begin
             intResult = '0;
             fpResult = fpResultDiv;
             done = '1;
             writeFlags = '1;
             writeFlagsValue = flagsDiv;
         end
-        FpUnitType_Sqrt: begin
+        FpSubUnitType_Sqrt: begin
             intResult = '0;
             fpResult = fpResultSqrt;
             done = doneSqrt;

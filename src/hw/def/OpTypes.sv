@@ -88,15 +88,15 @@ typedef enum logic [2:0]
 
 typedef enum logic [2:0]
 {
-    FpUnitType_Move         = 3'h0,
-    FpUnitType_Classifier   = 3'h1,
-    FpUnitType_Sign         = 3'h2,
-    FpUnitType_Comparator   = 3'h3,
-    FpUnitType_Converter    = 3'h4,
-    FpUnitType_MulAdd       = 3'h5,
-    FpUnitType_Div          = 3'h6,
-    FpUnitType_Sqrt         = 3'h7
-} FpUnitType;
+    FpSubUnitType_Move         = 3'h0,
+    FpSubUnitType_Classifier   = 3'h1,
+    FpSubUnitType_Sign         = 3'h2,
+    FpSubUnitType_Comparator   = 3'h3,
+    FpSubUnitType_Converter    = 3'h4,
+    FpSubUnitType_MulAdd       = 3'h5,
+    FpSubUnitType_Div          = 3'h6,
+    FpSubUnitType_Sqrt         = 3'h7
+} FpSubUnitType;
 
 typedef enum logic [3:0]
 {
@@ -236,7 +236,7 @@ typedef struct packed
     BranchType branchType;
     FenceType fenceType;
     ExUnitType exUnitType;
-    FpUnitType fpUnitType;
+    FpSubUnitType fpSubUnitType;
     CommandUnion command;
     IntRegWriteSrcType intRegWriteSrcType;
     TrapOpType trapOpType;
