@@ -53,23 +53,30 @@ function automatic logic BranchComparator(BranchType branchType, word_t src1, wo
 endfunction
 
 function automatic LoadStoreUnitCommand getLoadStoreUnitCommand(Op op);
-    if (op.isLoad) begin
-        return LoadStoreUnitCommand_Load;
-    end
-    else if (op.isStore) begin
-        return LoadStoreUnitCommand_Store;
-    end
-    else if (op.isFence && op.command.mem.fence inside {FenceType_I, FenceType_Vma}) begin
-        return LoadStoreUnitCommand_Invalidate;
-    end
-    else if (op.isAtomic && op.command.mem.atomic == AtomicType_LoadReserved) begin
-        return LoadStoreUnitCommand_LoadReserved;
-    end
-    else if (op.isAtomic && op.command.mem.atomic == AtomicType_StoreConditional) begin
-        return LoadStoreUnitCommand_StoreConditional;
-    end
-    else if (op.isAtomic) begin
-        return LoadStoreUnitCommand_AtomicMemOp;
+    MemUnitCommand cmd = op.command.mem;
+
+    if (op.exUnitType == ExUnitType_LoadStore) begin
+        if (op.isLoad) begin
+            return LoadStoreUnitCommand_Load;
+        end
+        else if (op.isStore) begin
+            return LoadStoreUnitCommand_Store;
+        end
+        else if (op.isFence && cmd.fence inside {FenceType_I, FenceType_Vma}) begin
+            return LoadStoreUnitCommand_Invalidate;
+        end
+        else if (op.isAtomic && cmd.atomic == AtomicType_LoadReserved) begin
+            return LoadStoreUnitCommand_LoadReserved;
+        end
+        else if (op.isAtomic && cmd.atomic == AtomicType_StoreConditional) begin
+            return LoadStoreUnitCommand_StoreConditional;
+        end
+        else if (op.isAtomic) begin
+            return LoadStoreUnitCommand_AtomicMemOp;
+        end
+        else begin
+            return LoadStoreUnitCommand_None;
+        end
     end
     else begin
         return LoadStoreUnitCommand_None;
@@ -345,7 +352,7 @@ module ExecuteStage(
         endcase
 
         loadStoreUnit.addr = memAddr;
-        loadStoreUnit.enable = valid && (op.isLoad || op.isStore || op.isFence || op.isAtomic) && !prevStage.trapInfo.valid;
+        loadStoreUnit.enable = valid && op.exUnitType == ExUnitType_LoadStore && !prevStage.trapInfo.valid;
         loadStoreUnit.invalidateTlb = valid && op.isFence && op.command.mem.fence == FenceType_Vma;
         loadStoreUnit.loadStoreType = op.command.mem.loadStoreType;
         loadStoreUnit.atomicType = op.command.mem.atomic;
@@ -418,10 +425,15 @@ module ExecuteStage(
             trapInfo.value = prevStage.insn;
             trapInfo.cause = ExceptionCode_IllegalInsn;
         end
-        else if (valid && loadStoreUnit.fault) begin
+        else if (valid && loadStoreUnit.loadPagefault) begin
             trapInfo.valid = 1;
             trapInfo.value = memAddr;
-            trapInfo.cause = op.isStore ? ExceptionCode_StorePageFault : ExceptionCode_LoadPageFault;
+            trapInfo.cause = ExceptionCode_LoadPageFault;
+        end
+        else if (valid && loadStoreUnit.storePagefault) begin
+            trapInfo.valid = 1;
+            trapInfo.value = memAddr;
+            trapInfo.cause = ExceptionCode_StorePageFault;
         end
         else begin
             trapInfo = '0;

@@ -415,7 +415,15 @@ module LoadStoreUnit (
             (reg_state == State_Reserve) ||
             (reg_state == State_WriteThrough && cacheReplacerDone) ||
             (reg_state == State_Invalidate && cacheReplacerDone);
-        bus.fault = reg_tlb_fault;
+        
+        if (bus.command inside {LoadStoreUnitCommand_Store, LoadStoreUnitCommand_StoreConditional}) begin
+            bus.loadPagefault = 0;
+            bus.storePagefault = reg_tlb_fault;
+        end
+        else begin
+            bus.loadPagefault = reg_tlb_fault;
+            bus.storePagefault = 0;
+        end
 
         if (bus.command == LoadStoreUnitCommand_StoreConditional) begin
             bus.result = (reg_state == State_WriteThrough) ? 0 : 1;
