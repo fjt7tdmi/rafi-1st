@@ -189,6 +189,10 @@ typedef enum logic
 
 typedef struct packed
 {
+    logic isAtomic;
+    logic isFence;
+    logic isLoad;
+    logic isStore;
     AtomicType atomic;
     FenceType fence;
     LoadStoreType loadStoreType;
@@ -242,11 +246,7 @@ typedef struct packed
     TrapOpType trapOpType;
     Privilege trapReturnPrivilege;
     word_t imm;
-    logic isAtomic;
     logic isBranch;
-    logic isFence;
-    logic isLoad;
-    logic isStore;
     logic isTrap;
     logic isTrapReturn;
     logic isUnknown;

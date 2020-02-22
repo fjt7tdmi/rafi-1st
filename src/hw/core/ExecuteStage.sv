@@ -56,22 +56,22 @@ function automatic LoadStoreUnitCommand getLoadStoreUnitCommand(Op op);
     MemUnitCommand cmd = op.command.mem;
 
     if (op.exUnitType == ExUnitType_LoadStore) begin
-        if (op.isLoad) begin
+        if (cmd.isLoad) begin
             return LoadStoreUnitCommand_Load;
         end
-        else if (op.isStore) begin
+        else if (cmd.isStore) begin
             return LoadStoreUnitCommand_Store;
         end
-        else if (op.isFence && cmd.fence inside {FenceType_I, FenceType_Vma}) begin
+        else if (cmd.isFence && cmd.fence inside {FenceType_I, FenceType_Vma}) begin
             return LoadStoreUnitCommand_Invalidate;
         end
-        else if (op.isAtomic && cmd.atomic == AtomicType_LoadReserved) begin
+        else if (cmd.isAtomic && cmd.atomic == AtomicType_LoadReserved) begin
             return LoadStoreUnitCommand_LoadReserved;
         end
-        else if (op.isAtomic && cmd.atomic == AtomicType_StoreConditional) begin
+        else if (cmd.isAtomic && cmd.atomic == AtomicType_StoreConditional) begin
             return LoadStoreUnitCommand_StoreConditional;
         end
-        else if (op.isAtomic) begin
+        else if (cmd.isAtomic) begin
             return LoadStoreUnitCommand_AtomicMemOp;
         end
         else begin
@@ -334,8 +334,8 @@ module ExecuteStage(
 
     // FetchUnit
     always_comb begin
-        invalidateICache = valid && op.isFence && op.command.mem.fence inside {FenceType_I, FenceType_Vma};
-        invalidateTlb = valid && op.isFence && op.command.mem.fence == FenceType_Vma;
+        invalidateICache = valid && op.exUnitType == ExUnitType_LoadStore && op.command.mem.isFence && op.command.mem.fence inside {FenceType_I, FenceType_Vma};
+        invalidateTlb = valid && op.exUnitType == ExUnitType_LoadStore && op.command.mem.isFence && op.command.mem.fence == FenceType_Vma;
 
         fetchUnit.invalidateICache = invalidateICache;
         fetchUnit.invalidateTlb = invalidateTlb;
@@ -353,7 +353,7 @@ module ExecuteStage(
 
         loadStoreUnit.addr = memAddr;
         loadStoreUnit.enable = valid && op.exUnitType == ExUnitType_LoadStore && !prevStage.trapInfo.valid;
-        loadStoreUnit.invalidateTlb = valid && op.isFence && op.command.mem.fence == FenceType_Vma;
+        loadStoreUnit.invalidateTlb = valid && op.exUnitType == ExUnitType_LoadStore && op.command.mem.isFence && op.command.mem.fence == FenceType_Vma;
         loadStoreUnit.loadStoreType = op.command.mem.loadStoreType;
         loadStoreUnit.atomicType = op.command.mem.atomic;
         loadStoreUnit.storeRegValue = storeRegValue;
