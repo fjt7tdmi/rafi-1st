@@ -20,7 +20,7 @@ import Rv32Types::*;
 
 import OpTypes::*;
 import Decoder::*;
-import ProcessorTypes::*;
+import RafiTypes::*;
 
 module DecodeStage(
     InsnBufferIF.DecodeStage insnBuffer,

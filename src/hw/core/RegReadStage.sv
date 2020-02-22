@@ -19,7 +19,7 @@ import RvTypes::*;
 import Rv32Types::*;
 
 import OpTypes::*;
-import ProcessorTypes::*;
+import RafiTypes::*;
 
 module RegReadStage(
     DecodeStageIF.NextStage prevStage,

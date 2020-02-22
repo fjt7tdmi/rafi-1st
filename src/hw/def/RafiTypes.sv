@@ -15,10 +15,10 @@
  */
 
 /*
- * Processor specific configurations
+ * RAFI-1st specific configurations
  */
 
-package ProcessorTypes;
+package RafiTypes;
 
 import BasicTypes::*;
 import RvTypes::*;

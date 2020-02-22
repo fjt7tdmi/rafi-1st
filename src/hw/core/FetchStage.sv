@@ -19,7 +19,7 @@ import RvTypes::*;
 import Rv32Types::*;
 
 import CacheTypes::*;
-import ProcessorTypes::*;
+import RafiTypes::*;
 
 module FetchStage(
     InsnBufferIF.FetchStage insnBuffer,

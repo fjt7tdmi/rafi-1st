@@ -18,7 +18,7 @@ import BasicTypes::*;
 import RvTypes::*;
 import Rv32Types::*;
 
-import ProcessorTypes::*;
+import RafiTypes::*;
 
 interface IntBypassLogicIF;
     reg_addr_t writeAddr;

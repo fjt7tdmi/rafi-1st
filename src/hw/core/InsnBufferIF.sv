@@ -18,7 +18,7 @@ import BasicTypes::*;
 import RvTypes::*;
 import Rv32Types::*;
 
-import ProcessorTypes::*;
+import RafiTypes::*;
 
 interface InsnBufferIF;
     insn_buffer_entry_count_t writableEntryCount;

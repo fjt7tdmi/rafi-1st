@@ -21,7 +21,7 @@ import RvTypes::*;
 import Rv32Types::*;
 
 import OpTypes::*;
-import ProcessorTypes::*;
+import RafiTypes::*;
 
 // Sign extension functions
 function automatic word_t sext12(logic [11:0] val);

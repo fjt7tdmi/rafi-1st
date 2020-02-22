@@ -18,7 +18,7 @@ import BasicTypes::*;
 import RvTypes::*;
 import Rv32Types::*;
 
-import ProcessorTypes::*;
+import RafiTypes::*;
 
 interface CsrIF;
     // Fetch
