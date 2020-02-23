@@ -59,11 +59,13 @@ module InsnBuffer(
     always_comb begin
         for (int i = 0; i < INSN_BUFFER_ENTRY_COUNT; i++) begin
             insn_buffer_index_t index = i[$clog2(INSN_BUFFER_ENTRY_COUNT)-1:0];
+            insn_buffer_index_t index_tail = reg_tail;
+            insn_buffer_index_t index_tail_next = reg_tail + 1;
 
-            if (bus.writeLow && index == reg_tail) begin
+            if (bus.writeLow && index == index_tail) begin
                 src_types[i] = SrcType_Low;
             end
-            else if (bus.writeHigh && ((!bus.writeLow && index == reg_tail) || (bus.writeLow && index == reg_tail + 1))) begin
+            else if (bus.writeHigh && ((!bus.writeLow && index == index_tail) || (bus.writeLow && index == index_tail_next))) begin
                 src_types[i] = SrcType_High;
             end
             else begin
