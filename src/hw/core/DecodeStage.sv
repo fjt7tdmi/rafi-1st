@@ -89,6 +89,7 @@ module DecodeStage(
             nextStage.pc <= '0;
             nextStage.op <= '0;
             nextStage.insn <= '0;
+            nextStage.isCompressedInsn <= '0;
             nextStage.csrAddr <= '0;
             nextStage.trapInfo <= '0;
         end
@@ -97,6 +98,7 @@ module DecodeStage(
             nextStage.pc <= nextStage.pc;
             nextStage.op <= nextStage.op;
             nextStage.insn <= nextStage.insn;
+            nextStage.isCompressedInsn <= nextStage.isCompressedInsn;
             nextStage.csrAddr <= nextStage.csrAddr;
             nextStage.trapInfo <= nextStage.trapInfo;
         end
@@ -105,6 +107,7 @@ module DecodeStage(
             nextStage.pc <= '0;
             nextStage.op <= '0;
             nextStage.insn <= '0;
+            nextStage.isCompressedInsn <= '0;
             nextStage.csrAddr <= '0;
             nextStage.trapInfo <= '0;
         end
@@ -113,6 +116,7 @@ module DecodeStage(
             nextStage.pc <= pc;
             nextStage.op <= op;
             nextStage.insn <= insn;
+            nextStage.isCompressedInsn <= is_compressed;
             nextStage.csrAddr <= csr_addr;
             nextStage.trapInfo <= trap_info;
         end

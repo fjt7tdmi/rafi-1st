@@ -25,6 +25,7 @@ interface RegReadStageIF;
     logic valid;
     addr_t pc;
     insn_t insn;
+    logic isCompressedInsn;
     Op op;
     csr_addr_t csrAddr;
     word_t srcIntRegValue1;
@@ -39,6 +40,7 @@ interface RegReadStageIF;
         valid,
         pc,
         insn,
+        isCompressedInsn,
         op,
         csrAddr,
         srcIntRegValue1,
@@ -54,6 +56,7 @@ interface RegReadStageIF;
         valid,
         pc,
         insn,
+        isCompressedInsn,
         op,
         csrAddr,
         srcIntRegValue1,

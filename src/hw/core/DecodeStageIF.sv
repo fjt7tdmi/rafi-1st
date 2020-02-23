@@ -25,6 +25,7 @@ interface DecodeStageIF;
     logic valid;
     addr_t pc;
     insn_t insn;
+    logic isCompressedInsn;
     Op op;
     csr_addr_t csrAddr;
     TrapInfo trapInfo;
@@ -34,6 +35,7 @@ interface DecodeStageIF;
         valid,
         pc,
         insn,
+        isCompressedInsn,
         op,
         csrAddr,
         trapInfo
@@ -44,6 +46,7 @@ interface DecodeStageIF;
         valid,
         pc,
         insn,
+        isCompressedInsn,
         op,
         csrAddr,
         trapInfo

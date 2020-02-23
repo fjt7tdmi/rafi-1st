@@ -314,7 +314,7 @@ module ExecuteStage(
     always_comb begin
         unique case (op.intRegWriteSrcType)
         IntRegWriteSrcType_Result:  dstIntRegValue = intResult;
-        IntRegWriteSrcType_NextPc:  dstIntRegValue = prevStage.pc + INSN_SIZE;
+        IntRegWriteSrcType_NextPc:  dstIntRegValue = prevStage.pc + (prevStage.isCompressedInsn ? 2 : 4);
         IntRegWriteSrcType_Memory:  dstIntRegValue = loadStoreUnit.result[31:0];
         IntRegWriteSrcType_Csr:     dstIntRegValue = csr.readValue;
         default: dstIntRegValue = '0;
@@ -375,7 +375,7 @@ module ExecuteStage(
             ctrl.nextPc = branchTarget;
         end
         else begin
-            ctrl.nextPc = prevStage.pc + INSN_SIZE;
+            ctrl.nextPc = prevStage.pc + (prevStage.isCompressedInsn ? 2 : 4);
         end
     end
 
