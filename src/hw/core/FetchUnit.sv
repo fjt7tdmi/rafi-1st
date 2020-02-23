@@ -24,7 +24,6 @@ import CacheTypes::*;
 module FetchUnit (
     FetchUnitIF.FetchUnit bus,
     BusAccessUnitIF.FetchUnit mem,
-    PipelineControllerIF.FetchUnit ctrl,
     CsrIF.FetchUnit csr,
     input logic clk,
     input logic rst
@@ -245,7 +244,7 @@ module FetchUnit (
         // Wires
         cacheMiss = reg_icache_read && !reg_tlb_miss &&
             (!validTagArrayReadValue.valid || reg_physical_pc[TAG_MSB:TAG_LSB] != validTagArrayReadValue.tag);
-        stall = ctrl.ifStall || (reg_stall_counter != '0);
+        stall = bus.stall || (reg_stall_counter != '0);
 
         // Module port
         bus.valid = (reg_icache_read && !reg_tlb_miss && !cacheMiss) || reg_fault;
@@ -303,14 +302,14 @@ module FetchUnit (
         if (csr.trapInfo.valid || csr.trapReturn) begin
             next_pc = csr.nextPc;
         end
-        else if (ctrl.flush) begin
-            next_pc = ctrl.nextPc;
+        else if (bus.flush) begin
+            next_pc = bus.nextPc;
         end
         else if (stall || !bus.valid || reg_state != State_Default) begin
             next_pc = reg_pc;
         end
         else begin
-            next_pc = reg_pc + INSN_SIZE;
+            next_pc = reg_pc + (reg_pc[1] ? 2 : 4);
         end
     end
 
@@ -367,11 +366,11 @@ module FetchUnit (
     // Next register values
     always_comb begin
         next_physical_pc = {tlbReadValue, next_pc[PAGE_OFFSET_WIDTH-1:0]};
-        next_icache_read = (reg_state == State_Default && !ctrl.flush && !stall && !waitInvalidate);
+        next_icache_read = (reg_state == State_Default && !bus.flush && !stall && !waitInvalidate);
         next_tlb_miss = next_icache_read && !tlbHit;
         next_fault = next_icache_read && tlbHit && tlbFault;
 
-        if (ctrl.flush) begin
+        if (bus.flush) begin
             next_stall_counter = StallCycleAfterFlush;
         end
         else begin

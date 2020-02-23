@@ -150,7 +150,6 @@ module Core (
     FetchUnit m_FetchUnit(
         .bus(m_FetchUnitIF.FetchUnit),
         .mem(m_BusAccessUnitIF.FetchUnit),
-        .ctrl(m_PipelineControllerIF.FetchUnit),
         .csr(m_CsrIF.FetchUnit),
         .clk,
         .rst(rstInternal)

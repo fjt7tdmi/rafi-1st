@@ -21,6 +21,10 @@ import Rv32Types::*;
 import CacheTypes::*;
 
 interface FetchUnitIF;
+    addr_t nextPc;
+    logic flush;
+    logic stall;
+
     logic valid;
     logic fault;
     addr_t pc;
@@ -30,6 +34,10 @@ interface FetchUnitIF;
     logic invalidateTlb;
 
     modport FetchStage(
+    output
+        stall,
+        flush,
+        nextPc,
     input
         valid,
         fault,
@@ -50,6 +58,9 @@ interface FetchUnitIF;
         pc,
         iCacheLine,
     input
+        stall,
+        flush,
+        nextPc,
         invalidateICache,
         invalidateTlb
     );

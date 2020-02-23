@@ -32,7 +32,15 @@ module FetchStage(
     localparam INSN_COUNT_IN_LINE = ICACHE_LINE_WIDTH / INSN_WIDTH;
     localparam INDEX_WIDTH = $clog2(INSN_COUNT_IN_LINE);
 
-    // Wires
+    logic fetch_compressed_insn;
+    addr_t pc_low;
+    addr_t pc_high;
+    always_comb begin
+        fetch_compressed_insn = fetchUnit.pc[1];
+        pc_low = fetchUnit.pc;
+        pc_high = fetchUnit.pc + 2;
+    end
+
     logic [INDEX_WIDTH-1:0] index;
     insn_t [INSN_COUNT_IN_LINE-1:0] insns;
     insn_t insn;
@@ -46,14 +54,20 @@ module FetchStage(
     end
 
     always_comb begin
-        insnBuffer.writeLow = !stall && fetchUnit.valid;
+        fetchUnit.nextPc = ctrl.nextPc;
+        fetchUnit.flush = ctrl.flush;
+        fetchUnit.stall = stall;
+    end
+
+    always_comb begin
+        insnBuffer.writeLow = !stall && fetchUnit.valid && ~fetch_compressed_insn;
         insnBuffer.writeHigh = !stall && fetchUnit.valid;
 
-        insnBuffer.writeEntryLow.pc = fetchUnit.pc;
+        insnBuffer.writeEntryLow.pc = pc_low;
         insnBuffer.writeEntryLow.fault = fetchUnit.fault;
         insnBuffer.writeEntryLow.insn = insn[15:0];
 
-        insnBuffer.writeEntryHigh.pc = fetchUnit.pc + 2;
+        insnBuffer.writeEntryHigh.pc = fetch_compressed_insn ? pc_low : pc_high;
         insnBuffer.writeEntryHigh.fault = fetchUnit.fault;
         insnBuffer.writeEntryHigh.insn = insn[31:16];
     end

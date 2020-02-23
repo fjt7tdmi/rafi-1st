@@ -33,6 +33,7 @@ interface PipelineControllerIF;
 
     modport FetchStage(
     input
+        nextPc,
         ifStall,
         flush
     );
@@ -60,13 +61,6 @@ interface PipelineControllerIF;
     input
         bypassStall,
         flush
-    );
-
-    modport FetchUnit(
-    input
-        ifStall,
-        flush,
-        nextPc
     );
 
     modport InsnBuffer(
