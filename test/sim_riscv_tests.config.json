@@ -9,6 +9,7 @@
     { "name": "rv32ua-p-amoswap_w",     "host-io-addr": "0x80001000", "cycle": 10000 },
     { "name": "rv32ua-p-amoxor_w",      "host-io-addr": "0x80001000", "cycle": 10000 },
     { "name": "rv32ua-p-lrsc",          "host-io-addr": "0x80001000", "cycle": 80000 },
+    { "name": "rv32uc-p-rvc",           "host-io-addr": "0x80003000", "cycle": 10000 },
     { "name": "rv32uf-p-fadd",          "host-io-addr": "0x80001000", "cycle": 10000 },
     { "name": "rv32uf-p-fclass",        "host-io-addr": "0x80001000", "cycle": 10000 },
     { "name": "rv32uf-p-fcmp",          "host-io-addr": "0x80001000", "cycle": 10000 },
