@@ -18,9 +18,10 @@ import BasicTypes::*;
 import RvTypes::*;
 import Rv32Types::*;
 
+import RafiTypes::*;
 import OpTypes::*;
 import Decoder::*;
-import RafiTypes::*;
+import DecoderRV32C::*;
 
 module DecodeStage(
     InsnBufferIF.DecodeStage insnBuffer,
@@ -29,36 +30,45 @@ module DecodeStage(
     input logic clk,
     input logic rst
 );
+    logic is_compressed;
+    logic [15:0] insn_low;
+    logic [15:0] insn_high;
+    always_comb begin
+        is_compressed = insnBuffer.readEntryLow.insn[1:0] inside {2'b00, 2'b01, 2'b10};
+        insn_low = insnBuffer.readEntryLow.insn;
+        insn_high = insnBuffer.readEntryHigh.insn;
+    end
+
     logic valid;
     addr_t pc;
-    logic [31:0] insn;
+    insn_t insn;
     always_comb begin
-        valid = insnBuffer.readableEntryCount >= 2;
+        valid = (insnBuffer.readableEntryCount == 1 && is_compressed) || insnBuffer.readableEntryCount >= 2;
         pc = insnBuffer.readEntryLow.pc;
-        insn = {insnBuffer.readEntryHigh.insn, insnBuffer.readEntryLow.insn};
+        insn = is_compressed ? {16'h0, insn_low} : {insn_high, insn_low};
     end
 
     Op op;
-    csr_addr_t csrAddr;
+    csr_addr_t csr_addr;
     always_comb begin
-        op = Decode(insn);
-        csrAddr = insn[31:20];
+        op = is_compressed ? DecodeRV32C(insn_low) : Decode(insn);
+        csr_addr = insn[31:20];
     end
 
-    TrapInfo trapInfo;
+    TrapInfo trap_info;
     always_comb begin
         if (valid && insnBuffer.readEntryLow.fault) begin
-            trapInfo.valid = '1;
-            trapInfo.cause = ExceptionCode_InsnPageFault;
-            trapInfo.value = pc;
+            trap_info.valid = '1;
+            trap_info.cause = ExceptionCode_InsnPageFault;
+            trap_info.value = pc;
         end
         else if (valid && op.isUnknown) begin
-            trapInfo.valid = 1;
-            trapInfo.cause = ExceptionCode_IllegalInsn;
-            trapInfo.value = insn;
+            trap_info.valid = 1;
+            trap_info.cause = ExceptionCode_IllegalInsn;
+            trap_info.value = insn;
         end
         else begin
-            trapInfo = '0;
+            trap_info = '0;
         end
     end
 
@@ -69,7 +79,7 @@ module DecodeStage(
         end
         else begin
             insnBuffer.readLow = valid;
-            insnBuffer.readHigh = valid;
+            insnBuffer.readHigh = valid && !is_compressed;
         end
     end
 
@@ -103,8 +113,8 @@ module DecodeStage(
             nextStage.pc <= pc;
             nextStage.op <= op;
             nextStage.insn <= insn;
-            nextStage.csrAddr <= csrAddr;
-            nextStage.trapInfo <= trapInfo;
+            nextStage.csrAddr <= csr_addr;
+            nextStage.trapInfo <= trap_info;
         end
     end
 endmodule
