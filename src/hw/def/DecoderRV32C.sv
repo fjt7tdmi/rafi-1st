@@ -73,7 +73,7 @@ function automatic Op DecodeRV32C_Quadrant0(uint16_t insn);
 
     logic [2:0] funct3  = insn[15:13];
     reg_addr_t rd       = {2'b01, insn[4:2]};
-    reg_addr_t rs1      = {2'b01, insn[12:10]};
+    reg_addr_t rs1      = {2'b01, insn[9:7]};
     reg_addr_t rs2      = {2'b01, insn[4:2]};
     uint32_t uimm4   = {25'h0, insn[5], insn[12:10], insn[6], 2'h0};
     uint32_t uimm8   = {24'h0, insn[6:5], insn[12:10], 3'h0};
@@ -97,6 +97,10 @@ function automatic Op DecodeRV32C_Quadrant0(uint16_t insn);
     op.csrWriteEnable = 0;
     op.fpRegWriteEnable = 0;
     op.intRegWriteEnable = 0;
+    op.rd = rd;
+    op.rs1 = rs1;
+    op.rs2 = rs2;
+    op.rs3 = '0;
 
     if (funct3 == 3'b000 && insn[12:5] != '0) begin
         // C.ADDI4SPN
@@ -105,7 +109,6 @@ function automatic Op DecodeRV32C_Quadrant0(uint16_t insn);
         op.aluSrcType2 = AluSrcType2_Imm;
         op.imm = nzuimm;
         op.intRegWriteEnable = 1;
-        op.rd = 2;
         op.rs1 = 2;
     end
     else if (funct3 == 3'b001) begin
@@ -123,8 +126,6 @@ function automatic Op DecodeRV32C_Quadrant0(uint16_t insn);
         op.command.mem.storeSrc = StoreSrcType_Fp;
         op.imm = uimm8;
         op.fpRegWriteEnable = 1;
-        op.rd = rd;
-        op.rs1 = rs1;
     end
     else if (funct3 == 3'b010) begin
         // C.LW
@@ -142,8 +143,6 @@ function automatic Op DecodeRV32C_Quadrant0(uint16_t insn);
         op.intRegWriteSrcType = IntRegWriteSrcType_Memory;
         op.imm = uimm4;
         op.intRegWriteEnable = 1;
-        op.rd = rd;
-        op.rs1 = rs1;
     end
     else if (funct3 == 3'b011) begin
         // C.FLW
@@ -160,8 +159,6 @@ function automatic Op DecodeRV32C_Quadrant0(uint16_t insn);
         op.command.mem.storeSrc = StoreSrcType_Fp;
         op.imm = uimm4;
         op.fpRegWriteEnable = 1;
-        op.rd = rd;
-        op.rs1 = rs1;
     end
     else if (funct3 == 3'b101) begin
         // C.FSD
@@ -177,8 +174,6 @@ function automatic Op DecodeRV32C_Quadrant0(uint16_t insn);
         op.command.mem.loadStoreType = LoadStoreType_DoubleWord;
         op.command.mem.storeSrc = StoreSrcType_Fp;
         op.imm = uimm8;
-        op.rd = rd;
-        op.rs1 = rs1;
     end
     else if (funct3 == 3'b110) begin
         // C.SW
@@ -194,8 +189,6 @@ function automatic Op DecodeRV32C_Quadrant0(uint16_t insn);
         op.command.mem.loadStoreType = LoadStoreType_Word;
         op.command.mem.storeSrc = StoreSrcType_Int;
         op.imm = uimm4;
-        op.rd = rd;
-        op.rs1 = rs1;
     end
     else if (funct3 == 3'b111) begin
         // C.FSW
@@ -211,8 +204,6 @@ function automatic Op DecodeRV32C_Quadrant0(uint16_t insn);
         op.command.mem.loadStoreType = LoadStoreType_FpWord;
         op.command.mem.storeSrc = StoreSrcType_Fp;
         op.imm = uimm4;
-        op.rd = rd;
-        op.rs1 = rs1;
     end
     else begin
         op.isUnknown = 1;
@@ -265,6 +256,7 @@ function automatic Op DecodeRV32C_Quadrant1(uint16_t insn);
         // C.JAL
         op.aluSrcType1 = AluSrcType1_Pc;
         op.aluSrcType2 = AluSrcType2_Imm;
+        op.branchType = BranchType_Always;
         op.intRegWriteSrcType = IntRegWriteSrcType_NextPc;
         op.imm = sext12({insn[12], insn[8], insn[10:9], insn[6], insn[7], insn[2], insn[11], insn [4:2], 1'b0});
         op.isBranch = 1;
@@ -284,9 +276,10 @@ function automatic Op DecodeRV32C_Quadrant1(uint16_t insn);
     else if (funct3 == 3'b011 && rd != '0) begin
         // C.LUI (C.ADDI16SP if rd == 2)
         op.aluCommand = AluCommand_Add;
-        op.aluSrcType1 = AluSrcType1_Zero;
+        op.aluSrcType1 = (rd == 5'h2) ? AluSrcType1_Reg : AluSrcType1_Zero;
         op.aluSrcType2 = AluSrcType2_Imm;
         op.intRegWriteEnable = 1;
+        op.intRegWriteSrcType = IntRegWriteSrcType_Result;
         op.imm = (rd == 5'h2)
             ? sext10({insn[12], insn[4:3], insn[5], insn[2], insn[6], 4'h0})
             : sext18({insn[12], insn[6:2], 12'h0});
@@ -334,25 +327,27 @@ function automatic Op DecodeRV32C_Quadrant1(uint16_t insn);
         // C.J
         op.aluSrcType1 = AluSrcType1_Pc;
         op.aluSrcType2 = AluSrcType2_Imm;
-        op.intRegWriteSrcType = IntRegWriteSrcType_NextPc;
-        op.imm = sext12({insn[12], insn[8], insn[10:9], insn[6], insn[7], insn[2], insn[11], insn [4:2], 1'b0});
+        op.branchType = BranchType_Always;
+        op.imm = sext12({insn[12], insn[8], insn[10:9], insn[6], insn[7], insn[2], insn[11], insn [5:3], 1'b0});
         op.isBranch = 1;
     end
     else if (funct3 == 3'b110) begin
         // C.BEQZ
         op.aluSrcType1 = AluSrcType1_Pc;
         op.aluSrcType2 = AluSrcType2_Imm;
-        op.imm = sext9({insn[8], insn[6:5], insn[2], insn[11:10], insn[4:3], 1'b0});
+        op.imm = sext9({insn[12], insn[6:5], insn[2], insn[11:10], insn[4:3], 1'b0});
         op.branchType = BranchType_Equal;
         op.isBranch = 1;
+        op.rs2 = 0;
     end
     else if (funct3 == 3'b111) begin
         // C.BNEZ
         op.aluSrcType1 = AluSrcType1_Pc;
         op.aluSrcType2 = AluSrcType2_Imm;
-        op.imm = sext9({insn[8], insn[6:5], insn[2], insn[11:10], insn[4:3], 1'b0});
+        op.imm = sext9({insn[12], insn[6:5], insn[2], insn[11:10], insn[4:3], 1'b0});
         op.branchType = BranchType_NotEqual;
         op.isBranch = 1;
+        op.rs2 = 0;
     end
     else begin
         op.isUnknown = 1;
@@ -368,7 +363,7 @@ function automatic Op DecodeRV32C_Quadrant2(uint16_t insn);
     logic [1:0] funct2 = insn[11:10];    
     reg_addr_t rd = insn[11:7];
     reg_addr_t rs1 = insn[11:7];
-    reg_addr_t rs2 = insn[11:7];
+    reg_addr_t rs2 = insn[6:2];
 
     uint32_t uimm   = {26'h0, insn[12], insn[6:2]};
     uint32_t uimm4  = {24'h0, insn[3:2], insn[12], insn[6:4], 2'h0};
@@ -470,6 +465,7 @@ function automatic Op DecodeRV32C_Quadrant2(uint16_t insn);
             // C.JR, C.JALR
             op.aluSrcType1 = AluSrcType1_Reg;
             op.aluSrcType2 = AluSrcType2_Zero;
+            op.branchType = BranchType_Always;
             op.intRegWriteSrcType = IntRegWriteSrcType_NextPc;
             op.isBranch = 1;
             op.intRegWriteEnable = 1;
