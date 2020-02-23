@@ -792,7 +792,6 @@ function automatic Op DecodeRV32D(insn_t insn);
             op.command.mem.fence = '0;
             op.command.mem.loadStoreType = LoadStoreType_DoubleWord;
             op.command.mem.storeSrc = StoreSrcType_Fp;
-            op.intRegWriteSrcType = IntRegWriteSrcType_Memory;
             op.imm = sext12(insn[31:20]);
             op.fpRegWriteEnable = 1;
         end
