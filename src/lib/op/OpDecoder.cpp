@@ -870,7 +870,7 @@ private:
                 Pick(insn, 5) << 3);
             
             // C.ADDI4SPN
-            return new op32::ADDI(2, 2, imm);
+            return new op32::ADDI(rd, 2, imm);
         }
         else if (funct3 == 0b001)
         {
