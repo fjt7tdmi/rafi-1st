@@ -272,8 +272,7 @@ function automatic Op DecodeRV32I(insn_t insn);
     end
     7'b1110011: begin
         if (funct3 == 3'b000 && rd == 5'b00000) begin
-            // ecall, ebreak, uret, sret, mret, sfence.vma
-            // TODO: Implement WFI
+            // ecall, ebreak, uret, sret, mret, wfi, sfence.vma
             if (csr == 12'b0000_0000_0000 && rs1 == 5'b00000) begin
                 op.isTrap = 1;
                 op.trapOpType = TrapOpType_Ecall;
@@ -293,6 +292,9 @@ function automatic Op DecodeRV32I(insn_t insn);
             else if (csr == 12'b0011_0000_0010 && rs1 == 5'b00000) begin
                 op.isTrapReturn = 1;
                 op.trapReturnPrivilege = Privilege_Machine;
+            end
+            else if (csr == 12'b0001_0000_0101 && rs1 == 5'b00000) begin
+                // TORIAEZU: Implement WFI as NOP
             end
             else if (funct7 == 7'b000_1001) begin
                 op.unit = ExecuteUnitType_LoadStore;
