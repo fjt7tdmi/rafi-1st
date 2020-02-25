@@ -88,7 +88,8 @@ typedef enum logic [2:0]
     ExecuteUnitType_Fp32         = 3'h2,
     ExecuteUnitType_Fp64         = 3'h3,
     ExecuteUnitType_LoadStore    = 3'h4,
-    ExecuteUnitType_MulDiv       = 3'h5
+    ExecuteUnitType_MulDiv       = 3'h5,
+    ExecuteUnitType_Branch       = 3'h6
 } ExecuteUnitType;
 
 typedef enum logic [2:0]
@@ -222,12 +223,19 @@ typedef enum logic [2:0]
     MulDivCommand_Remu     = 3'h7
 } MulDivCommand;
 
+typedef struct packed
+{
+    BranchType condition;
+    logic indirect;
+} BranchCommand;
+
 typedef union packed
 {
     FpConverterCommand fpConverter;
     FpCommand fp;
     MemUnitCommand mem;
     MulDivCommand mulDiv;
+    BranchCommand branch;
 } CommandUnion;
 
 typedef enum logic [1:0]
@@ -251,12 +259,10 @@ typedef struct packed
     AluCommand aluCommand;
     AluSrcType1 aluSrcType1;
     AluSrcType2 aluSrcType2;
-    BranchType branchType;
     IntRegWriteSrcType intRegWriteSrcType;
     TrapOpType trapOpType;
     Privilege trapReturnPrivilege;
     word_t imm;
-    logic isBranch;
     logic isTrap;
     logic isTrapReturn;
     logic isUnknown;

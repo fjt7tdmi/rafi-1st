@@ -39,19 +39,6 @@ function automatic word_t ALU(AluCommand command, word_t src1, word_t src2);
     endcase
 endfunction
 
-function automatic logic BranchComparator(BranchType branchType, word_t src1, word_t src2);
-    unique case (branchType)
-    BranchType_Equal: return src1 == src2;
-    BranchType_NotEqual: return src1 != src2;
-    BranchType_LessThan: return $signed(src1) < $signed(src2);
-    BranchType_GreaterEqual: return $signed(src1) >= $signed(src2);
-    BranchType_UnsignedLessThan: return $unsigned(src1) < $unsigned(src2);
-    BranchType_UnsignedGreaterEqual: return $unsigned(src1) >= $unsigned(src2);
-    BranchType_Always: return 1;
-    default: return '0;
-    endcase
-endfunction
-
 function automatic LoadStoreUnitCommand getLoadStoreUnitCommand(Op op);
     MemUnitCommand cmd = op.command.mem;
 
@@ -98,18 +85,22 @@ module ExecuteStage(
     // Wires
     logic valid;
     Op op;
+    addr_t pc;
     always_comb begin
         valid = prevStage.valid;
         op = prevStage.op;
+        pc = prevStage.pc;
     end
 
     logic enableFp32;
     logic enableFp64;
     logic enableMulDiv;
+    logic enableBranch;
     always_comb begin
         enableFp32 = valid && (op.unit == ExecuteUnitType_Fp32);
         enableFp64 = valid && (op.unit == ExecuteUnitType_Fp64);
         enableMulDiv = valid && (op.unit == ExecuteUnitType_MulDiv);
+        enableBranch = valid && (op.unit == ExecuteUnitType_Branch);
     end
 
     logic done;
@@ -238,6 +229,17 @@ module ExecuteStage(
         .rst
     );
 
+    BranchUnit m_BranchUnit (
+        .taken(branchTaken),
+        .target(branchTarget),
+        .enable(enableBranch),
+        .condition(op.command.branch.condition),
+        .indirect(op.command.branch.indirect),
+        .pc(pc),
+        .srcRegValue1(srcIntRegValue1),
+        .srcRegValue2(srcIntRegValue2),
+        .imm(op.imm));
+
     // CSR
     always_comb begin
         csr.readAddr = prevStage.csrAddr;
@@ -305,9 +307,6 @@ module ExecuteStage(
         ExecuteUnitType_MulDiv:      intResult = intResultMulDiv;
         default:                intResult = intResultAlu;
         endcase
-
-        branchTaken = op.isBranch && BranchComparator(op.branchType, srcIntRegValue1, srcIntRegValue2);
-        branchTarget = intResult;
     end
 
     // dstIntRegValue
@@ -364,14 +363,14 @@ module ExecuteStage(
     always_comb begin
         ctrl.exStallReq = !done || (loadStoreUnit.enable && !loadStoreUnit.done);
         ctrl.flushReq = valid && !ctrl.exStallReq && (
-            (op.isBranch && branchTaken) ||
+            (enableBranch && branchTaken) ||
             op.csrWriteEnable ||
             invalidateICache ||
             invalidateTlb ||
             trapInfo.valid ||
             trapReturn);
 
-        if (op.isBranch && branchTaken) begin
+        if (enableBranch && branchTaken) begin
             ctrl.nextPc = branchTarget;
         end
         else begin
