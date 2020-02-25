@@ -8,6 +8,7 @@
     { "name": "rv32si-p-csr",           "host-io-addr": "0x80001000", "cycle": 32000 },
     { "name": "rv32si-p-sbreak",        "host-io-addr": "0x80001000", "cycle": 32000 },
     { "name": "rv32si-p-scall",         "host-io-addr": "0x80001000", "cycle": 32000 },
+    { "name": "rv32si-p-wfi",           "host-io-addr": "0x80001000", "cycle": 32000 },
     { "name": "rv32ua-p-amoadd_w",      "host-io-addr": "0x80001000", "cycle": 10000 },
     { "name": "rv32ua-p-amoand_w",      "host-io-addr": "0x80001000", "cycle": 10000 },
     { "name": "rv32ua-p-amomax_w",      "host-io-addr": "0x80001000", "cycle": 10000 },
