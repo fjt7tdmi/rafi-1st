@@ -545,6 +545,7 @@ if (verilator_FOUND)
         src/hw/fp/SqrtUnit.sv
         src/hw/mul/MulUnit.sv
         src/hw/core/BlockRam.sv
+        src/hw/core/BranchUnit.sv
         src/hw/core/FlipFlopCam.sv
         src/hw/core/Tlb.sv
         src/hw/core/TlbReplacer.sv

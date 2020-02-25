@@ -84,12 +84,10 @@ function automatic Op DecodeRV32C_Quadrant0(uint16_t insn);
     op.aluCommand = '0;
     op.aluSrcType1 = '0;
     op.aluSrcType2 = '0;
-    op.branchType = '0;
     op.intRegWriteSrcType = '0;
     op.trapOpType = '0;
     op.trapReturnPrivilege = '0;
     op.imm = '0;
-    op.isBranch = 0;
     op.isTrap = 0;
     op.isTrapReturn = 0;
     op.isUnknown = 0;
@@ -224,12 +222,10 @@ function automatic Op DecodeRV32C_Quadrant1(uint16_t insn);
     op.aluCommand = '0;
     op.aluSrcType1 = '0;
     op.aluSrcType2 = '0;
-    op.branchType = '0;
     op.intRegWriteSrcType = '0;
     op.trapOpType = '0;
     op.trapReturnPrivilege = '0;
     op.imm = '0;
-    op.isBranch = 0;
     op.isTrap = 0;
     op.isTrapReturn = 0;
     op.isUnknown = 0;
@@ -254,13 +250,12 @@ function automatic Op DecodeRV32C_Quadrant1(uint16_t insn);
     end
     else if (funct3 == 3'b001) begin
         // C.JAL
-        op.aluSrcType1 = AluSrcType1_Pc;
-        op.aluSrcType2 = AluSrcType2_Imm;
-        op.branchType = BranchType_Always;
-        op.intRegWriteSrcType = IntRegWriteSrcType_NextPc;
+        op.unit = ExecuteUnitType_Branch;
+        op.command.branch.condition = BranchType_Always;
+        op.command.branch.indirect = 0;
         op.imm = sext12({insn[12], insn[8], insn[10:9], insn[6], insn[7], insn[2], insn[11], insn [4:2], 1'b0});
-        op.isBranch = 1;
         op.intRegWriteEnable = 1;
+        op.intRegWriteSrcType = IntRegWriteSrcType_NextPc;
         op.rd = 1; // x1
     end
     else if (funct3 == 3'b010 && rd != '0) begin
@@ -325,28 +320,25 @@ function automatic Op DecodeRV32C_Quadrant1(uint16_t insn);
     end
     else if (funct3 == 3'b101) begin
         // C.J
-        op.aluSrcType1 = AluSrcType1_Pc;
-        op.aluSrcType2 = AluSrcType2_Imm;
-        op.branchType = BranchType_Always;
+        op.unit = ExecuteUnitType_Branch;
+        op.command.branch.condition = BranchType_Always;
+        op.command.branch.indirect = 0;
         op.imm = sext12({insn[12], insn[8], insn[10:9], insn[6], insn[7], insn[2], insn[11], insn [5:3], 1'b0});
-        op.isBranch = 1;
     end
     else if (funct3 == 3'b110) begin
         // C.BEQZ
-        op.aluSrcType1 = AluSrcType1_Pc;
-        op.aluSrcType2 = AluSrcType2_Imm;
+        op.unit = ExecuteUnitType_Branch;
+        op.command.branch.condition = BranchType_Equal;
+        op.command.branch.indirect = 0;
         op.imm = sext9({insn[12], insn[6:5], insn[2], insn[11:10], insn[4:3], 1'b0});
-        op.branchType = BranchType_Equal;
-        op.isBranch = 1;
         op.rs2 = 0;
     end
     else if (funct3 == 3'b111) begin
         // C.BNEZ
-        op.aluSrcType1 = AluSrcType1_Pc;
-        op.aluSrcType2 = AluSrcType2_Imm;
+        op.unit = ExecuteUnitType_Branch;
+        op.command.branch.condition = BranchType_NotEqual;
+        op.command.branch.indirect = 0;
         op.imm = sext9({insn[12], insn[6:5], insn[2], insn[11:10], insn[4:3], 1'b0});
-        op.branchType = BranchType_NotEqual;
-        op.isBranch = 1;
         op.rs2 = 0;
     end
     else begin
@@ -374,12 +366,10 @@ function automatic Op DecodeRV32C_Quadrant2(uint16_t insn);
     op.aluCommand = '0;
     op.aluSrcType1 = '0;
     op.aluSrcType2 = '0;
-    op.branchType = '0;
     op.intRegWriteSrcType = '0;
     op.trapOpType = '0;
     op.trapReturnPrivilege = '0;
     op.imm = '0;
-    op.isBranch = 0;
     op.isTrap = 0;
     op.isTrapReturn = 0;
     op.isUnknown = 0;
@@ -463,13 +453,13 @@ function automatic Op DecodeRV32C_Quadrant2(uint16_t insn);
         end
         else if (rs1 != 0 && rs2 == 0) begin
             // C.JR, C.JALR
-            op.aluSrcType1 = AluSrcType1_Reg;
-            op.aluSrcType2 = AluSrcType2_Zero;
-            op.branchType = BranchType_Always;
-            op.intRegWriteSrcType = IntRegWriteSrcType_NextPc;
-            op.isBranch = 1;
+            op.unit = ExecuteUnitType_Branch;
+            op.command.branch.condition = BranchType_Always;
+            op.command.branch.indirect = 1;
             op.intRegWriteEnable = 1;
+            op.intRegWriteSrcType = IntRegWriteSrcType_NextPc;
             op.rd = insn[12] ? 1 : 0;
+            op.rs2 = 0;
         end
         else if (rs1 != 0 && rs2 != 0) begin
             // C.MV, C.ADD
@@ -543,14 +533,12 @@ function automatic Op DecodeRV32C_Unknown(uint16_t insn);
     op.aluCommand = '0;
     op.aluSrcType1 = '0;
     op.aluSrcType2 = '0;
-    op.branchType = '0;
     op.unit = '0;
     op.command.mulDiv = '0;
     op.intRegWriteSrcType = '0;
     op.trapOpType = '0;
     op.trapReturnPrivilege = '0;
     op.imm = '0;
-    op.isBranch = 0;
     op.isTrap = 0;
     op.isTrapReturn = 0;
     op.isUnknown = 1;

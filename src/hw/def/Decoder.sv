@@ -134,14 +134,12 @@ function automatic Op DecodeRV32I(insn_t insn);
     op.aluCommand = AluCommand_Add;
     op.aluSrcType1 = AluSrcType1_Zero;
     op.aluSrcType2 = AluSrcType2_Zero;
-    op.branchType = BranchType_Always;
     op.unit = '0;
     op.command = '0;
     op.intRegWriteSrcType = IntRegWriteSrcType_Result;
     op.trapOpType = TrapOpType_Ecall;
     op.trapReturnPrivilege = Privilege_User;
     op.imm = '0;
-    op.isBranch = 0;
     op.isTrap = 0;
     op.isTrapReturn = 0;
     op.isUnknown = 0;
@@ -170,32 +168,29 @@ function automatic Op DecodeRV32I(insn_t insn);
     end
     7'b1101111: begin
         // jal
-        op.aluSrcType1 = AluSrcType1_Pc;
-        op.aluSrcType2 = AluSrcType2_Imm;
-        op.intRegWriteSrcType = IntRegWriteSrcType_NextPc;
+        op.unit = ExecuteUnitType_Branch;
+        op.command.branch.condition = BranchType_Always;
+        op.command.branch.indirect = 0;
         op.imm = sext21({insn[31], insn[19:12], insn[20], insn[30:21], 1'b0});
-        op.isBranch = 1;
         op.intRegWriteEnable = 1;
+        op.intRegWriteSrcType = IntRegWriteSrcType_NextPc;
     end
     7'b1100111: begin
         // jalr
-        op.aluSrcType1 = AluSrcType1_Reg;
-        op.aluSrcType2 = AluSrcType2_Imm;
-        op.intRegWriteSrcType = IntRegWriteSrcType_NextPc;
+        op.unit = ExecuteUnitType_Branch;
+        op.command.branch.condition = BranchType_Always;
+        op.command.branch.indirect = 1;
         op.imm = sext12(insn[31:20]);
-        op.isBranch = 1;
         op.intRegWriteEnable = 1;
+        op.intRegWriteSrcType = IntRegWriteSrcType_NextPc;
     end
     7'b1100011: begin
         // beq, bne, blt, bge, bltu, bgeu
-        op.aluSrcType1 = AluSrcType1_Pc;
-        op.aluSrcType2 = AluSrcType2_Imm;
+        op.unit = ExecuteUnitType_Branch;
+        op.command.branch.condition = BranchType'({1'b0, funct3});
+        op.command.branch.indirect = 0;
         op.imm = sext13({insn[31], insn[7], insn[30:25], insn[11:8], 1'b0});
-        op.branchType = BranchType'({1'b0, funct3});
-        op.isBranch = 1;
-        if (!IsValidBranchType(op.branchType)) begin
-            op.isUnknown = 1;
-        end
+        op.isUnknown = !IsValidBranchType(op.command.branch.condition);
     end
     7'b0000011: begin
         // lb, lh, lw, lbu, lhu
@@ -421,14 +416,12 @@ function automatic Op DecodeRV32M(insn_t insn);
     op.aluCommand = '0;
     op.aluSrcType1 = '0;
     op.aluSrcType2 = '0;
-    op.branchType = '0;
     op.unit = ExecuteUnitType_MulDiv;
     op.command.mulDiv = MulDivCommand'(insn[14:12]);
     op.intRegWriteSrcType = IntRegWriteSrcType_Result;
     op.trapOpType = '0;
     op.trapReturnPrivilege = '0;
     op.imm = '0;
-    op.isBranch = 0;
     op.isTrap = 0;
     op.isTrapReturn = 0;
     op.isUnknown = 0;
@@ -466,7 +459,6 @@ function automatic Op DecodeRV32A(insn_t insn);
     op.aluCommand = AluCommand_Add;             // for address calculation
     op.aluSrcType1 = AluSrcType1_Reg;           // for address calculation
     op.aluSrcType2 = AluSrcType2_Zero;          // for address calculation
-    op.branchType = '0;
     op.unit = ExecuteUnitType_LoadStore;
     op.command.mem.isAtomic = 1;
     op.command.mem.isFence = 0;
@@ -480,7 +472,6 @@ function automatic Op DecodeRV32A(insn_t insn);
     op.trapOpType = '0;
     op.trapReturnPrivilege = '0;
     op.imm = '0;
-    op.isBranch = 0;
     op.isTrap = 0;
     op.isTrapReturn = 0;
     op.isUnknown = !isSupportedAtomicOp;
@@ -510,14 +501,12 @@ function automatic Op DecodeRV32F(insn_t insn);
     op.aluCommand = '0;
     op.aluSrcType1 = '0;
     op.aluSrcType2 = '0;
-    op.branchType = '0;
     op.unit = ExecuteUnitType_Fp32;
     op.command = '0;
     op.intRegWriteSrcType = '0;
     op.trapOpType = '0;
     op.trapReturnPrivilege = '0;
     op.imm = '0;
-    op.isBranch = 0;
     op.isTrap = 0;
     op.isTrapReturn = 0;
     op.isUnknown = '0;
@@ -758,7 +747,6 @@ function automatic Op DecodeRV32D(insn_t insn);
     op.aluCommand = '0;
     op.aluSrcType1 = '0;
     op.aluSrcType2 = '0;
-    op.branchType = '0;
     op.command.fp.unit = '0;
     op.unit = ExecuteUnitType_Fp64;
     op.command = '0;
@@ -766,7 +754,6 @@ function automatic Op DecodeRV32D(insn_t insn);
     op.trapOpType = '0;
     op.trapReturnPrivilege = '0;
     op.imm = '0;
-    op.isBranch = 0;
     op.isTrap = 0;
     op.isTrapReturn = 0;
     op.isUnknown = '0;
