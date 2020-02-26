@@ -65,8 +65,14 @@ typedef struct packed
 
 typedef struct packed
 {
+    logic isInterrupt; // 1: interrupt, 0: exception
+    logic [3:0] code;  // interrupt code or exception code
+} TrapCause;
+
+typedef struct packed
+{
     logic valid;
-    ExceptionCode cause;
+    TrapCause cause;
     word_t value;
 } TrapInfo;
 

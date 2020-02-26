@@ -105,11 +105,11 @@ parameter HARDWARE_THREAD_ID = 0;
 //
 
 function automatic Privilege calc_next_privilege(
-    exception_code_t cause,
+    TrapCause cause,
     word_t machineExceptionDelegate,
     word_t supervisorExceptionDelegate
 );
-    word_t decodedCause = 1 << cause;
+    word_t decodedCause = 1 << cause.code;
 
     Privilege privilege = Privilege_Machine;
     if ((decodedCause & machineExceptionDelegate) != 0) begin
@@ -122,9 +122,8 @@ function automatic Privilege calc_next_privilege(
     return privilege;
 endfunction
 
-function automatic word_t read_xcause(exception_code_t trapValue);
-    // bit 31 is 'interrupt' bit, but not implemented
-    return {28'h000_0000, trapValue};
+function automatic word_t read_xcause(TrapCause cause);
+    return {cause.isInterrupt, 27'h000_0000, cause.code};
 endfunction
 
 function automatic csr_xstatus_t get_sstatus_mask();
@@ -228,15 +227,15 @@ module Csr(
     csr_xstatus_t reg_status;
 
     word_t reg_uepc;
-    exception_code_t reg_ucause;
+    TrapCause reg_ucause;
     word_t reg_utval;
 
     word_t reg_sepc;
-    exception_code_t reg_scause;
+    TrapCause reg_scause;
     word_t reg_stval;
 
     word_t reg_mepc;
-    exception_code_t reg_mcause;
+    TrapCause reg_mcause;
     word_t reg_mtval;
 
     // Registers (written by csr insructions)
@@ -449,7 +448,7 @@ module Csr(
                     ? bus.writeValue
                     : reg_uepc;
                 reg_ucause <= (bus.writeEnable && bus.writeAddr == CSR_ADDR_UCAUSE)
-                    ? bus.writeValue[3:0]
+                    ? {bus.writeValue[31], bus.writeValue[3:0]}
                     : reg_ucause;
                 reg_utval <= (bus.writeEnable && bus.writeAddr == CSR_ADDR_UTVAL)
                     ? bus.writeValue
@@ -466,7 +465,7 @@ module Csr(
                     ? bus.writeValue
                     : reg_sepc;
                 reg_scause <= (bus.writeEnable && bus.writeAddr == CSR_ADDR_SCAUSE)
-                    ? bus.writeValue[3:0]
+                    ? {bus.writeValue[31], bus.writeValue[3:0]}
                     : reg_scause;
                 reg_stval <= (bus.writeEnable && bus.writeAddr == CSR_ADDR_STVAL)
                     ? bus.writeValue
@@ -483,7 +482,7 @@ module Csr(
                     ? bus.writeValue
                     : reg_mepc;
                 reg_mcause <= (bus.writeEnable && bus.writeAddr == CSR_ADDR_MCAUSE)
-                    ? bus.writeValue[3:0]
+                    ? {bus.writeValue[31], bus.writeValue[3:0]}
                     : reg_mcause;
                 reg_mtval <= (bus.writeEnable && bus.writeAddr == CSR_ADDR_MTVAL)
                     ? bus.writeValue
