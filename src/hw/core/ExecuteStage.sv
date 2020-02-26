@@ -401,11 +401,13 @@ module ExecuteStage(
         end
         else if (valid && csr.readEnable && csr.readIllegal) begin
             trapInfo.valid = 1;
+            trapInfo.isInterrupt = 0;
             trapInfo.value = prevStage.insn;
             trapInfo.cause = ExceptionCode_IllegalInsn;
         end
         else if (valid && op.isTrap && op.trapOpType == TrapOpType_Ecall) begin
             trapInfo.valid = 1;
+            trapInfo.isInterrupt = 0;
             trapInfo.value = '0;
 
             unique case (csr.privilege)
@@ -416,21 +418,25 @@ module ExecuteStage(
         end
         else if (valid && op.isTrap && op.trapOpType == TrapOpType_Ebreak) begin
             trapInfo.valid = 1;
+            trapInfo.isInterrupt = 0;
             trapInfo.value = '0;
             trapInfo.cause = ExceptionCode_Breakpoint;
         end
         else if (valid && op.isTrapReturn && op.trapReturnPrivilege == Privilege_Supervisor && csr.trapSupervisorReturn) begin
             trapInfo.valid = 1;
+            trapInfo.isInterrupt = 0;
             trapInfo.value = prevStage.insn;
             trapInfo.cause = ExceptionCode_IllegalInsn;
         end
         else if (valid && loadStoreUnit.loadPagefault) begin
             trapInfo.valid = 1;
+            trapInfo.isInterrupt = 0;
             trapInfo.value = memAddr;
             trapInfo.cause = ExceptionCode_LoadPageFault;
         end
         else if (valid && loadStoreUnit.storePagefault) begin
             trapInfo.valid = 1;
+            trapInfo.isInterrupt = 0;
             trapInfo.value = memAddr;
             trapInfo.cause = ExceptionCode_StorePageFault;
         end
