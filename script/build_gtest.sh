@@ -11,14 +11,14 @@ if [[ -v RAFI_WIN ]]; then
     # Debug
     mkdir -p x64-Debug
     pushd x64-Debug
-        cmake .. -DBUILD_GTEST=ON -DBUILD_GMOCK=OFF -G "Visual Studio 15 2017 Win64" && cmake --build . --config Debug
+        cmake .. -DBUILD_GTEST=ON -DBUILD_GMOCK=OFF -G "Visual Studio 16 2019" -A x64 && cmake --build . --config Debug
         exit_code="$?"
     popd
 
     # Release
     mkdir -p x64-Release
     pushd x64-Release
-        cmake .. -DBUILD_GTEST=ON -DBUILD_GMOCK=OFF -G "Visual Studio 15 2017 Win64" && cmake --build . --config Release
+        cmake .. -DBUILD_GTEST=ON -DBUILD_GMOCK=OFF -G "Visual Studio 16 2019" -A x64 && cmake --build . --config Release
         exit_code="$?"
     popd
 else
