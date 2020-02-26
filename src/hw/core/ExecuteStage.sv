@@ -401,44 +401,44 @@ module ExecuteStage(
         end
         else if (valid && csr.readEnable && csr.readIllegal) begin
             trapInfo.valid = 1;
-            trapInfo.isInterrupt = 0;
+            trapInfo.cause.isInterrupt = 0;
+            trapInfo.cause.code = EXCEPTION_CODE_ILLEGAL_INSN;
             trapInfo.value = prevStage.insn;
-            trapInfo.cause = ExceptionCode_IllegalInsn;
         end
         else if (valid && op.isTrap && op.trapOpType == TrapOpType_Ecall) begin
             trapInfo.valid = 1;
-            trapInfo.isInterrupt = 0;
             trapInfo.value = '0;
+            trapInfo.cause.isInterrupt = 0;
 
             unique case (csr.privilege)
-            Privilege_Machine:      trapInfo.cause = ExceptionCode_EcallFromMachine;
-            Privilege_Supervisor:   trapInfo.cause = ExceptionCode_EcallFromSupervisor;
-            default:                trapInfo.cause = ExceptionCode_EcallFromUser;
+            Privilege_Machine:      trapInfo.cause.code = EXCEPTION_CODE_ECALL_FROM_U;
+            Privilege_Supervisor:   trapInfo.cause.code = EXCEPTION_CODE_ECALL_FROM_S;
+            default:                trapInfo.cause.code = EXCEPTION_CODE_ECALL_FROM_M;
             endcase
         end
         else if (valid && op.isTrap && op.trapOpType == TrapOpType_Ebreak) begin
             trapInfo.valid = 1;
-            trapInfo.isInterrupt = 0;
+            trapInfo.cause.isInterrupt = 0;
+            trapInfo.cause.code = EXCEPTION_CODE_BREAKPOINT;
             trapInfo.value = '0;
-            trapInfo.cause = ExceptionCode_Breakpoint;
         end
         else if (valid && op.isTrapReturn && op.trapReturnPrivilege == Privilege_Supervisor && csr.trapSupervisorReturn) begin
             trapInfo.valid = 1;
-            trapInfo.isInterrupt = 0;
+            trapInfo.cause.isInterrupt = 0;
+            trapInfo.cause.code = EXCEPTION_CODE_ILLEGAL_INSN;
             trapInfo.value = prevStage.insn;
-            trapInfo.cause = ExceptionCode_IllegalInsn;
         end
         else if (valid && loadStoreUnit.loadPagefault) begin
             trapInfo.valid = 1;
-            trapInfo.isInterrupt = 0;
+            trapInfo.cause.isInterrupt = 0;
+            trapInfo.cause.code = EXCEPTION_CODE_LOAD_PAGE_FAULT;
             trapInfo.value = memAddr;
-            trapInfo.cause = ExceptionCode_LoadPageFault;
         end
         else if (valid && loadStoreUnit.storePagefault) begin
             trapInfo.valid = 1;
-            trapInfo.isInterrupt = 0;
+            trapInfo.cause.isInterrupt = 0;
+            trapInfo.cause.code = EXCEPTION_CODE_STORE_PAGE_FAULT;
             trapInfo.value = memAddr;
-            trapInfo.cause = ExceptionCode_StorePageFault;
         end
         else begin
             trapInfo = '0;

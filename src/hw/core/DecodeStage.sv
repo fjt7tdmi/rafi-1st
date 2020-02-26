@@ -59,14 +59,14 @@ module DecodeStage(
     always_comb begin
         if (valid && insnBuffer.readEntryLow.fault) begin
             trap_info.valid = '1;
-            trap_info.isInterrupt = 0;
-            trap_info.cause = ExceptionCode_InsnPageFault;
+            trap_info.cause.isInterrupt = 0;
+            trap_info.cause.code = EXCEPTION_CODE_INSN_PAGE_FAULT;
             trap_info.value = pc;
         end
         else if (valid && op.isUnknown) begin
             trap_info.valid = 1;
-            trap_info.isInterrupt = 0;
-            trap_info.cause = ExceptionCode_IllegalInsn;
+            trap_info.cause.isInterrupt = 0;
+            trap_info.cause.code = EXCEPTION_CODE_ILLEGAL_INSN;
             trap_info.value = insn;
         end
         else begin

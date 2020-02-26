@@ -46,7 +46,6 @@ module RegWriteStage(
 
     always_comb begin
         csr.trapInfo.valid = valid && prevStage.trapInfo.valid;
-        csr.trapInfo.isInterrupt = prevStage.trapInfo.isInterrupt;
         csr.trapInfo.cause = prevStage.trapInfo.cause;
         csr.trapInfo.value = prevStage.trapInfo.value;
         csr.trapPc = prevStage.pc;
