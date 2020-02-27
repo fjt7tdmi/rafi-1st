@@ -93,6 +93,18 @@ parameter CSR_ADDR_MIMPID       = 12'hf13;
 parameter CSR_ADDR_MHARTID      = 12'hf14;
 
 // ----------------------------------------------------------------------------
+// CSR masks
+//
+parameter CSR_MASK_MIP = 12'b1111_1111_1111;
+parameter CSR_MASK_MIE = 12'b1111_1111_1111;
+
+parameter CSR_MASK_SIP = 12'b0011_0011_0011;
+parameter CSR_MASK_SIE = 12'b0011_0011_0011;
+
+parameter CSR_MASK_UIP = 12'b0001_0001_0001;
+parameter CSR_MASK_UIE = 12'b0001_0001_0001;
+
+// ----------------------------------------------------------------------------
 // Constants
 //
 parameter VENDOR_ID = 0; // non commercial
@@ -253,6 +265,8 @@ module Csr(
 
     logic [2:0] reg_frm;
     fflags_t reg_fflags;
+    csr_xip_t reg_xip;
+    csr_xie_t reg_xie;
 
     always_comb begin
         // read_value
@@ -261,29 +275,35 @@ module Csr(
         CSR_ADDR_FFLAGS:    read_value = {27'h0, reg_fflags};
         CSR_ADDR_FRM:       read_value = {29'h0, reg_frm};
         CSR_ADDR_FCSR:      read_value = {24'h0, reg_frm, reg_fflags};
+        CSR_ADDR_UIE:       read_value = {20'h0, reg_xie & CSR_MASK_UIE};
         CSR_ADDR_UTVEC:     read_value = reg_utvec;
         CSR_ADDR_USCRATCH:  read_value = reg_uscratch;
         CSR_ADDR_UEPC:      read_value = reg_uepc;
         CSR_ADDR_UCAUSE:    read_value = read_xcause(reg_ucause);
         CSR_ADDR_UTVAL:     read_value = reg_utval;
+        CSR_ADDR_UIP:       read_value = {20'h0, reg_xip & CSR_MASK_UIP};
 
         CSR_ADDR_SSTATUS:   read_value = read_sstatus(reg_status);
         CSR_ADDR_SEDELEG:   read_value = reg_sedeleg;
+        CSR_ADDR_SIE:       read_value = {20'h0, reg_xie & CSR_MASK_SIE};
         CSR_ADDR_STVEC:     read_value = reg_stvec;
         CSR_ADDR_SSCRATCH:  read_value = reg_sscratch;
         CSR_ADDR_SEPC:      read_value = reg_sepc;
         CSR_ADDR_SCAUSE:    read_value = read_xcause(reg_scause);
         CSR_ADDR_STVAL:     read_value = reg_stval;
+        CSR_ADDR_SIP:       read_value = {20'h0, reg_xip & CSR_MASK_SIP};
         CSR_ADDR_SATP:      read_value = reg_satp;
 
         CSR_ADDR_MSTATUS:   read_value = reg_status;
         CSR_ADDR_MISA:      read_value = read_misa();
         CSR_ADDR_MEDELEG:   read_value = reg_medeleg;
+        CSR_ADDR_MIE:       read_value = {20'h0, reg_xie & CSR_MASK_MIE};
         CSR_ADDR_MTVEC:     read_value = reg_mtvec;
         CSR_ADDR_MSCRATCH:  read_value = reg_mscratch;
         CSR_ADDR_MEPC:      read_value = reg_mepc;
         CSR_ADDR_MCAUSE:    read_value = read_xcause(reg_mcause);
         CSR_ADDR_MTVAL:     read_value = reg_mtval;
+        CSR_ADDR_MIP:       read_value = {20'h0, reg_xip & CSR_MASK_MIP};
 
         CSR_ADDR_CYCLE:     read_value = reg_cycle[31:0];
         CSR_ADDR_TIME:      read_value = reg_cycle[31:0];
@@ -429,6 +449,8 @@ module Csr(
 
             reg_fflags <= '0;
             reg_frm <= '0;
+            reg_xip <= '0;
+            reg_xie <= '0;
         end
         else begin
             // Performance Counters
@@ -545,6 +567,32 @@ module Csr(
             else begin
                 reg_fflags <= reg_fflags;
                 reg_frm <= reg_frm;
+            end
+
+            if (bus.writeEnable && bus.writeAddr == CSR_ADDR_MIP) begin
+                reg_xip <= bus.writeValue[11:0] & CSR_MASK_MIP;
+            end
+            else if (bus.writeEnable && bus.writeAddr == CSR_ADDR_SIP) begin
+                reg_xip <= bus.writeValue[11:0] & CSR_MASK_SIP;
+            end
+            else if (bus.writeEnable && bus.writeAddr == CSR_ADDR_SIP) begin
+                reg_xip <= bus.writeValue[11:0] & CSR_MASK_UIP;
+            end
+            else begin
+                reg_xip <= reg_xip;
+            end
+
+            if (bus.writeEnable && bus.writeAddr == CSR_ADDR_MIE) begin
+                reg_xie <= bus.writeValue[11:0] & CSR_MASK_MIE;
+            end
+            else if (bus.writeEnable && bus.writeAddr == CSR_ADDR_SIE) begin
+                reg_xie <= bus.writeValue[11:0] & CSR_MASK_SIE;
+            end
+            else if (bus.writeEnable && bus.writeAddr == CSR_ADDR_SIE) begin
+                reg_xie <= bus.writeValue[11:0] & CSR_MASK_UIE;
+            end
+            else begin
+                reg_xie <= reg_xie;
             end
         end
     end
