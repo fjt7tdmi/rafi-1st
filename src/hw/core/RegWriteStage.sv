@@ -23,6 +23,7 @@ import RafiTypes::*;
 
 module RegWriteStage(
     ExecuteStageIF.NextStage prevStage,
+    PipelineControllerIF.RegWriteStage ctrl,
     CsrIF.RegWriteStage csr,
     IntRegFileIF.RegWriteStage intRegFile,
     FpRegFileIF.RegWriteStage fpRegFile,
@@ -45,6 +46,11 @@ module RegWriteStage(
     end
 
     always_comb begin
+        ctrl.trapValid = valid && prevStage.trapInfo.valid;
+        ctrl.trapCause = prevStage.trapInfo.cause;
+        ctrl.trapReturnValid = commit && prevStage.trapReturn;
+        ctrl.trapReturnPriv = op.trapReturnPrivilege;
+
         csr.trapInfo.valid = valid && prevStage.trapInfo.valid;
         csr.trapInfo.cause = prevStage.trapInfo.cause;
         csr.trapInfo.value = prevStage.trapInfo.value;

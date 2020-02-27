@@ -299,10 +299,7 @@ module FetchUnit (
 
     // next_pc
     always_comb begin
-        if (csr.trapInfo.valid || csr.trapReturn) begin
-            next_pc = csr.nextPc;
-        end
-        else if (bus.flush) begin
+        if (bus.flush) begin
             next_pc = bus.nextPc;
         end
         else if (stall || !bus.valid || reg_state != State_Default) begin

@@ -67,7 +67,6 @@ module Core (
         .insnBuffer(m_InsnBufferIF.FetchStage),
         .fetchUnit(m_FetchUnitIF.FetchStage),
         .ctrl(m_PipelineControllerIF.FetchStage),
-        .csr(m_CsrIF.FetchStage),
         .clk,
         .rst(rstInternal)
     );
@@ -107,6 +106,7 @@ module Core (
     );
     RegWriteStage m_RegWriteStage(
         .prevStage(m_ExecuteStageIF.NextStage),
+        .ctrl(m_PipelineControllerIF.RegWriteStage),
         .csr(m_CsrIF.RegWriteStage),
         .intRegFile(m_IntRegFileIF.RegWriteStage),
         .fpRegFile(m_FpRegFileIF.RegWriteStage),
@@ -143,6 +143,7 @@ module Core (
     );
     PipelineController m_PipelineController(
         .bus(m_PipelineControllerIF.PipelineController),
+        .csr(m_CsrIF.PipelineController),
         .clk,
         .rst(rstInternal)
     );

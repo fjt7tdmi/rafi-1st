@@ -381,39 +381,22 @@ module Csr(
             next_status = reg_status;
         end
 
-        // next_pc
-        if (bus.trapInfo.valid && next_priv == Privilege_Machine) begin
-            next_pc = {reg_mtvec.base, 2'b00};
-        end
-        else if (bus.trapInfo.valid && next_priv == Privilege_Supervisor) begin
-            next_pc = {reg_stvec.base, 2'b00};
-        end
-        else if (bus.trapInfo.valid && next_priv == Privilege_User) begin
-            next_pc = {reg_utvec.base, 2'b00};
-        end
-        else if (bus.trapReturn && bus.trapReturnPrivilege == Privilege_Machine) begin
-            next_pc = reg_mepc;
-        end
-        else if (bus.trapReturn && bus.trapReturnPrivilege == Privilege_Supervisor) begin
-            next_pc = reg_sepc;
-        end
-        else if (bus.trapReturn && bus.trapReturnPrivilege == Privilege_User) begin
-            next_pc = reg_uepc;
-        end
-        else begin
-            next_pc = '0;
-        end
-
         // bus output
-        bus.nextPc = next_pc;
         bus.readValue = read_value;
         bus.readIllegal = 0; // TEMP: Disable illegal access exception for riscv-tests
 
-        bus.frm = reg_frm;
+        bus.privilege = reg_priv;
         bus.satp = reg_satp;
         bus.mstatus = reg_status;
-        bus.privilege = reg_priv;
+        bus.frm = reg_frm;
+        bus.mtvec = reg_mtvec;
+        bus.stvec = reg_stvec;
+        bus.utvec = reg_utvec;
+        bus.mepc = reg_mepc;
+        bus.sepc = reg_sepc;
+        bus.uepc = reg_uepc;
         bus.trapSupervisorReturn = reg_status.tsr;
+        bus.nextPriv = next_priv;
     end
 
     always_ff @(posedge clk) begin

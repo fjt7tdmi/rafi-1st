@@ -22,12 +22,34 @@ import RafiTypes::*;
 
 module PipelineController(
     PipelineControllerIF.PipelineController bus,
+    CsrIF.PipelineController csr,
     input logic clk,
     input logic rst
 );
     always_comb begin
-        bus.flush = bus.flushReq;
+        if (bus.trapValid && csr.nextPriv == Privilege_Machine) begin
+            bus.nextPc = {csr.mtvec.base, 2'b00};
+        end
+        else if (bus.trapValid && csr.nextPriv == Privilege_Supervisor) begin
+            bus.nextPc = {csr.stvec.base, 2'b00};
+        end
+        else if (bus.trapValid && csr.nextPriv == Privilege_User) begin
+            bus.nextPc = {csr.utvec.base, 2'b00};
+        end
+        else if (bus.trapReturnValid && bus.trapReturnPriv == Privilege_Machine) begin
+            bus.nextPc = csr.mepc;
+        end
+        else if (bus.trapReturnValid && bus.trapReturnPriv == Privilege_Supervisor) begin
+            bus.nextPc = csr.sepc;
+        end
+        else if (bus.trapReturnValid && bus.trapReturnPriv == Privilege_User) begin
+            bus.nextPc = csr.uepc;
+        end
+        else begin
+            bus.nextPc = bus.flushTarget;
+        end
 
+        bus.flush = bus.flushReq || bus.trapValid || bus.trapReturnValid;
         bus.ifStall = bus.exStallReq;
         bus.idStall = bus.exStallReq;
         bus.rrStall = bus.exStallReq;
