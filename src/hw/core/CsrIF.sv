@@ -21,47 +21,57 @@ import Rv32Types::*;
 import RafiTypes::*;
 
 interface CsrIF;
-    // Fetch
-    addr_t nextPc;
-
-    // Read
+    // Read IF for EX stage
     word_t readValue;
     csr_addr_t readAddr;
     logic readEnable;
     logic readIllegal;
 
-    // Write
+    // Write IF for EX stage
     word_t writeValue;
     csr_addr_t writeAddr;
     logic writeEnable;
 
-    // Priv.
-    csr_satp_t satp;
-    csr_xstatus_t mstatus;
-    Privilege privilege;
-    logic trapSupervisorReturn;
-
-    // FP
+    // Write IF for FP unit
     logic write_fflags;
     fflags_t write_fflags_value;
-    logic [2:0] frm;
 
     // Trap
     TrapInfo trapInfo;
     addr_t trapPc;
     logic trapReturn;
+    logic trapSupervisorReturn;
     Privilege trapReturnPrivilege;
+    Privilege nextPriv;
+
+    // CSR values
+    Privilege privilege;
+    csr_satp_t satp;
+    csr_xstatus_t mstatus;
+    logic [2:0] frm;
+    csr_xtvec_t mtvec;
+    csr_xtvec_t stvec;
+    csr_xtvec_t utvec;
+    word_t mepc;
+    word_t sepc;
+    word_t uepc;
 
     modport Csr(
     output
-        nextPc,
         readValue,
         readIllegal,
         satp,
         mstatus,
         privilege,
         frm,
+        mtvec,
+        stvec,
+        utvec,
+        mepc,
+        sepc,
+        uepc,
         trapSupervisorReturn,
+        nextPriv,
     input
         readAddr,
         readEnable,
@@ -74,31 +84,6 @@ interface CsrIF;
         trapPc,
         trapReturn,
         trapReturnPrivilege
-    );
-
-    modport FetchUnit(
-    input
-        nextPc,
-        satp,
-        mstatus,
-        privilege,
-        trapInfo,
-        trapReturn
-    );
-
-    modport LoadStoreUnit(
-    input
-        nextPc,
-        satp,
-        mstatus,
-        privilege,
-        trapInfo
-    );
-
-    modport FetchStage(
-    input
-        nextPc,
-        trapInfo
     );
 
     modport ExecuteStage(
@@ -124,5 +109,30 @@ interface CsrIF;
         trapPc,
         trapReturn,
         trapReturnPrivilege
+    );
+
+    modport FetchUnit(
+    input
+        satp,
+        mstatus,
+        privilege
+    );
+
+    modport LoadStoreUnit(
+    input
+        satp,
+        mstatus,
+        privilege
+    );
+
+    modport PipelineController(
+    input
+        mtvec,
+        stvec,
+        utvec,
+        mepc,
+        sepc,
+        uepc,
+        nextPriv
     );
 endinterface

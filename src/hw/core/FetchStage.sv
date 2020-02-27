@@ -25,7 +25,6 @@ module FetchStage(
     InsnBufferIF.FetchStage insnBuffer,
     FetchUnitIF.FetchStage fetchUnit,
     PipelineControllerIF.FetchStage ctrl,
-    CsrIF.FetchStage csr,
     input   logic clk,
     input   logic rst
 );

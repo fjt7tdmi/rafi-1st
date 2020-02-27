@@ -126,6 +126,38 @@ typedef struct packed {
     TrapVectorMode mode;
 } csr_xtvec_t;
 
+// XIP
+typedef struct packed {
+    logic MEIP;
+    logic RESERVED0;
+    logic SEIP;
+    logic UEIP;
+    logic MTIP;
+    logic RESERVED1;
+    logic STIP;
+    logic UTIP;
+    logic MSIP;
+    logic RESERVED2;
+    logic SSIP;
+    logic USIP;
+} csr_xip_t;
+
+// XIE
+typedef struct packed {
+    logic MEIE;
+    logic RESERVED0;
+    logic SEIE;
+    logic UEIE;
+    logic MTIE;
+    logic RESERVED1;
+    logic STIE;
+    logic UTIE;
+    logic MSIE;
+    logic RESERVED2;
+    logic SSIE;
+    logic USIE;
+} csr_xie_t;
+
 // satp
 typedef struct packed {
     AddressTranslationMode mode;

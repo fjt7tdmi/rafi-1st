@@ -23,18 +23,28 @@ interface PipelineControllerIF;
 
     logic flush;
     logic flushReq;
+    addr_t flushTarget;
 
-    logic bypassStall;
+    logic trapValid;
+    TrapCause trapCause;
+    logic trapReturnValid;
+    Privilege trapReturnPriv;
+
     logic ifStall;
     logic idStall;
     logic rrStall;
-
+    logic bypassStall;
     logic exStallReq;
 
     modport FetchStage(
     input
         nextPc,
         ifStall,
+        flush
+    );
+
+    modport InsnBuffer(
+    input
         flush
     );
 
@@ -54,7 +64,7 @@ interface PipelineControllerIF;
     output
         exStallReq,
         flushReq,
-        nextPc
+        flushTarget
     );
 
     modport BypassLogic(
@@ -63,20 +73,29 @@ interface PipelineControllerIF;
         flush
     );
 
-    modport InsnBuffer(
-    input
-        flush
+    modport RegWriteStage(
+    output
+        trapValid,
+        trapCause,
+        trapReturnValid,
+        trapReturnPriv
     );
 
     modport PipelineController(
     output
-        bypassStall,
+        nextPc,
+        flush,
         ifStall,
         idStall,
         rrStall,
-        flush,
+        bypassStall,
     input
-        exStallReq,
-        flushReq
+        flushReq,
+        flushTarget,
+        trapValid,
+        trapCause,
+        trapReturnValid,
+        trapReturnPriv,
+        exStallReq
     );
 endinterface

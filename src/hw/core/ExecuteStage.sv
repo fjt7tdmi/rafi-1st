@@ -371,10 +371,10 @@ module ExecuteStage(
             trapReturn);
 
         if (enableBranch && branchTaken) begin
-            ctrl.nextPc = branchTarget;
+            ctrl.flushTarget = branchTarget;
         end
         else begin
-            ctrl.nextPc = prevStage.pc + (prevStage.isCompressedInsn ? 2 : 4);
+            ctrl.flushTarget = prevStage.pc + (prevStage.isCompressedInsn ? 2 : 4);
         end
     end
 
