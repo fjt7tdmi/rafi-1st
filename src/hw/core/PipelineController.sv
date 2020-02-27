@@ -26,24 +26,43 @@ module PipelineController(
     input logic clk,
     input logic rst
 );
+    csr_xtvec_t xtvec;
     always_comb begin
-        if (bus.trapValid && csr.nextPriv == Privilege_Machine) begin
-            bus.nextPc = {csr.mtvec.base, 2'b00};
+        unique case (csr.nextPriv)
+        Privilege_Machine:      xtvec = csr.mtvec;
+        Privilege_Supervisor:   xtvec = csr.stvec;
+        Privilege_User:         xtvec = csr.utvec;
+        default:                xtvec = '0;
+        endcase
+    end
+
+    addr_t trap_vector;
+    always_comb begin
+        if (xtvec.mode == 2'b01 && bus.trapCause.isInterrupt) begin
+            /* verilator lint_off WIDTH */
+            trap_vector = {xtvec.base + bus.trapCause.code, 2'b00};
         end
-        else if (bus.trapValid && csr.nextPriv == Privilege_Supervisor) begin
-            bus.nextPc = {csr.stvec.base, 2'b00};
+        else begin
+            trap_vector = {xtvec.base, 2'b00};
         end
-        else if (bus.trapValid && csr.nextPriv == Privilege_User) begin
-            bus.nextPc = {csr.utvec.base, 2'b00};
+    end
+
+    addr_t trap_return_pc;
+    always_comb begin
+        unique case (bus.trapReturnPriv)
+        Privilege_Machine:      trap_return_pc = csr.mepc;
+        Privilege_Supervisor:   trap_return_pc = csr.sepc;
+        Privilege_User:         trap_return_pc = csr.uepc;
+        default:                trap_return_pc = '0;
+        endcase
+    end
+
+    always_comb begin
+        if (bus.trapValid) begin
+            bus.nextPc = trap_vector;
         end
-        else if (bus.trapReturnValid && bus.trapReturnPriv == Privilege_Machine) begin
-            bus.nextPc = csr.mepc;
-        end
-        else if (bus.trapReturnValid && bus.trapReturnPriv == Privilege_Supervisor) begin
-            bus.nextPc = csr.sepc;
-        end
-        else if (bus.trapReturnValid && bus.trapReturnPriv == Privilege_User) begin
-            bus.nextPc = csr.uepc;
+        else if (bus.trapReturnValid) begin
+            bus.nextPc = trap_return_pc;
         end
         else begin
             bus.nextPc = bus.flushTarget;
