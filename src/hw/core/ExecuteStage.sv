@@ -422,7 +422,7 @@ module ExecuteStage(
             trapInfo.cause.code = EXCEPTION_CODE_BREAKPOINT;
             trapInfo.value = '0;
         end
-        else if (valid && op.isTrapReturn && op.trapReturnPrivilege == Privilege_Supervisor && csr.trapSupervisorReturn) begin
+        else if (valid && op.isTrapReturn && op.trapReturnPrivilege == Privilege_Supervisor && csr.status.TSR) begin
             trapInfo.valid = 1;
             trapInfo.cause.isInterrupt = 0;
             trapInfo.cause.code = EXCEPTION_CODE_ILLEGAL_INSN;

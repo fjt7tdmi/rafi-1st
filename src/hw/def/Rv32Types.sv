@@ -52,29 +52,29 @@ typedef logic signed    [PADDR_WIDTH-1:0] paddr_t;
 
 typedef struct packed
 {
-    logic [ 9:0] vpn1;
-    logic [ 9:0] vpn0;
+    logic [ 9:0] VPN1;
+    logic [ 9:0] VPN0;
 } virtual_page_number_t;
 
 typedef struct packed
 {
-    logic [11:0] ppn1;
-    logic [ 9:0] ppn0;
+    logic [11:0] PPN1;
+    logic [ 9:0] PPN0;
 } physical_page_number_t;
 
 typedef struct packed
 {
-    logic [11:0] ppn1;
-    logic [ 9:0] ppn0;
-    logic [ 1:0] reserved;
-    logic dirty;
-    logic accessed;
-    logic global_;
-    logic user;
-    logic execute;
-    logic write;
-    logic read;
-    logic valid;
+    logic [11:0] PPN1;
+    logic [ 9:0] PPN0;
+    logic [ 1:0] RESERVED;
+    logic D; // Dirty
+    logic A; // Accessed
+    logic G; // Global
+    logic U; // User
+    logic X; // Execute
+    logic W; // Write
+    logic R; // Read
+    logic V; // Valid
 } PageTableEntry;
 
 // satp address translation mode
@@ -92,38 +92,108 @@ typedef enum logic [1:0]
 } TrapVectorMode;
 
 // ----------------------------------------------------------------------------
-// Control status register definitions
+// CSR addresses
+//
+
+// User Trap Setup
+parameter CSR_ADDR_USTATUS  = 12'h000;
+parameter CSR_ADDR_UIE      = 12'h004;
+parameter CSR_ADDR_UTVEC    = 12'h005;
+
+// User Floating-Point CSRs
+parameter CSR_ADDR_FFLAGS   = 12'h001;
+parameter CSR_ADDR_FRM      = 12'h002;
+parameter CSR_ADDR_FCSR     = 12'h003;
+
+// User Trap Handling
+parameter CSR_ADDR_USCRATCH = 12'h040;
+parameter CSR_ADDR_UEPC     = 12'h041;
+parameter CSR_ADDR_UCAUSE   = 12'h042;
+parameter CSR_ADDR_UTVAL    = 12'h043;
+parameter CSR_ADDR_UIP      = 12'h044;
+
+// Supervisor Trap Setup
+parameter CSR_ADDR_SSTATUS      = 12'h100;
+parameter CSR_ADDR_SEDELEG      = 12'h102;
+parameter CSR_ADDR_SIDELEG      = 12'h103;
+parameter CSR_ADDR_SIE          = 12'h104;
+parameter CSR_ADDR_STVEC        = 12'h105;
+parameter CSR_ADDR_SCOUNTEREN   = 12'h106; // hard-wired to 0
+
+// User Trap Handling
+parameter CSR_ADDR_SSCRATCH = 12'h140;
+parameter CSR_ADDR_SEPC     = 12'h141;
+parameter CSR_ADDR_SCAUSE   = 12'h142;
+parameter CSR_ADDR_STVAL    = 12'h143;
+parameter CSR_ADDR_SIP      = 12'h144;
+
+// Supervisor Protection and Translation
+parameter CSR_ADDR_SATP     = 12'h180;
+
+// Machine Trap Setup
+parameter CSR_ADDR_MSTATUS      = 12'h300;
+parameter CSR_ADDR_MISA         = 12'h301;
+parameter CSR_ADDR_MEDELEG      = 12'h302;
+parameter CSR_ADDR_MIDELEG      = 12'h303;
+parameter CSR_ADDR_MIE          = 12'h304;
+parameter CSR_ADDR_MTVEC        = 12'h305;
+parameter CSR_ADDR_MCOUNTEREN   = 12'h306; // hard-wired to 0
+
+// Machine Trap handling
+parameter CSR_ADDR_MSCRATCH = 12'h340;
+parameter CSR_ADDR_MEPC     = 12'h341;
+parameter CSR_ADDR_MCAUSE   = 12'h342;
+parameter CSR_ADDR_MTVAL    = 12'h343;
+parameter CSR_ADDR_MIP      = 12'h344;
+
+// User Counter/Timers
+parameter CSR_ADDR_CYCLE    = 12'hc00;
+parameter CSR_ADDR_TIME     = 12'hc01;
+parameter CSR_ADDR_INSTRET  = 12'hc02;
+
+parameter CSR_ADDR_CYCLEH   = 12'hc80;
+parameter CSR_ADDR_TIMEH    = 12'hc81;
+parameter CSR_ADDR_INSTRETH = 12'hc82;
+
+// Machine Information Registers
+parameter CSR_ADDR_MVENDORID    = 12'hf11;
+parameter CSR_ADDR_MARCHID      = 12'hf12;
+parameter CSR_ADDR_MIMPID       = 12'hf13;
+parameter CSR_ADDR_MHARTID      = 12'hf14;
+
+// ----------------------------------------------------------------------------
+// CSR typedef
 //
 
 // mstatus, sstatus, ustatus
 typedef struct packed {
-    logic sd;
-    logic [7:0] reserved1;
-    logic tsr;
-    logic tw;
-    logic tvm;
-    logic mxr;
-    logic sum_;
-    logic mprv;
-    logic [1:0] xs;
-    logic [1:0] fs;
-    logic [1:0] mpp;
-    logic [1:0] reserved2;
-    logic spp;
-    logic mpie;
-    logic reserved3;
-    logic spie;
-    logic upie;
-    logic mie;
-    logic reserved4;
-    logic sie;
-    logic uie;
+    logic SD;
+    logic [7:0] RESERVED1;
+    logic TSR;
+    logic TW;
+    logic TVM;
+    logic MXR;
+    logic SUM;
+    logic MPRV;
+    logic [1:0] XS;
+    logic [1:0] FS;
+    logic [1:0] MPP;
+    logic [1:0] RESERVED2;
+    logic SPP;
+    logic MPIE;
+    logic RESERVED3;
+    logic SPIE;
+    logic UPIE;
+    logic MIE;
+    logic RESERVED4;
+    logic SIE;
+    logic UIE;
 } csr_xstatus_t;
 
 // mtvec, stvec, utvec
 typedef struct packed {
-    logic [XLEN-1:2] base;
-    TrapVectorMode mode;
+    logic [XLEN-1:2] BASE;
+    TrapVectorMode MODE;
 } csr_xtvec_t;
 
 // XIP
@@ -160,9 +230,9 @@ typedef struct packed {
 
 // satp
 typedef struct packed {
-    AddressTranslationMode mode;
-    logic [8:0] asid;
-    logic [21:0] ppn;
+    AddressTranslationMode MODE;
+    logic [8:0] ASID;
+    logic [21:0] PPN;
 } csr_satp_t;
 
 // ----------------------------------------------------------------------------

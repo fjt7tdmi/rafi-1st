@@ -40,14 +40,13 @@ interface CsrIF;
     TrapInfo trapInfo;
     addr_t trapPc;
     logic trapReturn;
-    logic trapSupervisorReturn;
     Privilege trapReturnPrivilege;
     Privilege nextPriv;
 
     // CSR values
     Privilege privilege;
     csr_satp_t satp;
-    csr_xstatus_t mstatus;
+    csr_xstatus_t status;
     logic [2:0] frm;
     csr_xtvec_t mtvec;
     csr_xtvec_t stvec;
@@ -61,7 +60,7 @@ interface CsrIF;
         readValue,
         readIllegal,
         satp,
-        mstatus,
+        status,
         privilege,
         frm,
         mtvec,
@@ -70,7 +69,6 @@ interface CsrIF;
         mepc,
         sepc,
         uepc,
-        trapSupervisorReturn,
         nextPriv,
     input
         readAddr,
@@ -97,8 +95,8 @@ interface CsrIF;
         write_fflags_value,
     input
         privilege,
+        status,
         frm,
-        trapSupervisorReturn,
         readValue,
         readIllegal
     );
@@ -114,14 +112,14 @@ interface CsrIF;
     modport FetchUnit(
     input
         satp,
-        mstatus,
+        status,
         privilege
     );
 
     modport LoadStoreUnit(
     input
         satp,
-        mstatus,
+        status,
         privilege
     );
 
