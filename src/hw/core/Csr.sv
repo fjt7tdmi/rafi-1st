@@ -315,7 +315,7 @@ module Csr(
 
         bus.privilege = reg_priv;
         bus.satp = reg_satp;
-        bus.mstatus = reg_status;
+        bus.status = reg_status;
         bus.frm = reg_frm;
         bus.mtvec = reg_mtvec;
         bus.stvec = reg_stvec;
@@ -323,7 +323,6 @@ module Csr(
         bus.mepc = reg_mepc;
         bus.sepc = reg_sepc;
         bus.uepc = reg_uepc;
-        bus.trapSupervisorReturn = reg_status.TSR;
         bus.nextPriv = next_priv;
     end
 
