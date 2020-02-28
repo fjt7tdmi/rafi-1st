@@ -20,78 +20,6 @@ import Rv32Types::*;
 
 import RafiTypes::*;
 
-// TODO: Implement Interrupt
-
-// ----------------------------------------------------------------------------
-// CSR addresses
-//
-
-// User Trap Setup
-parameter CSR_ADDR_USTATUS  = 12'h000;
-parameter CSR_ADDR_UIE      = 12'h004;
-parameter CSR_ADDR_UTVEC    = 12'h005;
-
-// User Floating-Point CSRs
-parameter CSR_ADDR_FFLAGS   = 12'h001;
-parameter CSR_ADDR_FRM      = 12'h002;
-parameter CSR_ADDR_FCSR     = 12'h003;
-
-// User Trap Handling
-parameter CSR_ADDR_USCRATCH = 12'h040;
-parameter CSR_ADDR_UEPC     = 12'h041;
-parameter CSR_ADDR_UCAUSE   = 12'h042;
-parameter CSR_ADDR_UTVAL    = 12'h043;
-parameter CSR_ADDR_UIP      = 12'h044;
-
-// Supervisor Trap Setup
-parameter CSR_ADDR_SSTATUS      = 12'h100;
-parameter CSR_ADDR_SEDELEG      = 12'h102;
-parameter CSR_ADDR_SIDELEG      = 12'h103;
-parameter CSR_ADDR_SIE          = 12'h104;
-parameter CSR_ADDR_STVEC        = 12'h105;
-parameter CSR_ADDR_SCOUNTEREN   = 12'h106; // hard-wired to 0
-
-// User Trap Handling
-parameter CSR_ADDR_SSCRATCH = 12'h140;
-parameter CSR_ADDR_SEPC     = 12'h141;
-parameter CSR_ADDR_SCAUSE   = 12'h142;
-parameter CSR_ADDR_STVAL    = 12'h143;
-parameter CSR_ADDR_SIP      = 12'h144;
-
-// Supervisor Protection and Translation
-parameter CSR_ADDR_SATP     = 12'h180;
-
-// Machine Trap Setup
-parameter CSR_ADDR_MSTATUS      = 12'h300;
-parameter CSR_ADDR_MISA         = 12'h301;
-parameter CSR_ADDR_MEDELEG      = 12'h302;
-parameter CSR_ADDR_MIDELEG      = 12'h303;
-parameter CSR_ADDR_MIE          = 12'h304;
-parameter CSR_ADDR_MTVEC        = 12'h305;
-parameter CSR_ADDR_MCOUNTEREN   = 12'h306; // hard-wired to 0
-
-// Machine Trap handling
-parameter CSR_ADDR_MSCRATCH = 12'h340;
-parameter CSR_ADDR_MEPC     = 12'h341;
-parameter CSR_ADDR_MCAUSE   = 12'h342;
-parameter CSR_ADDR_MTVAL    = 12'h343;
-parameter CSR_ADDR_MIP      = 12'h344;
-
-// User Counter/Timers
-parameter CSR_ADDR_CYCLE    = 12'hc00;
-parameter CSR_ADDR_TIME     = 12'hc01;
-parameter CSR_ADDR_INSTRET  = 12'hc02;
-
-parameter CSR_ADDR_CYCLEH   = 12'hc80;
-parameter CSR_ADDR_TIMEH    = 12'hc81;
-parameter CSR_ADDR_INSTRETH = 12'hc82;
-
-// Machine Information Registers
-parameter CSR_ADDR_MVENDORID    = 12'hf11;
-parameter CSR_ADDR_MARCHID      = 12'hf12;
-parameter CSR_ADDR_MIMPID       = 12'hf13;
-parameter CSR_ADDR_MHARTID      = 12'hf14;
-
 // ----------------------------------------------------------------------------
 // CSR masks
 //
@@ -141,16 +69,16 @@ endfunction
 function automatic csr_xstatus_t get_sstatus_mask();
     csr_xstatus_t mask = '0;
 
-    mask.sd     = '1;
-    mask.mxr    = '1;
-    mask.sum_    = '1;
-    mask.xs     = '1;
-    mask.fs     = '1;
-    mask.spp    = '1;
-    mask.spie   = '1;
-    mask.upie   = '1;
-    mask.sie    = '1;
-    mask.uie    = '1;
+    mask.SD     = '1;
+    mask.MXR    = '1;
+    mask.SUM    = '1;
+    mask.XS     = '1;
+    mask.FS     = '1;
+    mask.SPP    = '1;
+    mask.SPIE   = '1;
+    mask.UPIE   = '1;
+    mask.SIE    = '1;
+    mask.UIE    = '1;
 
     return mask;
 endfunction
@@ -158,8 +86,8 @@ endfunction
 function automatic csr_xstatus_t get_ustatus_mask();
     csr_xstatus_t mask = '0;
 
-    mask.upie   = '1;
-    mask.uie    = '1;
+    mask.UPIE   = '1;
+    mask.UIE    = '1;
 
     return mask;
 endfunction
@@ -184,27 +112,27 @@ endfunction
 
 function automatic csr_xstatus_t update_xstatus_mpp(csr_xstatus_t current, Privilege mpp);
     csr_xstatus_t ret = current;
-    ret.mpp = mpp;
+    ret.MPP = mpp;
     return ret;
 endfunction
 
 function automatic csr_xstatus_t update_xstatus_mpp_mie(csr_xstatus_t current, Privilege mpp, logic mie);
     csr_xstatus_t ret = current;
-    ret.mpp = mpp;
-    ret.mie = mie;
+    ret.MPP = mpp;
+    ret.MIE = mie;
     return ret;
 endfunction
 
 function automatic csr_xstatus_t update_xstatus_spp(csr_xstatus_t current, Privilege spp);
     csr_xstatus_t ret = current;
-    ret.spp = spp[0];
+    ret.SPP = spp[0];
     return ret;
 endfunction
 
 function automatic csr_xstatus_t update_xstatus_spp_sie(csr_xstatus_t current, Privilege spp, logic sie);
     csr_xstatus_t ret = current;
-    ret.spp = spp[0];
-    ret.sie = sie;
+    ret.SPP = spp[0];
+    ret.SIE = sie;
     return ret;
 endfunction
 
@@ -332,10 +260,10 @@ module Csr(
         end
         else if (bus.trapReturn) begin
             if (bus.trapReturnPrivilege == Privilege_Machine) begin
-                next_priv = Privilege'(reg_status.mpp);
+                next_priv = Privilege'(reg_status.MPP);
             end
             else if (bus.trapReturnPrivilege == Privilege_Supervisor) begin
-                next_priv = Privilege'(reg_status.spp);
+                next_priv = Privilege'(reg_status.SPP);
             end
             else begin
                 next_priv = Privilege_User;
@@ -359,10 +287,10 @@ module Csr(
         end
         else if (bus.trapReturn) begin
             if (bus.trapReturnPrivilege == Privilege_Machine) begin
-                next_status = update_xstatus_mpp_mie(reg_status, Privilege_User, reg_status.mpie);
+                next_status = update_xstatus_mpp_mie(reg_status, Privilege_User, reg_status.MPIE);
             end
             else if (next_priv == Privilege_Supervisor) begin
-                next_status = update_xstatus_spp_sie(reg_status, Privilege_User, reg_status.spie);
+                next_status = update_xstatus_spp_sie(reg_status, Privilege_User, reg_status.SPIE);
             end
             else begin
                 next_status = reg_status;
@@ -395,7 +323,7 @@ module Csr(
         bus.mepc = reg_mepc;
         bus.sepc = reg_sepc;
         bus.uepc = reg_uepc;
-        bus.trapSupervisorReturn = reg_status.tsr;
+        bus.trapSupervisorReturn = reg_status.TSR;
         bus.nextPriv = next_priv;
     end
 

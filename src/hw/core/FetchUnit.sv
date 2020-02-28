@@ -162,8 +162,8 @@ module FetchUnit (
         .writeValue(tlbWriteValue),
         .csrSatp(csr.satp),
         .csrPrivilege(csr.privilege),
-        .csrSum(csr.mstatus.sum_),
-        .csrMxr(csr.mstatus.mxr),
+        .csrSum(csr.mstatus.SUM),
+        .csrMxr(csr.mstatus.MXR),
         .invalidate(tlbInvalidate),
         .clk,
         .rst

@@ -72,11 +72,11 @@ module TlbReplacer #(
 
     // Functions
     function automatic logic isLeafEntry(PageTableEntry entry);
-        return entry.read || entry.execute;
+        return entry.R || entry.X;
     endfunction
 
     function automatic logic isFault(PageTableEntry entry);
-        return !entry.valid || (!entry.read && entry.write);
+        return !entry.V || (!entry.R && entry.W);
     endfunction
 
     function automatic _entry_index_t getEntryIndex(paddr_t entryAddr);
@@ -110,8 +110,8 @@ module TlbReplacer #(
     function automatic PageTableEntry makeEntryForWrite(PageTableEntry entry, MemoryAccessType accessType);
         PageTableEntry ret = entry;
 
-        ret.accessed = 1;
-        ret.dirty |= (accessType == MemoryAccessType_Store);
+        ret.A = 1;
+        ret.D |= (accessType == MemoryAccessType_Store);
         return ret;
     endfunction
 
@@ -144,8 +144,8 @@ module TlbReplacer #(
     always_comb begin
         writePageTableEntry1 = makeEntryForWrite(reg_page_table_entry1, reg_access_type);
         writePageTableEntry0 = makeEntryForWrite(reg_page_table_entry0, reg_access_type);
-        entryAddr1 = {csrSatp.ppn, reg_virtual_page_number.vpn1, 2'b00};
-        entryAddr0 = {reg_page_table_entry1.ppn1, reg_page_table_entry1.ppn0, reg_virtual_page_number.vpn0, 2'b00};
+        entryAddr1 = {csrSatp.PPN, reg_virtual_page_number.VPN1, 2'b00};
+        entryAddr0 = {reg_page_table_entry1.PPN1, reg_page_table_entry1.PPN0, reg_virtual_page_number.VPN0, 2'b00};
     end
 
     always_comb begin
@@ -196,20 +196,20 @@ module TlbReplacer #(
 
         unique case (reg_state)
         State_PageTableDecode1: begin
-            next_physical_page_number = {writePageTableEntry1.ppn1, reg_virtual_page_number[$bits(writePageTableEntry1.ppn0)-1:0]};
-            next_flags.dirty = writePageTableEntry1.dirty;
-            next_flags.user = writePageTableEntry1.user;
-            next_flags.execute = writePageTableEntry1.execute;
-            next_flags.write = writePageTableEntry1.write;
-            next_flags.read = writePageTableEntry1.read;
+            next_physical_page_number = {writePageTableEntry1.PPN1, reg_virtual_page_number[$bits(writePageTableEntry1.PPN0)-1:0]};
+            next_flags.dirty = writePageTableEntry1.D;
+            next_flags.user = writePageTableEntry1.U;
+            next_flags.execute = writePageTableEntry1.X;
+            next_flags.write = writePageTableEntry1.W;
+            next_flags.read = writePageTableEntry1.R;
         end
         State_PageTableDecode0: begin
-            next_physical_page_number = {writePageTableEntry0.ppn1, writePageTableEntry0.ppn0};
-            next_flags.dirty = writePageTableEntry0.dirty;
-            next_flags.user = writePageTableEntry0.user;
-            next_flags.execute = writePageTableEntry0.execute;
-            next_flags.write = writePageTableEntry0.write;
-            next_flags.read = writePageTableEntry0.read;
+            next_physical_page_number = {writePageTableEntry0.PPN1, writePageTableEntry0.PPN0};
+            next_flags.dirty = writePageTableEntry0.D;
+            next_flags.user = writePageTableEntry0.U;
+            next_flags.execute = writePageTableEntry0.X;
+            next_flags.write = writePageTableEntry0.W;
+            next_flags.read = writePageTableEntry0.R;
         end
         default: begin
             next_physical_page_number = reg_physical_page_number;

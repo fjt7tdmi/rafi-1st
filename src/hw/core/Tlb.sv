@@ -126,7 +126,7 @@ module Tlb  #(
         readEntryNeedsUpdate = isUpdateNecessary(camReadValue, readAccessType);
         ext = '0;
 
-        if (csrPrivilege == Privilege_Machine || csrSatp.mode == AddressTranslationMode_Bare) begin
+        if (csrPrivilege == Privilege_Machine || csrSatp.MODE == AddressTranslationMode_Bare) begin
             hit = readEnable;
             fault = 0;
             readValue = {ext, readKey};

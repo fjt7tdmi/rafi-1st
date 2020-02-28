@@ -38,12 +38,12 @@ module PipelineController(
 
     addr_t trap_vector;
     always_comb begin
-        if (xtvec.mode == 2'b01 && bus.trapCause.isInterrupt) begin
+        if (xtvec.MODE == 2'b01 && bus.trapCause.isInterrupt) begin
             /* verilator lint_off WIDTH */
-            trap_vector = {xtvec.base + bus.trapCause.code, 2'b00};
+            trap_vector = {xtvec.BASE + bus.trapCause.code, 2'b00};
         end
         else begin
-            trap_vector = {xtvec.base, 2'b00};
+            trap_vector = {xtvec.BASE, 2'b00};
         end
     end
 
