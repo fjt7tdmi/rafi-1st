@@ -39,11 +39,11 @@ module LoadStoreUnit (
     localparam TAG_LSB = INDEX_LSB + INDEX_WIDTH;
     localparam TAG_MSB = PADDR_WIDTH - 1;
 
-    typedef logic unsigned [TAG_WIDTH-1:0] _tag_t;
-    typedef logic unsigned [INDEX_WIDTH-1:0] _index_t;
-    typedef logic unsigned [LINE_WIDTH-1:0] _line_t;
-    typedef logic unsigned [$clog2(LINE_SIZE)-1:0] _shift_amount_t;
-    typedef logic unsigned [LINE_SIZE-1:0] _write_mask_t;
+    typedef logic [TAG_WIDTH-1:0] _tag_t;
+    typedef logic [INDEX_WIDTH-1:0] _index_t;
+    typedef logic [LINE_WIDTH-1:0] _line_t;
+    typedef logic [$clog2(LINE_SIZE)-1:0] _shift_amount_t;
+    typedef logic [LINE_SIZE-1:0] _write_mask_t;
 
     typedef enum logic [2:0]
     {

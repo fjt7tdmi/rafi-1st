@@ -23,10 +23,10 @@ import OpTypes::*;
 module FpSignUnit #(
     parameter WIDTH = 32
 )(
-    output logic unsigned [WIDTH-1:0] fpResult,
+    output logic [WIDTH-1:0] fpResult,
     input FpSignUnitCommand command,
-    input logic unsigned [WIDTH-1:0] fpSrc1,
-    input logic unsigned [WIDTH-1:0] fpSrc2,
+    input logic [WIDTH-1:0] fpSrc1,
+    input logic [WIDTH-1:0] fpSrc2,
     input logic clk,
     input logic rst
 );
