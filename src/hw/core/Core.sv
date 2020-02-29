@@ -46,6 +46,7 @@ module Core (
     RegReadStageIF m_RegReadStageIF();
     ExecuteStageIF m_ExecuteStageIF();
     PipelineControllerIF m_PipelineControllerIF();
+    InterruptControllerIF m_InterruptControllerIF();
     IntRegFileIF m_IntRegFileIF();
     FpRegFileIF m_FpRegFileIF();
     IntBypassLogicIF m_IntBypassLogicIF();
@@ -67,6 +68,7 @@ module Core (
         .insnBuffer(m_InsnBufferIF.FetchStage),
         .fetchUnit(m_FetchUnitIF.FetchStage),
         .ctrl(m_PipelineControllerIF.FetchStage),
+        .interrupt(m_InterruptControllerIF.FetchStage),
         .clk,
         .rst(rstInternal)
     );
@@ -144,6 +146,12 @@ module Core (
     PipelineController m_PipelineController(
         .bus(m_PipelineControllerIF.PipelineController),
         .csr(m_CsrIF.PipelineController),
+        .clk,
+        .rst(rstInternal)
+    );
+    InterruptController m_InterruptController(
+        .bus(m_InterruptControllerIF.InterruptController),
+        .csr(m_CsrIF.InterruptController),
         .clk,
         .rst(rstInternal)
     );

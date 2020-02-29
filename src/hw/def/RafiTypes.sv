@@ -59,8 +59,10 @@ typedef logic [$clog2(INSN_BUFFER_ENTRY_COUNT):0] insn_buffer_entry_count_t;
 typedef struct packed
 {
     addr_t pc;
-    logic fault;
     logic[15:0] insn;
+    logic fault;
+    logic interruptValid;
+    logic [3:0] interruptCode;
 } InsnBufferEntry;
 
 typedef struct packed

@@ -47,6 +47,8 @@ interface CsrIF;
     Privilege privilege;
     csr_satp_t satp;
     csr_xstatus_t status;
+    csr_xip_t ip;
+    csr_xie_t ie;
     logic [2:0] frm;
     csr_xtvec_t mtvec;
     csr_xtvec_t stvec;
@@ -59,9 +61,11 @@ interface CsrIF;
     output
         readValue,
         readIllegal,
+        privilege,
         satp,
         status,
-        privilege,
+        ip,
+        ie,
         frm,
         mtvec,
         stvec,
@@ -132,5 +136,13 @@ interface CsrIF;
         sepc,
         uepc,
         nextPriv
+    );
+
+    modport InterruptController(
+    input
+        privilege,
+        status,
+        ip,
+        ie
     );
 endinterface

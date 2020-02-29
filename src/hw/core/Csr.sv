@@ -316,6 +316,8 @@ module Csr(
         bus.privilege = reg_priv;
         bus.satp = reg_satp;
         bus.status = reg_status;
+        bus.ip = reg_xip;
+        bus.ie = reg_xie;
         bus.frm = reg_frm;
         bus.mtvec = reg_mtvec;
         bus.stvec = reg_stvec;

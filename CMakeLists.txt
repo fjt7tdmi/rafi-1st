@@ -556,6 +556,8 @@ if (verilator_FOUND)
         src/hw/core/ICacheReplacer.sv
         src/hw/core/InsnBufferIF.sv
         src/hw/core/InsnBuffer.sv
+        src/hw/core/InterruptControllerIF.sv
+        src/hw/core/InterruptController.sv
         src/hw/core/DCacheReplacer.sv
         src/hw/core/LoadStoreUnitIF.sv
         src/hw/core/LoadStoreUnit.sv
