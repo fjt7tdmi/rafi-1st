@@ -21,11 +21,11 @@ import OpTypes::*;
 
 module Fp64Comparator (
     output word_t intResult,
-    output logic unsigned [63:0] fpResult,
+    output logic [63:0] fpResult,
     output fflags_t flags,
     input FpComparatorCommand command,
-    input logic unsigned [63:0] fpSrc1,
-    input logic unsigned [63:0] fpSrc2,
+    input logic [63:0] fpSrc1,
+    input logic [63:0] fpSrc2,
     input logic clk,
     input logic rst
 );

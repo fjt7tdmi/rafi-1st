@@ -23,7 +23,7 @@ import Rv32Types::*;
 import OpTypes::*;
 import RafiTypes::*;
 
-function automatic word_t sext6(logic [5:0] val);
+function automatic word_t SignExtend6(logic [5:0] val);
     if (val[5]) begin
         return {26'b11_1111_1111_1111_1111_1111_1111, val};
     end
@@ -32,7 +32,7 @@ function automatic word_t sext6(logic [5:0] val);
     end
 endfunction
 
-function automatic word_t sext9(logic [8:0] val);
+function automatic word_t SignExtend9(logic [8:0] val);
     if (val[8]) begin
         return {23'b111_1111_1111_1111_1111_1111, val};
     end
@@ -41,7 +41,7 @@ function automatic word_t sext9(logic [8:0] val);
     end
 endfunction
 
-function automatic word_t sext10(logic [9:0] val);
+function automatic word_t SignExtend10(logic [9:0] val);
     if (val[9]) begin
         return {22'b11_1111_1111_1111_1111_1111, val};
     end
@@ -50,7 +50,7 @@ function automatic word_t sext10(logic [9:0] val);
     end
 endfunction
 
-function automatic word_t sext12(logic [11:0] val);
+function automatic word_t SignExtend12(logic [11:0] val);
     if (val[11]) begin
         return {20'b1111_1111_1111_1111_1111, val};
     end
@@ -59,7 +59,7 @@ function automatic word_t sext12(logic [11:0] val);
     end
 endfunction
 
-function automatic word_t sext18(logic [17:0] val);
+function automatic word_t SignExtend18(logic [17:0] val);
     if (val[17]) begin
         return {14'b11_1111_1111_1111, val};
     end
@@ -246,7 +246,7 @@ function automatic Op DecodeRV32C_Quadrant1(uint16_t insn);
         op.aluSrcType1 = AluSrcType1_Reg;
         op.aluSrcType2 = AluSrcType2_Imm;
         op.intRegWriteEnable = 1;
-        op.imm = sext6({insn[12], insn[6:2]});
+        op.imm = SignExtend6({insn[12], insn[6:2]});
         op.rd = insn[11:7];
         op.rs1 = insn[11:7];
     end
@@ -255,7 +255,7 @@ function automatic Op DecodeRV32C_Quadrant1(uint16_t insn);
         op.unit = ExecuteUnitType_Branch;
         op.command.branch.condition = BranchType_Always;
         op.command.branch.indirect = 0;
-        op.imm = sext12({insn[12], insn[8], insn[10:9], insn[6], insn[7], insn[2], insn[11], insn [4:2], 1'b0});
+        op.imm = SignExtend12({insn[12], insn[8], insn[10:9], insn[6], insn[7], insn[2], insn[11], insn [4:2], 1'b0});
         op.intRegWriteEnable = 1;
         op.intRegWriteSrcType = IntRegWriteSrcType_NextPc;
         op.rd = 1; // x1
@@ -266,7 +266,7 @@ function automatic Op DecodeRV32C_Quadrant1(uint16_t insn);
         op.aluSrcType1 = AluSrcType1_Zero;
         op.aluSrcType2 = AluSrcType2_Imm;
         op.intRegWriteEnable = 1;
-        op.imm = sext6({insn[12], insn[6:2]});
+        op.imm = SignExtend6({insn[12], insn[6:2]});
         op.rd = insn[11:7];
         op.rs1 = insn[11:7];
     end
@@ -278,8 +278,8 @@ function automatic Op DecodeRV32C_Quadrant1(uint16_t insn);
         op.intRegWriteEnable = 1;
         op.intRegWriteSrcType = IntRegWriteSrcType_Result;
         op.imm = (rd == 5'h2)
-            ? sext10({insn[12], insn[4:3], insn[5], insn[2], insn[6], 4'h0})
-            : sext18({insn[12], insn[6:2], 12'h0});
+            ? SignExtend10({insn[12], insn[4:3], insn[5], insn[2], insn[6], 4'h0})
+            : SignExtend18({insn[12], insn[6:2], 12'h0});
         op.rd = insn[11:7];
         op.rs1 = insn[11:7];
     end
@@ -305,7 +305,7 @@ function automatic Op DecodeRV32C_Quadrant1(uint16_t insn);
         op.aluSrcType1 = AluSrcType1_Reg;
         op.aluSrcType2 = AluSrcType2_Imm;
         op.intRegWriteEnable = 1;
-        op.imm = sext6({insn[12], insn[6:2]});
+        op.imm = SignExtend6({insn[12], insn[6:2]});
     end
     else if (funct3 == 3'b100 && funct2 == 2'b11) begin
         // C.SUB, C.XOR, C.OR, C.AND
@@ -325,14 +325,14 @@ function automatic Op DecodeRV32C_Quadrant1(uint16_t insn);
         op.unit = ExecuteUnitType_Branch;
         op.command.branch.condition = BranchType_Always;
         op.command.branch.indirect = 0;
-        op.imm = sext12({insn[12], insn[8], insn[10:9], insn[6], insn[7], insn[2], insn[11], insn [5:3], 1'b0});
+        op.imm = SignExtend12({insn[12], insn[8], insn[10:9], insn[6], insn[7], insn[2], insn[11], insn [5:3], 1'b0});
     end
     else if (funct3 == 3'b110) begin
         // C.BEQZ
         op.unit = ExecuteUnitType_Branch;
         op.command.branch.condition = BranchType_Equal;
         op.command.branch.indirect = 0;
-        op.imm = sext9({insn[12], insn[6:5], insn[2], insn[11:10], insn[4:3], 1'b0});
+        op.imm = SignExtend9({insn[12], insn[6:5], insn[2], insn[11:10], insn[4:3], 1'b0});
         op.rs2 = 0;
     end
     else if (funct3 == 3'b111) begin
@@ -340,7 +340,7 @@ function automatic Op DecodeRV32C_Quadrant1(uint16_t insn);
         op.unit = ExecuteUnitType_Branch;
         op.command.branch.condition = BranchType_NotEqual;
         op.command.branch.indirect = 0;
-        op.imm = sext9({insn[12], insn[6:5], insn[2], insn[11:10], insn[4:3], 1'b0});
+        op.imm = SignExtend9({insn[12], insn[6:5], insn[2], insn[11:10], insn[4:3], 1'b0});
         op.rs2 = 0;
     end
     else begin

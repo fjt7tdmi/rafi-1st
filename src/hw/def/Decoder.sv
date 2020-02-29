@@ -24,7 +24,7 @@ import OpTypes::*;
 import RafiTypes::*;
 
 // Sign extension functions
-function automatic word_t sext12(logic [11:0] val);
+function automatic word_t SignExtend12(logic [11:0] val);
     if (val[11]) begin
         return {20'b1111_1111_1111_1111_1111, val};
     end
@@ -33,7 +33,7 @@ function automatic word_t sext12(logic [11:0] val);
     end
 endfunction
 
-function automatic word_t sext13(logic [12:0] val);
+function automatic word_t SignExtend13(logic [12:0] val);
     if (val[12]) begin
         return {19'b1111_1111_1111_1111_111, val};
     end
@@ -42,7 +42,7 @@ function automatic word_t sext13(logic [12:0] val);
     end
 endfunction
 
-function automatic word_t sext21(logic [20:0] val);
+function automatic word_t SignExtend21(logic [20:0] val);
     if (val[20]) begin
         return {11'b111_1111_1111, val};
     end
@@ -51,7 +51,7 @@ function automatic word_t sext21(logic [20:0] val);
     end
 endfunction
 
-function automatic word_t sext32(logic [31:0] val);
+function automatic word_t SignExtend32(logic [31:0] val);
     return val;
 endfunction
 
@@ -157,14 +157,14 @@ function automatic Op DecodeRV32I(insn_t insn);
     7'b0110111: begin
         // lui
         op.aluSrcType2 = AluSrcType2_Imm;
-        op.imm = sext32({insn[31:12], 12'b0000_0000_0000});
+        op.imm = SignExtend32({insn[31:12], 12'b0000_0000_0000});
         op.intRegWriteEnable = 1;
     end
     7'b0010111: begin
         // auipc
         op.aluSrcType1 = AluSrcType1_Pc;
         op.aluSrcType2 = AluSrcType2_Imm;
-        op.imm = sext32({insn[31:12], 12'b0000_0000_0000});
+        op.imm = SignExtend32({insn[31:12], 12'b0000_0000_0000});
         op.intRegWriteEnable = 1;
     end
     7'b1101111: begin
@@ -172,7 +172,7 @@ function automatic Op DecodeRV32I(insn_t insn);
         op.unit = ExecuteUnitType_Branch;
         op.command.branch.condition = BranchType_Always;
         op.command.branch.indirect = 0;
-        op.imm = sext21({insn[31], insn[19:12], insn[20], insn[30:21], 1'b0});
+        op.imm = SignExtend21({insn[31], insn[19:12], insn[20], insn[30:21], 1'b0});
         op.intRegWriteEnable = 1;
         op.intRegWriteSrcType = IntRegWriteSrcType_NextPc;
     end
@@ -181,7 +181,7 @@ function automatic Op DecodeRV32I(insn_t insn);
         op.unit = ExecuteUnitType_Branch;
         op.command.branch.condition = BranchType_Always;
         op.command.branch.indirect = 1;
-        op.imm = sext12(insn[31:20]);
+        op.imm = SignExtend12(insn[31:20]);
         op.intRegWriteEnable = 1;
         op.intRegWriteSrcType = IntRegWriteSrcType_NextPc;
     end
@@ -190,7 +190,7 @@ function automatic Op DecodeRV32I(insn_t insn);
         op.unit = ExecuteUnitType_Branch;
         op.command.branch.condition = BranchType'({1'b0, funct3});
         op.command.branch.indirect = 0;
-        op.imm = sext13({insn[31], insn[7], insn[30:25], insn[11:8], 1'b0});
+        op.imm = SignExtend13({insn[31], insn[7], insn[30:25], insn[11:8], 1'b0});
         op.isUnknown = !IsValidBranchType(op.command.branch.condition);
     end
     7'b0000011: begin
@@ -207,7 +207,7 @@ function automatic Op DecodeRV32I(insn_t insn);
         op.command.mem.loadStoreType = LoadStoreType'(funct3);
         op.command.mem.storeSrc = StoreSrcType_Int;
         op.intRegWriteSrcType = IntRegWriteSrcType_Memory;
-        op.imm = sext12(insn[31:20]);
+        op.imm = SignExtend12(insn[31:20]);
         op.intRegWriteEnable = 1;
         if (!IsValidLoadType(op.command.mem.loadStoreType)) begin
             op.isUnknown = 1;
@@ -226,7 +226,7 @@ function automatic Op DecodeRV32I(insn_t insn);
         op.command.mem.fence = '0;
         op.command.mem.loadStoreType = LoadStoreType'(funct3);
         op.command.mem.storeSrc = StoreSrcType_Int;
-        op.imm = sext12({insn[31:25], insn[11:7]});
+        op.imm = SignExtend12({insn[31:25], insn[11:7]});
         if (!IsValidStoreType(op.command.mem.loadStoreType)) begin
             op.isUnknown = 1;
         end
@@ -251,7 +251,7 @@ function automatic Op DecodeRV32I(insn_t insn);
         else begin
             // addi, slti, sltiu, xori, ori, andi
             op.aluCommand = AluCommand'({1'b0, funct3});
-            op.imm = sext12(insn[31:20]);
+            op.imm = SignExtend12(insn[31:20]);
         end
         op.aluSrcType1 = AluSrcType1_Reg;
         op.aluSrcType2 = AluSrcType2_Imm;
@@ -539,7 +539,7 @@ function automatic Op DecodeRV32F(insn_t insn);
             op.command.mem.loadStoreType = LoadStoreType_FpWord;
             op.command.mem.storeSrc = StoreSrcType_Fp;
             op.intRegWriteSrcType = IntRegWriteSrcType_Memory;
-            op.imm = sext12(insn[31:20]);
+            op.imm = SignExtend12(insn[31:20]);
             op.fpRegWriteEnable = 1;
         end
         else begin
@@ -560,7 +560,7 @@ function automatic Op DecodeRV32F(insn_t insn);
             op.command.mem.fence = '0;
             op.command.mem.loadStoreType = LoadStoreType_FpWord;
             op.command.mem.storeSrc = StoreSrcType_Fp;
-            op.imm = sext12({insn[31:25], insn[11:7]});
+            op.imm = SignExtend12({insn[31:25], insn[11:7]});
         end
         else begin
             op.isUnknown = 1;
@@ -786,7 +786,7 @@ function automatic Op DecodeRV32D(insn_t insn);
             op.command.mem.fence = '0;
             op.command.mem.loadStoreType = LoadStoreType_DoubleWord;
             op.command.mem.storeSrc = StoreSrcType_Fp;
-            op.imm = sext12(insn[31:20]);
+            op.imm = SignExtend12(insn[31:20]);
             op.fpRegWriteEnable = 1;
         end
         else begin
@@ -807,7 +807,7 @@ function automatic Op DecodeRV32D(insn_t insn);
             op.command.mem.fence = '0;
             op.command.mem.loadStoreType = LoadStoreType_DoubleWord;
             op.command.mem.storeSrc = StoreSrcType_Fp;
-            op.imm = sext12({insn[31:25], insn[11:7]});
+            op.imm = SignExtend12({insn[31:25], insn[11:7]});
         end
         else begin
             op.isUnknown = 1;

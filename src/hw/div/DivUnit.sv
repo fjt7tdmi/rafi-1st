@@ -30,7 +30,7 @@ module DivUnit #(
     input   logic rst
 );
     // typedef
-    typedef logic unsigned [N:0] _abs_t;
+    typedef logic [N:0] _abs_t;
     typedef logic [$clog2(N+1)-1:0] _counter_t;
 
     typedef enum logic [1:0]

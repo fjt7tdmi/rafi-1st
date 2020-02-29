@@ -20,15 +20,15 @@ package BasicTypes;
 parameter BYTE_WIDTH = 8;
 
 // typedef
-typedef logic signed    [7:0]   int8_t;
-typedef logic signed    [15:0]  int16_t;
-typedef logic signed    [31:0]  int32_t;
-typedef logic signed    [63:0]  int64_t;
+typedef logic signed [7:0]  int8_t;
+typedef logic signed [15:0] int16_t;
+typedef logic signed [31:0] int32_t;
+typedef logic signed [63:0] int64_t;
 
-typedef logic unsigned  [7:0]   uint8_t;
-typedef logic unsigned  [15:0]  uint16_t;
-typedef logic unsigned  [31:0]  uint32_t;
-typedef logic unsigned  [63:0]  uint64_t;
+typedef logic [7:0]  uint8_t;
+typedef logic [15:0] uint16_t;
+typedef logic [31:0] uint32_t;
+typedef logic [63:0] uint64_t;
 
 typedef struct packed {
     logic sign;
