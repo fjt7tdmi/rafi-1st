@@ -240,11 +240,23 @@ module ExecuteStage(
         .srcRegValue2(srcIntRegValue2),
         .imm(op.imm));
 
+    // Permission check
+    logic csrPermissionError;
+    logic fencePermissionError;
+    always_comb begin
+        csrPermissionError = valid &&
+            csr.status.TVM == 1 && csr.privilege != Privilege_Machine &&
+            op.csrWriteEnable && prevStage.csrAddr == CSR_ADDR_SATP;
+        fencePermissionError = valid &&
+            csr.status.TVM == 1 && csr.privilege != Privilege_Machine &&
+            op.unit == ExecuteUnitType_LoadStore && op.command.mem.isFence && op.command.mem.fence == FenceType_Vma;
+    end
+
     // CSR
     always_comb begin
         csr.readAddr = prevStage.csrAddr;
         csr.readEnable = op.csrReadEnable;
-        csr.writeEnable = valid && !trapInfo.valid && op.csrWriteEnable;
+        csr.writeEnable = valid && !trapInfo.valid && op.csrWriteEnable && !csrPermissionError;
         csr.writeAddr = prevStage.csrAddr;
         csr.writeValue = intResult;
 
@@ -333,8 +345,10 @@ module ExecuteStage(
 
     // FetchUnit
     always_comb begin
-        invalidateICache = valid && op.unit == ExecuteUnitType_LoadStore && op.command.mem.isFence && op.command.mem.fence inside {FenceType_I, FenceType_Vma};
-        invalidateTlb = valid && op.unit == ExecuteUnitType_LoadStore && op.command.mem.isFence && op.command.mem.fence == FenceType_Vma;
+        invalidateICache = valid && !fencePermissionError &&
+            op.unit == ExecuteUnitType_LoadStore && op.command.mem.isFence && op.command.mem.fence inside {FenceType_I, FenceType_Vma};
+        invalidateTlb = valid && !fencePermissionError && 
+            op.unit == ExecuteUnitType_LoadStore && op.command.mem.isFence && op.command.mem.fence == FenceType_Vma;
 
         fetchUnit.invalidateICache = invalidateICache;
         fetchUnit.invalidateTlb = invalidateTlb;
@@ -352,7 +366,7 @@ module ExecuteStage(
 
         loadStoreUnit.addr = memAddr;
         loadStoreUnit.enable = valid && op.unit == ExecuteUnitType_LoadStore && !prevStage.trapInfo.valid;
-        loadStoreUnit.invalidateTlb = valid && op.unit == ExecuteUnitType_LoadStore && op.command.mem.isFence && op.command.mem.fence == FenceType_Vma;
+        loadStoreUnit.invalidateTlb = valid && !fencePermissionError && op.unit == ExecuteUnitType_LoadStore && op.command.mem.isFence && op.command.mem.fence == FenceType_Vma;
         loadStoreUnit.loadStoreType = op.command.mem.loadStoreType;
         loadStoreUnit.atomicType = op.command.mem.atomic;
         loadStoreUnit.storeRegValue = storeRegValue;
@@ -399,7 +413,13 @@ module ExecuteStage(
         if (prevStage.trapInfo.valid) begin
             trapInfo = prevStage.trapInfo;
         end
-        else if (valid && csr.readEnable && csr.readIllegal) begin
+        else if (valid && fencePermissionError && op.unit == ExecuteUnitType_LoadStore && op.command.mem.isFence) begin
+            trapInfo.valid = 1;
+            trapInfo.cause.isInterrupt = 0;
+            trapInfo.cause.code = EXCEPTION_CODE_ILLEGAL_INSN;
+            trapInfo.value = prevStage.insn;
+        end
+        else if (valid && csrPermissionError && op.csrWriteEnable) begin
             trapInfo.valid = 1;
             trapInfo.cause.isInterrupt = 0;
             trapInfo.cause.code = EXCEPTION_CODE_ILLEGAL_INSN;

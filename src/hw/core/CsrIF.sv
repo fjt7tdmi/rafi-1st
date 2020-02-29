@@ -25,7 +25,6 @@ interface CsrIF;
     word_t readValue;
     csr_addr_t readAddr;
     logic readEnable;
-    logic readIllegal;
 
     // Write IF for EX stage
     word_t writeValue;
@@ -60,7 +59,6 @@ interface CsrIF;
     modport Csr(
     output
         readValue,
-        readIllegal,
         privilege,
         satp,
         status,
@@ -101,8 +99,7 @@ interface CsrIF;
         privilege,
         status,
         frm,
-        readValue,
-        readIllegal
+        readValue
     );
 
     modport RegWriteStage(
