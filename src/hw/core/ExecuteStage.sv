@@ -428,6 +428,12 @@ module ExecuteStage(
             trapInfo.cause.code = EXCEPTION_CODE_ILLEGAL_INSN;
             trapInfo.value = prevStage.insn;
         end
+        else if (valid && op.isWfi && csr.privilege != Privilege_Machine && csr.status.TW) begin
+            trapInfo.valid = 1;
+            trapInfo.cause.isInterrupt = 0;
+            trapInfo.cause.code = EXCEPTION_CODE_ILLEGAL_INSN;
+            trapInfo.value = prevStage.insn;
+        end
         else if (valid && loadStoreUnit.loadPagefault) begin
             trapInfo.valid = 1;
             trapInfo.cause.isInterrupt = 0;

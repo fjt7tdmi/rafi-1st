@@ -142,6 +142,7 @@ function automatic Op DecodeRV32I(insn_t insn);
     op.imm = '0;
     op.isTrap = 0;
     op.isTrapReturn = 0;
+    op.isWfi = 0;
     op.isUnknown = 0;
     op.csrReadEnable = 0;
     op.csrWriteEnable = 0;
@@ -289,7 +290,7 @@ function automatic Op DecodeRV32I(insn_t insn);
                 op.trapReturnPrivilege = Privilege_Machine;
             end
             else if (csr == 12'b0001_0000_0101 && rs1 == 5'b00000) begin
-                // TORIAEZU: Implement WFI as NOP
+                op.isWfi = 1;
             end
             else if (funct7 == 7'b000_1001) begin
                 op.unit = ExecuteUnitType_LoadStore;
@@ -424,6 +425,7 @@ function automatic Op DecodeRV32M(insn_t insn);
     op.imm = '0;
     op.isTrap = 0;
     op.isTrapReturn = 0;
+    op.isWfi = 0;
     op.isUnknown = 0;
     op.csrReadEnable = 0;
     op.csrWriteEnable = 0;
@@ -474,6 +476,7 @@ function automatic Op DecodeRV32A(insn_t insn);
     op.imm = '0;
     op.isTrap = 0;
     op.isTrapReturn = 0;
+    op.isWfi = 0;
     op.isUnknown = !isSupportedAtomicOp;
     op.csrReadEnable = 0;
     op.csrWriteEnable = 0;
@@ -509,6 +512,7 @@ function automatic Op DecodeRV32F(insn_t insn);
     op.imm = '0;
     op.isTrap = 0;
     op.isTrapReturn = 0;
+    op.isWfi = 0;
     op.isUnknown = '0;
     op.csrReadEnable = 0;
     op.csrWriteEnable = 0;
@@ -756,6 +760,7 @@ function automatic Op DecodeRV32D(insn_t insn);
     op.imm = '0;
     op.isTrap = 0;
     op.isTrapReturn = 0;
+    op.isWfi = 0;
     op.isUnknown = '0;
     op.csrReadEnable = 0;
     op.csrWriteEnable = 0;
