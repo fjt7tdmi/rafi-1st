@@ -110,26 +110,37 @@ function automatic csr_xstatus_t write_ustatus(csr_xstatus_t currentValue, csr_x
     return (currentValue & (~mask)) | (write_value & mask);
 endfunction
 
-function automatic csr_xstatus_t update_xstatus_mpp(csr_xstatus_t current, Privilege mpp);
+function automatic csr_xstatus_t UpdateStatusForTrapM(csr_xstatus_t current, Privilege prev_priv);
     csr_xstatus_t ret = current;
-    ret.MPP = mpp;
+    ret.MPIE = current.MIE;
+    ret.MIE = 0;
+    ret.MPP = prev_priv;
     return ret;
 endfunction
 
-function automatic csr_xstatus_t update_xstatus_mpp_mie(csr_xstatus_t current, Privilege mpp, logic mie);
+function automatic csr_xstatus_t UpdateStatusForTrapS(csr_xstatus_t current, Privilege prev_priv);
+    csr_xstatus_t ret = current;
+    ret.SPIE = current.SIE;
+    ret.SIE = 0;
+    ret.SPP = prev_priv[0];
+    return ret;
+endfunction
+
+function automatic csr_xstatus_t UpdateStatusForTrapU(csr_xstatus_t current);
+    csr_xstatus_t ret = current;
+    ret.UPIE = current.UIE;
+    ret.UIE = 0;
+    return ret;
+endfunction
+
+function automatic csr_xstatus_t UpdateStatusForTrapReturnM(csr_xstatus_t current, Privilege mpp, logic mie);
     csr_xstatus_t ret = current;
     ret.MPP = mpp;
     ret.MIE = mie;
     return ret;
 endfunction
 
-function automatic csr_xstatus_t update_xstatus_spp(csr_xstatus_t current, Privilege spp);
-    csr_xstatus_t ret = current;
-    ret.SPP = spp[0];
-    return ret;
-endfunction
-
-function automatic csr_xstatus_t update_xstatus_spp_sie(csr_xstatus_t current, Privilege spp, logic sie);
+function automatic csr_xstatus_t UpdateStatusForTrapReturnS(csr_xstatus_t current, Privilege spp, logic sie);
     csr_xstatus_t ret = current;
     ret.SPP = spp[0];
     ret.SIE = sie;
@@ -276,21 +287,21 @@ module Csr(
         // next_status
         if (bus.trapInfo.valid) begin
             if (next_priv == Privilege_Machine) begin
-                next_status = update_xstatus_mpp(reg_status, reg_priv);
+                next_status = UpdateStatusForTrapM(reg_status, reg_priv);
             end
             else if (next_priv == Privilege_Supervisor) begin
-                next_status = update_xstatus_spp(reg_status, reg_priv);
+                next_status = UpdateStatusForTrapS(reg_status, reg_priv);
             end
             else begin
-                next_status = reg_status;
+                next_status = UpdateStatusForTrapU(reg_status);
             end
         end
         else if (bus.trapReturn) begin
             if (bus.trapReturnPrivilege == Privilege_Machine) begin
-                next_status = update_xstatus_mpp_mie(reg_status, Privilege_User, reg_status.MPIE);
+                next_status = UpdateStatusForTrapReturnM(reg_status, Privilege_User, reg_status.MPIE);
             end
             else if (next_priv == Privilege_Supervisor) begin
-                next_status = update_xstatus_spp_sie(reg_status, Privilege_User, reg_status.SPIE);
+                next_status = UpdateStatusForTrapReturnS(reg_status, Privilege_User, reg_status.SPIE);
             end
             else begin
                 next_status = reg_status;
