@@ -1,6 +1,7 @@
 [
     { "name": "rv32mi-p-breakpoint",    "host-io-addr": "0x80001000", "cycle": 32000 },
     { "name": "rv32mi-p-csr",           "host-io-addr": "0x80001000", "cycle": 32000 },
+    { "name": "rv32mi-p-illegal",       "host-io-addr": "0x80001000", "cycle": 32000 },
     { "name": "rv32mi-p-mcsr",          "host-io-addr": "0x80001000", "cycle": 32000 },
     { "name": "rv32mi-p-ma_fetch",      "host-io-addr": "0x80001000", "cycle": 32000 },
     { "name": "rv32mi-p-sbreak",        "host-io-addr": "0x80001000", "cycle": 32000 },

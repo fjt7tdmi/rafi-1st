@@ -265,6 +265,7 @@ typedef struct packed
     word_t imm;
     logic isTrap;
     logic isTrapReturn;
+    logic isWfi;
     logic isUnknown;
     logic csrReadEnable;
     logic csrWriteEnable;

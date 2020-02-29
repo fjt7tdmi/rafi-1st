@@ -25,6 +25,7 @@ module FetchStage(
     InsnBufferIF.FetchStage insnBuffer,
     FetchUnitIF.FetchStage fetchUnit,
     PipelineControllerIF.FetchStage ctrl,
+    InterruptControllerIF.FetchStage interrupt,
     input   logic clk,
     input   logic rst
 );
@@ -44,7 +45,6 @@ module FetchStage(
     insn_t [INSN_COUNT_IN_LINE-1:0] insns;
     insn_t insn;
     logic stall;
-
     always_comb begin
         index = fetchUnit.pc[INDEX_WIDTH+$clog2(INSN_SIZE)-1:$clog2(INSN_SIZE)];
         insns = fetchUnit.iCacheLine;
@@ -52,22 +52,26 @@ module FetchStage(
         stall = ctrl.ifStall || insnBuffer.writableEntryCount < 2;
     end
 
+    // FetchUnit
     always_comb begin
         fetchUnit.nextPc = ctrl.nextPc;
         fetchUnit.flush = ctrl.flush;
         fetchUnit.stall = stall;
     end
 
+    // InsnBuffer
     always_comb begin
         insnBuffer.writeLow = !stall && fetchUnit.valid && ~fetch_compressed_insn;
         insnBuffer.writeHigh = !stall && fetchUnit.valid;
-
         insnBuffer.writeEntryLow.pc = pc_low;
-        insnBuffer.writeEntryLow.fault = fetchUnit.fault;
         insnBuffer.writeEntryLow.insn = insn[15:0];
-
+        insnBuffer.writeEntryLow.fault = fetchUnit.fault;
+        insnBuffer.writeEntryLow.interruptValid = interrupt.valid;
+        insnBuffer.writeEntryLow.interruptCode = interrupt.code;
         insnBuffer.writeEntryHigh.pc = fetch_compressed_insn ? pc_low : pc_high;
-        insnBuffer.writeEntryHigh.fault = fetchUnit.fault;
         insnBuffer.writeEntryHigh.insn = insn[31:16];
+        insnBuffer.writeEntryHigh.fault = fetchUnit.fault;
+        insnBuffer.writeEntryHigh.interruptValid = interrupt.valid;
+        insnBuffer.writeEntryHigh.interruptCode = interrupt.code;
     end
 endmodule

@@ -57,17 +57,31 @@ module DecodeStage(
 
     TrapInfo trap_info;
     always_comb begin
-        if (valid && insnBuffer.readEntryLow.fault) begin
-            trap_info.valid = '1;
-            trap_info.cause.isInterrupt = 0;
-            trap_info.cause.code = EXCEPTION_CODE_INSN_PAGE_FAULT;
-            trap_info.value = pc;
-        end
-        else if (valid && op.isUnknown) begin
-            trap_info.valid = 1;
-            trap_info.cause.isInterrupt = 0;
-            trap_info.cause.code = EXCEPTION_CODE_ILLEGAL_INSN;
-            trap_info.value = insn;
+        if (valid) begin
+            if (insnBuffer.readEntryLow.interruptValid) begin
+                trap_info.valid = 1;
+                trap_info.cause.isInterrupt = 1;
+                trap_info.cause.code = insnBuffer.readEntryLow.interruptCode;
+                trap_info.value = pc;
+            end
+            else if (~is_compressed && insnBuffer.readEntryHigh.interruptValid) begin
+                trap_info.valid = 1;
+                trap_info.cause.isInterrupt = 1;
+                trap_info.cause.code = insnBuffer.readEntryHigh.interruptCode;
+                trap_info.value = pc;
+            end
+            else if (insnBuffer.readEntryLow.fault || (~is_compressed && insnBuffer.readEntryHigh.fault)) begin
+                trap_info.valid = 1;
+                trap_info.cause.isInterrupt = 0;
+                trap_info.cause.code = EXCEPTION_CODE_INSN_PAGE_FAULT;
+                trap_info.value = pc;
+            end
+            else if (op.isUnknown) begin
+                trap_info.valid = 1;
+                trap_info.cause.isInterrupt = 0;
+                trap_info.cause.code = EXCEPTION_CODE_ILLEGAL_INSN;
+                trap_info.value = insn;
+            end
         end
         else begin
             trap_info = '0;
