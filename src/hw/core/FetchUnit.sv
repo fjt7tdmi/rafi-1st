@@ -350,7 +350,7 @@ module FetchUnit (
             else if (reg_tlb_miss) begin
                 next_state = State_ReplaceTlb;
             end
-            else if (cacheMiss) begin
+            else if (!reg_fault && cacheMiss) begin
                 next_state = State_ReplaceCache;
             end
             else begin
