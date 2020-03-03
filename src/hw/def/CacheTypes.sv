@@ -69,11 +69,11 @@ typedef logic [ITLB_INDEX_WIDTH-1:0] itlb_index_t;
 
 typedef enum logic [1:0]
 {
-    CacheCommand_None = 2'h0,
-    CacheCommand_WriteThrough = 2'h1,
-    CacheCommand_Replace = 2'h2,
-    CacheCommand_Invalidate = 2'h3
-} CacheCommand;
+    ReplaceLogicCommand_None = 2'h0,
+    ReplaceLogicCommand_WriteThrough = 2'h1,
+    ReplaceLogicCommand_Replace = 2'h2,
+    ReplaceLogicCommand_Invalidate = 2'h3
+} ReplaceLogicCommand;
 
 typedef struct packed
 {
