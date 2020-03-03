@@ -48,7 +48,7 @@ module DCacheReplacer #(
     // Control
     output logic done,
     input logic enable,
-    input CacheCommand command,
+    input ReplaceLogicCommand command,
     input logic [MEM_ADDR_WIDTH-1:0] commandAddr,
 
     // clk & rst
@@ -121,13 +121,13 @@ module DCacheReplacer #(
     always_comb begin
         unique case (reg_state)
         State_None: begin
-            if (enable && command == CacheCommand_WriteThrough) begin
+            if (enable && command == ReplaceLogicCommand_WriteThrough) begin
                 next_state = State_ReadCache;
             end
-            else if (enable && command == CacheCommand_Replace) begin
+            else if (enable && command == ReplaceLogicCommand_Replace) begin
                 next_state = State_InvalidateForReplace;
             end
-            else if (enable && command == CacheCommand_Invalidate) begin
+            else if (enable && command == ReplaceLogicCommand_Invalidate) begin
                 next_state = State_Invalidate;
             end
             else begin

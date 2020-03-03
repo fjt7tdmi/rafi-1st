@@ -103,8 +103,8 @@ module LoadStoreUnit (
     MemoryAccessType accessType;
     logic cacheMiss;
     uint64_t shiftedReadData;
-    CacheCommand command;
-    dcache_mem_addr_t commandAddr;
+    ReplaceLogicCommand replaceLogicCommand;
+    dcache_mem_addr_t replaceLogicAddr;
     uint64_t loadResult;
     uint64_t storeValue;
     word_t storeAluValue;
@@ -227,8 +227,8 @@ module LoadStoreUnit (
         .memWriteValue(cacheReplacerMemWriteValue),
         .done(cacheReplacerDone),
         .enable(cacheReplacerEnable),
-        .command(command),
-        .commandAddr(commandAddr),
+        .command(replaceLogicCommand),
+        .commandAddr(replaceLogicAddr),
         .clk,
         .rst);
 
@@ -267,10 +267,6 @@ module LoadStoreUnit (
     end
 
     always_comb begin
-        commandAddr = reg_paddr[PADDR_WIDTH-1:INDEX_LSB];
-    end
-
-    always_comb begin
         storeAluValue = atomicAlu(bus.command.atomic, reg_store_value[31:0], loadResult[31:0]);
         storeValue = (bus.loadStoreUnitCommand == LoadStoreUnitCommand_AtomicMemOp)
             ? {32'h0, storeAluValue}
@@ -282,11 +278,13 @@ module LoadStoreUnit (
     end
 
     always_comb begin
+        replaceLogicAddr = reg_paddr[PADDR_WIDTH-1:INDEX_LSB];
+
         unique case (reg_state)
-        State_Invalidate:   command = CacheCommand_Invalidate;
-        State_ReplaceCache: command = CacheCommand_Replace;
-        State_WriteThrough: command = CacheCommand_WriteThrough;
-        default:            command = CacheCommand_None;
+        State_Invalidate:   replaceLogicCommand = ReplaceLogicCommand_Invalidate;
+        State_ReplaceCache: replaceLogicCommand = ReplaceLogicCommand_Replace;
+        State_WriteThrough: replaceLogicCommand = ReplaceLogicCommand_WriteThrough;
+        default:            replaceLogicCommand = ReplaceLogicCommand_None;
         endcase
     end
 
