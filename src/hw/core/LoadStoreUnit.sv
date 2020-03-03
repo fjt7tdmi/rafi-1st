@@ -63,49 +63,6 @@ module LoadStoreUnit (
         _tag_t tag;
     } TagArrayEntry;
 
-    // Functions
-    function automatic _line_t leftShift(uint64_t value, _shift_amount_t shift);
-        int8_t [7:0] bytes;
-        int8_t [LINE_SIZE-1:0] shiftedBytes;
-
-        bytes = value;
-
-        for (int i = 0; i < LINE_SIZE; i++) begin
-            /* verilator lint_off WIDTH */
-            if (shift <= i) begin
-                shiftedBytes[i] = bytes[i - shift];
-            end
-            else begin
-                shiftedBytes[i] = '0;
-            end
-        end
-
-        return shiftedBytes;
-    endfunction
-
-    function automatic _write_mask_t makeWriteMask(_shift_amount_t shift, LoadStoreType loadStoreType);
-        _write_mask_t mask;
-
-        /* verilator lint_off WIDTH */
-        if (loadStoreType inside {LoadStoreType_Byte, LoadStoreType_UnsignedByte}) begin
-            mask = 8'b0000_0001;
-        end
-        else if (loadStoreType inside {LoadStoreType_HalfWord, LoadStoreType_UnsignedHalfWord}) begin
-            mask = 8'b0000_0011;
-        end
-        else if (loadStoreType inside {LoadStoreType_Word, LoadStoreType_UnsignedWord, LoadStoreType_FpWord}) begin
-            mask = 8'b0000_1111;
-        end
-        else if (loadStoreType inside {LoadStoreType_DoubleWord}) begin
-            mask = 8'b1111_1111;
-        end
-        else begin
-            mask = '0;
-        end
-
-        return mask << shift;
-    endfunction
-
     function automatic word_t atomicAlu(AtomicType atomicType, word_t regValue, word_t memValue);
         unique case(atomicType)
         AtomicType_Swap:    return regValue;
@@ -152,6 +109,8 @@ module LoadStoreUnit (
     uint64_t storeValue;
     word_t storeAluValue;
     logic storeConditionFlag;
+    logic [LINE_WIDTH-1:0] storeLine;
+    logic [LINE_SIZE-1:0] storeWriteMask;
 
     _index_t        tagArrayIndex;
     TagArrayEntry   tagArrayReadValue;
@@ -195,6 +154,13 @@ module LoadStoreUnit (
         .result(loadResult),
         .addr(reg_vaddr[$clog2(LINE_SIZE)-1:0]),
         .line(dataArrayReadValue),
+        .loadStoreType(bus.command.loadStoreType));
+
+    StoreValueUnit m_StoreValueUnit (
+        .line(storeLine),
+        .writeMask(storeWriteMask),
+        .addr(next_vaddr[$clog2(LINE_SIZE)-1:0]),
+        .value(storeValue),
         .loadStoreType(bus.command.loadStoreType));
 
     BlockRamWithReset #(
@@ -307,7 +273,7 @@ module LoadStoreUnit (
     always_comb begin
         storeAluValue = atomicAlu(bus.command.atomic, reg_store_value[31:0], loadResult[31:0]);
         storeValue = (bus.loadStoreUnitCommand == LoadStoreUnitCommand_AtomicMemOp)
-            ? storeAluValue
+            ? {32'h0, storeAluValue}
             : reg_store_value;
         storeConditionFlag =
             (bus.loadStoreUnitCommand == LoadStoreUnitCommand_StoreConditional) &&
@@ -532,10 +498,8 @@ module LoadStoreUnit (
             dataArrayWriteValue = cacheReplacerArrayWriteData;
         end
         State_Store: begin
-            dataArrayWriteMask = (!reg_tlb_miss && !cacheMiss && !tlbFault) ?
-                makeWriteMask(next_paddr[$clog2(DCACHE_LINE_SIZE)-1:0], bus.command.loadStoreType) :
-                '0;
-            dataArrayWriteValue = leftShift(storeValue, reg_vaddr[$clog2(LINE_SIZE)-1:0]);
+            dataArrayWriteMask = (reg_tlb_miss || cacheMiss || tlbFault) ? '0 : storeWriteMask;
+            dataArrayWriteValue = storeLine;
         end
         default: begin
             dataArrayWriteMask = '0;
