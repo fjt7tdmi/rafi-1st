@@ -422,14 +422,16 @@ module LoadStoreUnit (
             bus.storePagefault = 0;
         end
 
+        bus.resultAddr = reg_addr;
+
         if (bus.loadStoreUnitCommand == LoadStoreUnitCommand_StoreConditional) begin
-            bus.result = (reg_state == State_WriteThrough) ? 0 : 1;
+            bus.resultValue = (reg_state == State_WriteThrough) ? 0 : 1;
         end
         else if (bus.loadStoreUnitCommand == LoadStoreUnitCommand_LoadReserved || bus.loadStoreUnitCommand == LoadStoreUnitCommand_AtomicMemOp) begin
-            bus.result = reg_load_result;
+            bus.resultValue = reg_load_result;
         end
         else begin
-            bus.result = loadResult;
+            bus.resultValue = loadResult;
         end
     end
 
@@ -523,7 +525,7 @@ module LoadStoreUnit (
     // next_addr, next_access_type, next_load_store_type, next_store_value
     always_comb begin
         if (reg_state == State_Default) begin
-            next_addr = bus.addr;
+            next_addr = bus.srcIntRegValue1 + bus.imm; // address generation
             next_access_type = accessType;
             next_load_store_type = bus.command.loadStoreType;
 

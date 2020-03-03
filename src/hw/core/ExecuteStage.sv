@@ -152,7 +152,6 @@ module ExecuteStage(
     TrapInfo trapInfo;
     logic trapReturn;
 
-    addr_t memAddr;
     uint64_t storeRegValue;
     logic invalidateICache;
     logic invalidateTlb;
@@ -326,7 +325,7 @@ module ExecuteStage(
         unique case (op.intRegWriteSrcType)
         IntRegWriteSrcType_Result:  dstIntRegValue = intResult;
         IntRegWriteSrcType_NextPc:  dstIntRegValue = prevStage.pc + (prevStage.isCompressedInsn ? 2 : 4);
-        IntRegWriteSrcType_Memory:  dstIntRegValue = loadStoreUnit.result[31:0];
+        IntRegWriteSrcType_Memory:  dstIntRegValue = loadStoreUnit.resultValue[31:0];
         IntRegWriteSrcType_Csr:     dstIntRegValue = csr.readValue;
         default: dstIntRegValue = '0;
         endcase
@@ -338,7 +337,7 @@ module ExecuteStage(
         ExecuteUnitType_FpConverter: dstFpRegValue = fpResultCvt;
         ExecuteUnitType_Fp32:        dstFpRegValue = {32'hffff_ffff, fpResult32};
         ExecuteUnitType_Fp64:        dstFpRegValue = fpResult64;
-        ExecuteUnitType_LoadStore:   dstFpRegValue = loadStoreUnit.result;
+        ExecuteUnitType_LoadStore:   dstFpRegValue = loadStoreUnit.resultValue;
         default:                dstFpRegValue = '0;
         endcase
     end
@@ -356,9 +355,6 @@ module ExecuteStage(
 
     // LoadStoreUnit
     always_comb begin
-        memAddr = intResult;
-
-        loadStoreUnit.addr = memAddr;
         loadStoreUnit.enable = valid && op.unit == ExecuteUnitType_LoadStore && !prevStage.trapInfo.valid;
         loadStoreUnit.invalidateTlb = valid && !fencePermissionError && op.unit == ExecuteUnitType_LoadStore && op.command.mem.isFence && op.command.mem.fence == FenceType_Vma;
         loadStoreUnit.loadStoreUnitCommand = getLoadStoreUnitCommand(op);
@@ -454,13 +450,13 @@ module ExecuteStage(
             trapInfo.valid = 1;
             trapInfo.cause.isInterrupt = 0;
             trapInfo.cause.code = EXCEPTION_CODE_LOAD_PAGE_FAULT;
-            trapInfo.value = memAddr;
+            trapInfo.value = loadStoreUnit.resultAddr;
         end
         else if (valid && loadStoreUnit.storePagefault) begin
             trapInfo.valid = 1;
             trapInfo.cause.isInterrupt = 0;
             trapInfo.cause.code = EXCEPTION_CODE_STORE_PAGE_FAULT;
-            trapInfo.value = memAddr;
+            trapInfo.value = loadStoreUnit.resultAddr;
         end
         else begin
             trapInfo = '0;

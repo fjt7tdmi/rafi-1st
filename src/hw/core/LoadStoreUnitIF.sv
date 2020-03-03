@@ -21,13 +21,13 @@ import Rv32Types::*;
 import OpTypes::*;
 
 interface LoadStoreUnitIF;
-    addr_t addr;
     logic done;
     logic enable;
     logic invalidateTlb;
     logic loadPagefault;
     logic storePagefault;
-    uint64_t result;
+    addr_t resultAddr;
+    uint64_t resultValue;
 
     LoadStoreUnitCommand loadStoreUnitCommand;
     MemUnitCommand command;
@@ -38,7 +38,6 @@ interface LoadStoreUnitIF;
 
     modport ExecuteStage(
     output
-        addr,
         enable,
         invalidateTlb,
         loadStoreUnitCommand,
@@ -51,7 +50,8 @@ interface LoadStoreUnitIF;
         done,
         loadPagefault,
         storePagefault,
-        result
+        resultAddr,
+        resultValue
     );
 
     modport LoadStoreUnit(
@@ -59,9 +59,9 @@ interface LoadStoreUnitIF;
         done,
         loadPagefault,
         storePagefault,
-        result,
+        resultAddr,
+        resultValue,
     input
-        addr,
         enable,
         invalidateTlb,
         loadStoreUnitCommand,
