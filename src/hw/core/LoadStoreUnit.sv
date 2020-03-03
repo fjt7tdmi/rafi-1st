@@ -64,25 +64,6 @@ module LoadStoreUnit (
     } TagArrayEntry;
 
     // Functions
-    function automatic uint64_t rightShift(_line_t value, _shift_amount_t shift);
-        int8_t [LINE_SIZE-1:0] bytes;
-        int8_t [7:0] shiftedBytes;
-
-        bytes = value;
-
-        for (int i = 0; i < 8; i++) begin
-            /* verilator lint_off WIDTH */
-            if (shift + i < LINE_SIZE) begin
-                shiftedBytes[i] = bytes[shift + i];
-            end
-            else begin
-                shiftedBytes[i] = '0;
-            end
-        end
-
-        return shiftedBytes;
-    endfunction
-
     function automatic _line_t leftShift(uint64_t value, _shift_amount_t shift);
         int8_t [7:0] bytes;
         int8_t [LINE_SIZE-1:0] shiftedBytes;
@@ -90,6 +71,7 @@ module LoadStoreUnit (
         bytes = value;
 
         for (int i = 0; i < LINE_SIZE; i++) begin
+            /* verilator lint_off WIDTH */
             if (shift <= i) begin
                 shiftedBytes[i] = bytes[i - shift];
             end
@@ -124,51 +106,6 @@ module LoadStoreUnit (
         return mask << shift;
     endfunction
 
-    function automatic uint64_t extend(uint64_t value, LoadStoreType loadStoreType);
-        unique case(loadStoreType)
-        LoadStoreType_Byte: begin
-            if (value[7]) begin
-                return {56'hffff_ffff_ffff_ff, value[7:0]};
-            end
-            else begin
-                return {56'h0000_0000_0000_00, value[7:0]};
-            end
-        end
-        LoadStoreType_HalfWord: begin
-            if (value[15]) begin
-                return {48'hffff_ffff_ffff, value[15:0]};
-            end
-            else begin
-                return {48'h0000_0000_0000, value[15:0]};
-            end
-        end
-        LoadStoreType_Word: begin
-            if (value[31]) begin
-                return {32'hffff_ffff, value[31:0]};
-            end
-            else begin
-                return {32'h0000_0000, value[31:0]};
-            end
-        end
-        LoadStoreType_DoubleWord: begin
-            return value;
-        end
-        LoadStoreType_UnsignedByte: begin
-            return {56'h0000_0000_0000_00, value[7:0]};
-        end
-        LoadStoreType_UnsignedHalfWord: begin
-            return {48'h0000_0000_0000, value[15:0]};
-        end
-        LoadStoreType_UnsignedWord: begin
-            return {32'h0000_0000, value[31:0]};
-        end
-        LoadStoreType_FpWord: begin
-            return {32'hffff_ffff, value[31:0]};
-        end
-        default: return '0;
-        endcase
-    endfunction
-
     function automatic word_t atomicAlu(AtomicType atomicType, word_t regValue, word_t memValue);
         unique case(atomicType)
         AtomicType_Swap:    return regValue;
@@ -192,7 +129,6 @@ module LoadStoreUnit (
     logic reg_tlb_fault;
     logic reg_tlb_miss;
     MemoryAccessType reg_access_type;
-    LoadStoreType reg_load_store_type;
     uint64_t reg_load_result;
     uint64_t reg_store_value;
 
@@ -204,7 +140,6 @@ module LoadStoreUnit (
     logic next_tlb_fault;
     logic next_tlb_miss;
     MemoryAccessType next_access_type;
-    LoadStoreType next_load_store_type;
     uint64_t next_load_result;
     uint64_t next_store_value;
 
@@ -256,6 +191,12 @@ module LoadStoreUnit (
     logic               tlbReplacerEnable;
 
     // Modules
+    LoadValueUnit m_LoadValueUnit (
+        .result(loadResult),
+        .addr(reg_vaddr[$clog2(LINE_SIZE)-1:0]),
+        .line(dataArrayReadValue),
+        .loadStoreType(bus.command.loadStoreType));
+
     BlockRamWithReset #(
         .DATA_WIDTH($bits(TagArrayEntry)),
         .INDEX_WIDTH(INDEX_WIDTH)
@@ -265,8 +206,7 @@ module LoadStoreUnit (
         .writeValue(tagArrayWriteValue),
         .writeEnable(tagArrayWriteEnable),
         .clk,
-        .rst
-    );
+        .rst);
 
     MultiBankBlockRam #(
         .DATA_WIDTH_PER_BANK(BYTE_WIDTH),
@@ -277,8 +217,7 @@ module LoadStoreUnit (
         .index(dataArrayIndex),
         .writeValue(dataArrayWriteValue),
         .writeMask(dataArrayWriteMask),
-        .clk
-    );
+        .clk);
 
     Tlb #(
         .TLB_INDEX_WIDTH(ITLB_INDEX_WIDTH)
@@ -298,8 +237,7 @@ module LoadStoreUnit (
         .csrMxr(csr.status.MXR),
         .invalidate(bus.invalidateTlb),
         .clk,
-        .rst
-    );
+        .rst);
 
     DCacheReplacer #(
         .LINE_WIDTH(LINE_WIDTH),
@@ -326,8 +264,7 @@ module LoadStoreUnit (
         .command(command),
         .commandAddr(commandAddr),
         .clk,
-        .rst
-    );
+        .rst);
 
     TlbReplacer #(
         .MEM_ADDR_WIDTH(DCACHE_MEM_ADDR_WIDTH),
@@ -349,8 +286,7 @@ module LoadStoreUnit (
         .missMemoryAccessType(reg_access_type),
         .missPage(reg_vaddr[VADDR_WIDTH-1:PAGE_OFFSET_WIDTH]),
         .clk,
-        .rst
-    );
+        .rst);
 
     // Wires
     always_comb begin
@@ -365,15 +301,7 @@ module LoadStoreUnit (
     end
 
     always_comb begin
-        shiftedReadData = rightShift(dataArrayReadValue, reg_vaddr[$clog2(LINE_SIZE)-1:0]);
-    end
-
-    always_comb begin
         commandAddr = reg_paddr[PADDR_WIDTH-1:INDEX_LSB];
-    end
-
-    always_comb begin
-        loadResult = extend(shiftedReadData, reg_load_store_type);
     end
 
     always_comb begin
@@ -520,7 +448,6 @@ module LoadStoreUnit (
         if (reg_state == State_Default) begin
             next_vaddr = bus.srcIntRegValue1 + bus.imm; // address generation
             next_access_type = accessType;
-            next_load_store_type = bus.command.loadStoreType;
 
             unique case (bus.command.storeSrc)
             StoreSrcType_Int:   next_store_value = {32'h0, bus.srcIntRegValue2};
@@ -531,7 +458,6 @@ module LoadStoreUnit (
         else begin
             next_vaddr = reg_vaddr;
             next_access_type = reg_access_type;
-            next_load_store_type = reg_load_store_type;
             next_store_value = reg_store_value;
         end
     end
@@ -607,7 +533,7 @@ module LoadStoreUnit (
         end
         State_Store: begin
             dataArrayWriteMask = (!reg_tlb_miss && !cacheMiss && !tlbFault) ?
-                makeWriteMask(next_paddr[$clog2(DCACHE_LINE_SIZE)-1:0], next_load_store_type) :
+                makeWriteMask(next_paddr[$clog2(DCACHE_LINE_SIZE)-1:0], bus.command.loadStoreType) :
                 '0;
             dataArrayWriteValue = leftShift(storeValue, reg_vaddr[$clog2(LINE_SIZE)-1:0]);
         end
@@ -634,7 +560,6 @@ module LoadStoreUnit (
             reg_tlb_fault <= '0;
             reg_tlb_miss <= '0;
             reg_access_type <= MemoryAccessType_Load;
-            reg_load_store_type <= LoadStoreType_Word;
             reg_load_result <= '0;
             reg_store_value <= '0;
         end
@@ -646,7 +571,6 @@ module LoadStoreUnit (
             reg_tlb_fault <= next_tlb_fault;
             reg_tlb_miss <= next_tlb_miss;
             reg_access_type <= next_access_type;
-            reg_load_store_type <= next_load_store_type;
             reg_load_result <= next_load_result;
             reg_store_value <= next_store_value;
         end

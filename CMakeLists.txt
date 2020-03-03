@@ -559,6 +559,7 @@ if (verilator_FOUND)
         src/hw/core/InterruptControllerIF.sv
         src/hw/core/InterruptController.sv
         src/hw/core/DCacheReplacer.sv
+        src/hw/core/LoadValueUnit.sv
         src/hw/core/LoadStoreUnitIF.sv
         src/hw/core/LoadStoreUnit.sv
         src/hw/core/BusAccessUnit.sv
