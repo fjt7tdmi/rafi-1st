@@ -23,9 +23,6 @@ import OpTypes::*;
 import RafiTypes::*;
 
 module Core (
-    // Debug signals
-    output  logic [31:0] hostIoValue,
-
     // APB like bus
     output  logic [31:0] addr,
     output  logic select,
@@ -167,7 +164,6 @@ module Core (
         .bus(m_LoadStoreUnitIF.LoadStoreUnit),
         .mem(m_BusAccessUnitIF.LoadStoreUnit),
         .csr(m_CsrIF.LoadStoreUnit),
-        .hostIoValue,
         .clk,
         .rst(rstInternal)
     );

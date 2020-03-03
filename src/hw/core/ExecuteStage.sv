@@ -152,7 +152,6 @@ module ExecuteStage(
     TrapInfo trapInfo;
     logic trapReturn;
 
-    uint64_t storeRegValue;
     logic invalidateICache;
     logic invalidateTlb;
 

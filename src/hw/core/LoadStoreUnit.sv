@@ -25,7 +25,6 @@ module LoadStoreUnit (
     LoadStoreUnitIF.LoadStoreUnit bus,
     BusAccessUnitIF.LoadStoreUnit mem,
     CsrIF.LoadStoreUnit csr,
-    output  logic [31:0] hostIoValue,
     input   logic clk,
     input   logic rst
 );
@@ -187,7 +186,7 @@ module LoadStoreUnit (
 
     // Registers
     State reg_state;
-    addr_t reg_addr;
+    addr_t reg_vaddr;
     paddr_t reg_paddr;
     logic reg_dcache_read;
     logic reg_tlb_fault;
@@ -196,11 +195,10 @@ module LoadStoreUnit (
     LoadStoreType reg_load_store_type;
     uint64_t reg_load_result;
     uint64_t reg_store_value;
-    word_t reg_host_io_value; // special register for debug
 
     // Wires
     State next_state;
-    addr_t next_addr;
+    addr_t next_vaddr;
     paddr_t next_paddr;
     logic next_dcache_read;
     logic next_tlb_fault;
@@ -209,7 +207,6 @@ module LoadStoreUnit (
     LoadStoreType next_load_store_type;
     uint64_t next_load_result;
     uint64_t next_store_value;
-    word_t next_host_io_value;
 
     MemoryAccessType accessType;
     logic cacheMiss;
@@ -290,7 +287,7 @@ module LoadStoreUnit (
         .fault(tlbFault),
         .readValue(tlbReadValue),
         .readEnable(tlbReadEnable),
-        .readKey(next_addr[VADDR_WIDTH-1:PAGE_OFFSET_WIDTH]),
+        .readKey(next_vaddr[VADDR_WIDTH-1:PAGE_OFFSET_WIDTH]),
         .readAccessType(accessType),
         .writeEnable(tlbWriteEnable),
         .writeKey(tlbWriteKey),
@@ -350,7 +347,7 @@ module LoadStoreUnit (
         .done(tlbReplacerDone),
         .enable(tlbReplacerEnable),
         .missMemoryAccessType(reg_access_type),
-        .missPage(reg_addr[VADDR_WIDTH-1:PAGE_OFFSET_WIDTH]),
+        .missPage(reg_vaddr[VADDR_WIDTH-1:PAGE_OFFSET_WIDTH]),
         .clk,
         .rst
     );
@@ -368,7 +365,7 @@ module LoadStoreUnit (
     end
 
     always_comb begin
-        shiftedReadData = rightShift(dataArrayReadValue, reg_addr[$clog2(LINE_SIZE)-1:0]);
+        shiftedReadData = rightShift(dataArrayReadValue, reg_vaddr[$clog2(LINE_SIZE)-1:0]);
     end
 
     always_comb begin
@@ -401,10 +398,6 @@ module LoadStoreUnit (
 
     // Module port
     always_comb begin
-        hostIoValue = reg_host_io_value;
-    end
-
-    always_comb begin
         bus.done =
             (bus.loadStoreUnitCommand == LoadStoreUnitCommand_None && reg_state == State_Default) ||
             (bus.loadStoreUnitCommand == LoadStoreUnitCommand_Load && reg_state == State_Load && !reg_tlb_miss && !cacheMiss) ||
@@ -422,7 +415,7 @@ module LoadStoreUnit (
             bus.storePagefault = 0;
         end
 
-        bus.resultAddr = reg_addr;
+        bus.resultAddr = reg_vaddr;
 
         if (bus.loadStoreUnitCommand == LoadStoreUnitCommand_StoreConditional) begin
             bus.resultValue = (reg_state == State_WriteThrough) ? 0 : 1;
@@ -522,10 +515,10 @@ module LoadStoreUnit (
         endcase
     end
 
-    // next_addr, next_access_type, next_load_store_type, next_store_value
+    // next_vaddr, next_access_type, next_load_store_type, next_store_value
     always_comb begin
         if (reg_state == State_Default) begin
-            next_addr = bus.srcIntRegValue1 + bus.imm; // address generation
+            next_vaddr = bus.srcIntRegValue1 + bus.imm; // address generation
             next_access_type = accessType;
             next_load_store_type = bus.command.loadStoreType;
 
@@ -536,7 +529,7 @@ module LoadStoreUnit (
             endcase
         end
         else begin
-            next_addr = reg_addr;
+            next_vaddr = reg_vaddr;
             next_access_type = reg_access_type;
             next_load_store_type = reg_load_store_type;
             next_store_value = reg_store_value;
@@ -556,7 +549,7 @@ module LoadStoreUnit (
     always_comb begin
         next_dcache_read = (reg_state == State_Default) && bus.enable;
         next_tlb_miss = next_dcache_read && !tlbHit;
-        next_paddr = {tlbReadValue, next_addr[PAGE_OFFSET_WIDTH-1:0]};
+        next_paddr = {tlbReadValue, next_vaddr[PAGE_OFFSET_WIDTH-1:0]};
 
         if (bus.done) begin
             next_tlb_fault = 0;
@@ -564,12 +557,6 @@ module LoadStoreUnit (
         else begin
             next_tlb_fault = (next_dcache_read && tlbHit && tlbFault);
         end
-    end
-
-    always_comb begin
-        next_host_io_value = (reg_state == State_WriteThrough) && cacheReplacerDone && (next_paddr == HOST_IO_ADDR) ?
-            reg_store_value[31:0] :
-            reg_host_io_value;
     end
 
     // Array input signals
@@ -622,7 +609,7 @@ module LoadStoreUnit (
             dataArrayWriteMask = (!reg_tlb_miss && !cacheMiss && !tlbFault) ?
                 makeWriteMask(next_paddr[$clog2(DCACHE_LINE_SIZE)-1:0], next_load_store_type) :
                 '0;
-            dataArrayWriteValue = leftShift(storeValue, reg_addr[$clog2(LINE_SIZE)-1:0]);
+            dataArrayWriteValue = leftShift(storeValue, reg_vaddr[$clog2(LINE_SIZE)-1:0]);
         end
         default: begin
             dataArrayWriteMask = '0;
@@ -641,7 +628,7 @@ module LoadStoreUnit (
     always_ff @(posedge clk) begin
         if (rst) begin
             reg_state <= State_Default;
-            reg_addr <= '0;
+            reg_vaddr <= '0;
             reg_paddr <= '0;
             reg_dcache_read <= '0;
             reg_tlb_fault <= '0;
@@ -650,11 +637,10 @@ module LoadStoreUnit (
             reg_load_store_type <= LoadStoreType_Word;
             reg_load_result <= '0;
             reg_store_value <= '0;
-            reg_host_io_value <= '0;
         end
         else begin
             reg_state <= next_state;
-            reg_addr <= next_addr;
+            reg_vaddr <= next_vaddr;
             reg_paddr <= next_paddr;
             reg_dcache_read <= next_dcache_read;
             reg_tlb_fault <= next_tlb_fault;
@@ -663,7 +649,6 @@ module LoadStoreUnit (
             reg_load_store_type <= next_load_store_type;
             reg_load_result <= next_load_result;
             reg_store_value <= next_store_value;
-            reg_host_io_value <= next_host_io_value;
         end
     end
 endmodule
