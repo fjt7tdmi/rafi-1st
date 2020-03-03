@@ -195,8 +195,6 @@ function automatic Op DecodeRV32I(insn_t insn);
     end
     7'b0000011: begin
         // lb, lh, lw, lbu, lhu
-        op.aluSrcType1 = AluSrcType1_Reg;
-        op.aluSrcType2 = AluSrcType2_Imm;
         op.unit = ExecuteUnitType_LoadStore;
         op.command.mem.isAtomic = 0;
         op.command.mem.isFence = 0;
@@ -215,8 +213,6 @@ function automatic Op DecodeRV32I(insn_t insn);
     end
     7'b0100011: begin
         // sb, sh, sw
-        op.aluSrcType1 = AluSrcType1_Reg;
-        op.aluSrcType2 = AluSrcType2_Imm;
         op.unit = ExecuteUnitType_LoadStore;
         op.command.mem.isAtomic = 0;
         op.command.mem.isFence = 0;
@@ -458,9 +454,9 @@ function automatic Op DecodeRV32A(insn_t insn);
         (atomicType == AtomicType_Minu) ||
         (atomicType == AtomicType_Maxu);
 
-    op.aluCommand = AluCommand_Add;             // for address calculation
-    op.aluSrcType1 = AluSrcType1_Reg;           // for address calculation
-    op.aluSrcType2 = AluSrcType2_Zero;          // for address calculation
+    op.aluCommand = '0;
+    op.aluSrcType1 = '0;
+    op.aluSrcType2 = '0;
     op.unit = ExecuteUnitType_LoadStore;
     op.command.mem.isAtomic = 1;
     op.command.mem.isFence = 0;
@@ -527,8 +523,6 @@ function automatic Op DecodeRV32F(insn_t insn);
     7'b0000111: begin
         if (funct3 == 3'b010) begin
             // FLW
-            op.aluSrcType1 = AluSrcType1_Reg;
-            op.aluSrcType2 = AluSrcType2_Imm;
             op.unit = ExecuteUnitType_LoadStore;
             op.command.mem.isAtomic = 0;
             op.command.mem.isFence = 0;
@@ -549,8 +543,6 @@ function automatic Op DecodeRV32F(insn_t insn);
     7'b0100111: begin
         if (funct3 == 3'b010) begin
             // FSW
-            op.aluSrcType1 = AluSrcType1_Reg;
-            op.aluSrcType2 = AluSrcType2_Imm;
             op.unit = ExecuteUnitType_LoadStore;
             op.command.mem.isAtomic = 0;
             op.command.mem.isFence = 0;
@@ -775,8 +767,6 @@ function automatic Op DecodeRV32D(insn_t insn);
     7'b0000111: begin
         if (funct3 == 3'b011) begin
             // FLD
-            op.aluSrcType1 = AluSrcType1_Reg;
-            op.aluSrcType2 = AluSrcType2_Imm;
             op.unit = ExecuteUnitType_LoadStore;
             op.command.mem.isAtomic = 0;
             op.command.mem.isFence = 0;
@@ -796,8 +786,6 @@ function automatic Op DecodeRV32D(insn_t insn);
     7'b0100111: begin
         if (funct3 == 3'b011) begin
             // FSD
-            op.aluSrcType1 = AluSrcType1_Reg;
-            op.aluSrcType2 = AluSrcType2_Imm;
             op.unit = ExecuteUnitType_LoadStore;
             op.command.mem.isAtomic = 0;
             op.command.mem.isFence = 0;

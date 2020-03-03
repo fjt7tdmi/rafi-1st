@@ -112,8 +112,6 @@ function automatic Op DecodeRV32C_Quadrant0(uint16_t insn);
     end
     else if (funct3 == 3'b001) begin
         // C.FLD
-        op.aluSrcType1 = AluSrcType1_Reg;
-        op.aluSrcType2 = AluSrcType2_Imm;
         op.unit = ExecuteUnitType_LoadStore;
         op.command.mem.isAtomic = 0;
         op.command.mem.isFence = 0;
@@ -128,8 +126,6 @@ function automatic Op DecodeRV32C_Quadrant0(uint16_t insn);
     end
     else if (funct3 == 3'b010) begin
         // C.LW
-        op.aluSrcType1 = AluSrcType1_Reg;
-        op.aluSrcType2 = AluSrcType2_Imm;
         op.unit = ExecuteUnitType_LoadStore;
         op.command.mem.isAtomic = 0;
         op.command.mem.isFence = 0;
@@ -145,8 +141,6 @@ function automatic Op DecodeRV32C_Quadrant0(uint16_t insn);
     end
     else if (funct3 == 3'b011) begin
         // C.FLW
-        op.aluSrcType1 = AluSrcType1_Reg;
-        op.aluSrcType2 = AluSrcType2_Imm;
         op.unit = ExecuteUnitType_LoadStore;
         op.command.mem.isAtomic = 0;
         op.command.mem.isFence = 0;
@@ -161,8 +155,6 @@ function automatic Op DecodeRV32C_Quadrant0(uint16_t insn);
     end
     else if (funct3 == 3'b101) begin
         // C.FSD
-        op.aluSrcType1 = AluSrcType1_Reg;
-        op.aluSrcType2 = AluSrcType2_Imm;
         op.unit = ExecuteUnitType_LoadStore;
         op.command.mem.isAtomic = 0;
         op.command.mem.isFence = 0;
@@ -176,8 +168,6 @@ function automatic Op DecodeRV32C_Quadrant0(uint16_t insn);
     end
     else if (funct3 == 3'b110) begin
         // C.SW
-        op.aluSrcType1 = AluSrcType1_Reg;
-        op.aluSrcType2 = AluSrcType2_Imm;
         op.unit = ExecuteUnitType_LoadStore;
         op.command.mem.isAtomic = 0;
         op.command.mem.isFence = 0;
@@ -191,8 +181,6 @@ function automatic Op DecodeRV32C_Quadrant0(uint16_t insn);
     end
     else if (funct3 == 3'b111) begin
         // C.FSW
-        op.aluSrcType1 = AluSrcType1_Reg;
-        op.aluSrcType2 = AluSrcType2_Imm;
         op.unit = ExecuteUnitType_LoadStore;
         op.command.mem.isAtomic = 0;
         op.command.mem.isFence = 0;
@@ -395,9 +383,6 @@ function automatic Op DecodeRV32C_Quadrant2(uint16_t insn);
     end
     else if (funct3 == 3'b001) begin
         // C.FLDSP
-        op.aluCommand = AluCommand_Add;
-        op.aluSrcType1 = AluSrcType1_Reg;
-        op.aluSrcType2 = AluSrcType2_Imm;
         op.unit = ExecuteUnitType_LoadStore;
         op.command.mem.isAtomic = 0;
         op.command.mem.isFence = 0;
@@ -413,9 +398,6 @@ function automatic Op DecodeRV32C_Quadrant2(uint16_t insn);
     end
     else if (funct3 == 3'b010) begin
         // C.LWSP
-        op.aluCommand = AluCommand_Add;
-        op.aluSrcType1 = AluSrcType1_Reg;
-        op.aluSrcType2 = AluSrcType2_Imm;
         op.unit = ExecuteUnitType_LoadStore;
         op.command.mem.isAtomic = 0;
         op.command.mem.isFence = 0;
@@ -432,9 +414,6 @@ function automatic Op DecodeRV32C_Quadrant2(uint16_t insn);
     end
     else if (funct3 == 3'b011) begin
         // C.FLWSP
-        op.aluCommand = AluCommand_Add;
-        op.aluSrcType1 = AluSrcType1_Reg;
-        op.aluSrcType2 = AluSrcType2_Imm;
         op.unit = ExecuteUnitType_LoadStore;
         op.command.mem.isAtomic = 0;
         op.command.mem.isFence = 0;
@@ -477,8 +456,6 @@ function automatic Op DecodeRV32C_Quadrant2(uint16_t insn);
     end
     else if (funct3 == 3'b101) begin
         // C.FSDSP
-        op.aluSrcType1 = AluSrcType1_Reg;
-        op.aluSrcType2 = AluSrcType2_Imm;
         op.unit = ExecuteUnitType_LoadStore;
         op.command.mem.isAtomic = 0;
         op.command.mem.isFence = 0;
@@ -493,8 +470,6 @@ function automatic Op DecodeRV32C_Quadrant2(uint16_t insn);
     end
     else if (funct3 == 3'b110) begin
         // C.SWSP
-        op.aluSrcType1 = AluSrcType1_Reg;
-        op.aluSrcType2 = AluSrcType2_Imm;
         op.unit = ExecuteUnitType_LoadStore;
         op.command.mem.isAtomic = 0;
         op.command.mem.isFence = 0;
@@ -509,8 +484,6 @@ function automatic Op DecodeRV32C_Quadrant2(uint16_t insn);
     end
     else if (funct3 == 3'b111) begin
         // C.FSWSP
-        op.aluSrcType1 = AluSrcType1_Reg;
-        op.aluSrcType2 = AluSrcType2_Imm;
         op.unit = ExecuteUnitType_LoadStore;
         op.command.mem.isAtomic = 0;
         op.command.mem.isFence = 0;
