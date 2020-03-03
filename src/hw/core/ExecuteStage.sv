@@ -358,19 +358,15 @@ module ExecuteStage(
     always_comb begin
         memAddr = intResult;
 
-        unique case (op.command.mem.storeSrc)
-        StoreSrcType_Int:   storeRegValue = {32'h0, srcIntRegValue2};
-        StoreSrcType_Fp:    storeRegValue = srcFpRegValue2;
-        default:            storeRegValue = '0;
-        endcase
-
         loadStoreUnit.addr = memAddr;
         loadStoreUnit.enable = valid && op.unit == ExecuteUnitType_LoadStore && !prevStage.trapInfo.valid;
         loadStoreUnit.invalidateTlb = valid && !fencePermissionError && op.unit == ExecuteUnitType_LoadStore && op.command.mem.isFence && op.command.mem.fence == FenceType_Vma;
-        loadStoreUnit.loadStoreType = op.command.mem.loadStoreType;
-        loadStoreUnit.atomicType = op.command.mem.atomic;
-        loadStoreUnit.storeRegValue = storeRegValue;
-        loadStoreUnit.command = getLoadStoreUnitCommand(op);
+        loadStoreUnit.loadStoreUnitCommand = getLoadStoreUnitCommand(op);
+        loadStoreUnit.command = op.command.mem;
+        loadStoreUnit.imm = op.imm;
+        loadStoreUnit.srcIntRegValue1 = srcIntRegValue1;
+        loadStoreUnit.srcIntRegValue2 = srcIntRegValue2;
+        loadStoreUnit.srcFpRegValue2 = srcFpRegValue2;
     end
 
     // PipelineController

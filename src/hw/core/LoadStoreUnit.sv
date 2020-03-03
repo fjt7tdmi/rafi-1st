@@ -357,7 +357,7 @@ module LoadStoreUnit (
 
     // Wires
     always_comb begin
-        accessType = (bus.command == LoadStoreUnitCommand_Store || bus.command == LoadStoreUnitCommand_AtomicMemOp)
+        accessType = (bus.loadStoreUnitCommand == LoadStoreUnitCommand_Store || bus.loadStoreUnitCommand == LoadStoreUnitCommand_AtomicMemOp)
             ? MemoryAccessType_Store
             : MemoryAccessType_Load;
     end
@@ -380,12 +380,12 @@ module LoadStoreUnit (
     end
 
     always_comb begin
-        storeAluValue = atomicAlu(bus.atomicType, reg_store_value[31:0], loadResult[31:0]);
-        storeValue = (bus.command == LoadStoreUnitCommand_AtomicMemOp)
+        storeAluValue = atomicAlu(bus.command.atomic, reg_store_value[31:0], loadResult[31:0]);
+        storeValue = (bus.loadStoreUnitCommand == LoadStoreUnitCommand_AtomicMemOp)
             ? storeAluValue
             : reg_store_value;
         storeConditionFlag =
-            (bus.command == LoadStoreUnitCommand_StoreConditional) &&
+            (bus.loadStoreUnitCommand == LoadStoreUnitCommand_StoreConditional) &&
             (reg_state == State_Load) &&
             (!reg_tlb_miss && !cacheMiss && !tlbFault && tagArrayReadValue.reserved);
     end
@@ -406,14 +406,14 @@ module LoadStoreUnit (
 
     always_comb begin
         bus.done =
-            (bus.command == LoadStoreUnitCommand_None && reg_state == State_Default) ||
-            (bus.command == LoadStoreUnitCommand_Load && reg_state == State_Load && !reg_tlb_miss && !cacheMiss) ||
-            (bus.command == LoadStoreUnitCommand_StoreConditional && reg_state == State_Load && !storeConditionFlag) ||
+            (bus.loadStoreUnitCommand == LoadStoreUnitCommand_None && reg_state == State_Default) ||
+            (bus.loadStoreUnitCommand == LoadStoreUnitCommand_Load && reg_state == State_Load && !reg_tlb_miss && !cacheMiss) ||
+            (bus.loadStoreUnitCommand == LoadStoreUnitCommand_StoreConditional && reg_state == State_Load && !storeConditionFlag) ||
             (reg_state == State_Reserve) ||
             (reg_state == State_WriteThrough && cacheReplacerDone) ||
             (reg_state == State_Invalidate && cacheReplacerDone);
         
-        if (bus.command inside {LoadStoreUnitCommand_Store, LoadStoreUnitCommand_StoreConditional}) begin
+        if (bus.loadStoreUnitCommand inside {LoadStoreUnitCommand_Store, LoadStoreUnitCommand_StoreConditional}) begin
             bus.loadPagefault = 0;
             bus.storePagefault = reg_tlb_fault;
         end
@@ -422,10 +422,10 @@ module LoadStoreUnit (
             bus.storePagefault = 0;
         end
 
-        if (bus.command == LoadStoreUnitCommand_StoreConditional) begin
+        if (bus.loadStoreUnitCommand == LoadStoreUnitCommand_StoreConditional) begin
             bus.result = (reg_state == State_WriteThrough) ? 0 : 1;
         end
-        else if (bus.command == LoadStoreUnitCommand_LoadReserved || bus.command == LoadStoreUnitCommand_AtomicMemOp) begin
+        else if (bus.loadStoreUnitCommand == LoadStoreUnitCommand_LoadReserved || bus.loadStoreUnitCommand == LoadStoreUnitCommand_AtomicMemOp) begin
             bus.result = reg_load_result;
         end
         else begin
@@ -468,13 +468,13 @@ module LoadStoreUnit (
                 next_state = State_ReplaceCache;
             end
             else begin
-                if (bus.command == LoadStoreUnitCommand_LoadReserved) begin
+                if (bus.loadStoreUnitCommand == LoadStoreUnitCommand_LoadReserved) begin
                     next_state = State_Reserve;
                 end
-                else if (bus.command == LoadStoreUnitCommand_StoreConditional) begin
+                else if (bus.loadStoreUnitCommand == LoadStoreUnitCommand_StoreConditional) begin
                     next_state = storeConditionFlag ? State_Store : State_Default;
                 end
-                else if (bus.command == LoadStoreUnitCommand_AtomicMemOp) begin
+                else if (bus.loadStoreUnitCommand == LoadStoreUnitCommand_AtomicMemOp) begin
                     next_state = State_Store;
                 end
                 else begin
@@ -501,16 +501,16 @@ module LoadStoreUnit (
             next_state = State_Default;
         end
         default: begin
-            if ((bus.enable && bus.command == LoadStoreUnitCommand_Load) ||
-                (bus.enable && bus.command == LoadStoreUnitCommand_AtomicMemOp) ||
-                (bus.enable && bus.command == LoadStoreUnitCommand_LoadReserved) ||
-                (bus.enable && bus.command == LoadStoreUnitCommand_StoreConditional)) begin
+            if ((bus.enable && bus.loadStoreUnitCommand == LoadStoreUnitCommand_Load) ||
+                (bus.enable && bus.loadStoreUnitCommand == LoadStoreUnitCommand_AtomicMemOp) ||
+                (bus.enable && bus.loadStoreUnitCommand == LoadStoreUnitCommand_LoadReserved) ||
+                (bus.enable && bus.loadStoreUnitCommand == LoadStoreUnitCommand_StoreConditional)) begin
                 next_state = State_Load;
             end
-            else if (bus.enable && bus.command == LoadStoreUnitCommand_Store) begin
+            else if (bus.enable && bus.loadStoreUnitCommand == LoadStoreUnitCommand_Store) begin
                 next_state = State_Store;
             end
-            else if (bus.enable && bus.command == LoadStoreUnitCommand_Invalidate) begin
+            else if (bus.enable && bus.loadStoreUnitCommand == LoadStoreUnitCommand_Invalidate) begin
                 next_state = State_Invalidate;
             end
             else begin
@@ -525,8 +525,13 @@ module LoadStoreUnit (
         if (reg_state == State_Default) begin
             next_addr = bus.addr;
             next_access_type = accessType;
-            next_load_store_type = bus.loadStoreType;
-            next_store_value = bus.storeRegValue;
+            next_load_store_type = bus.command.loadStoreType;
+
+            unique case (bus.command.storeSrc)
+            StoreSrcType_Int:   next_store_value = {32'h0, bus.srcIntRegValue2};
+            StoreSrcType_Fp:    next_store_value = bus.srcFpRegValue2;
+            default:            next_store_value = '0;
+            endcase
         end
         else begin
             next_addr = reg_addr;
