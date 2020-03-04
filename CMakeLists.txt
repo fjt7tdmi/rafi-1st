@@ -544,21 +544,21 @@ if (verilator_FOUND)
         src/hw/fp/FpUnit.sv
         src/hw/fp/SqrtUnit.sv
         src/hw/mul/MulUnit.sv
+        src/hw/cache/ICacheInvalidater.sv
+        src/hw/cache/ICacheReplacer.sv
+        src/hw/cache/DCacheReplacer.sv
+        src/hw/cache/Tlb.sv
+        src/hw/cache/TlbReplacer.sv
         src/hw/core/BlockRam.sv
         src/hw/core/BranchUnit.sv
         src/hw/core/FlipFlopCam.sv
-        src/hw/core/Tlb.sv
-        src/hw/core/TlbReplacer.sv
         src/hw/core/ResetSequencer.sv
         src/hw/core/FetchUnit.sv
         src/hw/core/FetchUnitIF.sv
-        src/hw/core/ICacheInvalidater.sv
-        src/hw/core/ICacheReplacer.sv
         src/hw/core/InsnBufferIF.sv
         src/hw/core/InsnBuffer.sv
         src/hw/core/InterruptControllerIF.sv
         src/hw/core/InterruptController.sv
-        src/hw/core/DCacheReplacer.sv
         src/hw/core/LoadValueUnit.sv
         src/hw/core/StoreValueUnit.sv
         src/hw/core/LoadStoreUnitIF.sv
