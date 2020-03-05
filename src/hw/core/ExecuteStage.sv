@@ -85,7 +85,7 @@ module ExecuteStage(
     // Wires
     logic valid;
     Op op;
-    addr_t pc;
+    vaddr_t pc;
     always_comb begin
         valid = prevStage.valid;
         op = prevStage.op;
@@ -145,7 +145,7 @@ module ExecuteStage(
     fflags_t fflagsValue64;
 
     logic branchTaken;
-    addr_t branchTarget;
+    vaddr_t branchTarget;
     word_t aluSrc1;
     word_t aluSrc2;
 

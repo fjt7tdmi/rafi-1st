@@ -47,7 +47,7 @@ parameter PAGE_TABLE_ENTRY_WIDTH = PAGE_TABLE_ENTRY_SIZE * BYTE_WIDTH;
 // typedef
 
 typedef logic signed    [XLEN-1:0] word_t;
-typedef logic signed    [VADDR_WIDTH-1:0] addr_t;
+typedef logic signed    [VADDR_WIDTH-1:0] vaddr_t;
 typedef logic signed    [PADDR_WIDTH-1:0] paddr_t;
 
 typedef struct packed

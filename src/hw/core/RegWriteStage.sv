@@ -34,7 +34,7 @@ module RegWriteStage(
     logic valid /* verilator public */;
     logic commit;
     Op op;
-    addr_t debugPc /* verilator public */;
+    vaddr_t debugPc /* verilator public */;
     insn_t debugInsn /* verilator public */;
 
     always_comb begin

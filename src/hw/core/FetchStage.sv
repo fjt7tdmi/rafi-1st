@@ -33,8 +33,8 @@ module FetchStage(
     localparam INDEX_WIDTH = $clog2(INSN_COUNT_IN_LINE);
 
     logic fetch_compressed_insn;
-    addr_t pc_low;
-    addr_t pc_high;
+    vaddr_t pc_low;
+    vaddr_t pc_high;
     always_comb begin
         fetch_compressed_insn = fetchUnit.pc[1];
         pc_low = fetchUnit.pc;

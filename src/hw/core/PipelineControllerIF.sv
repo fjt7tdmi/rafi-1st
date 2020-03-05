@@ -19,11 +19,11 @@ import RvTypes::*;
 import Rv32Types::*;
 
 interface PipelineControllerIF;
-    addr_t nextPc;
+    vaddr_t nextPc;
 
     logic flush;
     logic flushReq;
-    addr_t flushTarget;
+    vaddr_t flushTarget;
 
     logic trapValid;
     TrapCause trapCause;

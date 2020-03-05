@@ -23,7 +23,7 @@ import RafiTypes::*;
 
 interface ExecuteStageIF;
     logic valid;
-    addr_t pc;
+    vaddr_t pc;
     insn_t insn;
     Op op;
 
@@ -31,7 +31,7 @@ interface ExecuteStageIF;
     uint64_t dstFpRegValue;
 
     logic branchTaken;
-    addr_t branchTarget;
+    vaddr_t branchTarget;
 
     TrapInfo trapInfo;
     logic trapReturn;

@@ -80,7 +80,7 @@ module LoadStoreUnit (
 
     // Registers
     State reg_state;
-    addr_t reg_vaddr;
+    vaddr_t reg_vaddr;
     paddr_t reg_paddr;
     logic reg_dcache_read;
     logic reg_tlb_fault;
@@ -91,7 +91,7 @@ module LoadStoreUnit (
 
     // Wires
     State next_state;
-    addr_t next_vaddr;
+    vaddr_t next_vaddr;
     paddr_t next_paddr;
     logic next_dcache_read;
     logic next_tlb_fault;
