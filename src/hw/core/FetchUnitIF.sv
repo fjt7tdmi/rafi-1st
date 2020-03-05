@@ -21,13 +21,13 @@ import Rv32Types::*;
 import CacheTypes::*;
 
 interface FetchUnitIF;
-    addr_t nextPc;
+    vaddr_t nextPc;
     logic flush;
     logic stall;
 
     logic valid;
     logic fault;
-    addr_t pc;
+    vaddr_t pc;
     icache_line_t iCacheLine;
 
     logic invalidateICache;

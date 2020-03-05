@@ -23,7 +23,7 @@ import RafiTypes::*;
 
 interface RegReadStageIF;
     logic valid;
-    addr_t pc;
+    vaddr_t pc;
     insn_t insn;
     logic isCompressedInsn;
     Op op;

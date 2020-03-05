@@ -22,11 +22,11 @@ import OpTypes::*;
 
 module BranchUnit(
     output logic taken,
-    output addr_t target,
+    output vaddr_t target,
     input logic enable,
     input BranchType condition,
     input logic indirect,
-    input addr_t pc,
+    input vaddr_t pc,
     input word_t srcRegValue1,
     input word_t srcRegValue2,
     input word_t imm

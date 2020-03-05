@@ -37,7 +37,7 @@ interface CsrIF;
 
     // Trap
     TrapInfo trapInfo;
-    addr_t trapPc;
+    vaddr_t trapPc;
     logic trapReturn;
     Privilege trapReturnPrivilege;
     Privilege nextPriv;

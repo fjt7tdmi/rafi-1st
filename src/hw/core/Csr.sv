@@ -164,7 +164,7 @@ module Csr(
     Privilege next_priv;
     csr_xstatus_t next_status;
 
-    addr_t next_pc;
+    vaddr_t next_pc;
 
     word_t read_value;
     csr_xstatus_t write_value;

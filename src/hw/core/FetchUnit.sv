@@ -62,7 +62,7 @@ module FetchUnit (
 
     // Registers
     State reg_state;
-    addr_t reg_pc;
+    vaddr_t reg_pc;
     paddr_t reg_physical_pc;
     logic reg_icache_read;
     logic reg_tlb_miss;
@@ -71,7 +71,7 @@ module FetchUnit (
 
     // Wires
     State next_state;
-    addr_t next_pc;
+    vaddr_t next_pc;
     paddr_t next_physical_pc;
     logic next_icache_read;
     logic next_tlb_miss;

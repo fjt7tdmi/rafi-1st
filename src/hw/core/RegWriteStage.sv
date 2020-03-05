@@ -34,15 +34,15 @@ module RegWriteStage(
     logic valid /* verilator public */;
     logic commit;
     Op op;
-    addr_t debugPc /* verilator public */;
-    insn_t debugInsn /* verilator public */;
+    vaddr_t pc /* verilator public */;
+    insn_t insn /* verilator public */;
 
     always_comb begin
         valid = prevStage.valid;
         commit = valid && !prevStage.trapInfo.valid;
         op = prevStage.op;
-        debugPc = prevStage.pc;
-        debugInsn = prevStage.insn;
+        pc = prevStage.pc;
+        insn = prevStage.insn;
     end
 
     always_comb begin

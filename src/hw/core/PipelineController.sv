@@ -36,7 +36,7 @@ module PipelineController(
         endcase
     end
 
-    addr_t trap_vector;
+    vaddr_t trap_vector;
     always_comb begin
         if (xtvec.MODE == 2'b01 && bus.trapCause.isInterrupt) begin
             /* verilator lint_off WIDTH */
@@ -47,7 +47,7 @@ module PipelineController(
         end
     end
 
-    addr_t trap_return_pc;
+    vaddr_t trap_return_pc;
     always_comb begin
         unique case (bus.trapReturnPriv)
         Privilege_Machine:      trap_return_pc = csr.mepc;

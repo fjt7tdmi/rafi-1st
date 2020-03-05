@@ -26,7 +26,7 @@ interface LoadStoreUnitIF;
     logic invalidateTlb;
     logic loadPagefault;
     logic storePagefault;
-    addr_t resultAddr;
+    vaddr_t resultAddr;
     uint64_t resultValue;
 
     LoadStoreUnitCommand loadStoreUnitCommand;

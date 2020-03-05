@@ -40,7 +40,7 @@ module DecodeStage(
     end
 
     logic valid;
-    addr_t pc;
+    vaddr_t pc;
     insn_t insn;
     always_comb begin
         valid = (insnBuffer.readableEntryCount == 1 && is_compressed) || insnBuffer.readableEntryCount >= 2;
