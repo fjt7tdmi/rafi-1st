@@ -1011,6 +1011,37 @@ if (verilator_FOUND)
             PUBLIC /wd"4267"
         )
     endif()
+
+    # =========================================================================
+    # rafi-vtest-tlb
+    #
+    add_executable(rafi-vtest-tlb
+        include/rafi/test.h
+        include/rafi/test/ModuleTest.h
+        src/hw/cache/TlbTest.cpp
+    )
+    verilate(rafi-vtest-tlb
+        PREFIX VTlb
+        THREADS 1
+        TRACE
+        VERILATOR_ARGS --trace-structs
+        SOURCES
+        src/hw/def/BasicTypes.sv
+        src/hw/def/RvTypes.sv
+        src/hw/def/Rv32Types.sv
+        src/hw/def/CacheTypes.sv
+        src/hw/cache/Tlb.sv
+    )
+    target_link_libraries(rafi-vtest-tlb
+        PRIVATE ${GoogleTest_LIBRARIES} ${FS_LIBRARIES}
+    )
+
+    # disable warnings for verilator
+    if (MSVC)
+        target_compile_options(rafi-vtest-tlb
+            PUBLIC /wd"4267"
+        )
+    endif()
 else()
   message(WARNING "Verilator was not found. Skip building SystemVerilog codes")
 endif()
