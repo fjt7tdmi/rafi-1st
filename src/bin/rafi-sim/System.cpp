@@ -84,7 +84,7 @@ void System::ProcessNegativeEdge()
     if (IsOpRetired())
     {
         m_EventList.emplace_back(trace::OpEvent {
-            m_pCore->Core->m_RegWriteStage->debugInsn,
+            m_pCore->Core->m_RegWriteStage->insn,
             PrivilegeLevel::Machine,
         });
     }
@@ -134,7 +134,7 @@ uint32_t System::GetHostIoValue() const
 
 uint64_t System::GetPc() const
 {
-    return m_pCore->Core->m_RegWriteStage->debugPc;
+    return m_pCore->Core->m_RegWriteStage->pc;
 }
 
 void System::CopyIntReg(trace::NodeIntReg32* pOut) const
