@@ -20,7 +20,7 @@ import Rv32Types::*;
 
 import CacheTypes::*;
 
-module Tlb  #(
+module TlbArray  #(
     parameter TLB_INDEX_WIDTH
 )(
     output  logic hit,

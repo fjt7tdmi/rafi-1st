@@ -547,7 +547,7 @@ if (verilator_FOUND)
         src/hw/cache/ICacheInvalidater.sv
         src/hw/cache/ICacheReplacer.sv
         src/hw/cache/DCacheReplacer.sv
-        src/hw/cache/Tlb.sv
+        src/hw/cache/TlbArray.sv
         src/hw/cache/TlbReplacer.sv
         src/hw/core/BlockRam.sv
         src/hw/core/BranchUnit.sv
