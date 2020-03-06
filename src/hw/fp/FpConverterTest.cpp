@@ -15,7 +15,7 @@
  */
 
 #include "VFpConverter.h"
-#include "FpTest.h"
+#include <rafi/test.h>
 
 namespace rafi { namespace test {
 
@@ -47,7 +47,7 @@ namespace {
     const int FRM_DYN = 0b111; // In instruction's rm field, selects dynamic rounding mode; In Rounding Mode register, Invalid.
 }
 
-class FpConverterTest : public FpTest<VFpConverter>
+class FpConverterTest : public ModuleTest<VFpConverter>
 {
 public:
     void ProcessCycle()

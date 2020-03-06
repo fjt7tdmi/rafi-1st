@@ -609,9 +609,10 @@ if (verilator_FOUND)
     # rafi-vtest-fp32-comparator
     #
     add_executable(rafi-vtest-fp32-comparator
+        include/rafi/test.h
+        include/rafi/test/ModuleTest.h
         src/hw/fp/Fp32ComparatorTest.cpp
         src/hw/fp/FpComparatorTest.h
-        src/hw/fp/FpTest.h
     )
     verilate(rafi-vtest-fp32-comparator
         PREFIX VFp32Comparator
@@ -641,9 +642,10 @@ if (verilator_FOUND)
     # rafi-vtest-fp64-comparator
     #
     add_executable(rafi-vtest-fp64-comparator
+        include/rafi/test.h
+        include/rafi/test/ModuleTest.h
         src/hw/fp/Fp64ComparatorTest.cpp
         src/hw/fp/FpComparatorTest.h
-        src/hw/fp/FpTest.h
     )
     verilate(rafi-vtest-fp64-comparator
         PREFIX VFp64Comparator
@@ -673,8 +675,9 @@ if (verilator_FOUND)
     # rafi-vtest-fp-converter
     #
     add_executable(rafi-vtest-fp-converter
+        include/rafi/test.h
+        include/rafi/test/ModuleTest.h
         src/hw/fp/FpConverterTest.cpp
-        src/hw/fp/FpTest.h
     )
     verilate(rafi-vtest-fp-converter
         PREFIX VFpConverter
@@ -704,9 +707,10 @@ if (verilator_FOUND)
     # rafi-vtest-fp32-div
     #
     add_executable(rafi-vtest-fp32-div
+        include/rafi/test.h
+        include/rafi/test/ModuleTest.h
         src/hw/fp/Fp32DivUnitTest.cpp
         src/hw/fp/FpDivUnitTest.h
-        src/hw/fp/FpTest.h
     )
     verilate(rafi-vtest-fp32-div
         PREFIX VFp32DivUnit
@@ -736,9 +740,10 @@ if (verilator_FOUND)
     # rafi-vtest-fp64-div
     #
     add_executable(rafi-vtest-fp64-div
+        include/rafi/test.h
+        include/rafi/test/ModuleTest.h
         src/hw/fp/Fp64DivUnitTest.cpp
         src/hw/fp/FpDivUnitTest.h
-        src/hw/fp/FpTest.h
     )
     verilate(rafi-vtest-fp64-div
         PREFIX VFp64DivUnit
@@ -768,9 +773,10 @@ if (verilator_FOUND)
     # rafi-vtest-fp32-mul-add
     #
     add_executable(rafi-vtest-fp32-mul-add
+        include/rafi/test.h
+        include/rafi/test/ModuleTest.h
         src/hw/fp/Fp32MulAddTest.cpp
         src/hw/fp/FpMulAddTest.h
-        src/hw/fp/FpTest.h
     )
     verilate(rafi-vtest-fp32-mul-add
         PREFIX VFpMulAdd
@@ -801,9 +807,10 @@ if (verilator_FOUND)
     # rafi-vtest-fp64-mul-add
     #
     add_executable(rafi-vtest-fp64-mul-add
+        include/rafi/test.h
+        include/rafi/test/ModuleTest.h
         src/hw/fp/Fp64MulAddTest.cpp
         src/hw/fp/FpMulAddTest.h
-        src/hw/fp/FpTest.h
     )
     verilate(rafi-vtest-fp64-mul-add
         PREFIX VFpMulAdd
@@ -834,9 +841,10 @@ if (verilator_FOUND)
     # rafi-vtest-fp32-sqrt
     #
     add_executable(rafi-vtest-fp32-sqrt
+        include/rafi/test.h
+        include/rafi/test/ModuleTest.h
         src/hw/fp/Fp32SqrtUnitTest.cpp
         src/hw/fp/FpSqrtUnitTest.h
-        src/hw/fp/FpTest.h
     )
     verilate(rafi-vtest-fp32-sqrt
         PREFIX VFp32SqrtUnit
@@ -867,9 +875,10 @@ if (verilator_FOUND)
     # rafi-vtest-fp64-sqrt
     #
     add_executable(rafi-vtest-fp64-sqrt
+        include/rafi/test.h
+        include/rafi/test/ModuleTest.h
         src/hw/fp/Fp64SqrtUnitTest.cpp
         src/hw/fp/FpSqrtUnitTest.h
-        src/hw/fp/FpTest.h
     )
     verilate(rafi-vtest-fp64-sqrt
         PREFIX VFp64SqrtUnit
@@ -956,8 +965,9 @@ if (verilator_FOUND)
     # rafi-vtest-sqrt
     #
     add_executable(rafi-vtest-sqrt
+        include/rafi/test.h
+        include/rafi/test/ModuleTest.h
         src/hw/fp/SqrtUnitTest.cpp
-        src/hw/fp/FpTest.h
     )
     verilate(rafi-vtest-sqrt
         PREFIX VSqrtUnit

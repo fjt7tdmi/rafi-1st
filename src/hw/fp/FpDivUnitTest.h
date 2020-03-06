@@ -16,12 +16,12 @@
 
 #pragma once
 
-#include "FpTest.h"
+#include <rafi/test.h>
 
 namespace rafi { namespace test {
 
 template<typename VTopModule>
-class FpDivUnitTest : public FpTest<VTopModule>
+class FpDivUnitTest : public ModuleTest<VTopModule>
 {
 public:
     void ProcessCycle()
