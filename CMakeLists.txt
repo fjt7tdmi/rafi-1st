@@ -593,6 +593,7 @@ if (verilator_FOUND)
             PUBLIC /wd"4018"
             PUBLIC /wd"4267"
             PUBLIC /wd"4273"
+            PUBLIC /wd"4805"
         )
     endif()
 
