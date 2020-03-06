@@ -41,7 +41,7 @@ namespace fs = std::filesystem;
 namespace rafi { namespace test {
 
 template<typename VTopModule>
-class FpTest : public ::testing::Test
+class ModuleTest : public ::testing::Test
 {
 public:
     VTopModule* GetTop()

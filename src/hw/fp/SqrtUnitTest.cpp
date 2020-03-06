@@ -15,7 +15,7 @@
  */
 
 #include "VSqrtUnit.h"
-#include "FpTest.h"
+#include <rafi/test.h>
 
 namespace rafi { namespace test {
 
@@ -23,7 +23,7 @@ namespace {
     const int MaxCycle = 50;
 }
 
-class SqrtUnitTest : public FpTest<VSqrtUnit>
+class SqrtUnitTest : public ModuleTest<VSqrtUnit>
 {
 public:
     void ProcessCycle()

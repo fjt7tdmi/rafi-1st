@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "FpTest.h"
+#include <rafi/test.h>
 
 namespace rafi { namespace test {
 
@@ -29,7 +29,7 @@ namespace {
 }
 
 template<typename VTopModule>
-class FpComparatorTest : public FpTest<VTopModule>
+class FpComparatorTest : public ModuleTest<VTopModule>
 {
 public:
     void ProcessCycle()

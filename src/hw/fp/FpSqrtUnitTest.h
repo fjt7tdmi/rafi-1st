@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-#include "FpTest.h"
+#include <rafi/test.h>
 
 namespace rafi { namespace test {
 
 template <typename VTopModule>
-class FpSqrtUnitTest : public FpTest<VTopModule>
+class FpSqrtUnitTest : public ModuleTest<VTopModule>
 {
 public:
     void ProcessCycle()
