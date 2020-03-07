@@ -67,7 +67,7 @@ module MulDivUnit(
         .done(divDone),
         .quotient,
         .remnant,
-        .isSigned(divSigned),
+        .is_signed(divSigned),
         .dividend(src1),
         .divisor(src2),
         .enable,

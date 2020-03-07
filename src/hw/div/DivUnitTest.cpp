@@ -27,7 +27,7 @@ namespace rafi { namespace test {
 
 struct DivUnitConfig
 {
-    bool isSigned;
+    bool is_signed;
 };
 
 const DivUnitConfig DivUnitConfigs[] = {
@@ -42,7 +42,7 @@ protected:
     {
         m_pTop = new VDivUnit();
 
-        m_pTop->isSigned = 0;
+        m_pTop->is_signed = 0;
         m_pTop->dividend = 0;
         m_pTop->divisor = 0;
         m_pTop->enable = 0;
@@ -75,7 +75,7 @@ INSTANTIATE_TEST_SUITE_P(AllConfig, DivUnitTest, ::testing::ValuesIn(DivUnitConf
 
 void DoBasicTest(VDivUnit* pTop, const DivUnitConfig& config, uint32_t dividend, uint32_t divisor)
 {
-    pTop->isSigned = config.isSigned;
+    pTop->is_signed = config.is_signed;
     pTop->dividend = dividend;
     pTop->divisor = divisor;
     pTop->enable = true;
@@ -88,7 +88,7 @@ void DoBasicTest(VDivUnit* pTop, const DivUnitConfig& config, uint32_t dividend,
         pTop->eval();
     } while (!pTop->done);
 
-    if (config.isSigned)
+    if (config.is_signed)
     {
         // quotient
         if (dividend == 0x80000000 && divisor == 0xffffffff)
