@@ -22,8 +22,8 @@ module MulUnit(
     output logic done,
     output logic [31:0] result,
     input logic high,
-    input logic srcSigned1,
-    input logic srcSigned2,
+    input logic src1_signed,
+    input logic src2_signed,
     input logic [31:0] src1,
     input logic [31:0] src2,
     input logic enable,
@@ -39,47 +39,47 @@ module MulUnit(
     } State;
 
     // Regs
-    logic [63:0] reg_Result;
-    State reg_State;
+    logic [63:0] reg_result;
+    State reg_state;
 
     // Wires
-    logic [63:0] next_Result;
-    State next_State;
+    logic [63:0] next_result;
+    State next_state;
 
     logic sign1;
     logic sign2;
 
-    logic [32:0] extendedSrc1;
-    logic [32:0] extendedSrc2;
+    logic [32:0] extended_src1;
+    logic [32:0] extended_src2;
 
     always_comb begin
-        done = (reg_State == State_Done);
-        result = high ? reg_Result[63:32] : reg_Result[31:0];
+        done = (reg_state == State_Done);
+        result = high ? reg_result[63:32] : reg_result[31:0];
 
-        sign1 = srcSigned1 && src1[31];
-        sign2 = srcSigned2 && src2[31];
+        sign1 = src1_signed && src1[31];
+        sign2 = src2_signed && src2[31];
 
-        extendedSrc1 = {sign1, src1};
-        extendedSrc2 = {sign2, src2};
+        extended_src1 = {sign1, src1};
+        extended_src2 = {sign2, src2};
 
-        next_Result = $signed(extendedSrc1) * $signed(extendedSrc2);
-        next_State = (reg_State == State_Init && enable)
+        next_result = $signed(extended_src1) * $signed(extended_src2);
+        next_state = (reg_state == State_Init && enable)
             ? State_Done
             : State_Init;
     end
 
     always_ff @(posedge clk) begin
         if (rst || flush) begin
-            reg_Result <= '0;
-            reg_State <= State_Init;
+            reg_result <= '0;
+            reg_state <= State_Init;
         end
         else if (stall) begin
-            reg_Result <= reg_Result;
-            reg_State <= reg_State;
+            reg_result <= reg_result;
+            reg_state <= reg_state;
         end
         else begin
-            reg_Result <= next_Result;
-            reg_State <= next_State;
+            reg_result <= next_result;
+            reg_state <= next_state;
         end
     end
 endmodule

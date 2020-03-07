@@ -28,8 +28,8 @@ namespace rafi { namespace test {
 struct MulUnitConfig
 {
     bool high;
-    bool srcSigned1;
-    bool srcSigned2;
+    bool src1_signed;
+    bool src2_signed;
 };
 
 const MulUnitConfig MulUnitConfigs[] = {
@@ -51,8 +51,8 @@ protected:
         m_pTop = new VMulUnit();
 
         m_pTop->high = 0;
-        m_pTop->srcSigned1 = 0;
-        m_pTop->srcSigned2 = 0;
+        m_pTop->src1_signed = 0;
+        m_pTop->src2_signed = 0;
         m_pTop->src1 = 0;
         m_pTop->src2 = 0;
         m_pTop->enable = 0;
@@ -85,8 +85,8 @@ INSTANTIATE_TEST_SUITE_P(AllConfig, MulUnitTest, ::testing::ValuesIn(MulUnitConf
 void DoBasicTest(VMulUnit* pTop, const MulUnitConfig& config, uint32_t src1, uint32_t src2)
 {
     pTop->high = config.high;
-    pTop->srcSigned1 = config.srcSigned1;
-    pTop->srcSigned2 = config.srcSigned2;
+    pTop->src1_signed = config.src1_signed;
+    pTop->src2_signed = config.src2_signed;
     pTop->src1 = src1;
     pTop->src2 = src2;
     pTop->enable = 1;
@@ -100,19 +100,19 @@ void DoBasicTest(VMulUnit* pTop, const MulUnitConfig& config, uint32_t src1, uin
     } while (!pTop->done);
 
     uint64_t expected;
-    if (config.srcSigned1 && config.srcSigned2)
+    if (config.src1_signed && config.src2_signed)
     {
         const uint64_t lhs = SignExtend<uint64_t>(32, src1);
         const uint64_t rhs = SignExtend<uint64_t>(32, src2);
         expected = static_cast<uint64_t>(lhs * rhs);
     }
-    else if (config.srcSigned1 && !config.srcSigned2)
+    else if (config.src1_signed && !config.src2_signed)
     {
         const uint64_t lhs = SignExtend<uint64_t>(32, src1);
         const uint64_t rhs = ZeroExtend<uint64_t>(32, src2);
         expected = static_cast<uint64_t>(lhs * rhs);
     }
-    else if (!config.srcSigned1 && config.srcSigned2)
+    else if (!config.src1_signed && config.src2_signed)
     {
         const uint64_t lhs = ZeroExtend<uint64_t>(32, src1);
         const uint64_t rhs = SignExtend<uint64_t>(32, src2);
