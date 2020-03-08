@@ -159,7 +159,7 @@ void AssertTlbState_Invalidate(TlbTest* pTest, uint32_t vaddr, uint64_t paddr, b
         expectedEntry.SetMember<PageTableEntrySv32::PPN0>(GetPPN0(paddr));
         expectedEntry.SetMember<PageTableEntrySv32::D>(dirty ? 1 : 0);
         expectedEntry.SetMember<PageTableEntrySv32::A>(1);
-        expectedEntry.SetMember<PageTableEntrySv32::E>(1);
+        expectedEntry.SetMember<PageTableEntrySv32::X>(1);
         expectedEntry.SetMember<PageTableEntrySv32::W>(1);
         expectedEntry.SetMember<PageTableEntrySv32::R>(1);
         expectedEntry.SetMember<PageTableEntrySv32::V>(1);
@@ -221,7 +221,7 @@ void DoFirstAccessForPrepare(TlbTest* pTest, uint32_t vaddr, uint64_t paddr)
     {
         entryL1.SetMember<PageTableEntrySv32::PPN1>(GetPPN1(paddr));
         entryL1.SetMember<PageTableEntrySv32::PPN0>(GetPPN0(paddr));
-        entryL1.SetMember<PageTableEntrySv32::E>(1);
+        entryL1.SetMember<PageTableEntrySv32::X>(1);
         entryL1.SetMember<PageTableEntrySv32::W>(1);
         entryL1.SetMember<PageTableEntrySv32::R>(1);
         entryL1.SetMember<PageTableEntrySv32::V>(1);
@@ -271,7 +271,7 @@ void DoFaultTest(TlbTest* pTest, bool expectedFault, MemoryAccessType accessType
         entryL1.SetMember<PageTableEntrySv32::PPN1>(GetPPN1(paddr));
         entryL1.SetMember<PageTableEntrySv32::PPN0>(GetPPN0(paddr));
         entryL1.SetMember<PageTableEntrySv32::U>(user ? 1 : 0);
-        entryL1.SetMember<PageTableEntrySv32::E>(executable ? 1 : 0);
+        entryL1.SetMember<PageTableEntrySv32::X>(executable ? 1 : 0);
         entryL1.SetMember<PageTableEntrySv32::W>(writable ? 1 : 0);
         entryL1.SetMember<PageTableEntrySv32::R>(readable ? 1 : 0);
         entryL1.SetMember<PageTableEntrySv32::V>(valid ? 1 : 0);
@@ -407,7 +407,7 @@ TEST_F(TlbTest, PageTableWalk_Level2)
         entryL2.SetMember<PageTableEntrySv32::PPN1>(GetPPN1(paddr));
         entryL2.SetMember<PageTableEntrySv32::PPN0>(GetPPN0(paddr));
         entryL2.SetMember<PageTableEntrySv32::W>(1);
-        entryL2.SetMember<PageTableEntrySv32::E>(1);
+        entryL2.SetMember<PageTableEntrySv32::X>(1);
         entryL2.SetMember<PageTableEntrySv32::R>(1);
         entryL2.SetMember<PageTableEntrySv32::V>(1);
     }
@@ -519,7 +519,7 @@ TEST_F(TlbTest, Replace)
     {
         entry.SetMember<PageTableEntrySv32::PPN1>(GetPPN1(paddr));
         entry.SetMember<PageTableEntrySv32::PPN0>(GetPPN0(paddr));
-        entry.SetMember<PageTableEntrySv32::E>(1);
+        entry.SetMember<PageTableEntrySv32::X>(1);
         entry.SetMember<PageTableEntrySv32::W>(1);
         entry.SetMember<PageTableEntrySv32::R>(1);
         entry.SetMember<PageTableEntrySv32::V>(1);

@@ -31,7 +31,7 @@ public:
     using V = Member<0>; // Valid
     using R = Member<1>; // Read
     using W = Member<2>; // Write
-    using E = Member<3>; // Execute
+    using X = Member<3>; // eXecute
     using U = Member<4>; // User
     using G = Member<5>; // Global
     using A = Member<6>; // Accessed
@@ -53,7 +53,7 @@ public:
     using V = Member<0>; // Valid
     using R = Member<1>; // Read
     using W = Member<2>; // Write
-    using E = Member<3>; // Execute
+    using X = Member<3>; // eXecute
     using U = Member<4>; // User
     using G = Member<5>; // Global
     using A = Member<6>; // Accessed
@@ -76,7 +76,7 @@ public:
     using V = Member<0>; // Valid
     using R = Member<1>; // Read
     using W = Member<2>; // Write
-    using E = Member<3>; // Execute
+    using X = Member<3>; // eXecute
     using U = Member<4>; // User
     using G = Member<5>; // Global
     using A = Member<6>; // Accessed

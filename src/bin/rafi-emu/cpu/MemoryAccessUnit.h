@@ -112,14 +112,14 @@ private:
         switch (accessType)
         {
         case MemoryAccessType::Instruction:
-            if (!entry.template GetMember<typename EntryType::E>())
+            if (!entry.template GetMember<typename EntryType::X>())
             {
                 return MakeTrap(accessType, pc, addr);
             }
             break;
         case MemoryAccessType::Load:
             if (!entry.template GetMember<typename EntryType::R>() &&
-                !(mxr && entry.template GetMember<typename EntryType::E>()))
+                !(mxr && entry.template GetMember<typename EntryType::X>()))
             {
                 return MakeTrap(accessType, pc, addr);
             }
@@ -171,7 +171,7 @@ private:
     template <typename EntryType>
     bool IsLeafEntry(const EntryType& entry) const
     {
-        return entry.template GetMember<typename EntryType::R>() || entry.template GetMember<typename EntryType::E>();
+        return entry.template GetMember<typename EntryType::R>() || entry.template GetMember<typename EntryType::X>();
     }
 
     Bus* m_pBus{ nullptr };
