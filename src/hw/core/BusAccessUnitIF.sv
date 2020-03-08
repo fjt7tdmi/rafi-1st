@@ -23,62 +23,62 @@ import CacheTypes::*;
 // Interface between D$, I$ and BusAccessUnit
 
 interface BusAccessUnitIF;
-    icache_mem_addr_t icAddr;
-    logic icReadGrant;
-    logic icReadReq;
-    icache_line_t icReadValue;
-    logic icWriteGrant;
-    logic icWriteReq;
-    icache_line_t icWriteValue;
+    icache_mem_addr_t icacheAddr;
+    logic icacheReadGrant;
+    logic icacheReadReq;
+    icache_line_t icacheReadValue;
+    logic icacheWriteGrant;
+    logic icacheWriteReq;
+    icache_line_t icacheWriteValue;
 
-    dcache_mem_addr_t dcAddr;
-    logic dcReadGrant;
-    logic dcReadReq;
-    dcache_line_t dcReadValue;
-    logic dcWriteGrant;
-    logic dcWriteReq;
-    dcache_line_t dcWriteValue;
+    dcache_mem_addr_t dcacheAddr;
+    logic dcacheReadGrant;
+    logic dcacheReadReq;
+    dcache_line_t dcacheReadValue;
+    logic dcacheWriteGrant;
+    logic dcacheWriteReq;
+    dcache_line_t dcacheWriteValue;
 
     modport FetchUnit(
     output
-        icAddr,
-        icReadReq,
-        icWriteReq,
-        icWriteValue,
+        icacheAddr,
+        icacheReadReq,
+        icacheWriteReq,
+        icacheWriteValue,
     input
-        icReadValue,
-        icReadGrant,
-        icWriteGrant
+        icacheReadValue,
+        icacheReadGrant,
+        icacheWriteGrant
     );
 
     modport LoadStoreUnit(
     output
-        dcAddr,
-        dcReadReq,
-        dcWriteReq,
-        dcWriteValue,
+        dcacheAddr,
+        dcacheReadReq,
+        dcacheWriteReq,
+        dcacheWriteValue,
     input
-        dcReadGrant,
-        dcReadValue,
-        dcWriteGrant
+        dcacheReadGrant,
+        dcacheReadValue,
+        dcacheWriteGrant
     );
 
     modport BusAccessUnit(
     output
-        dcReadGrant,
-        dcReadValue,
-        dcWriteGrant,
-        icReadGrant,
-        icReadValue,
-        icWriteGrant,
+        dcacheReadGrant,
+        dcacheReadValue,
+        dcacheWriteGrant,
+        icacheReadGrant,
+        icacheReadValue,
+        icacheWriteGrant,
     input
-        dcAddr,
-        dcReadReq,
-        dcWriteReq,
-        dcWriteValue,
-        icAddr,
-        icReadReq,
-        icWriteReq,
-        icWriteValue
+        dcacheAddr,
+        dcacheReadReq,
+        dcacheWriteReq,
+        dcacheWriteValue,
+        icacheAddr,
+        icacheReadReq,
+        icacheWriteReq,
+        icacheWriteValue
     );
 endinterface

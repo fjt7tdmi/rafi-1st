@@ -75,26 +75,26 @@ module BusAccessUnit (
 
     // D$
     always_comb begin
-        core.dcReadValue = dcValue;
-        core.dcReadGrant = done && (state == State_DCacheRead);
-        core.dcWriteGrant = done && (state == State_DCacheWrite);
+        core.dcacheReadValue = dcValue;
+        core.dcacheReadGrant = done && (state == State_DCacheRead);
+        core.dcacheWriteGrant = done && (state == State_DCacheWrite);
     end
 
     // I$
     always_comb begin
-        core.icReadValue = icValue;
-        core.icReadGrant = done && (state == State_ICacheRead);
-        core.icWriteGrant = done && (state == State_ICacheWrite);
+        core.icacheReadValue = icValue;
+        core.icacheReadGrant = done && (state == State_ICacheRead);
+        core.icacheWriteGrant = done && (state == State_ICacheWrite);
     end
 
     // bus
     always_comb begin
         if (state == State_DCacheRead || state == State_DCacheWrite) begin
-            addr = {core.dcAddr[(29 - $bits(dcWordIndex)):0], dcWordIndex, 2'b00};
+            addr = {core.dcacheAddr[(29 - $bits(dcWordIndex)):0], dcWordIndex, 2'b00};
             wdata = dcValue[dcWordIndex];
         end
         else if (state == State_ICacheRead || state == State_ICacheWrite) begin
-            addr = {core.icAddr[(29 - $bits(icWordIndex)):0], icWordIndex, 2'b00};
+            addr = {core.icacheAddr[(29 - $bits(icWordIndex)):0], icWordIndex, 2'b00};
             wdata = icValue[icWordIndex];
         end
         else begin
@@ -115,16 +115,16 @@ module BusAccessUnit (
     always_comb begin
         unique case(state)
             State_Idle: begin
-                if (core.dcWriteReq) begin
+                if (core.dcacheWriteReq) begin
                     nextState = State_DCacheWrite;
                 end
-                else if (core.dcReadReq) begin
+                else if (core.dcacheReadReq) begin
                     nextState = State_DCacheRead;
                 end
-                else if (core.icWriteReq) begin
+                else if (core.icacheWriteReq) begin
                     nextState = State_ICacheWrite;
                 end
-                else if (core.icReadReq) begin
+                else if (core.icacheReadReq) begin
                     nextState = State_ICacheRead;
                 end
                 else begin
@@ -182,7 +182,7 @@ module BusAccessUnit (
     always_comb begin
         unique case(state)
             State_Idle: begin
-                nextDcValue = (core.dcWriteReq) ? core.dcWriteValue : '0;
+                nextDcValue = (core.dcacheWriteReq) ? core.dcacheWriteValue : '0;
             end
             State_DCacheRead: begin
                 for (int i = 0; i < DCACHE_WORD_COUNT; i++) begin
@@ -190,7 +190,7 @@ module BusAccessUnit (
                 end
             end
             State_DCacheWrite: begin
-                nextDcValue = core.dcWriteValue;
+                nextDcValue = core.dcacheWriteValue;
             end
             default: begin
                 nextDcValue = '0;
@@ -201,7 +201,7 @@ module BusAccessUnit (
     always_comb begin
         unique case(state)
             State_Idle: begin
-                nextIcValue = (core.icWriteReq) ? core.icWriteValue : '0;
+                nextIcValue = (core.icacheWriteReq) ? core.icacheWriteValue : '0;
             end
             State_ICacheRead: begin
                 for (int i = 0; i < ICACHE_WORD_COUNT; i++) begin
@@ -209,7 +209,7 @@ module BusAccessUnit (
                 end
             end
             State_ICacheWrite: begin
-                nextIcValue = core.icWriteValue;
+                nextIcValue = core.icacheWriteValue;
             end
             default: begin
                 nextIcValue = '0;

@@ -202,8 +202,8 @@ module FetchUnit (
         .arrayReadTag(validTagArrayReadValue.tag),
         .memAddr(cacheReplacerMemAddr),
         .memReadEnable(cacheReplacerMemReadEnable),
-        .memReadDone(mem.icReadGrant),
-        .memReadValue(mem.icReadValue),
+        .memReadDone(mem.icacheReadGrant),
+        .memReadValue(mem.icacheReadValue),
         .miss(cacheMiss),
         .done(cacheReplacerDone),
         .enable(cacheReplacerEnable),
@@ -221,11 +221,11 @@ module FetchUnit (
         .tlbWriteValue,
         .memAddr(tlbReplacerMemAddr),
         .memReadEnable(tlbReplacerMemReadEnable),
-        .memReadDone(mem.icReadGrant),
-        .memReadValue(mem.icReadValue),
-        .memWriteEnable(mem.icWriteReq),
-        .memWriteDone(mem.icWriteGrant),
-        .memWriteValue(mem.icWriteValue),
+        .memReadDone(mem.icacheReadGrant),
+        .memReadValue(mem.icacheReadValue),
+        .memWriteEnable(mem.icacheWriteReq),
+        .memWriteDone(mem.icacheWriteGrant),
+        .memWriteValue(mem.icacheWriteValue),
         .csrSatp(csr.satp),
         .done(tlbReplacerDone),
         .enable(tlbReplacerEnable),
@@ -253,12 +253,12 @@ module FetchUnit (
         bus.iCacheLine = dataArrayReadValue;
 
         if (reg_state == State_ReplaceTlb) begin
-            mem.icAddr = tlbReplacerMemAddr;
-            mem.icReadReq = tlbReplacerMemReadEnable;
+            mem.icacheAddr = tlbReplacerMemAddr;
+            mem.icacheReadReq = tlbReplacerMemReadEnable;
         end
         else begin
-            mem.icAddr = cacheReplacerMemAddr;
-            mem.icReadReq = cacheReplacerMemReadEnable;
+            mem.icacheAddr = cacheReplacerMemAddr;
+            mem.icacheReadReq = cacheReplacerMemReadEnable;
         end
 
         // Valid & tag array input signals

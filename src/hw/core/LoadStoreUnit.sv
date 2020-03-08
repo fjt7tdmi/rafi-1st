@@ -220,10 +220,10 @@ module LoadStoreUnit (
         .arrayReadData(dataArrayReadValue),
         .memAddr(cacheReplacerMemAddr),
         .memReadEnable(cacheReplacerMemReadEnable),
-        .memReadDone(mem.dcReadGrant),
-        .memReadValue(mem.dcReadValue),
+        .memReadDone(mem.dcacheReadGrant),
+        .memReadValue(mem.dcacheReadValue),
         .memWriteEnable(cacheReplacerMemWriteEnable),
-        .memWriteDone(mem.dcWriteGrant),
+        .memWriteDone(mem.dcacheWriteGrant),
         .memWriteValue(cacheReplacerMemWriteValue),
         .done(cacheReplacerDone),
         .enable(cacheReplacerEnable),
@@ -240,10 +240,10 @@ module LoadStoreUnit (
         .tlbWriteKey,
         .tlbWriteValue,
         .memAddr(tlbReplacerMemAddr),
-        .memReadDone(mem.dcReadGrant),
+        .memReadDone(mem.dcacheReadGrant),
         .memReadEnable(tlbReplacerMemReadEnable),
-        .memReadValue(mem.dcReadValue),
-        .memWriteDone(mem.dcWriteGrant),
+        .memReadValue(mem.dcacheReadValue),
+        .memWriteDone(mem.dcacheWriteGrant),
         .memWriteEnable(tlbReplacerMemWriteEnable),
         .memWriteValue(tlbReplacerMemWriteValue),
         .csrSatp(csr.satp),
@@ -322,16 +322,16 @@ module LoadStoreUnit (
 
     always_comb begin
         if (reg_state == State_ReplaceTlb) begin
-            mem.dcAddr = tlbReplacerMemAddr;
-            mem.dcReadReq = tlbReplacerMemReadEnable;
-            mem.dcWriteReq = tlbReplacerMemWriteEnable;
-            mem.dcWriteValue = tlbReplacerMemWriteValue;
+            mem.dcacheAddr = tlbReplacerMemAddr;
+            mem.dcacheReadReq = tlbReplacerMemReadEnable;
+            mem.dcacheWriteReq = tlbReplacerMemWriteEnable;
+            mem.dcacheWriteValue = tlbReplacerMemWriteValue;
         end
         else begin
-            mem.dcAddr = cacheReplacerMemAddr;
-            mem.dcReadReq = cacheReplacerMemReadEnable;
-            mem.dcWriteReq = cacheReplacerMemWriteEnable;
-            mem.dcWriteValue = cacheReplacerMemWriteValue;
+            mem.dcacheAddr = cacheReplacerMemAddr;
+            mem.dcacheReadReq = cacheReplacerMemReadEnable;
+            mem.dcacheWriteReq = cacheReplacerMemWriteEnable;
+            mem.dcacheWriteValue = cacheReplacerMemWriteValue;
         end
     end
 
