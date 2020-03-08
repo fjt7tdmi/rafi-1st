@@ -235,6 +235,14 @@ module FetchUnit (
         .rst
     );
 
+    // TODO: connect to new TLB
+    always_comb begin
+        mem.itlbAddr = '0;
+        mem.itlbReadReq = '0;
+        mem.itlbWriteReq = '0;
+        mem.itlbWriteValue = '0;
+    end
+
     // Wires
     always_comb begin
         tlbReadKey = next_pc[VADDR_WIDTH-1:PAGE_OFFSET_WIDTH];

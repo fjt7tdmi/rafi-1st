@@ -31,6 +31,14 @@ interface BusAccessUnitIF;
     logic icacheWriteReq;
     icache_line_t icacheWriteValue;
 
+    paddr_t itlbAddr;
+    logic itlbReadGrant;
+    logic itlbReadReq;
+    uint32_t itlbReadValue;
+    logic itlbWriteGrant;
+    logic itlbWriteReq;
+    uint32_t itlbWriteValue;
+
     dcache_mem_addr_t dcacheAddr;
     logic dcacheReadGrant;
     logic dcacheReadReq;
@@ -39,16 +47,31 @@ interface BusAccessUnitIF;
     logic dcacheWriteReq;
     dcache_line_t dcacheWriteValue;
 
+    paddr_t dtlbAddr;
+    logic dtlbReadGrant;
+    logic dtlbReadReq;
+    uint32_t dtlbReadValue;
+    logic dtlbWriteGrant;
+    logic dtlbWriteReq;
+    uint32_t dtlbWriteValue;
+
     modport FetchUnit(
     output
         icacheAddr,
         icacheReadReq,
         icacheWriteReq,
         icacheWriteValue,
+        itlbAddr,
+        itlbReadReq,
+        itlbWriteReq,
+        itlbWriteValue,
     input
         icacheReadValue,
         icacheReadGrant,
-        icacheWriteGrant
+        icacheWriteGrant,
+        itlbReadValue,
+        itlbReadGrant,
+        itlbWriteGrant
     );
 
     modport LoadStoreUnit(
@@ -57,10 +80,17 @@ interface BusAccessUnitIF;
         dcacheReadReq,
         dcacheWriteReq,
         dcacheWriteValue,
+        dtlbAddr,
+        dtlbReadReq,
+        dtlbWriteReq,
+        dtlbWriteValue,
     input
         dcacheReadGrant,
         dcacheReadValue,
-        dcacheWriteGrant
+        dcacheWriteGrant,
+        dtlbReadGrant,
+        dtlbReadValue,
+        dtlbWriteGrant
     );
 
     modport BusAccessUnit(
@@ -68,17 +98,31 @@ interface BusAccessUnitIF;
         dcacheReadGrant,
         dcacheReadValue,
         dcacheWriteGrant,
+        dtlbReadGrant,
+        dtlbReadValue,
+        dtlbWriteGrant,
         icacheReadGrant,
         icacheReadValue,
         icacheWriteGrant,
+        itlbReadGrant,
+        itlbReadValue,
+        itlbWriteGrant,
     input
         dcacheAddr,
         dcacheReadReq,
         dcacheWriteReq,
         dcacheWriteValue,
+        dtlbAddr,
+        dtlbReadReq,
+        dtlbWriteReq,
+        dtlbWriteValue,
         icacheAddr,
         icacheReadReq,
         icacheWriteReq,
-        icacheWriteValue
+        icacheWriteValue,
+        itlbAddr,
+        itlbReadReq,
+        itlbWriteReq,
+        itlbWriteValue
     );
 endinterface

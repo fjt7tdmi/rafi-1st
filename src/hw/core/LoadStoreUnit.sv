@@ -254,6 +254,14 @@ module LoadStoreUnit (
         .clk,
         .rst);
 
+    // TODO: connect to new TLB
+    always_comb begin
+        mem.dtlbAddr = '0;
+        mem.dtlbReadReq = '0;
+        mem.dtlbWriteReq = '0;
+        mem.dtlbWriteValue = '0;
+    end
+
     // Wires
     always_comb begin
         accessType = (bus.loadStoreUnitCommand == LoadStoreUnitCommand_Store || bus.loadStoreUnitCommand == LoadStoreUnitCommand_AtomicMemOp)
