@@ -185,9 +185,9 @@ module LoadStoreUnit (
         .writeMask(dataArrayWriteMask),
         .clk);
 
-    Tlb #(
+    TlbArray #(
         .TLB_INDEX_WIDTH(ITLB_INDEX_WIDTH)
-    ) m_Tlb (
+    ) m_TlbArray (
         .hit(tlbHit),
         .fault(tlbFault),
         .readValue(tlbReadValue),
@@ -297,7 +297,7 @@ module LoadStoreUnit (
             (reg_state == State_Reserve) ||
             (reg_state == State_WriteThrough && cacheReplacerDone) ||
             (reg_state == State_Invalidate && cacheReplacerDone);
-        
+
         if (bus.loadStoreUnitCommand inside {LoadStoreUnitCommand_Store, LoadStoreUnitCommand_StoreConditional}) begin
             bus.loadPagefault = 0;
             bus.storePagefault = reg_tlb_fault;

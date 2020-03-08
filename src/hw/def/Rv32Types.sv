@@ -64,6 +64,20 @@ typedef struct packed
 
 typedef struct packed
 {
+    logic [ 9:0] VPN1;
+    logic [ 9:0] VPN0;
+    logic [11:0] OFFSET;
+} vaddr_sv32_t;
+
+typedef struct packed
+{
+    logic [11:0] PPN1;
+    logic [ 9:0] PPN0;
+    logic [11:0] OFFSET;
+} paddr_sv32_t;
+
+typedef struct packed
+{
     logic [11:0] PPN1;
     logic [ 9:0] PPN0;
     logic [ 1:0] RESERVED;

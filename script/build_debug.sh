@@ -13,14 +13,14 @@ else
     export VERILATOR_ROOT=`pwd`/third_party/rafi-prebuilt-binary/verilator/Linux-x86_64
 fi
 
-mkdir -p build_Debug
+mkdir -p build_Debug/Debug
 cd build_Debug
 
 if [[ -v RAFI_WIN ]]; then
-    cmake .. -DCMAKE_BUILD_TYPE=Debug -G "Visual Studio 16 2019" -A x64 && cmake --build . --config Debug
+    cmake .. -DCMAKE_BUILD_TYPE=Debug -G "Visual Studio 16 2019" -A x64 && cmake --build . --parallel --config Debug
     exit_code="$?"
 else
-    cmake .. -DCMAKE_BUILD_TYPE=Debug -G Ninja && cmake --build . --config Debug
+    cmake .. -DCMAKE_BUILD_TYPE=Debug -G Ninja && cmake --build . --parallel --config Debug
     exit_code=$?
 fi
 

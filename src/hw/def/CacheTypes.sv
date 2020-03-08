@@ -1,12 +1,12 @@
 /*
  * Copyright 2018 Akifumi Fujita
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -66,6 +66,13 @@ typedef logic [ICACHE_TAG_WIDTH-1:0] icache_tag_t;
 typedef logic [DTLB_INDEX_WIDTH-1:0] dtlb_index_t;
 
 typedef logic [ITLB_INDEX_WIDTH-1:0] itlb_index_t;
+
+typedef enum logic [1:0]
+{
+    TlbCommand_MarkDirty  = 2'h1,
+    TlbCommand_Invalidate = 2'h2,
+    TlbCommand_Translate  = 2'h3
+} TlbCommand;
 
 typedef enum logic [1:0]
 {

@@ -148,7 +148,7 @@ module FetchUnit (
         .clk
     );
 
-    Tlb #(
+    TlbArray #(
         .TLB_INDEX_WIDTH(ITLB_INDEX_WIDTH)
     ) m_Tlb (
         .hit(tlbHit),
