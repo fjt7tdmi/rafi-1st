@@ -34,16 +34,19 @@ module BusAccessUnit (
     typedef logic [$clog2(DCACHE_WORD_COUNT)-1:0] _dcache_word_index_t;
     typedef logic [$clog2(ICACHE_WORD_COUNT)-1:0] _icache_word_index_t;
 
-    typedef enum logic [2:0]
+    typedef enum logic [3:0]
     {
-        State_Idle         = 3'h0,
-        State_Reserved     = 3'h1,
-        State_IoRead       = 3'h2,
-        State_IoWrite      = 3'h3,
-        State_DCacheRead   = 3'h4,
-        State_DCacheWrite  = 3'h5,
-        State_ICacheRead   = 3'h6,
-        State_ICacheWrite  = 3'h7
+        State_Idle         = 4'h0,
+        State_IoRead       = 4'h6,
+        State_IoWrite      = 4'h7,
+        State_DCacheRead   = 4'h8,
+        State_DCacheWrite  = 4'h9,
+        State_DTlbRead     = 4'ha,
+        State_DTlbWrite    = 4'hb,
+        State_ICacheRead   = 4'hc,
+        State_ICacheWrite  = 4'hd,
+        State_ITlbRead     = 4'he,
+        State_ITlbWrite    = 4'hf
     } State;
 
     typedef enum logic [1:0]
@@ -54,187 +57,271 @@ module BusAccessUnit (
     } BusState;
 
     // Registers
-    State state;
-    BusState busState;
-    logic done;
-    _dcache_word_index_t dcWordIndex;
-    _icache_word_index_t icWordIndex;
-    int32_t [DCACHE_WORD_COUNT-1:0] dcValue;
-    int32_t [ICACHE_WORD_COUNT-1:0] icValue;
+    State reg_state;
+    BusState reg_bus_state;
+    logic reg_done;
+    _dcache_word_index_t reg_dcache_index;
+    _icache_word_index_t reg_icache_index;
+    uint32_t [DCACHE_WORD_COUNT-1:0] reg_dcache_value;
+    uint32_t [ICACHE_WORD_COUNT-1:0] reg_icache_value;
+    uint32_t reg_dtlb_value;    
+    uint32_t reg_itlb_value;
 
-    // Wires
-    logic rdataValid;
+    State next_state;
+    BusState next_bus_state;
+    logic next_done;
+    _dcache_word_index_t next_dcache_index;
+    _icache_word_index_t next_icache_index;
+    uint32_t [DCACHE_WORD_COUNT-1:0] next_dcache_value;    
+    uint32_t [ICACHE_WORD_COUNT-1:0] next_icache_value;
+    uint32_t next_dtlb_value;    
+    uint32_t next_itlb_value;
 
-    State nextState;
-    BusState nextBusState;
-    logic nextDone;
-    _dcache_word_index_t nextDcWordIndex;
-    _icache_word_index_t nextIcWordIndex;
-    int32_t [DCACHE_WORD_COUNT-1:0] nextDcValue;
-    int32_t [ICACHE_WORD_COUNT-1:0] nextIcValue;
+    logic rdata_valid;
+    always_comb begin
+        rdata_valid = (reg_bus_state == BusState_Access) && ready;
+    end
 
     // D$
     always_comb begin
-        core.dcReadValue = dcValue;
-        core.dcReadGrant = done && (state == State_DCacheRead);
-        core.dcWriteGrant = done && (state == State_DCacheWrite);
+        core.dcacheReadValue = reg_dcache_value;
+        core.dcacheReadGrant = reg_done && (reg_state == State_DCacheRead);
+        core.dcacheWriteGrant = reg_done && (reg_state == State_DCacheWrite);
+    end
+
+    // DTLB
+    always_comb begin
+        core.dtlbReadValue = reg_dtlb_value;
+        core.dtlbReadGrant = reg_done && (reg_state == State_DTlbRead);
+        core.dtlbWriteGrant = reg_done && (reg_state == State_DTlbWrite);
     end
 
     // I$
     always_comb begin
-        core.icReadValue = icValue;
-        core.icReadGrant = done && (state == State_ICacheRead);
-        core.icWriteGrant = done && (state == State_ICacheWrite);
+        core.icacheReadValue = reg_icache_value;
+        core.icacheReadGrant = reg_done && (reg_state == State_ICacheRead);
+        core.icacheWriteGrant = reg_done && (reg_state == State_ICacheWrite);
     end
 
-    // bus
+    // ITLB
     always_comb begin
-        if (state == State_DCacheRead || state == State_DCacheWrite) begin
-            addr = {core.dcAddr[(29 - $bits(dcWordIndex)):0], dcWordIndex, 2'b00};
-            wdata = dcValue[dcWordIndex];
+        core.itlbReadValue = reg_itlb_value;
+        core.itlbReadGrant = reg_done && (reg_state == State_ITlbRead);
+        core.itlbWriteGrant = reg_done && (reg_state == State_ITlbWrite);
+    end
+
+    // module IF
+    always_comb begin
+        if (reg_state inside {State_DTlbRead, State_DTlbWrite}) begin
+            addr = {core.dtlbAddr[31:2], 2'b00};
+            wdata = reg_dtlb_value;
         end
-        else if (state == State_ICacheRead || state == State_ICacheWrite) begin
-            addr = {core.icAddr[(29 - $bits(icWordIndex)):0], icWordIndex, 2'b00};
-            wdata = icValue[icWordIndex];
+        else if (reg_state inside {State_ITlbRead, State_ITlbWrite}) begin
+            addr = {core.itlbAddr[31:2], 2'b00};
+            wdata = reg_itlb_value;
+        end
+        else if (reg_state inside {State_DCacheRead, State_DCacheWrite}) begin
+            addr = {core.dcacheAddr[(29 - $bits(reg_dcache_index)):0], reg_dcache_index, 2'b00};
+            wdata = reg_dcache_value[reg_dcache_index];
+        end
+        else if (reg_state inside {State_ICacheRead, State_ICacheWrite}) begin
+            addr = {core.icacheAddr[(29 - $bits(reg_icache_index)):0], reg_icache_index, 2'b00};
+            wdata = reg_icache_value[reg_icache_index];
         end
         else begin
             addr = '0;
             wdata = '0;
         end
 
-        select = (busState == BusState_Setup || busState == BusState_Access);
-        enable = (busState == BusState_Access);
-        write = (busState == BusState_Access) && (state == State_DCacheWrite || state == State_ICacheWrite);
+        select = (reg_bus_state == BusState_Setup || reg_bus_state == BusState_Access);
+        enable = (reg_bus_state == BusState_Access);
+        write = (reg_bus_state == BusState_Access) && (reg_state inside {State_DCacheWrite, State_DTlbWrite, State_ICacheWrite, State_DTlbWrite});
     end
 
+    // next_state
     always_comb begin
-        rdataValid = (busState == BusState_Access) && ready;
-    end
-
-    // next
-    always_comb begin
-        unique case(state)
+        unique case(reg_state)
             State_Idle: begin
-                if (core.dcWriteReq) begin
-                    nextState = State_DCacheWrite;
+                if (core.dtlbWriteReq) begin
+                    next_state = State_DTlbWrite;
                 end
-                else if (core.dcReadReq) begin
-                    nextState = State_DCacheRead;
+                else if (core.dtlbReadReq) begin
+                    next_state = State_DTlbRead;
                 end
-                else if (core.icWriteReq) begin
-                    nextState = State_ICacheWrite;
+                else if (core.dcacheWriteReq) begin
+                    next_state = State_DCacheWrite;
                 end
-                else if (core.icReadReq) begin
-                    nextState = State_ICacheRead;
+                else if (core.dcacheReadReq) begin
+                    next_state = State_DCacheRead;
+                end
+                else if (core.itlbWriteReq) begin
+                    next_state = State_ITlbWrite;
+                end
+                else if (core.itlbReadReq) begin
+                    next_state = State_ITlbRead;
+                end
+                else if (core.icacheWriteReq) begin
+                    next_state = State_ICacheWrite;
+                end
+                else if (core.icacheReadReq) begin
+                    next_state = State_ICacheRead;
                 end
                 else begin
-                    nextState = State_Idle;
+                    next_state = State_Idle;
                 end
             end
             default: begin
-                nextState = done ? State_Idle : state;
+                next_state = reg_done ? State_Idle : reg_state;
             end
         endcase
     end
 
+    // next_bus_state
     always_comb begin
-        if (state == State_Idle || done) begin
-            nextBusState = BusState_Idle;
+        if (reg_state == State_Idle || reg_done) begin
+            next_bus_state = BusState_Idle;
         end
         else begin
-            unique case(busState)
-                BusState_Idle: nextBusState = BusState_Setup;
-                BusState_Setup: nextBusState = BusState_Access;
-                BusState_Access: nextBusState = ready ? BusState_Idle : busState;
-                default: nextBusState = BusState_Setup;
+            unique case(reg_bus_state)
+                BusState_Idle: next_bus_state = BusState_Setup;
+                BusState_Setup: next_bus_state = BusState_Access;
+                BusState_Access: next_bus_state = ready ? BusState_Idle : reg_bus_state;
+                default: next_bus_state = BusState_Setup;
             endcase
         end
     end
 
+    // next_done
     always_comb begin
-        if (state == State_DCacheRead || state == State_DCacheWrite) begin
-            nextDone = rdataValid && (dcWordIndex == _dcache_word_index_t'(DCACHE_WORD_COUNT - 1));
+        if (reg_state inside {State_DCacheRead, State_DCacheWrite}) begin
+            next_done = rdata_valid && (reg_dcache_index == _dcache_word_index_t'(DCACHE_WORD_COUNT - 1));
         end
-        else if (state == State_ICacheRead || state == State_ICacheWrite) begin
-            nextDone = rdataValid && (icWordIndex == _icache_word_index_t'(ICACHE_WORD_COUNT - 1));
+        else if (reg_state inside {State_ICacheRead, State_ICacheWrite}) begin
+            next_done = rdata_valid && (reg_icache_index == _icache_word_index_t'(ICACHE_WORD_COUNT - 1));
+        end
+        else if (reg_state inside {State_DTlbRead, State_DTlbWrite, State_ITlbRead, State_ITlbWrite}) begin
+            next_done = rdata_valid;
         end
         else begin
-            nextDone = 1'b0;
+            next_done = 1'b0;
         end
     end
 
+    // next_dcache_index, next_icache_index
     always_comb begin
-        if (state == State_DCacheRead || state == State_DCacheWrite) begin
-            nextDcWordIndex = (busState == BusState_Access && rdataValid) ? dcWordIndex + 1 : dcWordIndex;
+        if (reg_state inside {State_DCacheRead, State_DCacheWrite}) begin
+            next_dcache_index = (reg_bus_state == BusState_Access && rdata_valid) ? reg_dcache_index + 1 : reg_dcache_index;
         end
         else begin
-            nextDcWordIndex = '0;
+            next_dcache_index = '0;
         end
 
-        if (state == State_ICacheRead || state == State_ICacheWrite) begin
-            nextIcWordIndex = (busState == BusState_Access && rdataValid) ? icWordIndex + 1 : icWordIndex;
+        if (reg_state inside {State_ICacheRead, State_ICacheWrite}) begin
+            next_icache_index = (reg_bus_state == BusState_Access && rdata_valid) ? reg_icache_index + 1 : reg_icache_index;
         end
         else begin
-            nextIcWordIndex = '0;
+            next_icache_index = '0;
         end
     end
 
+    // next_dcache_value
     always_comb begin
-        unique case(state)
+        unique case(reg_state)
             State_Idle: begin
-                nextDcValue = (core.dcWriteReq) ? core.dcWriteValue : '0;
+                next_dcache_value = (core.dcacheWriteReq) ? core.dcacheWriteValue : '0;
             end
             State_DCacheRead: begin
                 for (int i = 0; i < DCACHE_WORD_COUNT; i++) begin
-                    nextDcValue[i] = (_dcache_word_index_t'(i) == dcWordIndex && rdataValid) ? rdata : dcValue[i];
+                    next_dcache_value[i] = (_dcache_word_index_t'(i) == reg_dcache_index && rdata_valid) ? rdata : reg_dcache_value[i];
                 end
             end
             State_DCacheWrite: begin
-                nextDcValue = core.dcWriteValue;
+                next_dcache_value = core.dcacheWriteValue;
             end
             default: begin
-                nextDcValue = '0;
+                next_dcache_value = '0;
             end
         endcase
     end
 
+    // next_icache_value
     always_comb begin
-        unique case(state)
+        unique case(reg_state)
             State_Idle: begin
-                nextIcValue = (core.icWriteReq) ? core.icWriteValue : '0;
+                next_icache_value = (core.icacheWriteReq) ? core.icacheWriteValue : '0;
             end
             State_ICacheRead: begin
                 for (int i = 0; i < ICACHE_WORD_COUNT; i++) begin
-                    nextIcValue[i] = (_icache_word_index_t'(i) == icWordIndex && rdataValid) ? rdata : icValue[i];
+                    next_icache_value[i] = (_icache_word_index_t'(i) == reg_icache_index && rdata_valid) ? rdata : reg_icache_value[i];
                 end
             end
             State_ICacheWrite: begin
-                nextIcValue = core.icWriteValue;
+                next_icache_value = core.icacheWriteValue;
             end
             default: begin
-                nextIcValue = '0;
+                next_icache_value = '0;
+            end
+        endcase
+    end
+
+    // next_dtlb_value
+    always_comb begin
+        unique case(reg_state)
+            State_Idle: begin
+                next_dtlb_value = (core.dtlbWriteReq) ? core.dtlbWriteValue : '0;
+            end
+            State_DTlbRead: begin
+                next_dtlb_value = rdata;
+            end
+            State_DTlbWrite: begin
+                next_dtlb_value = core.dtlbWriteValue;
+            end
+            default: begin
+                next_dtlb_value = '0;
+            end
+        endcase
+    end
+
+    // next_itlb_value
+    always_comb begin
+        unique case(reg_state)
+            State_Idle: begin
+                next_itlb_value = (core.itlbWriteReq) ? core.itlbWriteValue : '0;
+            end
+            State_ITlbRead: begin
+                next_itlb_value = rdata;
+            end
+            State_ITlbWrite: begin
+                next_itlb_value = core.itlbWriteValue;
+            end
+            default: begin
+                next_itlb_value = '0;
             end
         endcase
     end
 
     always_ff @(posedge clk) begin
         if (rst) begin
-            state <= State_Idle;
-            busState <= BusState_Idle;
-            done <= '0;
-            dcWordIndex <= '0;
-            icWordIndex <= '0;
-            dcValue <= '0;
-            icValue <= '0;
+            reg_state <= State_Idle;
+            reg_bus_state <= BusState_Idle;
+            reg_done <= '0;
+            reg_dcache_index <= '0;
+            reg_icache_index <= '0;
+            reg_dcache_value <= '0;
+            reg_icache_value <= '0;
+            reg_dtlb_value <= '0;
+            reg_itlb_value <= '0;
         end
         else begin
-            state <= nextState;
-            busState <= nextBusState;
-            done <= nextDone;
-            dcWordIndex <= nextDcWordIndex;
-            icWordIndex <= nextIcWordIndex;
-            dcValue <= nextDcValue;
-            icValue <= nextIcValue;
+            reg_state <= next_state;
+            reg_bus_state <= next_bus_state;
+            reg_done <= next_done;
+            reg_dcache_index <= next_dcache_index;
+            reg_icache_index <= next_icache_index;
+            reg_dcache_value <= next_dcache_value;
+            reg_icache_value <= next_icache_value;
+            reg_dtlb_value <= next_dtlb_value;
+            reg_itlb_value <= next_itlb_value;
         end
     end
 endmodule

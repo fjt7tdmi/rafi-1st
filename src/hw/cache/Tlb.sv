@@ -111,13 +111,12 @@ module Tlb (
     PageTableEntry next_page_table_entry;
 
     vaddr_sv32_t vaddr_sv32;
+    logic hit;
+    logic enable_translation;
     always_comb begin
         vaddr_sv32 = vaddr;
-    end
-
-    logic hit;
-    always_comb begin
         hit = reg_valid && reg_entry_vaddr.VPN1 == vaddr_sv32.VPN1 && reg_entry_vaddr.VPN0 == vaddr_sv32.VPN0;
+        enable_translation = (priv != Privilege_Machine && satp.MODE != AddressTranslationMode_Bare);
     end    
 
     // next_state
@@ -127,7 +126,7 @@ module Tlb (
             if (enable && command == TlbCommand_Invalidate) begin
                 next_state = reg_valid ? State_Invalidate : reg_state;
             end
-            else if (enable && command == TlbCommand_Translate && !hit) begin
+            else if (enable && command == TlbCommand_Translate && enable_translation && !hit) begin
                 next_state = reg_valid ? State_Invalidate : State_PageTableRead1;
             end
             else begin
@@ -222,12 +221,7 @@ module Tlb (
         memWriteEnable = (reg_state == State_Invalidate);
         memWriteValue = UpdatePageTableEntry(reg_page_table_entry, reg_dirty);
 
-        if (priv == Privilege_Machine || satp.MODE == AddressTranslationMode_Bare) begin
-            done = 1;
-            fault = 0;
-            paddr = {2'b00, vaddr};
-        end
-        else begin
+        if (enable_translation) begin
             if (enable && command == TlbCommand_MarkDirty) begin
                 done = 1;
             end
@@ -243,6 +237,11 @@ module Tlb (
 
             fault = IsFault(reg_page_table_entry, accessType, priv, status);
             paddr = {reg_page_table_entry.PPN1, reg_page_table_entry.PPN0, vaddr_sv32.OFFSET};
+        end
+        else begin
+            done = 1;
+            fault = 0;
+            paddr = {2'b00, vaddr};
         end
     end
 

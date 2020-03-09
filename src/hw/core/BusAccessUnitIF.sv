@@ -23,62 +23,106 @@ import CacheTypes::*;
 // Interface between D$, I$ and BusAccessUnit
 
 interface BusAccessUnitIF;
-    icache_mem_addr_t icAddr;
-    logic icReadGrant;
-    logic icReadReq;
-    icache_line_t icReadValue;
-    logic icWriteGrant;
-    logic icWriteReq;
-    icache_line_t icWriteValue;
+    icache_mem_addr_t icacheAddr;
+    logic icacheReadGrant;
+    logic icacheReadReq;
+    icache_line_t icacheReadValue;
+    logic icacheWriteGrant;
+    logic icacheWriteReq;
+    icache_line_t icacheWriteValue;
 
-    dcache_mem_addr_t dcAddr;
-    logic dcReadGrant;
-    logic dcReadReq;
-    dcache_line_t dcReadValue;
-    logic dcWriteGrant;
-    logic dcWriteReq;
-    dcache_line_t dcWriteValue;
+    paddr_t itlbAddr;
+    logic itlbReadGrant;
+    logic itlbReadReq;
+    uint32_t itlbReadValue;
+    logic itlbWriteGrant;
+    logic itlbWriteReq;
+    uint32_t itlbWriteValue;
+
+    dcache_mem_addr_t dcacheAddr;
+    logic dcacheReadGrant;
+    logic dcacheReadReq;
+    dcache_line_t dcacheReadValue;
+    logic dcacheWriteGrant;
+    logic dcacheWriteReq;
+    dcache_line_t dcacheWriteValue;
+
+    paddr_t dtlbAddr;
+    logic dtlbReadGrant;
+    logic dtlbReadReq;
+    uint32_t dtlbReadValue;
+    logic dtlbWriteGrant;
+    logic dtlbWriteReq;
+    uint32_t dtlbWriteValue;
 
     modport FetchUnit(
     output
-        icAddr,
-        icReadReq,
-        icWriteReq,
-        icWriteValue,
+        icacheAddr,
+        icacheReadReq,
+        icacheWriteReq,
+        icacheWriteValue,
+        itlbAddr,
+        itlbReadReq,
+        itlbWriteReq,
+        itlbWriteValue,
     input
-        icReadValue,
-        icReadGrant,
-        icWriteGrant
+        icacheReadValue,
+        icacheReadGrant,
+        icacheWriteGrant,
+        itlbReadValue,
+        itlbReadGrant,
+        itlbWriteGrant
     );
 
     modport LoadStoreUnit(
     output
-        dcAddr,
-        dcReadReq,
-        dcWriteReq,
-        dcWriteValue,
+        dcacheAddr,
+        dcacheReadReq,
+        dcacheWriteReq,
+        dcacheWriteValue,
+        dtlbAddr,
+        dtlbReadReq,
+        dtlbWriteReq,
+        dtlbWriteValue,
     input
-        dcReadGrant,
-        dcReadValue,
-        dcWriteGrant
+        dcacheReadGrant,
+        dcacheReadValue,
+        dcacheWriteGrant,
+        dtlbReadGrant,
+        dtlbReadValue,
+        dtlbWriteGrant
     );
 
     modport BusAccessUnit(
     output
-        dcReadGrant,
-        dcReadValue,
-        dcWriteGrant,
-        icReadGrant,
-        icReadValue,
-        icWriteGrant,
+        dcacheReadGrant,
+        dcacheReadValue,
+        dcacheWriteGrant,
+        dtlbReadGrant,
+        dtlbReadValue,
+        dtlbWriteGrant,
+        icacheReadGrant,
+        icacheReadValue,
+        icacheWriteGrant,
+        itlbReadGrant,
+        itlbReadValue,
+        itlbWriteGrant,
     input
-        dcAddr,
-        dcReadReq,
-        dcWriteReq,
-        dcWriteValue,
-        icAddr,
-        icReadReq,
-        icWriteReq,
-        icWriteValue
+        dcacheAddr,
+        dcacheReadReq,
+        dcacheWriteReq,
+        dcacheWriteValue,
+        dtlbAddr,
+        dtlbReadReq,
+        dtlbWriteReq,
+        dtlbWriteValue,
+        icacheAddr,
+        icacheReadReq,
+        icacheWriteReq,
+        icacheWriteValue,
+        itlbAddr,
+        itlbReadReq,
+        itlbWriteReq,
+        itlbWriteValue
     );
 endinterface
