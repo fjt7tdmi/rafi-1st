@@ -50,8 +50,7 @@ module FetchUnit (
     {
         State_Default = 2'h0,
         State_Invalidate = 2'h1,
-        State_ReplaceCache = 2'h2,
-        State_ReplaceTlb = 2'h3
+        State_ReplaceCache = 2'h2
     } State;
 
     typedef struct packed
@@ -63,22 +62,62 @@ module FetchUnit (
     // Registers
     State reg_state;
     vaddr_t reg_pc;
-    paddr_t reg_physical_pc;
-    logic reg_icache_read;
-    logic reg_tlb_miss;
-    logic reg_fault;
+    paddr_t reg_paddr;
+    logic reg_cache_read;
+    logic reg_tlb_fault;
     _stall_cycle_t reg_stall_counter;
 
-    // Wires
     State next_state;
     vaddr_t next_pc;
-    paddr_t next_physical_pc;
-    logic next_icache_read;
-    logic next_tlb_miss;
-    logic next_fault;
+    paddr_t next_paddr;
+    logic next_tlb_fault;
+    logic next_cache_read;
     _stall_cycle_t next_stall_counter;
 
-    logic cacheMiss;
+    // TLB
+    logic tlb_done;
+    logic tlb_invalidate;
+    logic tlb_enable;
+    TlbCommand tlb_command;
+    always_comb begin
+        if (reg_state == State_Invalidate && tlb_invalidate) begin
+            tlb_enable = 1;
+            tlb_command = TlbCommand_Invalidate;
+        end
+        else if (reg_state == State_Default) begin
+            tlb_enable = 1;
+            tlb_command = TlbCommand_Translate;
+        end
+        else begin
+            tlb_enable = 0;
+            tlb_command = '0;
+        end
+    end
+
+    Tlb m_Tlb (
+        .memAddr(mem.itlbAddr),
+        .memReadEnable(mem.itlbReadReq),
+        .memWriteEnable(mem.itlbWriteReq),
+        .memWriteValue(mem.itlbWriteValue),
+        .memReadDone(mem.itlbReadGrant),
+        .memWriteDone(mem.itlbWriteGrant),
+        .memReadValue(mem.itlbReadValue),
+        .done(tlb_done),
+        .fault(next_tlb_fault),
+        .paddr(next_paddr),
+        .enable(tlb_enable),
+        .command(tlb_command),
+        .vaddr(next_pc),
+        .accessType(MemoryAccessType_Instruction),
+        .satp(csr.satp),
+        .status(csr.status),
+        .priv(csr.privilege),
+        .clk,
+        .rst
+    );
+
+    // ICache
+    logic cache_miss;
     logic stall;
 
     _index_t            validTagArrayIndex;
@@ -90,16 +129,6 @@ module FetchUnit (
     logic [LINE_WIDTH-1:0]   dataArrayReadValue;
     logic [LINE_WIDTH-1:0]   dataArrayWriteValue;
     logic                   dataArrayWriteEnable;
-
-    logic                   tlbHit;
-    logic                   tlbFault;
-    virtual_page_number_t   tlbReadKey;
-    physical_page_number_t  tlbReadValue;
-    logic                   tlbReadEnable;
-    logic                   tlbWriteEnable;
-    virtual_page_number_t   tlbWriteKey;
-    TlbEntry                tlbWriteValue;
-    logic                   tlbInvalidate;
 
     logic       waitInvalidate;
 
@@ -119,12 +148,6 @@ module FetchUnit (
     logic               cacheReplacerDone;
     logic               cacheReplacerEnable;
 
-    icache_mem_addr_t   tlbReplacerMemAddr;
-    logic               tlbReplacerMemReadEnable;
-    logic               tlbReplacerDone;
-    logic               tlbReplacerEnable;
-
-    // Modules
     BlockRamWithReset #(
         .DATA_WIDTH($bits(ValidTagArrayEntry)),
         .INDEX_WIDTH(INDEX_WIDTH)
@@ -148,27 +171,6 @@ module FetchUnit (
         .clk
     );
 
-    TlbArray #(
-        .TLB_INDEX_WIDTH(ITLB_INDEX_WIDTH)
-    ) m_Tlb (
-        .hit(tlbHit),
-        .fault(tlbFault),
-        .readValue(tlbReadValue),
-        .readEnable(tlbReadEnable),
-        .readKey(tlbReadKey),
-        .readAccessType(MemoryAccessType_Instruction),
-        .writeEnable(tlbWriteEnable),
-        .writeKey(tlbWriteKey),
-        .writeValue(tlbWriteValue),
-        .csrSatp(csr.satp),
-        .csrPrivilege(csr.privilege),
-        .csrSum(csr.status.SUM),
-        .csrMxr(csr.status.MXR),
-        .invalidate(tlbInvalidate),
-        .clk,
-        .rst
-    );
-
     ICacheInvalidater #(
         .LINE_SIZE(LINE_SIZE),
         .INDEX_WIDTH(INDEX_WIDTH),
@@ -178,7 +180,7 @@ module FetchUnit (
         .arrayIndex(invalidaterArrayIndex),
         .arrayWriteValid(invalidaterArrayWriteValid),
         .arrayWriteTag(invalidaterArrayWriteTag),
-        .tlbInvalidate,
+        .tlbInvalidate(tlb_invalidate),
         .done(invalidaterDone),
         .enable(invalidaterEnable),
         .waitInvalidate,
@@ -204,70 +206,19 @@ module FetchUnit (
         .memReadEnable(cacheReplacerMemReadEnable),
         .memReadDone(mem.icacheReadGrant),
         .memReadValue(mem.icacheReadValue),
-        .miss(cacheMiss),
+        .miss(cache_miss),
         .done(cacheReplacerDone),
         .enable(cacheReplacerEnable),
-        .missAddr(reg_physical_pc[PADDR_WIDTH-1:INDEX_LSB]),
+        .missAddr(reg_paddr[PADDR_WIDTH-1:INDEX_LSB]),
         .clk,
         .rst
     );
-
-    TlbReplacer #(
-        .MEM_ADDR_WIDTH(ICACHE_MEM_ADDR_WIDTH),
-        .LINE_WIDTH(ICACHE_LINE_WIDTH)
-    ) m_TlbReplacer (
-        .tlbWriteEnable,
-        .tlbWriteKey,
-        .tlbWriteValue,
-        .memAddr(tlbReplacerMemAddr),
-        .memReadEnable(tlbReplacerMemReadEnable),
-        .memReadDone(mem.icacheReadGrant),
-        .memReadValue(mem.icacheReadValue),
-        .memWriteEnable(mem.icacheWriteReq),
-        .memWriteDone(mem.icacheWriteGrant),
-        .memWriteValue(mem.icacheWriteValue),
-        .csrSatp(csr.satp),
-        .done(tlbReplacerDone),
-        .enable(tlbReplacerEnable),
-        .missMemoryAccessType(MemoryAccessType_Instruction),
-        .missPage(reg_pc[VADDR_WIDTH-1:PAGE_OFFSET_WIDTH]),
-        .clk,
-        .rst
-    );
-
-    // TODO: connect to new TLB
-    always_comb begin
-        mem.itlbAddr = '0;
-        mem.itlbReadReq = '0;
-        mem.itlbWriteReq = '0;
-        mem.itlbWriteValue = '0;
-    end
-
-    // Wires
-    always_comb begin
-        tlbReadKey = next_pc[VADDR_WIDTH-1:PAGE_OFFSET_WIDTH];
-    end
 
     always_comb begin
         // Wires
-        cacheMiss = reg_icache_read && !reg_tlb_miss &&
-            (!validTagArrayReadValue.valid || reg_physical_pc[TAG_MSB:TAG_LSB] != validTagArrayReadValue.tag);
+        cache_miss = reg_cache_read &&
+            (!validTagArrayReadValue.valid || reg_paddr[TAG_MSB:TAG_LSB] != validTagArrayReadValue.tag);
         stall = bus.stall || (reg_stall_counter != '0);
-
-        // Module port
-        bus.valid = (reg_icache_read && !reg_tlb_miss && !cacheMiss) || reg_fault;
-        bus.fault = reg_fault;
-        bus.pc = reg_pc;
-        bus.iCacheLine = dataArrayReadValue;
-
-        if (reg_state == State_ReplaceTlb) begin
-            mem.icacheAddr = tlbReplacerMemAddr;
-            mem.icacheReadReq = tlbReplacerMemReadEnable;
-        end
-        else begin
-            mem.icacheAddr = cacheReplacerMemAddr;
-            mem.icacheReadReq = cacheReplacerMemReadEnable;
-        end
 
         // Valid & tag array input signals
         unique case (reg_state)
@@ -282,7 +233,7 @@ module FetchUnit (
             validTagArrayWriteEnable = cacheReplacerArrayWriteEnable;
         end
         default: begin
-            validTagArrayIndex = next_physical_pc[INDEX_MSB:INDEX_LSB];
+            validTagArrayIndex = next_paddr[INDEX_MSB:INDEX_LSB];
             validTagArrayWriteValue = '0;
             validTagArrayWriteEnable = 0;
         end
@@ -294,15 +245,24 @@ module FetchUnit (
             dataArrayWriteEnable = cacheReplacerArrayWriteEnable;
         end
         else begin
-            dataArrayIndex = next_physical_pc[INDEX_MSB:INDEX_LSB];
+            dataArrayIndex = next_paddr[INDEX_MSB:INDEX_LSB];
             dataArrayWriteEnable = 0;
         end
 
         // Module enable signals
-        tlbReadEnable = (reg_state == State_Default);
         invalidaterEnable = (reg_state == State_Invalidate);
         cacheReplacerEnable = (reg_state == State_ReplaceCache);
-        tlbReplacerEnable = (reg_state == State_ReplaceTlb);
+    end
+
+    // Module IF
+    always_comb begin
+        bus.valid = reg_cache_read && (reg_tlb_fault || !cache_miss);
+        bus.fault = reg_cache_read && reg_tlb_fault;
+        bus.pc = reg_pc;
+        bus.iCacheLine = dataArrayReadValue;
+
+        mem.icacheAddr = cacheReplacerMemAddr;
+        mem.icacheReadReq = cacheReplacerMemReadEnable;
     end
 
     // next_pc
@@ -340,25 +300,11 @@ module FetchUnit (
                 next_state = State_Default;
             end
         end
-        State_ReplaceTlb: begin
-            if (!tlbReplacerDone) begin
-                next_state = State_ReplaceTlb;
-            end
-            else if (waitInvalidate) begin
-                next_state = State_Invalidate;
-            end
-            else begin
-                next_state = State_Default;
-            end
-        end
         default: begin
             if (waitInvalidate) begin
                 next_state = State_Invalidate;
             end
-            else if (reg_tlb_miss) begin
-                next_state = State_ReplaceTlb;
-            end
-            else if (!reg_fault && cacheMiss) begin
+            else if (cache_miss) begin
                 next_state = State_ReplaceCache;
             end
             else begin
@@ -368,12 +314,9 @@ module FetchUnit (
         endcase
     end
 
-    // Next register values
+    // next_cache_read, next_stall_counter
     always_comb begin
-        next_physical_pc = {tlbReadValue, next_pc[PAGE_OFFSET_WIDTH-1:0]};
-        next_icache_read = (reg_state == State_Default && !bus.flush && !stall && !waitInvalidate);
-        next_tlb_miss = next_icache_read && !tlbHit;
-        next_fault = next_icache_read && tlbHit && tlbFault;
+        next_cache_read = (reg_state == State_Default && tlb_done && !next_tlb_fault && !bus.flush && !stall && !waitInvalidate);
 
         if (bus.flush) begin
             next_stall_counter = StallCycleAfterFlush;
@@ -387,19 +330,17 @@ module FetchUnit (
         if (rst) begin
             reg_state <= State_Default;
             reg_pc <= INITIAL_PC;
-            reg_physical_pc <= '0;
-            reg_icache_read <= '0;
-            reg_tlb_miss <= '0;
-            reg_fault <= '0;
+            reg_paddr <= '0;
+            reg_tlb_fault <= next_tlb_fault;
+            reg_cache_read <= '0;
             reg_stall_counter <= '0;
         end
         else begin
             reg_state <= next_state;
             reg_pc <= next_pc;
-            reg_physical_pc <= next_physical_pc;
-            reg_icache_read <= next_icache_read;
-            reg_tlb_miss <= next_tlb_miss;
-            reg_fault <= next_fault;
+            reg_paddr <= next_paddr;
+            reg_tlb_fault <= next_tlb_fault;
+            reg_cache_read <= next_cache_read;
             reg_stall_counter <= next_stall_counter;
         end
     end
