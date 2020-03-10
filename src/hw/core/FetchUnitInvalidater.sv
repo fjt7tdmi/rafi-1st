@@ -18,7 +18,7 @@ import BasicTypes::*;
 import RvTypes::*;
 import Rv32Types::*;
 
-module ICacheInvalidater #(
+module FetchUnitInvalidater #(
     parameter LINE_SIZE,
     parameter INDEX_WIDTH,
     parameter TAG_WIDTH

@@ -544,7 +544,6 @@ if (verilator_FOUND)
         src/hw/fp/FpUnit.sv
         src/hw/fp/SqrtUnit.sv
         src/hw/mul/MulUnit.sv
-        src/hw/cache/ICacheInvalidater.sv
         src/hw/cache/ICacheReplacer.sv
         src/hw/cache/DCacheReplacer.sv
         src/hw/cache/Tlb.sv
@@ -556,6 +555,7 @@ if (verilator_FOUND)
         src/hw/core/ResetSequencer.sv
         src/hw/core/FetchUnit.sv
         src/hw/core/FetchUnitIF.sv
+        src/hw/core/FetchUnitInvalidater.sv
         src/hw/core/InsnBufferIF.sv
         src/hw/core/InsnBuffer.sv
         src/hw/core/InterruptControllerIF.sv

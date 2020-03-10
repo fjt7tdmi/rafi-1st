@@ -46,14 +46,14 @@ module LoadStoreUnit (
 
     typedef enum logic [2:0]
     {
-        State_Default = 3'h0,
-        State_Invalidate = 3'h1,
-        State_ReplaceCache = 3'h2,
-        State_ReplaceTlb = 3'h3,
-        State_Load = 3'h4,
-        State_Store = 3'h5,
-        State_WriteThrough = 3'h6,
-        State_Reserve = 3'h7
+        State_AddrGen       = 3'h0,
+        State_Translate     = 3'h1,
+        State_Invalidate    = 3'h2,
+        State_ReplaceCache  = 3'h3,
+        State_Load          = 3'h4,
+        State_Store         = 3'h5,
+        State_WriteThrough  = 3'h6,
+        State_Reserve       = 3'h7
     } State;
 
     typedef struct packed
@@ -84,72 +84,30 @@ module LoadStoreUnit (
     paddr_t reg_paddr;
     logic reg_dcache_read;
     logic reg_tlb_fault;
-    logic reg_tlb_miss;
     MemoryAccessType reg_access_type;
     uint64_t reg_load_result;
     uint64_t reg_store_value;
 
-    // Wires
     State next_state;
     vaddr_t next_vaddr;
     paddr_t next_paddr;
     logic next_dcache_read;
     logic next_tlb_fault;
-    logic next_tlb_miss;
     MemoryAccessType next_access_type;
     uint64_t next_load_result;
     uint64_t next_store_value;
 
-    MemoryAccessType accessType;
+    // Signals
     logic cacheMiss;
-    uint64_t shiftedReadData;
-    ReplaceLogicCommand replaceLogicCommand;
-    dcache_mem_addr_t replaceLogicAddr;
-    uint64_t loadResult;
     uint64_t storeValue;
     word_t storeAluValue;
     logic storeConditionFlag;
+
+    // Value Generation
+    uint64_t loadResult;
     logic [LINE_WIDTH-1:0] storeLine;
     logic [LINE_SIZE-1:0] storeWriteMask;
 
-    _index_t        tagArrayIndex;
-    TagArrayEntry   tagArrayReadValue;
-    TagArrayEntry   tagArrayWriteValue;
-    logic           tagArrayWriteEnable;
-
-    _index_t                dataArrayIndex;
-    logic [LINE_WIDTH-1:0]   dataArrayReadValue;
-    logic [LINE_WIDTH-1:0]   dataArrayWriteValue;
-    _write_mask_t           dataArrayWriteMask;
-
-    logic                   tlbHit;
-    logic                   tlbFault;
-    physical_page_number_t  tlbReadValue;
-    logic                   tlbReadEnable;
-    logic                   tlbWriteEnable;
-    virtual_page_number_t   tlbWriteKey;
-    TlbEntry                tlbWriteValue;
-
-    logic               cacheReplacerArrayWriteEnable;
-    _index_t            cacheReplacerArrayIndex;
-    logic               cacheReplacerArrayWriteValid;
-    _tag_t              cacheReplacerArrayWriteTag;
-    _line_t             cacheReplacerArrayWriteData;
-    dcache_mem_addr_t   cacheReplacerMemAddr;
-    logic               cacheReplacerMemReadEnable;
-    logic               cacheReplacerMemWriteEnable;
-    _line_t             cacheReplacerMemWriteValue;
-    logic               cacheReplacerDone;
-    logic               cacheReplacerEnable;
-
-    dcache_mem_addr_t   tlbReplacerMemAddr;
-    logic               tlbReplacerMemReadEnable;
-    logic               tlbReplacerMemWriteEnable;
-    _line_t             tlbReplacerMemWriteValue;
-    logic               tlbReplacerDone;
-    logic               tlbReplacerEnable;
-
-    // Modules
     LoadValueUnit m_LoadValueUnit (
         .result(loadResult),
         .addr(reg_vaddr[$clog2(LINE_SIZE)-1:0]),
@@ -163,27 +121,21 @@ module LoadStoreUnit (
         .value(storeValue),
         .loadStoreType(bus.command.loadStoreType));
 
-    BlockRamWithReset #(
-        .DATA_WIDTH($bits(TagArrayEntry)),
-        .INDEX_WIDTH(INDEX_WIDTH)
-    ) m_ValidTagArray (
-        .readValue(tagArrayReadValue),
-        .index(tagArrayIndex),
-        .writeValue(tagArrayWriteValue),
-        .writeEnable(tagArrayWriteEnable),
-        .clk,
-        .rst);
+    // TLB
+    logic                   tlbHit;
+    logic                   tlbFault;
+    physical_page_number_t  tlbReadValue;
+    logic                   tlbReadEnable;
+    logic                   tlbWriteEnable;
+    virtual_page_number_t   tlbWriteKey;
+    TlbEntry                tlbWriteValue;
 
-    MultiBankBlockRam #(
-        .DATA_WIDTH_PER_BANK(BYTE_WIDTH),
-        .BANK_COUNT(LINE_SIZE),
-        .INDEX_WIDTH(INDEX_WIDTH)
-    ) m_DataArray (
-        .readValue(dataArrayReadValue),
-        .index(dataArrayIndex),
-        .writeValue(dataArrayWriteValue),
-        .writeMask(dataArrayWriteMask),
-        .clk);
+    dcache_mem_addr_t   tlbReplacerMemAddr;
+    logic               tlbReplacerMemReadEnable;
+    logic               tlbReplacerMemWriteEnable;
+    _line_t             tlbReplacerMemWriteValue;
+    logic               tlbReplacerDone;
+    logic               tlbReplacerEnable;
 
     TlbArray #(
         .TLB_INDEX_WIDTH(ITLB_INDEX_WIDTH)
@@ -192,8 +144,8 @@ module LoadStoreUnit (
         .fault(tlbFault),
         .readValue(tlbReadValue),
         .readEnable(tlbReadEnable),
-        .readKey(next_vaddr[VADDR_WIDTH-1:PAGE_OFFSET_WIDTH]),
-        .readAccessType(accessType),
+        .readKey(reg_vaddr[VADDR_WIDTH-1:PAGE_OFFSET_WIDTH]),
+        .readAccessType(reg_access_type),
         .writeEnable(tlbWriteEnable),
         .writeKey(tlbWriteKey),
         .writeValue(tlbWriteValue),
@@ -202,33 +154,6 @@ module LoadStoreUnit (
         .csrSum(csr.status.SUM),
         .csrMxr(csr.status.MXR),
         .invalidate(bus.invalidateTlb),
-        .clk,
-        .rst);
-
-    DCacheReplacer #(
-        .LINE_WIDTH(LINE_WIDTH),
-        .TAG_WIDTH(TAG_WIDTH),
-        .INDEX_WIDTH(INDEX_WIDTH)
-    ) m_CacheReplacer (
-        .arrayWriteEnable(cacheReplacerArrayWriteEnable),
-        .arrayIndex(cacheReplacerArrayIndex),
-        .arrayWriteValid(cacheReplacerArrayWriteValid),
-        .arrayWriteTag(cacheReplacerArrayWriteTag),
-        .arrayWriteData(cacheReplacerArrayWriteData),
-        .arrayReadValid(tagArrayReadValue.valid),
-        .arrayReadTag(tagArrayReadValue.tag),
-        .arrayReadData(dataArrayReadValue),
-        .memAddr(cacheReplacerMemAddr),
-        .memReadEnable(cacheReplacerMemReadEnable),
-        .memReadDone(mem.dcacheReadGrant),
-        .memReadValue(mem.dcacheReadValue),
-        .memWriteEnable(cacheReplacerMemWriteEnable),
-        .memWriteDone(mem.dcacheWriteGrant),
-        .memWriteValue(cacheReplacerMemWriteValue),
-        .done(cacheReplacerDone),
-        .enable(cacheReplacerEnable),
-        .command(replaceLogicCommand),
-        .commandAddr(replaceLogicAddr),
         .clk,
         .rst);
 
@@ -262,15 +187,84 @@ module LoadStoreUnit (
         mem.dtlbWriteValue = '0;
     end
 
+    // DCache
+    _index_t        tagArrayIndex;
+    TagArrayEntry   tagArrayReadValue;
+    TagArrayEntry   tagArrayWriteValue;
+    logic           tagArrayWriteEnable;
+
+    _index_t                dataArrayIndex;
+    logic [LINE_WIDTH-1:0]   dataArrayReadValue;
+    logic [LINE_WIDTH-1:0]   dataArrayWriteValue;
+    _write_mask_t           dataArrayWriteMask;
+
+    ReplaceLogicCommand replaceLogicCommand;
+    dcache_mem_addr_t replaceLogicAddr;
+
+    logic               cacheReplacerArrayWriteEnable;
+    _index_t            cacheReplacerArrayIndex;
+    logic               cacheReplacerArrayWriteValid;
+    _tag_t              cacheReplacerArrayWriteTag;
+    _line_t             cacheReplacerArrayWriteData;
+    dcache_mem_addr_t   cacheReplacerMemAddr;
+    logic               cacheReplacerMemReadEnable;
+    logic               cacheReplacerMemWriteEnable;
+    _line_t             cacheReplacerMemWriteValue;
+    logic               cacheReplacerDone;
+    logic               cacheReplacerEnable;
+
+    BlockRamWithReset #(
+        .DATA_WIDTH($bits(TagArrayEntry)),
+        .INDEX_WIDTH(INDEX_WIDTH)
+    ) m_ValidTagArray (
+        .readValue(tagArrayReadValue),
+        .index(tagArrayIndex),
+        .writeValue(tagArrayWriteValue),
+        .writeEnable(tagArrayWriteEnable),
+        .clk,
+        .rst);
+
+    MultiBankBlockRam #(
+        .DATA_WIDTH_PER_BANK(BYTE_WIDTH),
+        .BANK_COUNT(LINE_SIZE),
+        .INDEX_WIDTH(INDEX_WIDTH)
+    ) m_DataArray (
+        .readValue(dataArrayReadValue),
+        .index(dataArrayIndex),
+        .writeValue(dataArrayWriteValue),
+        .writeMask(dataArrayWriteMask),
+        .clk);
+
+    DCacheReplacer #(
+        .LINE_WIDTH(LINE_WIDTH),
+        .TAG_WIDTH(TAG_WIDTH),
+        .INDEX_WIDTH(INDEX_WIDTH)
+    ) m_CacheReplacer (
+        .arrayWriteEnable(cacheReplacerArrayWriteEnable),
+        .arrayIndex(cacheReplacerArrayIndex),
+        .arrayWriteValid(cacheReplacerArrayWriteValid),
+        .arrayWriteTag(cacheReplacerArrayWriteTag),
+        .arrayWriteData(cacheReplacerArrayWriteData),
+        .arrayReadValid(tagArrayReadValue.valid),
+        .arrayReadTag(tagArrayReadValue.tag),
+        .arrayReadData(dataArrayReadValue),
+        .memAddr(cacheReplacerMemAddr),
+        .memReadEnable(cacheReplacerMemReadEnable),
+        .memReadDone(mem.dcacheReadGrant),
+        .memReadValue(mem.dcacheReadValue),
+        .memWriteEnable(cacheReplacerMemWriteEnable),
+        .memWriteDone(mem.dcacheWriteGrant),
+        .memWriteValue(cacheReplacerMemWriteValue),
+        .done(cacheReplacerDone),
+        .enable(cacheReplacerEnable),
+        .command(replaceLogicCommand),
+        .commandAddr(replaceLogicAddr),
+        .clk,
+        .rst);
+
     // Wires
     always_comb begin
-        accessType = (bus.loadStoreUnitCommand == LoadStoreUnitCommand_Store || bus.loadStoreUnitCommand == LoadStoreUnitCommand_AtomicMemOp)
-            ? MemoryAccessType_Store
-            : MemoryAccessType_Load;
-    end
-
-    always_comb begin
-        cacheMiss = reg_dcache_read && !reg_tlb_miss &&
+        cacheMiss = reg_dcache_read &&
             (!tagArrayReadValue.valid || reg_paddr[TAG_MSB:TAG_LSB] != tagArrayReadValue.tag);
     end
 
@@ -282,7 +276,7 @@ module LoadStoreUnit (
         storeConditionFlag =
             (bus.loadStoreUnitCommand == LoadStoreUnitCommand_StoreConditional) &&
             (reg_state == State_Load) &&
-            (!reg_tlb_miss && !cacheMiss && !tlbFault && tagArrayReadValue.reserved);
+            (!cacheMiss && !tlbFault && tagArrayReadValue.reserved);
     end
 
     always_comb begin
@@ -296,11 +290,11 @@ module LoadStoreUnit (
         endcase
     end
 
-    // Module port
+    // Module IF
     always_comb begin
         bus.done =
-            (bus.loadStoreUnitCommand == LoadStoreUnitCommand_None && reg_state == State_Default) ||
-            (bus.loadStoreUnitCommand == LoadStoreUnitCommand_Load && reg_state == State_Load && !reg_tlb_miss && !cacheMiss) ||
+            (bus.loadStoreUnitCommand == LoadStoreUnitCommand_None && reg_state == State_AddrGen) ||
+            (bus.loadStoreUnitCommand == LoadStoreUnitCommand_Load && reg_state == State_Load && !cacheMiss) ||
             (bus.loadStoreUnitCommand == LoadStoreUnitCommand_StoreConditional && reg_state == State_Load && !storeConditionFlag) ||
             (reg_state == State_Reserve) ||
             (reg_state == State_WriteThrough && cacheReplacerDone) ||
@@ -326,40 +320,41 @@ module LoadStoreUnit (
         else begin
             bus.resultValue = loadResult;
         end
-    end
 
-    always_comb begin
-        if (reg_state == State_ReplaceTlb) begin
-            mem.dcacheAddr = tlbReplacerMemAddr;
-            mem.dcacheReadReq = tlbReplacerMemReadEnable;
-            mem.dcacheWriteReq = tlbReplacerMemWriteEnable;
-            mem.dcacheWriteValue = tlbReplacerMemWriteValue;
-        end
-        else begin
-            mem.dcacheAddr = cacheReplacerMemAddr;
-            mem.dcacheReadReq = cacheReplacerMemReadEnable;
-            mem.dcacheWriteReq = cacheReplacerMemWriteEnable;
-            mem.dcacheWriteValue = cacheReplacerMemWriteValue;
-        end
+        mem.dcacheAddr = cacheReplacerMemAddr;
+        mem.dcacheReadReq = cacheReplacerMemReadEnable;
+        mem.dcacheWriteReq = cacheReplacerMemWriteEnable;
+        mem.dcacheWriteValue = cacheReplacerMemWriteValue;
     end
 
     // next_state
     always_comb begin
         unique case (reg_state)
+        State_AddrGen: begin
+            next_state = (bus.enable && bus.loadStoreUnitCommand != LoadStoreUnitCommand_None) ? State_Translate : reg_state;
+        end
+        State_Translate: begin
+            if (bus.loadStoreUnitCommand inside {LoadStoreUnitCommand_Load, LoadStoreUnitCommand_AtomicMemOp, LoadStoreUnitCommand_LoadReserved, LoadStoreUnitCommand_StoreConditional}) begin
+                next_state = State_Load;
+            end
+            else if (bus.loadStoreUnitCommand == LoadStoreUnitCommand_Store) begin
+                next_state = State_Store;
+            end
+            else if (bus.loadStoreUnitCommand == LoadStoreUnitCommand_Invalidate) begin
+                next_state = State_Invalidate;
+            end
+            else begin
+                next_state = State_AddrGen;
+            end
+        end
         State_Invalidate: begin
-            next_state = cacheReplacerDone ? State_Default : reg_state;
+            next_state = cacheReplacerDone ? State_AddrGen : reg_state;
         end
         State_ReplaceCache: begin
-            next_state = cacheReplacerDone ? State_Default : reg_state;
-        end
-        State_ReplaceTlb: begin
-            next_state = tlbReplacerDone ? State_Default : reg_state;
+            next_state = cacheReplacerDone ? State_AddrGen : reg_state;
         end
         State_Load: begin
-            if (reg_tlb_miss) begin
-                next_state = State_ReplaceTlb;
-            end
-            else if (cacheMiss) begin
+            if (cacheMiss) begin
                 next_state = State_ReplaceCache;
             end
             else begin
@@ -367,22 +362,19 @@ module LoadStoreUnit (
                     next_state = State_Reserve;
                 end
                 else if (bus.loadStoreUnitCommand == LoadStoreUnitCommand_StoreConditional) begin
-                    next_state = storeConditionFlag ? State_Store : State_Default;
+                    next_state = storeConditionFlag ? State_Store : State_AddrGen;
                 end
                 else if (bus.loadStoreUnitCommand == LoadStoreUnitCommand_AtomicMemOp) begin
                     next_state = State_Store;
                 end
                 else begin
                     // Normal Load
-                    next_state = State_Default;
+                    next_state = State_AddrGen;
                 end
             end
         end
         State_Store: begin
-            if (reg_tlb_miss) begin
-                next_state = State_ReplaceTlb;
-            end
-            else if (cacheMiss) begin
+            if (cacheMiss) begin
                 next_state = State_ReplaceCache;
             end
             else begin
@@ -390,36 +382,24 @@ module LoadStoreUnit (
             end
         end
         State_WriteThrough: begin
-            next_state = cacheReplacerDone ? State_Default : reg_state;
+            next_state = cacheReplacerDone ? State_AddrGen : reg_state;
         end
         State_Reserve: begin
-            next_state = State_Default;
+            next_state = State_AddrGen;
         end
         default: begin
-            if ((bus.enable && bus.loadStoreUnitCommand == LoadStoreUnitCommand_Load) ||
-                (bus.enable && bus.loadStoreUnitCommand == LoadStoreUnitCommand_AtomicMemOp) ||
-                (bus.enable && bus.loadStoreUnitCommand == LoadStoreUnitCommand_LoadReserved) ||
-                (bus.enable && bus.loadStoreUnitCommand == LoadStoreUnitCommand_StoreConditional)) begin
-                next_state = State_Load;
-            end
-            else if (bus.enable && bus.loadStoreUnitCommand == LoadStoreUnitCommand_Store) begin
-                next_state = State_Store;
-            end
-            else if (bus.enable && bus.loadStoreUnitCommand == LoadStoreUnitCommand_Invalidate) begin
-                next_state = State_Invalidate;
-            end
-            else begin
-                next_state = State_Default;
-            end
+            next_state = State_AddrGen;
         end
         endcase
     end
 
     // next_vaddr, next_access_type, next_load_store_type, next_store_value
     always_comb begin
-        if (reg_state == State_Default) begin
+        if (reg_state == State_AddrGen) begin
             next_vaddr = bus.srcIntRegValue1 + bus.imm; // address generation
-            next_access_type = accessType;
+            next_access_type = (bus.loadStoreUnitCommand == LoadStoreUnitCommand_Store || bus.loadStoreUnitCommand == LoadStoreUnitCommand_AtomicMemOp)
+                ? MemoryAccessType_Store
+                : MemoryAccessType_Load;
 
             unique case (bus.command.storeSrc)
             StoreSrcType_Int:   next_store_value = {32'h0, bus.srcIntRegValue2};
@@ -445,8 +425,7 @@ module LoadStoreUnit (
     end
 
     always_comb begin
-        next_dcache_read = (reg_state == State_Default) && bus.enable;
-        next_tlb_miss = next_dcache_read && !tlbHit;
+        next_dcache_read = (reg_state == State_Translate) && bus.enable;
         next_paddr = {tlbReadValue, next_vaddr[PAGE_OFFSET_WIDTH-1:0]};
 
         if (bus.done) begin
@@ -504,7 +483,7 @@ module LoadStoreUnit (
             dataArrayWriteValue = cacheReplacerArrayWriteData;
         end
         State_Store: begin
-            dataArrayWriteMask = (reg_tlb_miss || cacheMiss || tlbFault) ? '0 : storeWriteMask;
+            dataArrayWriteMask = (cacheMiss || tlbFault) ? '0 : storeWriteMask;
             dataArrayWriteValue = storeLine;
         end
         default: begin
@@ -516,19 +495,17 @@ module LoadStoreUnit (
 
     // Module enable signals
     always_comb begin
-        tlbReadEnable = (reg_state == State_Default);
+        tlbReadEnable = (reg_state == State_Translate);
         cacheReplacerEnable = (reg_state == State_Invalidate || reg_state == State_ReplaceCache || reg_state == State_WriteThrough);
-        tlbReplacerEnable = (reg_state == State_ReplaceTlb);
     end
 
     always_ff @(posedge clk) begin
         if (rst) begin
-            reg_state <= State_Default;
+            reg_state <= State_AddrGen;
             reg_vaddr <= '0;
             reg_paddr <= '0;
             reg_dcache_read <= '0;
             reg_tlb_fault <= '0;
-            reg_tlb_miss <= '0;
             reg_access_type <= MemoryAccessType_Load;
             reg_load_result <= '0;
             reg_store_value <= '0;
@@ -539,7 +516,6 @@ module LoadStoreUnit (
             reg_paddr <= next_paddr;
             reg_dcache_read <= next_dcache_read;
             reg_tlb_fault <= next_tlb_fault;
-            reg_tlb_miss <= next_tlb_miss;
             reg_access_type <= next_access_type;
             reg_load_result <= next_load_result;
             reg_store_value <= next_store_value;
