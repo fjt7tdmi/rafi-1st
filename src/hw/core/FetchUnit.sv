@@ -171,25 +171,6 @@ module FetchUnit (
         .clk
     );
 
-    ICacheInvalidater #(
-        .LINE_SIZE(LINE_SIZE),
-        .INDEX_WIDTH(INDEX_WIDTH),
-        .TAG_WIDTH(TAG_WIDTH)
-    ) m_Invalidater (
-        .arrayWriteEnable(invalidaterArrayWriteEnable),
-        .arrayIndex(invalidaterArrayIndex),
-        .arrayWriteValid(invalidaterArrayWriteValid),
-        .arrayWriteTag(invalidaterArrayWriteTag),
-        .tlbInvalidate(tlb_invalidate),
-        .done(invalidaterDone),
-        .enable(invalidaterEnable),
-        .waitInvalidate,
-        .invalidateICacheReq(bus.invalidateICache),
-        .invalidateTlbReq(bus.invalidateTlb),
-        .clk,
-        .rst
-    );
-
     ICacheReplacer #(
         .LINE_WIDTH(LINE_WIDTH),
         .TAG_WIDTH(TAG_WIDTH),
@@ -210,6 +191,25 @@ module FetchUnit (
         .done(cacheReplacerDone),
         .enable(cacheReplacerEnable),
         .missAddr(reg_paddr[PADDR_WIDTH-1:INDEX_LSB]),
+        .clk,
+        .rst
+    );
+
+    FetchUnitInvalidater #(
+        .LINE_SIZE(LINE_SIZE),
+        .INDEX_WIDTH(INDEX_WIDTH),
+        .TAG_WIDTH(TAG_WIDTH)
+    ) m_Invalidater (
+        .arrayWriteEnable(invalidaterArrayWriteEnable),
+        .arrayIndex(invalidaterArrayIndex),
+        .arrayWriteValid(invalidaterArrayWriteValid),
+        .arrayWriteTag(invalidaterArrayWriteTag),
+        .tlbInvalidate(tlb_invalidate),
+        .done(invalidaterDone),
+        .enable(invalidaterEnable),
+        .waitInvalidate,
+        .invalidateICacheReq(bus.invalidateICache),
+        .invalidateTlbReq(bus.invalidateTlb),
         .clk,
         .rst
     );
