@@ -47,9 +47,8 @@ module LoadStoreUnit (
     typedef enum logic [2:0]
     {
         State_AddrGen = 3'h0,
-        State_Invalidate = 3'h1,
-        State_ReplaceCache = 3'h2,
-        State_ReplaceTlb = 3'h3,
+        State_Invalidate = 3'h2,
+        State_ReplaceCache = 3'h3,
         State_Load = 3'h4,
         State_Store = 3'h5,
         State_WriteThrough = 3'h6,
@@ -84,7 +83,6 @@ module LoadStoreUnit (
     paddr_t reg_paddr;
     logic reg_dcache_read;
     logic reg_tlb_fault;
-    logic reg_tlb_miss;
     MemoryAccessType reg_access_type;
     uint64_t reg_load_result;
     uint64_t reg_store_value;
@@ -95,7 +93,6 @@ module LoadStoreUnit (
     paddr_t next_paddr;
     logic next_dcache_read;
     logic next_tlb_fault;
-    logic next_tlb_miss;
     MemoryAccessType next_access_type;
     uint64_t next_load_result;
     uint64_t next_store_value;
@@ -272,7 +269,7 @@ module LoadStoreUnit (
     end
 
     always_comb begin
-        cacheMiss = reg_dcache_read && !reg_tlb_miss &&
+        cacheMiss = reg_dcache_read &&
             (!tagArrayReadValue.valid || reg_paddr[TAG_MSB:TAG_LSB] != tagArrayReadValue.tag);
     end
 
@@ -284,7 +281,7 @@ module LoadStoreUnit (
         storeConditionFlag =
             (bus.loadStoreUnitCommand == LoadStoreUnitCommand_StoreConditional) &&
             (reg_state == State_Load) &&
-            (!reg_tlb_miss && !cacheMiss && !tlbFault && tagArrayReadValue.reserved);
+            (!cacheMiss && !tlbFault && tagArrayReadValue.reserved);
     end
 
     always_comb begin
@@ -302,7 +299,7 @@ module LoadStoreUnit (
     always_comb begin
         bus.done =
             (bus.loadStoreUnitCommand == LoadStoreUnitCommand_None && reg_state == State_AddrGen) ||
-            (bus.loadStoreUnitCommand == LoadStoreUnitCommand_Load && reg_state == State_Load && !reg_tlb_miss && !cacheMiss) ||
+            (bus.loadStoreUnitCommand == LoadStoreUnitCommand_Load && reg_state == State_Load && !cacheMiss) ||
             (bus.loadStoreUnitCommand == LoadStoreUnitCommand_StoreConditional && reg_state == State_Load && !storeConditionFlag) ||
             (reg_state == State_Reserve) ||
             (reg_state == State_WriteThrough && cacheReplacerDone) ||
@@ -331,18 +328,10 @@ module LoadStoreUnit (
     end
 
     always_comb begin
-        if (reg_state == State_ReplaceTlb) begin
-            mem.dcacheAddr = tlbReplacerMemAddr;
-            mem.dcacheReadReq = tlbReplacerMemReadEnable;
-            mem.dcacheWriteReq = tlbReplacerMemWriteEnable;
-            mem.dcacheWriteValue = tlbReplacerMemWriteValue;
-        end
-        else begin
-            mem.dcacheAddr = cacheReplacerMemAddr;
-            mem.dcacheReadReq = cacheReplacerMemReadEnable;
-            mem.dcacheWriteReq = cacheReplacerMemWriteEnable;
-            mem.dcacheWriteValue = cacheReplacerMemWriteValue;
-        end
+        mem.dcacheAddr = cacheReplacerMemAddr;
+        mem.dcacheReadReq = cacheReplacerMemReadEnable;
+        mem.dcacheWriteReq = cacheReplacerMemWriteEnable;
+        mem.dcacheWriteValue = cacheReplacerMemWriteValue;
     end
 
     // next_state
@@ -354,14 +343,8 @@ module LoadStoreUnit (
         State_ReplaceCache: begin
             next_state = cacheReplacerDone ? State_AddrGen : reg_state;
         end
-        State_ReplaceTlb: begin
-            next_state = tlbReplacerDone ? State_AddrGen : reg_state;
-        end
         State_Load: begin
-            if (reg_tlb_miss) begin
-                next_state = State_ReplaceTlb;
-            end
-            else if (cacheMiss) begin
+            if (cacheMiss) begin
                 next_state = State_ReplaceCache;
             end
             else begin
@@ -381,10 +364,7 @@ module LoadStoreUnit (
             end
         end
         State_Store: begin
-            if (reg_tlb_miss) begin
-                next_state = State_ReplaceTlb;
-            end
-            else if (cacheMiss) begin
+            if (cacheMiss) begin
                 next_state = State_ReplaceCache;
             end
             else begin
@@ -448,7 +428,6 @@ module LoadStoreUnit (
 
     always_comb begin
         next_dcache_read = (reg_state == State_AddrGen) && bus.enable;
-        next_tlb_miss = next_dcache_read && !tlbHit;
         next_paddr = {tlbReadValue, next_vaddr[PAGE_OFFSET_WIDTH-1:0]};
 
         if (bus.done) begin
@@ -506,7 +485,7 @@ module LoadStoreUnit (
             dataArrayWriteValue = cacheReplacerArrayWriteData;
         end
         State_Store: begin
-            dataArrayWriteMask = (reg_tlb_miss || cacheMiss || tlbFault) ? '0 : storeWriteMask;
+            dataArrayWriteMask = (cacheMiss || tlbFault) ? '0 : storeWriteMask;
             dataArrayWriteValue = storeLine;
         end
         default: begin
@@ -520,7 +499,6 @@ module LoadStoreUnit (
     always_comb begin
         tlbReadEnable = (reg_state == State_AddrGen);
         cacheReplacerEnable = (reg_state == State_Invalidate || reg_state == State_ReplaceCache || reg_state == State_WriteThrough);
-        tlbReplacerEnable = (reg_state == State_ReplaceTlb);
     end
 
     always_ff @(posedge clk) begin
@@ -530,7 +508,6 @@ module LoadStoreUnit (
             reg_paddr <= '0;
             reg_dcache_read <= '0;
             reg_tlb_fault <= '0;
-            reg_tlb_miss <= '0;
             reg_access_type <= MemoryAccessType_Load;
             reg_load_result <= '0;
             reg_store_value <= '0;
@@ -541,7 +518,6 @@ module LoadStoreUnit (
             reg_paddr <= next_paddr;
             reg_dcache_read <= next_dcache_read;
             reg_tlb_fault <= next_tlb_fault;
-            reg_tlb_miss <= next_tlb_miss;
             reg_access_type <= next_access_type;
             reg_load_result <= next_load_result;
             reg_store_value <= next_store_value;
