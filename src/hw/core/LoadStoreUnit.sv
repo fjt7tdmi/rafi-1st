@@ -46,13 +46,14 @@ module LoadStoreUnit (
 
     typedef enum logic [2:0]
     {
-        State_AddrGen = 3'h0,
-        State_Invalidate = 3'h2,
-        State_ReplaceCache = 3'h3,
-        State_Load = 3'h4,
-        State_Store = 3'h5,
-        State_WriteThrough = 3'h6,
-        State_Reserve = 3'h7
+        State_AddrGen       = 3'h0,
+        State_Translate     = 3'h1,
+        State_Invalidate    = 3'h2,
+        State_ReplaceCache  = 3'h3,
+        State_Load          = 3'h4,
+        State_Store         = 3'h5,
+        State_WriteThrough  = 3'h6,
+        State_Reserve       = 3'h7
     } State;
 
     typedef struct packed
@@ -87,7 +88,6 @@ module LoadStoreUnit (
     uint64_t reg_load_result;
     uint64_t reg_store_value;
 
-    // Wires
     State next_state;
     vaddr_t next_vaddr;
     paddr_t next_paddr;
@@ -97,16 +97,17 @@ module LoadStoreUnit (
     uint64_t next_load_result;
     uint64_t next_store_value;
 
-    MemoryAccessType accessType;
+    // Signals
     logic cacheMiss;
-    uint64_t loadResult;
     uint64_t storeValue;
     word_t storeAluValue;
     logic storeConditionFlag;
+
+    // Value Generation
+    uint64_t loadResult;
     logic [LINE_WIDTH-1:0] storeLine;
     logic [LINE_SIZE-1:0] storeWriteMask;
 
-    // Modules
     LoadValueUnit m_LoadValueUnit (
         .result(loadResult),
         .addr(reg_vaddr[$clog2(LINE_SIZE)-1:0]),
@@ -143,8 +144,8 @@ module LoadStoreUnit (
         .fault(tlbFault),
         .readValue(tlbReadValue),
         .readEnable(tlbReadEnable),
-        .readKey(next_vaddr[VADDR_WIDTH-1:PAGE_OFFSET_WIDTH]),
-        .readAccessType(accessType),
+        .readKey(reg_vaddr[VADDR_WIDTH-1:PAGE_OFFSET_WIDTH]),
+        .readAccessType(reg_access_type),
         .writeEnable(tlbWriteEnable),
         .writeKey(tlbWriteKey),
         .writeValue(tlbWriteValue),
@@ -263,12 +264,6 @@ module LoadStoreUnit (
 
     // Wires
     always_comb begin
-        accessType = (bus.loadStoreUnitCommand == LoadStoreUnitCommand_Store || bus.loadStoreUnitCommand == LoadStoreUnitCommand_AtomicMemOp)
-            ? MemoryAccessType_Store
-            : MemoryAccessType_Load;
-    end
-
-    always_comb begin
         cacheMiss = reg_dcache_read &&
             (!tagArrayReadValue.valid || reg_paddr[TAG_MSB:TAG_LSB] != tagArrayReadValue.tag);
     end
@@ -295,7 +290,7 @@ module LoadStoreUnit (
         endcase
     end
 
-    // Module port
+    // Module IF
     always_comb begin
         bus.done =
             (bus.loadStoreUnitCommand == LoadStoreUnitCommand_None && reg_state == State_AddrGen) ||
@@ -325,9 +320,7 @@ module LoadStoreUnit (
         else begin
             bus.resultValue = loadResult;
         end
-    end
 
-    always_comb begin
         mem.dcacheAddr = cacheReplacerMemAddr;
         mem.dcacheReadReq = cacheReplacerMemReadEnable;
         mem.dcacheWriteReq = cacheReplacerMemWriteEnable;
@@ -337,6 +330,23 @@ module LoadStoreUnit (
     // next_state
     always_comb begin
         unique case (reg_state)
+        State_AddrGen: begin
+            next_state = (bus.enable && bus.loadStoreUnitCommand != LoadStoreUnitCommand_None) ? State_Translate : reg_state;
+        end
+        State_Translate: begin
+            if (bus.loadStoreUnitCommand inside {LoadStoreUnitCommand_Load, LoadStoreUnitCommand_AtomicMemOp, LoadStoreUnitCommand_LoadReserved, LoadStoreUnitCommand_StoreConditional}) begin
+                next_state = State_Load;
+            end
+            else if (bus.loadStoreUnitCommand == LoadStoreUnitCommand_Store) begin
+                next_state = State_Store;
+            end
+            else if (bus.loadStoreUnitCommand == LoadStoreUnitCommand_Invalidate) begin
+                next_state = State_Invalidate;
+            end
+            else begin
+                next_state = State_AddrGen;
+            end
+        end
         State_Invalidate: begin
             next_state = cacheReplacerDone ? State_AddrGen : reg_state;
         end
@@ -378,21 +388,7 @@ module LoadStoreUnit (
             next_state = State_AddrGen;
         end
         default: begin
-            if ((bus.enable && bus.loadStoreUnitCommand == LoadStoreUnitCommand_Load) ||
-                (bus.enable && bus.loadStoreUnitCommand == LoadStoreUnitCommand_AtomicMemOp) ||
-                (bus.enable && bus.loadStoreUnitCommand == LoadStoreUnitCommand_LoadReserved) ||
-                (bus.enable && bus.loadStoreUnitCommand == LoadStoreUnitCommand_StoreConditional)) begin
-                next_state = State_Load;
-            end
-            else if (bus.enable && bus.loadStoreUnitCommand == LoadStoreUnitCommand_Store) begin
-                next_state = State_Store;
-            end
-            else if (bus.enable && bus.loadStoreUnitCommand == LoadStoreUnitCommand_Invalidate) begin
-                next_state = State_Invalidate;
-            end
-            else begin
-                next_state = State_AddrGen;
-            end
+            next_state = State_AddrGen;
         end
         endcase
     end
@@ -401,7 +397,9 @@ module LoadStoreUnit (
     always_comb begin
         if (reg_state == State_AddrGen) begin
             next_vaddr = bus.srcIntRegValue1 + bus.imm; // address generation
-            next_access_type = accessType;
+            next_access_type = (bus.loadStoreUnitCommand == LoadStoreUnitCommand_Store || bus.loadStoreUnitCommand == LoadStoreUnitCommand_AtomicMemOp)
+                ? MemoryAccessType_Store
+                : MemoryAccessType_Load;
 
             unique case (bus.command.storeSrc)
             StoreSrcType_Int:   next_store_value = {32'h0, bus.srcIntRegValue2};
@@ -427,7 +425,7 @@ module LoadStoreUnit (
     end
 
     always_comb begin
-        next_dcache_read = (reg_state == State_AddrGen) && bus.enable;
+        next_dcache_read = (reg_state == State_Translate) && bus.enable;
         next_paddr = {tlbReadValue, next_vaddr[PAGE_OFFSET_WIDTH-1:0]};
 
         if (bus.done) begin
@@ -497,7 +495,7 @@ module LoadStoreUnit (
 
     // Module enable signals
     always_comb begin
-        tlbReadEnable = (reg_state == State_AddrGen);
+        tlbReadEnable = (reg_state == State_Translate);
         cacheReplacerEnable = (reg_state == State_Invalidate || reg_state == State_ReplaceCache || reg_state == State_WriteThrough);
     end
 
