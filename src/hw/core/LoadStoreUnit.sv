@@ -102,52 +102,12 @@ module LoadStoreUnit (
 
     MemoryAccessType accessType;
     logic cacheMiss;
-    uint64_t shiftedReadData;
-    ReplaceLogicCommand replaceLogicCommand;
-    dcache_mem_addr_t replaceLogicAddr;
     uint64_t loadResult;
     uint64_t storeValue;
     word_t storeAluValue;
     logic storeConditionFlag;
     logic [LINE_WIDTH-1:0] storeLine;
     logic [LINE_SIZE-1:0] storeWriteMask;
-
-    _index_t        tagArrayIndex;
-    TagArrayEntry   tagArrayReadValue;
-    TagArrayEntry   tagArrayWriteValue;
-    logic           tagArrayWriteEnable;
-
-    _index_t                dataArrayIndex;
-    logic [LINE_WIDTH-1:0]   dataArrayReadValue;
-    logic [LINE_WIDTH-1:0]   dataArrayWriteValue;
-    _write_mask_t           dataArrayWriteMask;
-
-    logic                   tlbHit;
-    logic                   tlbFault;
-    physical_page_number_t  tlbReadValue;
-    logic                   tlbReadEnable;
-    logic                   tlbWriteEnable;
-    virtual_page_number_t   tlbWriteKey;
-    TlbEntry                tlbWriteValue;
-
-    logic               cacheReplacerArrayWriteEnable;
-    _index_t            cacheReplacerArrayIndex;
-    logic               cacheReplacerArrayWriteValid;
-    _tag_t              cacheReplacerArrayWriteTag;
-    _line_t             cacheReplacerArrayWriteData;
-    dcache_mem_addr_t   cacheReplacerMemAddr;
-    logic               cacheReplacerMemReadEnable;
-    logic               cacheReplacerMemWriteEnable;
-    _line_t             cacheReplacerMemWriteValue;
-    logic               cacheReplacerDone;
-    logic               cacheReplacerEnable;
-
-    dcache_mem_addr_t   tlbReplacerMemAddr;
-    logic               tlbReplacerMemReadEnable;
-    logic               tlbReplacerMemWriteEnable;
-    _line_t             tlbReplacerMemWriteValue;
-    logic               tlbReplacerDone;
-    logic               tlbReplacerEnable;
 
     // Modules
     LoadValueUnit m_LoadValueUnit (
@@ -163,27 +123,21 @@ module LoadStoreUnit (
         .value(storeValue),
         .loadStoreType(bus.command.loadStoreType));
 
-    BlockRamWithReset #(
-        .DATA_WIDTH($bits(TagArrayEntry)),
-        .INDEX_WIDTH(INDEX_WIDTH)
-    ) m_ValidTagArray (
-        .readValue(tagArrayReadValue),
-        .index(tagArrayIndex),
-        .writeValue(tagArrayWriteValue),
-        .writeEnable(tagArrayWriteEnable),
-        .clk,
-        .rst);
+    // TLB
+    logic                   tlbHit;
+    logic                   tlbFault;
+    physical_page_number_t  tlbReadValue;
+    logic                   tlbReadEnable;
+    logic                   tlbWriteEnable;
+    virtual_page_number_t   tlbWriteKey;
+    TlbEntry                tlbWriteValue;
 
-    MultiBankBlockRam #(
-        .DATA_WIDTH_PER_BANK(BYTE_WIDTH),
-        .BANK_COUNT(LINE_SIZE),
-        .INDEX_WIDTH(INDEX_WIDTH)
-    ) m_DataArray (
-        .readValue(dataArrayReadValue),
-        .index(dataArrayIndex),
-        .writeValue(dataArrayWriteValue),
-        .writeMask(dataArrayWriteMask),
-        .clk);
+    dcache_mem_addr_t   tlbReplacerMemAddr;
+    logic               tlbReplacerMemReadEnable;
+    logic               tlbReplacerMemWriteEnable;
+    _line_t             tlbReplacerMemWriteValue;
+    logic               tlbReplacerDone;
+    logic               tlbReplacerEnable;
 
     TlbArray #(
         .TLB_INDEX_WIDTH(ITLB_INDEX_WIDTH)
@@ -202,33 +156,6 @@ module LoadStoreUnit (
         .csrSum(csr.status.SUM),
         .csrMxr(csr.status.MXR),
         .invalidate(bus.invalidateTlb),
-        .clk,
-        .rst);
-
-    DCacheReplacer #(
-        .LINE_WIDTH(LINE_WIDTH),
-        .TAG_WIDTH(TAG_WIDTH),
-        .INDEX_WIDTH(INDEX_WIDTH)
-    ) m_CacheReplacer (
-        .arrayWriteEnable(cacheReplacerArrayWriteEnable),
-        .arrayIndex(cacheReplacerArrayIndex),
-        .arrayWriteValid(cacheReplacerArrayWriteValid),
-        .arrayWriteTag(cacheReplacerArrayWriteTag),
-        .arrayWriteData(cacheReplacerArrayWriteData),
-        .arrayReadValid(tagArrayReadValue.valid),
-        .arrayReadTag(tagArrayReadValue.tag),
-        .arrayReadData(dataArrayReadValue),
-        .memAddr(cacheReplacerMemAddr),
-        .memReadEnable(cacheReplacerMemReadEnable),
-        .memReadDone(mem.dcacheReadGrant),
-        .memReadValue(mem.dcacheReadValue),
-        .memWriteEnable(cacheReplacerMemWriteEnable),
-        .memWriteDone(mem.dcacheWriteGrant),
-        .memWriteValue(cacheReplacerMemWriteValue),
-        .done(cacheReplacerDone),
-        .enable(cacheReplacerEnable),
-        .command(replaceLogicCommand),
-        .commandAddr(replaceLogicAddr),
         .clk,
         .rst);
 
@@ -261,6 +188,81 @@ module LoadStoreUnit (
         mem.dtlbWriteReq = '0;
         mem.dtlbWriteValue = '0;
     end
+
+    // DCache
+    _index_t        tagArrayIndex;
+    TagArrayEntry   tagArrayReadValue;
+    TagArrayEntry   tagArrayWriteValue;
+    logic           tagArrayWriteEnable;
+
+    _index_t                dataArrayIndex;
+    logic [LINE_WIDTH-1:0]   dataArrayReadValue;
+    logic [LINE_WIDTH-1:0]   dataArrayWriteValue;
+    _write_mask_t           dataArrayWriteMask;
+
+    ReplaceLogicCommand replaceLogicCommand;
+    dcache_mem_addr_t replaceLogicAddr;
+
+    logic               cacheReplacerArrayWriteEnable;
+    _index_t            cacheReplacerArrayIndex;
+    logic               cacheReplacerArrayWriteValid;
+    _tag_t              cacheReplacerArrayWriteTag;
+    _line_t             cacheReplacerArrayWriteData;
+    dcache_mem_addr_t   cacheReplacerMemAddr;
+    logic               cacheReplacerMemReadEnable;
+    logic               cacheReplacerMemWriteEnable;
+    _line_t             cacheReplacerMemWriteValue;
+    logic               cacheReplacerDone;
+    logic               cacheReplacerEnable;
+
+    BlockRamWithReset #(
+        .DATA_WIDTH($bits(TagArrayEntry)),
+        .INDEX_WIDTH(INDEX_WIDTH)
+    ) m_ValidTagArray (
+        .readValue(tagArrayReadValue),
+        .index(tagArrayIndex),
+        .writeValue(tagArrayWriteValue),
+        .writeEnable(tagArrayWriteEnable),
+        .clk,
+        .rst);
+
+    MultiBankBlockRam #(
+        .DATA_WIDTH_PER_BANK(BYTE_WIDTH),
+        .BANK_COUNT(LINE_SIZE),
+        .INDEX_WIDTH(INDEX_WIDTH)
+    ) m_DataArray (
+        .readValue(dataArrayReadValue),
+        .index(dataArrayIndex),
+        .writeValue(dataArrayWriteValue),
+        .writeMask(dataArrayWriteMask),
+        .clk);
+
+    DCacheReplacer #(
+        .LINE_WIDTH(LINE_WIDTH),
+        .TAG_WIDTH(TAG_WIDTH),
+        .INDEX_WIDTH(INDEX_WIDTH)
+    ) m_CacheReplacer (
+        .arrayWriteEnable(cacheReplacerArrayWriteEnable),
+        .arrayIndex(cacheReplacerArrayIndex),
+        .arrayWriteValid(cacheReplacerArrayWriteValid),
+        .arrayWriteTag(cacheReplacerArrayWriteTag),
+        .arrayWriteData(cacheReplacerArrayWriteData),
+        .arrayReadValid(tagArrayReadValue.valid),
+        .arrayReadTag(tagArrayReadValue.tag),
+        .arrayReadData(dataArrayReadValue),
+        .memAddr(cacheReplacerMemAddr),
+        .memReadEnable(cacheReplacerMemReadEnable),
+        .memReadDone(mem.dcacheReadGrant),
+        .memReadValue(mem.dcacheReadValue),
+        .memWriteEnable(cacheReplacerMemWriteEnable),
+        .memWriteDone(mem.dcacheWriteGrant),
+        .memWriteValue(cacheReplacerMemWriteValue),
+        .done(cacheReplacerDone),
+        .enable(cacheReplacerEnable),
+        .command(replaceLogicCommand),
+        .commandAddr(replaceLogicAddr),
+        .clk,
+        .rst);
 
     // Wires
     always_comb begin
