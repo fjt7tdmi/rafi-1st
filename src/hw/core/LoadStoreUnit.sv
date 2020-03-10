@@ -46,7 +46,7 @@ module LoadStoreUnit (
 
     typedef enum logic [2:0]
     {
-        State_Default = 3'h0,
+        State_AddrGen = 3'h0,
         State_Invalidate = 3'h1,
         State_ReplaceCache = 3'h2,
         State_ReplaceTlb = 3'h3,
@@ -301,7 +301,7 @@ module LoadStoreUnit (
     // Module port
     always_comb begin
         bus.done =
-            (bus.loadStoreUnitCommand == LoadStoreUnitCommand_None && reg_state == State_Default) ||
+            (bus.loadStoreUnitCommand == LoadStoreUnitCommand_None && reg_state == State_AddrGen) ||
             (bus.loadStoreUnitCommand == LoadStoreUnitCommand_Load && reg_state == State_Load && !reg_tlb_miss && !cacheMiss) ||
             (bus.loadStoreUnitCommand == LoadStoreUnitCommand_StoreConditional && reg_state == State_Load && !storeConditionFlag) ||
             (reg_state == State_Reserve) ||
@@ -349,13 +349,13 @@ module LoadStoreUnit (
     always_comb begin
         unique case (reg_state)
         State_Invalidate: begin
-            next_state = cacheReplacerDone ? State_Default : reg_state;
+            next_state = cacheReplacerDone ? State_AddrGen : reg_state;
         end
         State_ReplaceCache: begin
-            next_state = cacheReplacerDone ? State_Default : reg_state;
+            next_state = cacheReplacerDone ? State_AddrGen : reg_state;
         end
         State_ReplaceTlb: begin
-            next_state = tlbReplacerDone ? State_Default : reg_state;
+            next_state = tlbReplacerDone ? State_AddrGen : reg_state;
         end
         State_Load: begin
             if (reg_tlb_miss) begin
@@ -369,14 +369,14 @@ module LoadStoreUnit (
                     next_state = State_Reserve;
                 end
                 else if (bus.loadStoreUnitCommand == LoadStoreUnitCommand_StoreConditional) begin
-                    next_state = storeConditionFlag ? State_Store : State_Default;
+                    next_state = storeConditionFlag ? State_Store : State_AddrGen;
                 end
                 else if (bus.loadStoreUnitCommand == LoadStoreUnitCommand_AtomicMemOp) begin
                     next_state = State_Store;
                 end
                 else begin
                     // Normal Load
-                    next_state = State_Default;
+                    next_state = State_AddrGen;
                 end
             end
         end
@@ -392,10 +392,10 @@ module LoadStoreUnit (
             end
         end
         State_WriteThrough: begin
-            next_state = cacheReplacerDone ? State_Default : reg_state;
+            next_state = cacheReplacerDone ? State_AddrGen : reg_state;
         end
         State_Reserve: begin
-            next_state = State_Default;
+            next_state = State_AddrGen;
         end
         default: begin
             if ((bus.enable && bus.loadStoreUnitCommand == LoadStoreUnitCommand_Load) ||
@@ -411,7 +411,7 @@ module LoadStoreUnit (
                 next_state = State_Invalidate;
             end
             else begin
-                next_state = State_Default;
+                next_state = State_AddrGen;
             end
         end
         endcase
@@ -419,7 +419,7 @@ module LoadStoreUnit (
 
     // next_vaddr, next_access_type, next_load_store_type, next_store_value
     always_comb begin
-        if (reg_state == State_Default) begin
+        if (reg_state == State_AddrGen) begin
             next_vaddr = bus.srcIntRegValue1 + bus.imm; // address generation
             next_access_type = accessType;
 
@@ -447,7 +447,7 @@ module LoadStoreUnit (
     end
 
     always_comb begin
-        next_dcache_read = (reg_state == State_Default) && bus.enable;
+        next_dcache_read = (reg_state == State_AddrGen) && bus.enable;
         next_tlb_miss = next_dcache_read && !tlbHit;
         next_paddr = {tlbReadValue, next_vaddr[PAGE_OFFSET_WIDTH-1:0]};
 
@@ -518,14 +518,14 @@ module LoadStoreUnit (
 
     // Module enable signals
     always_comb begin
-        tlbReadEnable = (reg_state == State_Default);
+        tlbReadEnable = (reg_state == State_AddrGen);
         cacheReplacerEnable = (reg_state == State_Invalidate || reg_state == State_ReplaceCache || reg_state == State_WriteThrough);
         tlbReplacerEnable = (reg_state == State_ReplaceTlb);
     end
 
     always_ff @(posedge clk) begin
         if (rst) begin
-            reg_state <= State_Default;
+            reg_state <= State_AddrGen;
             reg_vaddr <= '0;
             reg_paddr <= '0;
             reg_dcache_read <= '0;
