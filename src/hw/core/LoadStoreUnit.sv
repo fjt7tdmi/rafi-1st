@@ -82,7 +82,7 @@ module LoadStoreUnit (
     State reg_state;
     vaddr_t reg_vaddr;
     paddr_t reg_paddr;
-    logic reg_dcache_read;
+    logic reg_cache_read;
     logic reg_tlb_fault;
     MemoryAccessType reg_access_type;
     uint64_t reg_load_result;
@@ -91,7 +91,7 @@ module LoadStoreUnit (
     State next_state;
     vaddr_t next_vaddr;
     paddr_t next_paddr;
-    logic next_dcache_read;
+    logic next_cache_read;
     logic next_tlb_fault;
     MemoryAccessType next_access_type;
     uint64_t next_load_result;
@@ -122,70 +122,43 @@ module LoadStoreUnit (
         .loadStoreType(bus.command.loadStoreType));
 
     // TLB
-    logic                   tlbHit;
-    logic                   tlbFault;
-    physical_page_number_t  tlbReadValue;
-    logic                   tlbReadEnable;
-    logic                   tlbWriteEnable;
-    virtual_page_number_t   tlbWriteKey;
-    TlbEntry                tlbWriteValue;
-
-    dcache_mem_addr_t   tlbReplacerMemAddr;
-    logic               tlbReplacerMemReadEnable;
-    logic               tlbReplacerMemWriteEnable;
-    _line_t             tlbReplacerMemWriteValue;
-    logic               tlbReplacerDone;
-    logic               tlbReplacerEnable;
-
-    TlbArray #(
-        .TLB_INDEX_WIDTH(ITLB_INDEX_WIDTH)
-    ) m_TlbArray (
-        .hit(tlbHit),
-        .fault(tlbFault),
-        .readValue(tlbReadValue),
-        .readEnable(tlbReadEnable),
-        .readKey(reg_vaddr[VADDR_WIDTH-1:PAGE_OFFSET_WIDTH]),
-        .readAccessType(reg_access_type),
-        .writeEnable(tlbWriteEnable),
-        .writeKey(tlbWriteKey),
-        .writeValue(tlbWriteValue),
-        .csrSatp(csr.satp),
-        .csrPrivilege(csr.privilege),
-        .csrSum(csr.status.SUM),
-        .csrMxr(csr.status.MXR),
-        .invalidate(bus.invalidateTlb),
-        .clk,
-        .rst);
-
-    TlbReplacer #(
-        .MEM_ADDR_WIDTH(DCACHE_MEM_ADDR_WIDTH),
-        .LINE_WIDTH(DCACHE_LINE_WIDTH)
-    ) m_TlbReplacer (
-        .tlbWriteEnable,
-        .tlbWriteKey,
-        .tlbWriteValue,
-        .memAddr(tlbReplacerMemAddr),
-        .memReadDone(mem.dcacheReadGrant),
-        .memReadEnable(tlbReplacerMemReadEnable),
-        .memReadValue(mem.dcacheReadValue),
-        .memWriteDone(mem.dcacheWriteGrant),
-        .memWriteEnable(tlbReplacerMemWriteEnable),
-        .memWriteValue(tlbReplacerMemWriteValue),
-        .csrSatp(csr.satp),
-        .done(tlbReplacerDone),
-        .enable(tlbReplacerEnable),
-        .missMemoryAccessType(reg_access_type),
-        .missPage(reg_vaddr[VADDR_WIDTH-1:PAGE_OFFSET_WIDTH]),
-        .clk,
-        .rst);
-
-    // TODO: connect to new TLB
+    logic tlb_done;
+    logic tlb_fault;
+    logic tlb_enable;
+    TlbCommand tlb_command;
     always_comb begin
-        mem.dtlbAddr = '0;
-        mem.dtlbReadReq = '0;
-        mem.dtlbWriteReq = '0;
-        mem.dtlbWriteValue = '0;
+        // TODO: impl TlbCommand_Invalidate
+        if (reg_state == State_Translate) begin
+            tlb_enable = 1;
+            tlb_command = TlbCommand_Translate;
+        end
+        else begin
+            tlb_enable = 0;
+            tlb_command = '0;
+        end
     end
+
+    Tlb m_Tlb (
+        .memAddr(mem.dtlbAddr),
+        .memReadEnable(mem.dtlbReadReq),
+        .memWriteEnable(mem.dtlbWriteReq),
+        .memWriteValue(mem.dtlbWriteValue),
+        .memReadDone(mem.dtlbReadGrant),
+        .memWriteDone(mem.dtlbWriteGrant),
+        .memReadValue(mem.dtlbReadValue),
+        .done(tlb_done),
+        .fault(tlb_fault),
+        .paddr(next_paddr),
+        .enable(tlb_enable),
+        .command(tlb_command),
+        .vaddr(reg_vaddr),
+        .accessType(reg_access_type),
+        .satp(csr.satp),
+        .status(csr.status),
+        .priv(csr.privilege),
+        .clk,
+        .rst
+    );
 
     // DCache
     _index_t        tagArrayIndex;
@@ -264,7 +237,7 @@ module LoadStoreUnit (
 
     // Wires
     always_comb begin
-        cacheMiss = reg_dcache_read &&
+        cacheMiss = reg_cache_read &&
             (!tagArrayReadValue.valid || reg_paddr[TAG_MSB:TAG_LSB] != tagArrayReadValue.tag);
     end
 
@@ -276,7 +249,7 @@ module LoadStoreUnit (
         storeConditionFlag =
             (bus.loadStoreUnitCommand == LoadStoreUnitCommand_StoreConditional) &&
             (reg_state == State_Load) &&
-            (!cacheMiss && !tlbFault && tagArrayReadValue.reserved);
+            (!cacheMiss && !reg_tlb_fault && tagArrayReadValue.reserved);
     end
 
     always_comb begin
@@ -288,6 +261,8 @@ module LoadStoreUnit (
         State_WriteThrough: replaceLogicCommand = ReplaceLogicCommand_WriteThrough;
         default:            replaceLogicCommand = ReplaceLogicCommand_None;
         endcase
+
+        cacheReplacerEnable = (reg_state == State_Invalidate || reg_state == State_ReplaceCache || reg_state == State_WriteThrough);
     end
 
     // Module IF
@@ -334,17 +309,17 @@ module LoadStoreUnit (
             next_state = (bus.enable && bus.loadStoreUnitCommand != LoadStoreUnitCommand_None) ? State_Translate : reg_state;
         end
         State_Translate: begin
-            if (bus.loadStoreUnitCommand inside {LoadStoreUnitCommand_Load, LoadStoreUnitCommand_AtomicMemOp, LoadStoreUnitCommand_LoadReserved, LoadStoreUnitCommand_StoreConditional}) begin
+            if (tlb_done && bus.loadStoreUnitCommand inside {LoadStoreUnitCommand_Load, LoadStoreUnitCommand_AtomicMemOp, LoadStoreUnitCommand_LoadReserved, LoadStoreUnitCommand_StoreConditional}) begin
                 next_state = State_Load;
             end
-            else if (bus.loadStoreUnitCommand == LoadStoreUnitCommand_Store) begin
+            else if (tlb_done && bus.loadStoreUnitCommand == LoadStoreUnitCommand_Store) begin
                 next_state = State_Store;
             end
-            else if (bus.loadStoreUnitCommand == LoadStoreUnitCommand_Invalidate) begin
+            else if (tlb_done && bus.loadStoreUnitCommand == LoadStoreUnitCommand_Invalidate) begin
                 next_state = State_Invalidate;
             end
             else begin
-                next_state = State_AddrGen;
+                next_state = State_Translate;
             end
         end
         State_Invalidate: begin
@@ -424,16 +399,10 @@ module LoadStoreUnit (
         end
     end
 
+    // next_tlb_fault, next_cache_read
     always_comb begin
-        next_dcache_read = (reg_state == State_Translate) && bus.enable;
-        next_paddr = {tlbReadValue, next_vaddr[PAGE_OFFSET_WIDTH-1:0]};
-
-        if (bus.done) begin
-            next_tlb_fault = 0;
-        end
-        else begin
-            next_tlb_fault = (next_dcache_read && tlbHit && tlbFault);
-        end
+        next_tlb_fault = (reg_state == State_Translate) ? tlb_fault : reg_tlb_fault;
+        next_cache_read = (reg_state == State_Translate && tlb_done);
     end
 
     // Array input signals
@@ -483,7 +452,7 @@ module LoadStoreUnit (
             dataArrayWriteValue = cacheReplacerArrayWriteData;
         end
         State_Store: begin
-            dataArrayWriteMask = (cacheMiss || tlbFault) ? '0 : storeWriteMask;
+            dataArrayWriteMask = (cacheMiss || tlb_fault) ? '0 : storeWriteMask;
             dataArrayWriteValue = storeLine;
         end
         default: begin
@@ -494,17 +463,12 @@ module LoadStoreUnit (
     end
 
     // Module enable signals
-    always_comb begin
-        tlbReadEnable = (reg_state == State_Translate);
-        cacheReplacerEnable = (reg_state == State_Invalidate || reg_state == State_ReplaceCache || reg_state == State_WriteThrough);
-    end
-
     always_ff @(posedge clk) begin
         if (rst) begin
             reg_state <= State_AddrGen;
             reg_vaddr <= '0;
             reg_paddr <= '0;
-            reg_dcache_read <= '0;
+            reg_cache_read <= '0;
             reg_tlb_fault <= '0;
             reg_access_type <= MemoryAccessType_Load;
             reg_load_result <= '0;
@@ -514,7 +478,7 @@ module LoadStoreUnit (
             reg_state <= next_state;
             reg_vaddr <= next_vaddr;
             reg_paddr <= next_paddr;
-            reg_dcache_read <= next_dcache_read;
+            reg_cache_read <= next_cache_read;
             reg_tlb_fault <= next_tlb_fault;
             reg_access_type <= next_access_type;
             reg_load_result <= next_load_result;
