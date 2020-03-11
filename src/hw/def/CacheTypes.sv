@@ -99,6 +99,15 @@ typedef struct packed
     TlbEntryFlags flags;
 } TlbEntry;
 
+typedef enum logic [2:0]
+{
+    DCacheCommand_Load              = 3'h0,
+    DCacheCommand_LoadReserved      = 3'h1,
+    DCacheCommand_Store             = 3'h2,
+    DCacheCommand_StoreConditional  = 3'h3,
+    DCacheCommand_Invalidate        = 3'h4
+} DCacheCommand;
+
 // ----------------------------------------------------------------------------
 
 endpackage

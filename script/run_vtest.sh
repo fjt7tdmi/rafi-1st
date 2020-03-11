@@ -37,6 +37,7 @@ run_test rafi-vtest-mul
 run_test rafi-vtest-sqrt
 run_test rafi-vtest-timer
 run_test rafi-vtest-tlb
+run_test rafi-vtest-dcache
 
 popd
 

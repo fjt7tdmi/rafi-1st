@@ -546,7 +546,7 @@ if (verilator_FOUND)
         src/hw/fp/SqrtUnit.sv
         src/hw/mul/MulUnit.sv
         src/hw/cache/ICacheReplacer.sv
-        src/hw/cache/DCacheReplacer.sv
+        src/hw/cache/DCache.sv
         src/hw/cache/Tlb.sv
         src/hw/core/BranchUnit.sv
         src/hw/core/ResetSequencer.sv
@@ -1038,6 +1038,39 @@ if (verilator_FOUND)
     if (MSVC)
         target_compile_options(rafi-vtest-tlb
             PUBLIC /wd"4267"
+        )
+    endif()
+
+    # =========================================================================
+    # rafi-vtest-dcache
+    #
+    add_executable(rafi-vtest-dcache
+        include/rafi/test.h
+        include/rafi/test/ModuleTest.h
+        src/hw/cache/DCacheTest.cpp
+    )
+    verilate(rafi-vtest-dcache
+        PREFIX VDCache
+        THREADS 1
+        TRACE
+        VERILATOR_ARGS --trace-structs
+        SOURCES
+        src/hw/def/BasicTypes.sv
+        src/hw/def/RvTypes.sv
+        src/hw/def/Rv32Types.sv
+        src/hw/def/CacheTypes.sv
+        src/hw/module/BlockRam.sv
+        src/hw/cache/DCache.sv
+    )
+    target_link_libraries(rafi-vtest-dcache
+        PRIVATE ${GoogleTest_LIBRARIES} ${FS_LIBRARIES}
+    )
+
+    # disable warnings for verilator
+    if (MSVC)
+        target_compile_options(rafi-vtest-dcache
+            PUBLIC /wd"4267"
+            PUBLIC /wd"4701"
         )
     endif()
 else()

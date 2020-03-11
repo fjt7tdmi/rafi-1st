@@ -39,7 +39,7 @@ interface BusAccessUnitIF;
     logic itlbWriteReq;
     uint32_t itlbWriteValue;
 
-    dcache_mem_addr_t dcacheAddr;
+    paddr_t dcacheAddr;
     logic dcacheReadGrant;
     logic dcacheReadReq;
     dcache_line_t dcacheReadValue;
