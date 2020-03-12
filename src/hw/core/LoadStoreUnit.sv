@@ -63,7 +63,7 @@ module LoadStoreUnit (
         _tag_t tag;
     } TagArrayEntry;
 
-    function automatic word_t atomicAlu(AtomicType atomicType, word_t regValue, word_t memValue);
+    function automatic word_t AtomicAlu(AtomicType atomicType, word_t regValue, word_t memValue);
         unique case(atomicType)
         AtomicType_Swap:    return regValue;
         AtomicType_Add:     return regValue + memValue;
@@ -242,7 +242,7 @@ module LoadStoreUnit (
     end
 
     always_comb begin
-        storeAluValue = atomicAlu(bus.command.atomic, reg_store_value[31:0], loadResult[31:0]);
+        storeAluValue = AtomicAlu(bus.command.atomic, reg_store_value[31:0], loadResult[31:0]);
         storeValue = (bus.loadStoreUnitCommand == LoadStoreUnitCommand_AtomicMemOp)
             ? {32'h0, storeAluValue}
             : reg_store_value;

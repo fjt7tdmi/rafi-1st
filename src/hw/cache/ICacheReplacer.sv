@@ -64,15 +64,15 @@ module ICacheReplacer #(
     } State;
 
     // Internal functions
-    function automatic _mem_addr_t makeAddr(_tag_t tag, _index_t index);
+    function automatic _mem_addr_t MakeAddr(_tag_t tag, _index_t index);
         return {tag, index};
     endfunction
 
-    function automatic _tag_t makeTag(_mem_addr_t addr);
+    function automatic _tag_t MakeTag(_mem_addr_t addr);
         return addr[MEM_ADDR_WIDTH-1:INDEX_WIDTH];
     endfunction
 
-    function automatic _index_t makeIndex(_mem_addr_t addr);
+    function automatic _index_t MakeIndex(_mem_addr_t addr);
         return addr[INDEX_WIDTH-1:0];
     endfunction
 
@@ -88,9 +88,9 @@ module ICacheReplacer #(
         // Cache array access
     always_comb begin
         arrayWriteEnable = (reg_state == State_WriteCache);
-        arrayIndex = makeIndex(reg_miss_addr);
+        arrayIndex = MakeIndex(reg_miss_addr);
         arrayWriteValid = 1;
-        arrayWriteTag = makeTag(reg_miss_addr);
+        arrayWriteTag = MakeTag(reg_miss_addr);
         arrayWriteData = reg_line;
     end
 

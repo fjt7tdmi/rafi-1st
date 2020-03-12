@@ -45,7 +45,7 @@ module FlipFlopCam #(
     typedef logic [INDEX_WIDTH-1:0]  _index_t;
 
     // Functions
-    function automatic _index_t encodeIndex(logic [EntryCount-1:0] value);
+    function automatic _index_t EncodeIndex(logic [EntryCount-1:0] value);
         /* verilator lint_off WIDTH */
         for (int i = 0; i < EntryCount; i++) begin
             if (value[i]) begin
@@ -68,7 +68,7 @@ module FlipFlopCam #(
             hits[i] = valid[i] && (readKey == key[i]);
         end
 
-        readIndex = encodeIndex(hits);
+        readIndex = EncodeIndex(hits);
 
         hit = !rst && !clear && (|hits);
         if (writeEnable && readKey == writeKey) begin

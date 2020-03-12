@@ -31,7 +31,7 @@ module LoadValueUnit #(
     input logic [LINE_WIDTH-1:0] line,
     input LoadStoreType loadStoreType
 );
-    function automatic uint64_t rightShift(logic [LINE_WIDTH-1:0] value, logic [ADDR_WIDTH-1:0] shift);
+    function automatic uint64_t RightShift(logic [LINE_WIDTH-1:0] value, logic [ADDR_WIDTH-1:0] shift);
         int8_t [LINE_SIZE-1:0] bytes;
         int8_t [7:0] shiftedBytes;
 
@@ -50,7 +50,7 @@ module LoadValueUnit #(
         return shiftedBytes;
     endfunction
 
-    function automatic uint64_t extend(uint64_t value, LoadStoreType loadStoreType);
+    function automatic uint64_t Extend(uint64_t value, LoadStoreType loadStoreType);
         unique case(loadStoreType)
         LoadStoreType_Byte: begin
             if (value[7]) begin
@@ -97,10 +97,10 @@ module LoadValueUnit #(
 
     uint64_t shiftedValue;
     always_comb begin
-        shiftedValue = rightShift(line, addr);
+        shiftedValue = RightShift(line, addr);
     end
 
     always_comb begin
-        result = extend(shiftedValue, loadStoreType);
+        result = Extend(shiftedValue, loadStoreType);
     end
 endmodule
