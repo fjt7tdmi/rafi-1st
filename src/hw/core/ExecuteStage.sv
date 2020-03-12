@@ -39,7 +39,7 @@ function automatic word_t ALU(AluCommand command, word_t src1, word_t src2);
     endcase
 endfunction
 
-function automatic LoadStoreUnitCommand getLoadStoreUnitCommand(Op op);
+function automatic LoadStoreUnitCommand GetLoadStoreUnitCommand(Op op);
     MemUnitCommand cmd = op.command.mem;
 
     if (op.unit == ExecuteUnitType_LoadStore) begin
@@ -356,7 +356,7 @@ module ExecuteStage(
     always_comb begin
         loadStoreUnit.enable = valid && op.unit == ExecuteUnitType_LoadStore && !prevStage.trapInfo.valid;
         loadStoreUnit.invalidateTlb = valid && !fencePermissionError && op.unit == ExecuteUnitType_LoadStore && op.command.mem.isFence && op.command.mem.fence == FenceType_Vma;
-        loadStoreUnit.loadStoreUnitCommand = getLoadStoreUnitCommand(op);
+        loadStoreUnit.loadStoreUnitCommand = GetLoadStoreUnitCommand(op);
         loadStoreUnit.command = op.command.mem;
         loadStoreUnit.imm = op.imm;
         loadStoreUnit.srcIntRegValue1 = srcIntRegValue1;

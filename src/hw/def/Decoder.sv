@@ -55,7 +55,7 @@ function automatic word_t SignExtend32(logic [31:0] val);
     return val;
 endfunction
 
-function automatic word_t zext5(logic [4:0] val);
+function automatic word_t ZeroExtend5(logic [4:0] val);
     return {27'b000_0000_0000_0000_0000_0000_0000, val};
 endfunction
 
@@ -339,7 +339,7 @@ function automatic Op DecodeRV32I(insn_t insn);
             op.csrWriteEnable = 1;
             op.intRegWriteEnable = 1;
             op.intRegWriteSrcType = IntRegWriteSrcType_Csr;
-            op.imm = zext5(zimm);
+            op.imm = ZeroExtend5(zimm);
             op.aluCommand = AluCommand_Add;
             op.aluSrcType1 = AluSrcType1_Zero;
             op.aluSrcType2 = AluSrcType2_Imm;
@@ -350,7 +350,7 @@ function automatic Op DecodeRV32I(insn_t insn);
             op.csrWriteEnable = (rs1 == 5'b00000) ? 0 : 1;
             op.intRegWriteEnable = 1;
             op.intRegWriteSrcType = IntRegWriteSrcType_Csr;
-            op.imm = zext5(zimm);
+            op.imm = ZeroExtend5(zimm);
             op.aluCommand = AluCommand_Or;
             op.aluSrcType1 = AluSrcType1_Csr;
             op.aluSrcType2 = AluSrcType2_Imm;
@@ -361,7 +361,7 @@ function automatic Op DecodeRV32I(insn_t insn);
             op.csrWriteEnable = (rs1 == 5'b00000) ? 0 : 1;
             op.intRegWriteEnable = 1;
             op.intRegWriteSrcType = IntRegWriteSrcType_Csr;
-            op.imm = zext5(zimm);
+            op.imm = ZeroExtend5(zimm);
             op.aluCommand = AluCommand_Clear1;
             op.aluSrcType1 = AluSrcType1_Csr;
             op.aluSrcType2 = AluSrcType2_Imm;

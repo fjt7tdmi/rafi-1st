@@ -32,7 +32,7 @@ module StoreValueUnit #(
     input uint64_t value,
     input LoadStoreType loadStoreType
 );
-    function automatic logic [LINE_WIDTH-1:0] leftShift(uint64_t value, logic [ADDR_WIDTH-1:0] shift);
+    function automatic logic [LINE_WIDTH-1:0] LeftShift(uint64_t value, logic [ADDR_WIDTH-1:0] shift);
         int8_t [7:0] bytes;
         int8_t [LINE_SIZE-1:0] shiftedBytes;
 
@@ -51,7 +51,7 @@ module StoreValueUnit #(
         return shiftedBytes;
     endfunction
 
-    function automatic logic [LINE_SIZE-1:0] makeWriteMask(logic [ADDR_WIDTH-1:0] shift, LoadStoreType loadStoreType);
+    function automatic logic [LINE_SIZE-1:0] MakeWriteMask(logic [ADDR_WIDTH-1:0] shift, LoadStoreType loadStoreType);
         logic [LINE_SIZE-1:0] mask;
 
         /* verilator lint_off WIDTH */
@@ -75,7 +75,7 @@ module StoreValueUnit #(
     endfunction
 
     always_comb begin
-        line = leftShift(value, addr);
-        writeMask = makeWriteMask(addr, loadStoreType);
+        line = LeftShift(value, addr);
+        writeMask = MakeWriteMask(addr, loadStoreType);
     end
 endmodule

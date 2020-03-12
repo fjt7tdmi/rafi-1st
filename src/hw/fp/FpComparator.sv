@@ -44,7 +44,7 @@ module FpComparator #(
     typedef logic unsigned [EXPONENT_WIDTH-1:0] exponent_t;
     typedef logic unsigned [FRACTION_WIDTH-1:0] fraction_t;
 
-    function automatic logic unsigned [WIDTH-1:0] get_canonical_quiet_nan();
+    function automatic logic unsigned [WIDTH-1:0] GetCanonicalQuietNan();
         logic unsigned [WIDTH-1:0] value;
         value[WIDTH-1] = '0;
         value[WIDTH-2:FRACTION_WIDTH-1] = '1;
@@ -52,7 +52,7 @@ module FpComparator #(
         return value;
     endfunction
 
-    function automatic logic unsigned [WIDTH-1:0] get_canonical_signaling_nan();
+    function automatic logic unsigned [WIDTH-1:0] GetCanonicalSignalingNan();
         logic unsigned [WIDTH-1:0] value;
         value[WIDTH-1] = '0;
         value[WIDTH-2:FRACTION_WIDTH] = '1;
@@ -170,8 +170,8 @@ module FpComparator #(
         unique case (fp_result_type)
         FpResultType_Src1:          fpResult = fpSrc1;
         FpResultType_Src2:          fpResult = fpSrc2;
-        FpResultType_QuietNan:      fpResult = get_canonical_quiet_nan();
-        FpResultType_SignalingNan:  fpResult = get_canonical_signaling_nan();
+        FpResultType_QuietNan:      fpResult = GetCanonicalQuietNan();
+        FpResultType_SignalingNan:  fpResult = GetCanonicalSignalingNan();
         default:                    fpResult = '0;
         endcase
 

@@ -35,7 +35,7 @@ module IntBypassLogic(
     } PipelineEntry;
 
     // Functions
-    function automatic _index_t encodeIndex(logic [BYPASS_DEPTH-1:0] depth);
+    function automatic _index_t EncodeIndex(logic [BYPASS_DEPTH-1:0] depth);
         /* verilator lint_off WIDTH */
         for (int i = 0; i < BYPASS_DEPTH; i++) begin
             if (depth[i]) begin
@@ -72,7 +72,7 @@ module IntBypassLogic(
             for (int j = 0; j < BYPASS_DEPTH; j++) begin
                 camHits[i][j] = pipeline[j].valid && (pipeline[j].addr == readAddr[i]);
             end
-            camIndex[i] = encodeIndex(camHits[i]);
+            camIndex[i] = EncodeIndex(camHits[i]);
 
             hit[i] = |(camHits[i]);
             if (readAddr[i] == '0) begin
@@ -130,7 +130,7 @@ module FpBypassLogic(
     } PipelineEntry;
 
     // Functions
-    function automatic _index_t encodeIndex(logic [BYPASS_DEPTH-1:0] depth);
+    function automatic _index_t EncodeIndex(logic [BYPASS_DEPTH-1:0] depth);
         /* verilator lint_off WIDTH */
         for (int i = 0; i < BYPASS_DEPTH; i++) begin
             if (depth[i]) begin
@@ -170,7 +170,7 @@ module FpBypassLogic(
             for (int j = 0; j < BYPASS_DEPTH; j++) begin
                 camHits[i][j] = pipeline[j].valid && (pipeline[j].addr == readAddr[i]);
             end
-            camIndex[i] = encodeIndex(camHits[i]);
+            camIndex[i] = EncodeIndex(camHits[i]);
 
             hit[i] = |(camHits[i]);
             if (|(camHits[i])) begin
