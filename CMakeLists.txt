@@ -533,6 +533,7 @@ if (verilator_FOUND)
         src/hw/def/Decoder.sv
         src/hw/def/DecoderRV32C.sv
         src/hw/div/DivUnit.sv
+        src/hw/module/BlockRam.sv
         src/hw/fp/FpClassifier.sv
         src/hw/fp/FpComparator.sv
         src/hw/fp/FpConverter.sv
@@ -547,7 +548,6 @@ if (verilator_FOUND)
         src/hw/cache/ICacheReplacer.sv
         src/hw/cache/DCacheReplacer.sv
         src/hw/cache/Tlb.sv
-        src/hw/core/BlockRam.sv
         src/hw/core/BranchUnit.sv
         src/hw/core/ResetSequencer.sv
         src/hw/core/FetchUnit.sv
