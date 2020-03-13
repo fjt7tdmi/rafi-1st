@@ -64,7 +64,7 @@ module BusAccessUnit (
     _icache_word_index_t reg_icache_index;
     uint32_t [DCACHE_WORD_COUNT-1:0] reg_dcache_value;
     uint32_t [ICACHE_WORD_COUNT-1:0] reg_icache_value;
-    uint32_t reg_dtlb_value;    
+    uint32_t reg_dtlb_value;
     uint32_t reg_itlb_value;
 
     State next_state;
@@ -72,9 +72,9 @@ module BusAccessUnit (
     logic next_done;
     _dcache_word_index_t next_dcache_index;
     _icache_word_index_t next_icache_index;
-    uint32_t [DCACHE_WORD_COUNT-1:0] next_dcache_value;    
+    uint32_t [DCACHE_WORD_COUNT-1:0] next_dcache_value;
     uint32_t [ICACHE_WORD_COUNT-1:0] next_icache_value;
-    uint32_t next_dtlb_value;    
+    uint32_t next_dtlb_value;
     uint32_t next_itlb_value;
 
     logic rdata_valid;
@@ -121,7 +121,7 @@ module BusAccessUnit (
             wdata = reg_itlb_value;
         end
         else if (reg_state inside {State_DCacheRead, State_DCacheWrite}) begin
-            addr = {core.dcacheAddr[(29 - $bits(reg_dcache_index)):0], reg_dcache_index, 2'b00};
+            addr = {core.dcacheAddr[31:$clog2(DCACHE_LINE_SIZE)], reg_dcache_index, 2'b00};
             wdata = reg_dcache_value[reg_dcache_index];
         end
         else if (reg_state inside {State_ICacheRead, State_ICacheWrite}) begin
