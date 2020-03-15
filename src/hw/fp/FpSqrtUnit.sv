@@ -92,7 +92,7 @@ module FpSqrtUnit #(
 
     SqrtUnit #(
         .WIDTH(FRACTION_WIDTH+3)
-    ) m_SqrtUnit (
+    ) sqrtUnit (
         .sqrt(fraction_sqrt),
         .remnant(remnant),
         .done(done),

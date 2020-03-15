@@ -84,7 +84,7 @@ void System::ProcessNegativeEdge()
     if (IsOpRetired())
     {
         m_EventList.emplace_back(trace::OpEvent {
-            m_pCore->Core->m_RegWriteStage->insn,
+            m_pCore->Core->regWriteStage->insn,
             PrivilegeLevel::Machine,
         });
     }
@@ -121,7 +121,7 @@ void System::ClearEventList()
 
 bool System::IsOpRetired() const
 {
-    return m_pCore->Core->m_RegWriteStage->valid;
+    return m_pCore->Core->regWriteStage->valid;
 }
 
 uint32_t System::GetHostIoValue() const
@@ -134,14 +134,14 @@ uint32_t System::GetHostIoValue() const
 
 uint64_t System::GetPc() const
 {
-    return m_pCore->Core->m_RegWriteStage->pc;
+    return m_pCore->Core->regWriteStage->pc;
 }
 
 void System::CopyIntReg(trace::NodeIntReg32* pOut) const
 {
     for (int i = 0; i < 32; i++)
     {
-        pOut->regs[i] = static_cast<uint32_t>(m_pCore->Core->m_IntRegFile->body[i]);
+        pOut->regs[i] = static_cast<uint32_t>(m_pCore->Core->intRegFile->body[i]);
     }
 }
 
@@ -155,7 +155,7 @@ void System::CopyFpReg(trace::NodeFpReg* pOut) const
 {
     for (int i = 0; i < 32; i++)
     {
-        pOut->regs[i].u64.value = m_pCore->Core->m_FpRegFile->body[i];
+        pOut->regs[i].u64.value = m_pCore->Core->fpRegFile->body[i];
     }
 }
 

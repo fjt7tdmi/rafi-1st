@@ -156,7 +156,7 @@ module ExecuteStage(
     logic invalidateTlb;
 
     // Modules
-    FpConverter m_FpConverter (
+    FpConverter fpConverter (
         .intResult(intResultFpCvt),
         .fpResult(fpResultCvt),
         .writeFlagsValue(fflagsValueCvt),
@@ -171,7 +171,7 @@ module ExecuteStage(
     FpUnit #(
         .EXPONENT_WIDTH(8),
         .FRACTION_WIDTH(23)
-    ) m_Fp32Unit (
+    ) fp32Unit (
         .intResult(intResultFp32),
         .fpResult(fpResult32),
         .writeFlagsValue(fflagsValue32),
@@ -194,7 +194,7 @@ module ExecuteStage(
     FpUnit #(
         .EXPONENT_WIDTH(11),
         .FRACTION_WIDTH(52)
-    ) m_Fp64Unit (
+    ) fp64Unit (
         .intResult(intResultFp64),
         .fpResult(fpResult64),
         .writeFlagsValue(fflagsValue64),
@@ -214,7 +214,7 @@ module ExecuteStage(
         .rst
     );
 
-    MulDivUnit m_MulDivUnit(
+    MulDivUnit mulDivUnit(
         .done(doneMulDiv),
         .result(intResultMulDiv),
         .command(op.command.mulDiv),
@@ -227,7 +227,7 @@ module ExecuteStage(
         .rst
     );
 
-    BranchUnit m_BranchUnit (
+    BranchUnit branchUnit (
         .taken(branchTaken),
         .target(branchTarget),
         .enable(enableBranch),

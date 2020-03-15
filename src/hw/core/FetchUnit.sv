@@ -94,7 +94,7 @@ module FetchUnit (
         end
     end
 
-    Tlb m_Tlb (
+    Tlb tlb (
         .memAddr(mem.itlbAddr),
         .memReadEnable(mem.itlbReadReq),
         .memWriteEnable(mem.itlbWriteReq),
@@ -151,7 +151,7 @@ module FetchUnit (
     BlockRamWithReset #(
         .DATA_WIDTH($bits(ValidTagArrayEntry)),
         .INDEX_WIDTH(INDEX_WIDTH)
-    ) m_ValidTagArray (
+    ) tagArray (
         .readValue(validTagArrayReadValue),
         .index(validTagArrayIndex),
         .writeValue(validTagArrayWriteValue),
@@ -163,7 +163,7 @@ module FetchUnit (
     BlockRam #(
         .DATA_WIDTH(LINE_WIDTH),
         .INDEX_WIDTH(INDEX_WIDTH)
-    ) m_DataArray (
+    ) dataArray (
         .readValue(dataArrayReadValue),
         .index(dataArrayIndex),
         .writeValue(dataArrayWriteValue),
@@ -175,7 +175,7 @@ module FetchUnit (
         .LINE_WIDTH(LINE_WIDTH),
         .TAG_WIDTH(TAG_WIDTH),
         .INDEX_WIDTH(INDEX_WIDTH)
-    ) m_CacheReplacer (
+    ) cacheReplacer (
         .arrayWriteEnable(cacheReplacerArrayWriteEnable),
         .arrayIndex(cacheReplacerArrayIndex),
         .arrayWriteValid(cacheReplacerArrayWriteValid),
@@ -199,7 +199,7 @@ module FetchUnit (
         .LINE_SIZE(LINE_SIZE),
         .INDEX_WIDTH(INDEX_WIDTH),
         .TAG_WIDTH(TAG_WIDTH)
-    ) m_Invalidater (
+    ) invalidater (
         .arrayWriteEnable(invalidaterArrayWriteEnable),
         .arrayIndex(invalidaterArrayIndex),
         .arrayWriteValid(invalidaterArrayWriteValid),

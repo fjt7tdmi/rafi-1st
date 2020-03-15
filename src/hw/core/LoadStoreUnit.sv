@@ -89,13 +89,13 @@ module LoadStoreUnit (
     _line_t cacheWriteValue;
     logic [LINE_SIZE-1:0] cacheWriteMask;
 
-    LoadValueUnit m_LoadValueUnit (
+    LoadValueUnit loadValueUnit (
         .result(loadValue),
         .addr(reg_vaddr[$clog2(LINE_SIZE)-1:0]),
         .line(cacheReadValue),
         .loadStoreType(bus.command.loadStoreType));
 
-    StoreValueUnit m_StoreValueUnit (
+    StoreValueUnit storeValueUnit (
         .line(cacheWriteValue),
         .writeMask(cacheWriteMask),
         .addr(next_vaddr[$clog2(LINE_SIZE)-1:0]),
@@ -119,7 +119,7 @@ module LoadStoreUnit (
         end
     end
 
-    Tlb m_Tlb (
+    Tlb tlb (
         .memAddr(mem.dtlbAddr),
         .memReadEnable(mem.dtlbReadReq),
         .memWriteEnable(mem.dtlbWriteReq),
@@ -165,7 +165,7 @@ module LoadStoreUnit (
         .LINE_SIZE(LINE_SIZE),
         .TAG_WIDTH(TAG_WIDTH),
         .INDEX_WIDTH(INDEX_WIDTH)
-    ) m_Cache (
+    ) cache (
         .done(cacheDone),
         .storeConditionalFailure(cacheStoreConditionalFailure),
         .readValue(cacheReadValue),

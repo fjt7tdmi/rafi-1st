@@ -40,7 +40,7 @@ module MulDivUnit(
     logic mulSrcSigned1;
     logic mulSrcSigned2;
 
-    MulUnit m_MulUnit(
+    MulUnit mulUnit(
         .done(mulDone),
         .result(mulResult),
         .high(mulHigh),
@@ -63,7 +63,7 @@ module MulDivUnit(
 
     DivUnit #(
         .N(32)
-    ) m_DivUnit (
+    ) divUnit (
         .done(divDone),
         .quotient,
         .remnant,

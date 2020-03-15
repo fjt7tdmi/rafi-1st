@@ -46,7 +46,7 @@ module FpUnit #(
     FpClassifier #(
         .EXPONENT_WIDTH(EXPONENT_WIDTH),
         .FRACTION_WIDTH(FRACTION_WIDTH)
-    ) m_FpClassifier(
+    ) fpClassifier(
         .intResult(fpResultClass),
         .fpSrc(fpSrc1),
         .clk(clk),
@@ -55,7 +55,7 @@ module FpUnit #(
     logic [FP_WIDTH-1:0] fpResultSign;
     FpSignUnit #(
         .WIDTH(FP_WIDTH)
-    ) m_FpSignUnit (
+    ) fpSignUnit (
         .fpResult(fpResultSign),
         .command(command.sign),
         .fpSrc1(fpSrc1),
@@ -69,7 +69,7 @@ module FpUnit #(
     FpComparator #(
         .EXPONENT_WIDTH(EXPONENT_WIDTH),
         .FRACTION_WIDTH(FRACTION_WIDTH)
-    ) m_FpComparator (
+    ) fpComparator (
         .intResult(intResultCmp),
         .fpResult(fpResultCmp),
         .flags(flagsCmp),
@@ -84,7 +84,7 @@ module FpUnit #(
     FpMulAdd #(
         .EXPONENT_WIDTH(EXPONENT_WIDTH),
         .FRACTION_WIDTH(FRACTION_WIDTH)
-    ) m_FpMulAdd (
+    ) fpMulAdd (
         .fpResult(fpResultMulAdd),
         .flags(flagsMulAdd),
         .command(command.mulAdd),
@@ -100,7 +100,7 @@ module FpUnit #(
     FpDivUnit #(
         .EXPONENT_WIDTH(EXPONENT_WIDTH),
         .FRACTION_WIDTH(FRACTION_WIDTH)
-    ) m_FpDivUnit (
+    ) fpDivUnit (
         .fpResult(fpResultDiv),
         .flags(flagsDiv),
         .roundingMode(roundingMode),
@@ -115,7 +115,7 @@ module FpUnit #(
     FpSqrtUnit #(
         .EXPONENT_WIDTH(EXPONENT_WIDTH),
         .FRACTION_WIDTH(FRACTION_WIDTH)
-    ) m_FpSqrtUnit (
+    ) fpSqrtUnit (
         .fpResult(fpResultSqrt),
         .flags(flagsSqrt),
         .done(doneSqrt),

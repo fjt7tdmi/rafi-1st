@@ -420,7 +420,7 @@ module FpConverter (
     FpConverter_FpToInt32 #(
         .EXPONENT_WIDTH(8),
         .FRACTION_WIDTH(23)
-    ) m_Fp32ToInt32 (
+    ) fp32ToInt32 (
         .result(result_f32_to_i32),
         .flags(flags_f32_to_i32),
         .intSigned(intSigned),
@@ -432,7 +432,7 @@ module FpConverter (
     FpConverter_FpToInt32 #(
         .EXPONENT_WIDTH(11),
         .FRACTION_WIDTH(52)
-    ) m_Fp64ToInt32 (
+    ) fp64ToInt32 (
         .result(result_f64_to_i32),
         .flags(flags_f64_to_i32),
         .intSigned(intSigned),
@@ -444,7 +444,7 @@ module FpConverter (
     FpConverter_Int32ToFp #(
         .EXPONENT_WIDTH(8),
         .FRACTION_WIDTH(23)
-    ) m_i32_to_f32(
+    ) i32_to_f32(
         .result(result_i32_to_f32),
         .flags(flags_i32_to_f32),
         .intSigned(intSigned),
@@ -456,7 +456,7 @@ module FpConverter (
     FpConverter_Int32ToFp #(
         .EXPONENT_WIDTH(11),
         .FRACTION_WIDTH(52)
-    ) m_i32_to_f64(
+    ) i32_to_f64(
         .result(result_i32_to_f64),
         .flags(flags_i32_to_f64),
         .intSigned(intSigned),
@@ -465,7 +465,7 @@ module FpConverter (
 
     logic [63:0] result_f32_to_f64;
     fflags_t flags_f32_to_f64;
-    FpConverter_Fp32ToFp64 m_f32_to_f64(
+    FpConverter_Fp32ToFp64 f32_to_f64(
         .result(result_f32_to_f64),
         .flags(flags_f32_to_f64),
         .roundingMode(roundingMode),
@@ -473,7 +473,7 @@ module FpConverter (
 
     logic [31:0] result_f64_to_f32;
     fflags_t flags_f64_to_f32;
-    FpConverter_Fp64ToFp32 m_f64_to_f32(
+    FpConverter_Fp64ToFp32 f64_to_f32(
         .result(result_f64_to_f32),
         .flags(flags_f64_to_f32),
         .roundingMode(roundingMode),
