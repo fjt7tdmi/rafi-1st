@@ -414,7 +414,7 @@ module FpMulAdd #(
     FpMul #(
         .EXPONENT_WIDTH(EXPONENT_WIDTH),
         .FRACTION_WIDTH(FRACTION_WIDTH)
-    ) m_FpMul (
+    ) fpMul (
         .result(resultMul),
         .flags(flagsMul),
         .roundingMode(roundingMode),
@@ -429,7 +429,7 @@ module FpMulAdd #(
     FpAdd #(
         .EXPONENT_WIDTH(EXPONENT_WIDTH),
         .FRACTION_WIDTH(FRACTION_WIDTH)
-    ) m_FpAdd (
+    ) fpAdd (
         .result(resultAdd),
         .flags(flagsAdd),
         .roundingMode(roundingMode),

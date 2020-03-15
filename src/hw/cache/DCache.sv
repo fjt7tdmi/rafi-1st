@@ -120,7 +120,7 @@ module DCache #(
     BlockRamWithReset #(
         .DATA_WIDTH($bits(TagArrayEntry)),
         .INDEX_WIDTH(INDEX_WIDTH)
-    ) m_TagArray (
+    ) tagArray (
         .readValue(tagArrayReadValue),
         .index(tagArrayIndex),
         .writeValue(tagArrayWriteValue),
@@ -138,7 +138,7 @@ module DCache #(
         .DATA_WIDTH_PER_BANK(BYTE_WIDTH),
         .BANK_COUNT(LINE_SIZE),
         .INDEX_WIDTH(INDEX_WIDTH)
-    ) m_DataArray (
+    ) dataArray (
         .readValue(dataArrayReadValue),
         .index(dataArrayIndex),
         .writeValue(dataArrayWriteValue),

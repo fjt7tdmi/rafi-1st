@@ -38,137 +38,137 @@ module Core (
 );
     logic rstInternal;
 
-    InsnBufferIF m_InsnBufferIF();
-    DecodeStageIF m_DecodeStageIF();
-    RegReadStageIF m_RegReadStageIF();
-    ExecuteStageIF m_ExecuteStageIF();
-    PipelineControllerIF m_PipelineControllerIF();
-    InterruptControllerIF m_InterruptControllerIF();
-    IntRegFileIF m_IntRegFileIF();
-    FpRegFileIF m_FpRegFileIF();
-    IntBypassLogicIF m_IntBypassLogicIF();
-    FpBypassLogicIF m_FpBypassLogicIF();
-    LoadStoreUnitIF m_LoadStoreUnitIF();
-    CsrIF m_CsrIF();
-    FetchUnitIF m_FetchUnitIF();
-    BusAccessUnitIF m_BusAccessUnitIF();
+    InsnBufferIF insnBufferIF();
+    DecodeStageIF decodeStageIF();
+    RegReadStageIF regReadStageIF();
+    ExecuteStageIF executeStageIF();
+    PipelineControllerIF pipelineControllerIF();
+    InterruptControllerIF interruptControllerIF();
+    IntRegFileIF intRegFileIF();
+    FpRegFileIF fpRegFileIF();
+    IntBypassLogicIF intBypassLogicIF();
+    FpBypassLogicIF fpBypassLogicIF();
+    LoadStoreUnitIF loadStoreUnitIF();
+    CsrIF csrIF();
+    FetchUnitIF fetchUnitIF();
+    BusAccessUnitIF busAccessUnitIF();
 
     ResetSequencer #(
         .RESET_CYCLE(CACHE_RESET_CYCLE)
-    ) m_ResetSequencer (
+    ) resetSequencer (
         .rstOut(rstInternal),
         .rstIn(rst),
         .clk
     );
 
-    FetchStage m_FetchStage(
-        .insnBuffer(m_InsnBufferIF.FetchStage),
-        .fetchUnit(m_FetchUnitIF.FetchStage),
-        .ctrl(m_PipelineControllerIF.FetchStage),
-        .interrupt(m_InterruptControllerIF.FetchStage),
+    FetchStage fetchStage(
+        .insnBuffer(insnBufferIF.FetchStage),
+        .fetchUnit(fetchUnitIF.FetchStage),
+        .ctrl(pipelineControllerIF.FetchStage),
+        .interrupt(interruptControllerIF.FetchStage),
         .clk,
         .rst(rstInternal)
     );
-    InsnBuffer m_InsnBuffer(
-        .bus(m_InsnBufferIF.InsnBuffer),
-        .ctrl(m_PipelineControllerIF.InsnBuffer),
+    InsnBuffer insnBuffer(
+        .bus(insnBufferIF.InsnBuffer),
+        .ctrl(pipelineControllerIF.InsnBuffer),
         .clk,
         .rst(rstInternal)
     );
-    DecodeStage m_DecodeStage(
-        .insnBuffer(m_InsnBufferIF.InsnBuffer),
-        .nextStage(m_DecodeStageIF.ThisStage),
-        .ctrl(m_PipelineControllerIF.DecodeStage),
+    DecodeStage decodeStage(
+        .insnBuffer(insnBufferIF.InsnBuffer),
+        .nextStage(decodeStageIF.ThisStage),
+        .ctrl(pipelineControllerIF.DecodeStage),
         .clk,
         .rst(rstInternal)
     );
-    RegReadStage m_RegReadStage(
-        .prevStage(m_DecodeStageIF.NextStage),
-        .nextStage(m_RegReadStageIF.ThisStage),
-        .ctrl(m_PipelineControllerIF.RegReadStage),
-        .intRegFile(m_IntRegFileIF.RegReadStage),
-        .fpRegFile(m_FpRegFileIF.RegReadStage),
+    RegReadStage regReadStage(
+        .prevStage(decodeStageIF.NextStage),
+        .nextStage(regReadStageIF.ThisStage),
+        .ctrl(pipelineControllerIF.RegReadStage),
+        .intRegFile(intRegFileIF.RegReadStage),
+        .fpRegFile(fpRegFileIF.RegReadStage),
         .clk,
         .rst(rstInternal)
     );
-    ExecuteStage m_ExecuteStage(
-        .prevStage(m_RegReadStageIF.NextStage),
-        .nextStage(m_ExecuteStageIF.ThisStage),
-        .ctrl(m_PipelineControllerIF.ExecuteStage),
-        .csr(m_CsrIF.ExecuteStage),
-        .fetchUnit(m_FetchUnitIF.ExecuteStage),
-        .loadStoreUnit(m_LoadStoreUnitIF.ExecuteStage),
-        .intBypass(m_IntBypassLogicIF.ExecuteStage),
-        .fpBypass(m_FpBypassLogicIF.ExecuteStage),
+    ExecuteStage executeStage(
+        .prevStage(regReadStageIF.NextStage),
+        .nextStage(executeStageIF.ThisStage),
+        .ctrl(pipelineControllerIF.ExecuteStage),
+        .csr(csrIF.ExecuteStage),
+        .fetchUnit(fetchUnitIF.ExecuteStage),
+        .loadStoreUnit(loadStoreUnitIF.ExecuteStage),
+        .intBypass(intBypassLogicIF.ExecuteStage),
+        .fpBypass(fpBypassLogicIF.ExecuteStage),
         .clk,
         .rst(rstInternal)
     );
-    RegWriteStage m_RegWriteStage(
-        .prevStage(m_ExecuteStageIF.NextStage),
-        .ctrl(m_PipelineControllerIF.RegWriteStage),
-        .csr(m_CsrIF.RegWriteStage),
-        .intRegFile(m_IntRegFileIF.RegWriteStage),
-        .fpRegFile(m_FpRegFileIF.RegWriteStage),
-        .clk,
-        .rst(rstInternal)
-    );
-
-    IntRegFile m_IntRegFile(
-        .bus(m_IntRegFileIF.RegFile),
-        .clk,
-        .rst(rstInternal)
-    );
-    FpRegFile m_FpRegFile(
-        .bus(m_FpRegFileIF.RegFile),
-        .clk,
-        .rst(rstInternal)
-    );
-    IntBypassLogic m_IntBypassLogic(
-        .bus(m_IntBypassLogicIF.BypassLogic),
-        .ctrl(m_PipelineControllerIF.BypassLogic),
-        .clk,
-        .rst(rstInternal)
-    );
-    FpBypassLogic m_FpBypassLogic(
-        .bus(m_FpBypassLogicIF.BypassLogic),
-        .ctrl(m_PipelineControllerIF.BypassLogic),
-        .clk,
-        .rst(rstInternal)
-    );
-    Csr m_Csr(
-        .bus(m_CsrIF.Csr),
-        .clk,
-        .rst(rstInternal)
-    );
-    PipelineController m_PipelineController(
-        .bus(m_PipelineControllerIF.PipelineController),
-        .csr(m_CsrIF.PipelineController),
-        .clk,
-        .rst(rstInternal)
-    );
-    InterruptController m_InterruptController(
-        .bus(m_InterruptControllerIF.InterruptController),
-        .csr(m_CsrIF.InterruptController),
+    RegWriteStage regWriteStage(
+        .prevStage(executeStageIF.NextStage),
+        .ctrl(pipelineControllerIF.RegWriteStage),
+        .csr(csrIF.RegWriteStage),
+        .intRegFile(intRegFileIF.RegWriteStage),
+        .fpRegFile(fpRegFileIF.RegWriteStage),
         .clk,
         .rst(rstInternal)
     );
 
-    FetchUnit m_FetchUnit(
-        .bus(m_FetchUnitIF.FetchUnit),
-        .mem(m_BusAccessUnitIF.FetchUnit),
-        .csr(m_CsrIF.FetchUnit),
+    IntRegFile intRegFile(
+        .bus(intRegFileIF.RegFile),
         .clk,
         .rst(rstInternal)
     );
-    LoadStoreUnit m_LoadStoreUnit(
-        .bus(m_LoadStoreUnitIF.LoadStoreUnit),
-        .mem(m_BusAccessUnitIF.LoadStoreUnit),
-        .csr(m_CsrIF.LoadStoreUnit),
+    FpRegFile fpRegFile(
+        .bus(fpRegFileIF.RegFile),
         .clk,
         .rst(rstInternal)
     );
-    BusAccessUnit m_BusAccessUnit(
-        .core(m_BusAccessUnitIF.BusAccessUnit),
+    IntBypassLogic intBypassLogic(
+        .bus(intBypassLogicIF.BypassLogic),
+        .ctrl(pipelineControllerIF.BypassLogic),
+        .clk,
+        .rst(rstInternal)
+    );
+    FpBypassLogic fpBypassLogic(
+        .bus(fpBypassLogicIF.BypassLogic),
+        .ctrl(pipelineControllerIF.BypassLogic),
+        .clk,
+        .rst(rstInternal)
+    );
+    Csr csr(
+        .bus(csrIF.Csr),
+        .clk,
+        .rst(rstInternal)
+    );
+    PipelineController pipelineController(
+        .bus(pipelineControllerIF.PipelineController),
+        .csr(csrIF.PipelineController),
+        .clk,
+        .rst(rstInternal)
+    );
+    InterruptController interruptController(
+        .bus(interruptControllerIF.InterruptController),
+        .csr(csrIF.InterruptController),
+        .clk,
+        .rst(rstInternal)
+    );
+
+    FetchUnit fetchUnit(
+        .bus(fetchUnitIF.FetchUnit),
+        .mem(busAccessUnitIF.FetchUnit),
+        .csr(csrIF.FetchUnit),
+        .clk,
+        .rst(rstInternal)
+    );
+    LoadStoreUnit loadStoreUnit(
+        .bus(loadStoreUnitIF.LoadStoreUnit),
+        .mem(busAccessUnitIF.LoadStoreUnit),
+        .csr(csrIF.LoadStoreUnit),
+        .clk,
+        .rst(rstInternal)
+    );
+    BusAccessUnit busAccessUnit(
+        .core(busAccessUnitIF.BusAccessUnit),
         .addr,
         .select,
         .enable,
