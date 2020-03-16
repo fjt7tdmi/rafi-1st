@@ -33,21 +33,21 @@ module LoadValueUnit #(
 );
     function automatic uint64_t RightShift(logic [LINE_WIDTH-1:0] value, logic [ADDR_WIDTH-1:0] shift);
         int8_t [LINE_SIZE-1:0] bytes;
-        int8_t [7:0] shiftedBytes;
+        int8_t [7:0] shifted_bytes;
 
         bytes = value;
 
         for (int i = 0; i < 8; i++) begin
             /* verilator lint_off WIDTH */
             if (shift + i < LINE_SIZE) begin
-                shiftedBytes[i] = bytes[shift + i];
+                shifted_bytes[i] = bytes[shift + i];
             end
             else begin
-                shiftedBytes[i] = '0;
+                shifted_bytes[i] = '0;
             end
         end
 
-        return shiftedBytes;
+        return shifted_bytes;
     endfunction
 
     function automatic uint64_t Extend(uint64_t value, LoadStoreType loadStoreType);
@@ -95,12 +95,12 @@ module LoadValueUnit #(
         endcase
     endfunction
 
-    uint64_t shiftedValue;
+    uint64_t shifted_value;
     always_comb begin
-        shiftedValue = RightShift(line, addr);
+        shifted_value = RightShift(line, addr);
     end
 
     always_comb begin
-        result = Extend(shiftedValue, loadStoreType);
+        result = Extend(shifted_value, loadStoreType);
     end
 endmodule

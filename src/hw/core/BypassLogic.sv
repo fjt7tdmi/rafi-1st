@@ -50,18 +50,18 @@ module IntBypassLogic(
 
     // Wires
     logic hit[BYPASS_READ_PORT_COUNT];
-    reg_addr_t readAddr[BYPASS_READ_PORT_COUNT];
-    word_t readValue[BYPASS_READ_PORT_COUNT];
+    reg_addr_t read_addr[BYPASS_READ_PORT_COUNT];
+    word_t read_value[BYPASS_READ_PORT_COUNT];
 
-    logic [BYPASS_DEPTH-1:0] camHits[BYPASS_READ_PORT_COUNT];
-    _index_t camIndex[BYPASS_READ_PORT_COUNT];
+    logic [BYPASS_DEPTH-1:0] cam_hits[BYPASS_READ_PORT_COUNT];
+    _index_t cam_index[BYPASS_READ_PORT_COUNT];
 
     always_comb begin
-        readAddr[0] = bus.readAddr1;
-        readAddr[1] = bus.readAddr2;
+        read_addr[0] = bus.readAddr1;
+        read_addr[1] = bus.readAddr2;
 
-        bus.readValue1 = readValue[0];
-        bus.readValue2 = readValue[1];
+        bus.readValue1 = read_value[0];
+        bus.readValue2 = read_value[1];
         bus.hit1 = hit[0];
         bus.hit2 = hit[1];
     end
@@ -70,21 +70,21 @@ module IntBypassLogic(
     always_comb begin
         for (int i = 0; i < BYPASS_READ_PORT_COUNT; i++) begin
             for (int j = 0; j < BYPASS_DEPTH; j++) begin
-                camHits[i][j] = pipeline[j].valid && (pipeline[j].addr == readAddr[i]);
+                cam_hits[i][j] = pipeline[j].valid && (pipeline[j].addr == read_addr[i]);
             end
-            camIndex[i] = EncodeIndex(camHits[i]);
+            cam_index[i] = EncodeIndex(cam_hits[i]);
 
-            hit[i] = |(camHits[i]);
-            if (readAddr[i] == '0) begin
+            hit[i] = |(cam_hits[i]);
+            if (read_addr[i] == '0) begin
                 // zero register
-                readValue[i] = '0;
+                read_value[i] = '0;
             end
-            else if (|(camHits[i])) begin
-                readValue[i] = pipeline[camIndex[i]].value;
+            else if (|(cam_hits[i])) begin
+                read_value[i] = pipeline[cam_index[i]].value;
             end
             else begin
                 // bypass failure
-                readValue[i] = '0;
+                read_value[i] = '0;
             end
         end
     end
@@ -145,20 +145,20 @@ module FpBypassLogic(
 
     // Wires
     logic hit[READ_PORT_COUNT];
-    reg_addr_t readAddr[READ_PORT_COUNT];
-    uint64_t readValue[READ_PORT_COUNT];
+    reg_addr_t read_addr[READ_PORT_COUNT];
+    uint64_t read_value[READ_PORT_COUNT];
 
-    logic [BYPASS_DEPTH-1:0] camHits[READ_PORT_COUNT];
-    _index_t camIndex[READ_PORT_COUNT];
+    logic [BYPASS_DEPTH-1:0] cam_hits[READ_PORT_COUNT];
+    _index_t cam_index[READ_PORT_COUNT];
 
     always_comb begin
-        readAddr[0] = bus.readAddr1;
-        readAddr[1] = bus.readAddr2;
-        readAddr[2] = bus.readAddr3;
+        read_addr[0] = bus.readAddr1;
+        read_addr[1] = bus.readAddr2;
+        read_addr[2] = bus.readAddr3;
 
-        bus.readValue1 = readValue[0];
-        bus.readValue2 = readValue[1];
-        bus.readValue3 = readValue[2];
+        bus.readValue1 = read_value[0];
+        bus.readValue2 = read_value[1];
+        bus.readValue3 = read_value[2];
         bus.hit1 = hit[0];
         bus.hit2 = hit[1];
         bus.hit3 = hit[2];
@@ -168,17 +168,17 @@ module FpBypassLogic(
     always_comb begin
         for (int i = 0; i < READ_PORT_COUNT; i++) begin
             for (int j = 0; j < BYPASS_DEPTH; j++) begin
-                camHits[i][j] = pipeline[j].valid && (pipeline[j].addr == readAddr[i]);
+                cam_hits[i][j] = pipeline[j].valid && (pipeline[j].addr == read_addr[i]);
             end
-            camIndex[i] = EncodeIndex(camHits[i]);
+            cam_index[i] = EncodeIndex(cam_hits[i]);
 
-            hit[i] = |(camHits[i]);
-            if (|(camHits[i])) begin
-                readValue[i] = pipeline[camIndex[i]].value;
+            hit[i] = |(cam_hits[i]);
+            if (|(cam_hits[i])) begin
+                read_value[i] = pipeline[cam_index[i]].value;
             end
             else begin
                 // bypass failure
-                readValue[i] = '0;
+                read_value[i] = '0;
             end
         end
     end
