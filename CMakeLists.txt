@@ -552,9 +552,9 @@ if (verilator_FOUND)
         src/hw/cache/Tlb.sv
         src/hw/core/BranchUnit.sv
         src/hw/core/ResetSequencer.sv
-        src/hw/core/FetchUnit.sv
         src/hw/core/FetchUnitIF.sv
         src/hw/core/FetchUnitInvalidater.sv
+        src/hw/core/FetchUnit.sv
         src/hw/core/InsnBufferIF.sv
         src/hw/core/InsnBuffer.sv
         src/hw/core/InterruptControllerIF.sv
@@ -1073,6 +1073,40 @@ if (verilator_FOUND)
     # disable warnings for verilator
     if (MSVC)
         target_compile_options(rafi-vtest-dcache
+            PUBLIC /wd"4267"
+            PUBLIC /wd"4701"
+        )
+    endif()
+
+    # =========================================================================
+    # rafi-vtest-icache
+    #
+    add_executable(rafi-vtest-icache
+        include/rafi/test.h
+        include/rafi/test/ModuleTest.h
+        src/hw/cache/ICacheTest.cpp
+    )
+    verilate(rafi-vtest-icache
+        PREFIX VICache
+        THREADS 1
+        TRACE
+        VERILATOR_ARGS --trace-structs
+        SOURCES
+        src/hw/def/BasicTypes.sv
+        src/hw/def/RvTypes.sv
+        src/hw/def/Rv32Types.sv
+        src/hw/def/CacheTypes.sv
+        src/hw/module/BlockRam.sv
+        src/hw/module/BlockRamWithReset.sv
+        src/hw/cache/ICache.sv
+    )
+    target_link_libraries(rafi-vtest-icache
+        PRIVATE ${GoogleTest_LIBRARIES} ${FS_LIBRARIES}
+    )
+
+    # disable warnings for verilator
+    if (MSVC)
+        target_compile_options(rafi-vtest-icache
             PUBLIC /wd"4267"
             PUBLIC /wd"4701"
         )
