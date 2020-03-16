@@ -84,20 +84,20 @@ module LoadStoreUnit (
     uint64_t next_store_value;
 
     // Value Generation
-    uint64_t loadValue;
-    _line_t cacheReadValue;
-    _line_t cacheWriteValue;
-    logic [LINE_SIZE-1:0] cacheWriteMask;
+    uint64_t load_value;
+    _line_t cache_read_value;
+    _line_t cache_write_value;
+    logic [LINE_SIZE-1:0] cache_write_mask;
 
     LoadValueUnit loadValueUnit (
-        .result(loadValue),
+        .result(load_value),
         .addr(reg_vaddr[$clog2(LINE_SIZE)-1:0]),
-        .line(cacheReadValue),
+        .line(cache_read_value),
         .loadStoreType(bus.command.loadStoreType));
 
     StoreValueUnit storeValueUnit (
-        .line(cacheWriteValue),
-        .writeMask(cacheWriteMask),
+        .line(cache_write_value),
+        .writeMask(cache_write_mask),
         .addr(next_vaddr[$clog2(LINE_SIZE)-1:0]),
         .value(reg_store_value),
         .loadStoreType(bus.command.loadStoreType));
@@ -168,11 +168,11 @@ module LoadStoreUnit (
     ) cache (
         .done(cacheDone),
         .storeConditionalFailure(cacheStoreConditionalFailure),
-        .readValue(cacheReadValue),
+        .readValue(cache_read_value),
         .enable(cacheEnable),
         .command(cacheCommand),
-        .writeMask(cacheWriteMask),
-        .writeValue(cacheWriteValue),
+        .writeMask(cache_write_mask),
+        .writeValue(cache_write_value),
         .addr(reg_paddr),
         .memAddr(mem.dcacheAddr),
         .memReadEnable(mem.dcacheReadReq),
@@ -273,7 +273,7 @@ module LoadStoreUnit (
             next_load_result = cacheStoreConditionalFailure ? 64'h1 : 64'h0;
         end
         else if (reg_state == State_CacheRead) begin
-            next_load_result = loadValue;
+            next_load_result = load_value;
         end
         else begin
             next_load_result = reg_load_result;

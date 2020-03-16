@@ -34,18 +34,18 @@ module MulDivUnit(
     input logic rst
 );
     // MulUnit
-    logic mulDone;
-    logic [31:0] mulResult;
-    logic mulHigh;
-    logic mulSrcSigned1;
-    logic mulSrcSigned2;
+    logic mul_done;
+    logic [31:0] mul_result;
+    logic mul_high;
+    logic mul_src1_signed;
+    logic mul_src2_signed;
 
     MulUnit mulUnit(
-        .done(mulDone),
-        .result(mulResult),
-        .high(mulHigh),
-        .src1_signed(mulSrcSigned1),
-        .src2_signed(mulSrcSigned2),
+        .done(mul_done),
+        .result(mul_result),
+        .high(mul_high),
+        .src1_signed(mul_src1_signed),
+        .src2_signed(mul_src2_signed),
         .src1,
         .src2,
         .enable,
@@ -56,18 +56,18 @@ module MulDivUnit(
     );
 
     // DivUnit
-    logic divDone;
+    logic div_done;
     logic [31:0] quotient;
     logic [31:0] remnant;
-    logic divSigned;
+    logic div_signed;
 
     DivUnit #(
         .N(32)
     ) divUnit (
-        .done(divDone),
+        .done(div_done),
         .quotient,
         .remnant,
-        .is_signed(divSigned),
+        .is_signed(div_signed),
         .dividend(src1),
         .divisor(src2),
         .enable,
@@ -78,23 +78,23 @@ module MulDivUnit(
     );
 
     always_comb begin
-        mulHigh = (command == MulDivCommand_Mulh || command == MulDivCommand_Mulhsu || command == MulDivCommand_Mulhu);
-        mulSrcSigned1 = (command == MulDivCommand_Mulh || command == MulDivCommand_Mulhsu);
-        mulSrcSigned2 = (command == MulDivCommand_Mulh);
-        divSigned = (command == MulDivCommand_Div || command == MulDivCommand_Rem);
+        mul_high = (command == MulDivCommand_Mulh || command == MulDivCommand_Mulhsu || command == MulDivCommand_Mulhu);
+        mul_src1_signed = (command == MulDivCommand_Mulh || command == MulDivCommand_Mulhsu);
+        mul_src2_signed = (command == MulDivCommand_Mulh);
+        div_signed = (command == MulDivCommand_Div || command == MulDivCommand_Rem);
     end
 
     always_comb begin
         if (command == MulDivCommand_Mul || command == MulDivCommand_Mulh || command == MulDivCommand_Mulhsu || command == MulDivCommand_Mulhu) begin
-            done = mulDone;
-            result = mulResult;
+            done = mul_done;
+            result = mul_result;
         end
         else if (command == MulDivCommand_Div || command == MulDivCommand_Divu) begin
-            done = divDone;
+            done = div_done;
             result = quotient;
         end
         else begin
-            done = divDone;
+            done = div_done;
             result = remnant;
         end
     end

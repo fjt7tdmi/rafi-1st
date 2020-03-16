@@ -36,7 +36,7 @@ module Core (
     input   logic clk,
     input   logic rst
 );
-    logic rstInternal;
+    logic rst_internal;
 
     InsnBufferIF insnBufferIF();
     DecodeStageIF decodeStageIF();
@@ -56,7 +56,7 @@ module Core (
     ResetSequencer #(
         .RESET_CYCLE(CACHE_RESET_CYCLE)
     ) resetSequencer (
-        .rstOut(rstInternal),
+        .rstOut(rst_internal),
         .rstIn(rst),
         .clk
     );
@@ -67,20 +67,20 @@ module Core (
         .ctrl(pipelineControllerIF.FetchStage),
         .interrupt(interruptControllerIF.FetchStage),
         .clk,
-        .rst(rstInternal)
+        .rst(rst_internal)
     );
     InsnBuffer insnBuffer(
         .bus(insnBufferIF.InsnBuffer),
         .ctrl(pipelineControllerIF.InsnBuffer),
         .clk,
-        .rst(rstInternal)
+        .rst(rst_internal)
     );
     DecodeStage decodeStage(
         .insnBuffer(insnBufferIF.InsnBuffer),
         .nextStage(decodeStageIF.ThisStage),
         .ctrl(pipelineControllerIF.DecodeStage),
         .clk,
-        .rst(rstInternal)
+        .rst(rst_internal)
     );
     RegReadStage regReadStage(
         .prevStage(decodeStageIF.NextStage),
@@ -89,7 +89,7 @@ module Core (
         .intRegFile(intRegFileIF.RegReadStage),
         .fpRegFile(fpRegFileIF.RegReadStage),
         .clk,
-        .rst(rstInternal)
+        .rst(rst_internal)
     );
     ExecuteStage executeStage(
         .prevStage(regReadStageIF.NextStage),
@@ -101,7 +101,7 @@ module Core (
         .intBypass(intBypassLogicIF.ExecuteStage),
         .fpBypass(fpBypassLogicIF.ExecuteStage),
         .clk,
-        .rst(rstInternal)
+        .rst(rst_internal)
     );
     RegWriteStage regWriteStage(
         .prevStage(executeStageIF.NextStage),
@@ -110,47 +110,47 @@ module Core (
         .intRegFile(intRegFileIF.RegWriteStage),
         .fpRegFile(fpRegFileIF.RegWriteStage),
         .clk,
-        .rst(rstInternal)
+        .rst(rst_internal)
     );
 
     IntRegFile intRegFile(
         .bus(intRegFileIF.RegFile),
         .clk,
-        .rst(rstInternal)
+        .rst(rst_internal)
     );
     FpRegFile fpRegFile(
         .bus(fpRegFileIF.RegFile),
         .clk,
-        .rst(rstInternal)
+        .rst(rst_internal)
     );
     IntBypassLogic intBypassLogic(
         .bus(intBypassLogicIF.BypassLogic),
         .ctrl(pipelineControllerIF.BypassLogic),
         .clk,
-        .rst(rstInternal)
+        .rst(rst_internal)
     );
     FpBypassLogic fpBypassLogic(
         .bus(fpBypassLogicIF.BypassLogic),
         .ctrl(pipelineControllerIF.BypassLogic),
         .clk,
-        .rst(rstInternal)
+        .rst(rst_internal)
     );
     Csr csr(
         .bus(csrIF.Csr),
         .clk,
-        .rst(rstInternal)
+        .rst(rst_internal)
     );
     PipelineController pipelineController(
         .bus(pipelineControllerIF.PipelineController),
         .csr(csrIF.PipelineController),
         .clk,
-        .rst(rstInternal)
+        .rst(rst_internal)
     );
     InterruptController interruptController(
         .bus(interruptControllerIF.InterruptController),
         .csr(csrIF.InterruptController),
         .clk,
-        .rst(rstInternal)
+        .rst(rst_internal)
     );
 
     FetchUnit fetchUnit(
@@ -158,14 +158,14 @@ module Core (
         .mem(busAccessUnitIF.FetchUnit),
         .csr(csrIF.FetchUnit),
         .clk,
-        .rst(rstInternal)
+        .rst(rst_internal)
     );
     LoadStoreUnit loadStoreUnit(
         .bus(loadStoreUnitIF.LoadStoreUnit),
         .mem(busAccessUnitIF.LoadStoreUnit),
         .csr(csrIF.LoadStoreUnit),
         .clk,
-        .rst(rstInternal)
+        .rst(rst_internal)
     );
     BusAccessUnit busAccessUnit(
         .core(busAccessUnitIF.BusAccessUnit),
@@ -179,6 +179,6 @@ module Core (
         .irq,
         .irqTimer,
         .clk,
-        .rst(rstInternal)
+        .rst(rst_internal)
     );
 endmodule
