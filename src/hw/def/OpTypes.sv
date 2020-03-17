@@ -20,17 +20,6 @@ import BasicTypes::*;
 import RvTypes::*;
 import Rv32Types::*;
 
-typedef enum logic [2:0]
-{
-    LoadStoreUnitCommand_None               = 3'h0,
-    LoadStoreUnitCommand_Load               = 3'h1,
-    LoadStoreUnitCommand_Store              = 3'h2,
-    LoadStoreUnitCommand_Invalidate         = 3'h3,
-    LoadStoreUnitCommand_AtomicMemOp        = 3'h4,
-    LoadStoreUnitCommand_LoadReserved       = 3'h5,
-    LoadStoreUnitCommand_StoreConditional   = 3'h6
-} LoadStoreUnitCommand;
-
 typedef enum logic [3:0]
 {
     AluCommand_Add      = 4'b0000,
@@ -76,9 +65,10 @@ typedef enum logic [3:0]
 
 typedef enum logic [1:0]
 {
-    FenceType_Default   = 2'b00,
-    FenceType_I         = 2'b01,
-    FenceType_Vma       = 2'b10
+    FenceType_None   = 2'b00,
+    FenceType_Normal = 2'b01, // fence
+    FenceType_I      = 2'b10, // fence.i
+    FenceType_Vma    = 2'b11  // sfence.vma
 } FenceType;
 
 typedef enum logic [2:0]
@@ -166,6 +156,17 @@ typedef struct packed
     FpCommandUnion command;
 } FpCommand;
 
+typedef enum logic [2:0]
+{
+    LoadStoreUnitCommand_None               = 3'h0,
+    LoadStoreUnitCommand_Load               = 3'h1,
+    LoadStoreUnitCommand_Store              = 3'h2,
+    LoadStoreUnitCommand_Invalidate         = 3'h3,
+    LoadStoreUnitCommand_AtomicMemOp        = 3'h4,
+    LoadStoreUnitCommand_LoadReserved       = 3'h5,
+    LoadStoreUnitCommand_StoreConditional   = 3'h6
+} LoadStoreUnitCommand;
+
 typedef enum logic [4:0]
 {
     AtomicType_LoadReserved     = 5'b00010,
@@ -201,10 +202,7 @@ typedef enum logic
 
 typedef struct packed
 {
-    logic isAtomic;
-    logic isFence;
-    logic isLoad;
-    logic isStore;
+    LoadStoreUnitCommand command;
     AtomicType atomic;
     FenceType fence;
     LoadStoreType loadStoreType;

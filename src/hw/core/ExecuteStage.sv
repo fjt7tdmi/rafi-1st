@@ -39,37 +39,6 @@ function automatic word_t ALU(AluCommand command, word_t src1, word_t src2);
     endcase
 endfunction
 
-function automatic LoadStoreUnitCommand GetLoadStoreUnitCommand(Op op);
-    MemUnitCommand cmd = op.command.mem;
-
-    if (op.unit == ExecuteUnitType_LoadStore) begin
-        if (cmd.isLoad) begin
-            return LoadStoreUnitCommand_Load;
-        end
-        else if (cmd.isStore) begin
-            return LoadStoreUnitCommand_Store;
-        end
-        else if (cmd.isFence && cmd.fence inside {FenceType_I, FenceType_Vma}) begin
-            return LoadStoreUnitCommand_Invalidate;
-        end
-        else if (cmd.isAtomic && cmd.atomic == AtomicType_LoadReserved) begin
-            return LoadStoreUnitCommand_LoadReserved;
-        end
-        else if (cmd.isAtomic && cmd.atomic == AtomicType_StoreConditional) begin
-            return LoadStoreUnitCommand_StoreConditional;
-        end
-        else if (cmd.isAtomic) begin
-            return LoadStoreUnitCommand_AtomicMemOp;
-        end
-        else begin
-            return LoadStoreUnitCommand_None;
-        end
-    end
-    else begin
-        return LoadStoreUnitCommand_None;
-    end
-endfunction
-
 module ExecuteStage(
     RegReadStageIF.NextStage prevStage,
     ExecuteStageIF.ThisStage nextStage,
@@ -247,7 +216,7 @@ module ExecuteStage(
             op.csrWriteEnable && prevStage.csrAddr == CSR_ADDR_SATP;
         fencePermissionError = valid &&
             csr.status.TVM == 1 && csr.privilege != Privilege_Machine &&
-            op.unit == ExecuteUnitType_LoadStore && op.command.mem.isFence && op.command.mem.fence == FenceType_Vma;
+            op.unit == ExecuteUnitType_LoadStore && op.command.mem.fence == FenceType_Vma;
     end
 
     // CSR
@@ -344,9 +313,9 @@ module ExecuteStage(
     // FetchUnit
     always_comb begin
         invalidateICache = valid && !fencePermissionError &&
-            op.unit == ExecuteUnitType_LoadStore && op.command.mem.isFence && op.command.mem.fence inside {FenceType_I, FenceType_Vma};
+            op.unit == ExecuteUnitType_LoadStore && op.command.mem.fence inside {FenceType_I, FenceType_Vma};
         invalidateTlb = valid && !fencePermissionError && 
-            op.unit == ExecuteUnitType_LoadStore && op.command.mem.isFence && op.command.mem.fence == FenceType_Vma;
+            op.unit == ExecuteUnitType_LoadStore && op.command.mem.fence == FenceType_Vma;
 
         fetchUnit.invalidateICache = invalidateICache;
         fetchUnit.invalidateTlb = invalidateTlb;
@@ -355,8 +324,8 @@ module ExecuteStage(
     // LoadStoreUnit
     always_comb begin
         loadStoreUnit.enable = valid && op.unit == ExecuteUnitType_LoadStore && !prevStage.trapInfo.valid;
-        loadStoreUnit.invalidateTlb = valid && !fencePermissionError && op.unit == ExecuteUnitType_LoadStore && op.command.mem.isFence && op.command.mem.fence == FenceType_Vma;
-        loadStoreUnit.loadStoreUnitCommand = GetLoadStoreUnitCommand(op);
+        loadStoreUnit.invalidateTlb = valid && !fencePermissionError && op.unit == ExecuteUnitType_LoadStore && op.command.mem.fence == FenceType_Vma;
+        loadStoreUnit.loadStoreUnitCommand = op.command.mem.command;
         loadStoreUnit.command = op.command.mem;
         loadStoreUnit.imm = op.imm;
         loadStoreUnit.srcIntRegValue1 = srcIntRegValue1;
@@ -404,7 +373,7 @@ module ExecuteStage(
         if (prevStage.trapInfo.valid) begin
             trapInfo = prevStage.trapInfo;
         end
-        else if (valid && fencePermissionError && op.unit == ExecuteUnitType_LoadStore && op.command.mem.isFence) begin
+        else if (valid && fencePermissionError && op.unit == ExecuteUnitType_LoadStore && op.command.mem.fence != FenceType_None) begin
             trapInfo.valid = 1;
             trapInfo.cause.isInterrupt = 0;
             trapInfo.cause.code = EXCEPTION_CODE_ILLEGAL_INSN;
