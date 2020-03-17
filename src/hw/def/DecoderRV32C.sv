@@ -113,10 +113,7 @@ function automatic Op DecodeRV32C_Quadrant0(uint16_t insn);
     else if (funct3 == 3'b001) begin
         // C.FLD
         op.unit = ExecuteUnitType_LoadStore;
-        op.command.mem.isAtomic = 0;
-        op.command.mem.isFence = 0;
-        op.command.mem.isLoad = 1;
-        op.command.mem.isStore = 0;
+        op.command.mem.command = LoadStoreUnitCommand_Load;
         op.command.mem.atomic = '0;
         op.command.mem.fence = '0;
         op.command.mem.loadStoreType = LoadStoreType_DoubleWord;
@@ -127,10 +124,7 @@ function automatic Op DecodeRV32C_Quadrant0(uint16_t insn);
     else if (funct3 == 3'b010) begin
         // C.LW
         op.unit = ExecuteUnitType_LoadStore;
-        op.command.mem.isAtomic = 0;
-        op.command.mem.isFence = 0;
-        op.command.mem.isLoad = 1;
-        op.command.mem.isStore = 0;
+        op.command.mem.command = LoadStoreUnitCommand_Load;
         op.command.mem.atomic = '0;
         op.command.mem.fence = '0;
         op.command.mem.loadStoreType = LoadStoreType_Word;
@@ -142,10 +136,7 @@ function automatic Op DecodeRV32C_Quadrant0(uint16_t insn);
     else if (funct3 == 3'b011) begin
         // C.FLW
         op.unit = ExecuteUnitType_LoadStore;
-        op.command.mem.isAtomic = 0;
-        op.command.mem.isFence = 0;
-        op.command.mem.isLoad = 1;
-        op.command.mem.isStore = 0;
+        op.command.mem.command = LoadStoreUnitCommand_Load;
         op.command.mem.atomic = '0;
         op.command.mem.fence = '0;
         op.command.mem.loadStoreType = LoadStoreType_Word;
@@ -156,10 +147,7 @@ function automatic Op DecodeRV32C_Quadrant0(uint16_t insn);
     else if (funct3 == 3'b101) begin
         // C.FSD
         op.unit = ExecuteUnitType_LoadStore;
-        op.command.mem.isAtomic = 0;
-        op.command.mem.isFence = 0;
-        op.command.mem.isLoad = 0;
-        op.command.mem.isStore = 1;
+        op.command.mem.command = LoadStoreUnitCommand_Store;
         op.command.mem.atomic = '0;
         op.command.mem.fence = '0;
         op.command.mem.loadStoreType = LoadStoreType_DoubleWord;
@@ -169,10 +157,7 @@ function automatic Op DecodeRV32C_Quadrant0(uint16_t insn);
     else if (funct3 == 3'b110) begin
         // C.SW
         op.unit = ExecuteUnitType_LoadStore;
-        op.command.mem.isAtomic = 0;
-        op.command.mem.isFence = 0;
-        op.command.mem.isLoad = 0;
-        op.command.mem.isStore = 1;
+        op.command.mem.command = LoadStoreUnitCommand_Store;
         op.command.mem.atomic = '0;
         op.command.mem.fence = '0;
         op.command.mem.loadStoreType = LoadStoreType_Word;
@@ -182,10 +167,7 @@ function automatic Op DecodeRV32C_Quadrant0(uint16_t insn);
     else if (funct3 == 3'b111) begin
         // C.FSW
         op.unit = ExecuteUnitType_LoadStore;
-        op.command.mem.isAtomic = 0;
-        op.command.mem.isFence = 0;
-        op.command.mem.isLoad = 0;
-        op.command.mem.isStore = 1;
+        op.command.mem.command = LoadStoreUnitCommand_Store;
         op.command.mem.atomic ='0;
         op.command.mem.fence = '0;
         op.command.mem.loadStoreType = LoadStoreType_FpWord;
@@ -384,10 +366,7 @@ function automatic Op DecodeRV32C_Quadrant2(uint16_t insn);
     else if (funct3 == 3'b001) begin
         // C.FLDSP
         op.unit = ExecuteUnitType_LoadStore;
-        op.command.mem.isAtomic = 0;
-        op.command.mem.isFence = 0;
-        op.command.mem.isLoad = 1;
-        op.command.mem.isStore = 0;
+        op.command.mem.command = LoadStoreUnitCommand_Load;
         op.command.mem.atomic = '0;
         op.command.mem.fence = '0;
         op.command.mem.loadStoreType = LoadStoreType_DoubleWord;
@@ -399,10 +378,7 @@ function automatic Op DecodeRV32C_Quadrant2(uint16_t insn);
     else if (funct3 == 3'b010) begin
         // C.LWSP
         op.unit = ExecuteUnitType_LoadStore;
-        op.command.mem.isAtomic = 0;
-        op.command.mem.isFence = 0;
-        op.command.mem.isLoad = 1;
-        op.command.mem.isStore = 0;
+        op.command.mem.command = LoadStoreUnitCommand_Load;
         op.command.mem.atomic = '0;
         op.command.mem.fence = '0;
         op.command.mem.loadStoreType = LoadStoreType_Word;
@@ -415,10 +391,7 @@ function automatic Op DecodeRV32C_Quadrant2(uint16_t insn);
     else if (funct3 == 3'b011) begin
         // C.FLWSP
         op.unit = ExecuteUnitType_LoadStore;
-        op.command.mem.isAtomic = 0;
-        op.command.mem.isFence = 0;
-        op.command.mem.isLoad = 1;
-        op.command.mem.isStore = 0;
+        op.command.mem.command = LoadStoreUnitCommand_Load;
         op.command.mem.atomic = '0;
         op.command.mem.fence = '0;
         op.command.mem.loadStoreType = LoadStoreType_FpWord;
@@ -457,10 +430,7 @@ function automatic Op DecodeRV32C_Quadrant2(uint16_t insn);
     else if (funct3 == 3'b101) begin
         // C.FSDSP
         op.unit = ExecuteUnitType_LoadStore;
-        op.command.mem.isAtomic = 0;
-        op.command.mem.isFence = 0;
-        op.command.mem.isLoad = 0;
-        op.command.mem.isStore = 1;
+        op.command.mem.command = LoadStoreUnitCommand_Store;
         op.command.mem.atomic = '0;
         op.command.mem.fence = '0;
         op.command.mem.loadStoreType = LoadStoreType_DoubleWord;
@@ -471,10 +441,7 @@ function automatic Op DecodeRV32C_Quadrant2(uint16_t insn);
     else if (funct3 == 3'b110) begin
         // C.SWSP
         op.unit = ExecuteUnitType_LoadStore;
-        op.command.mem.isAtomic = 0;
-        op.command.mem.isFence = 0;
-        op.command.mem.isLoad = 0;
-        op.command.mem.isStore = 1;
+        op.command.mem.command = LoadStoreUnitCommand_Store;
         op.command.mem.atomic = '0;
         op.command.mem.fence = '0;
         op.command.mem.loadStoreType = LoadStoreType_Word;
@@ -485,10 +452,7 @@ function automatic Op DecodeRV32C_Quadrant2(uint16_t insn);
     else if (funct3 == 3'b111) begin
         // C.FSWSP
         op.unit = ExecuteUnitType_LoadStore;
-        op.command.mem.isAtomic = 0;
-        op.command.mem.isFence = 0;
-        op.command.mem.isLoad = 0;
-        op.command.mem.isStore = 1;
+        op.command.mem.command = LoadStoreUnitCommand_Store;
         op.command.mem.atomic ='0;
         op.command.mem.fence = '0;
         op.command.mem.loadStoreType = LoadStoreType_FpWord;
