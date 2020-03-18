@@ -44,22 +44,22 @@ parameter HARDWARE_THREAD_ID = 0;
 // Functions
 //
 
-function automatic Privilege calc_next_privilege(
+function automatic Privilege calc_next_priv(
     TrapCause cause,
     word_t machineExceptionDelegate,
     word_t supervisorExceptionDelegate
 );
     word_t decodedCause = 1 << cause.code;
 
-    Privilege privilege = Privilege_Machine;
+    Privilege priv = Privilege_Machine;
     if ((decodedCause & machineExceptionDelegate) != 0) begin
-        privilege = Privilege_Supervisor;
+        priv = Privilege_Supervisor;
         if ((decodedCause & supervisorExceptionDelegate) != 0) begin
-            privilege = Privilege_User;
+            priv = Privilege_User;
         end
     end
 
-    return privilege;
+    return priv;
 endfunction
 
 function automatic word_t read_xcause(TrapCause cause);
@@ -263,7 +263,7 @@ module Csr(
 
         // next_priv
         if (bus.trapInfo.valid) begin
-            next_priv = calc_next_privilege(
+            next_priv = calc_next_priv(
                 .cause(bus.trapInfo.cause),
                 .machineExceptionDelegate(reg_medeleg),
                 .supervisorExceptionDelegate(reg_sedeleg)
@@ -322,7 +322,7 @@ module Csr(
 
         // bus output
         bus.readValue = read_value;
-        bus.privilege = reg_priv;
+        bus.priv = reg_priv;
         bus.satp = reg_satp;
         bus.status = reg_status;
         bus.ip = reg_xip;

@@ -43,7 +43,7 @@ interface CsrIF;
     Privilege nextPriv;
 
     // CSR values
-    Privilege privilege;
+    Privilege priv;
     csr_satp_t satp;
     csr_xstatus_t status;
     csr_xip_t ip;
@@ -59,7 +59,7 @@ interface CsrIF;
     modport Csr(
     output
         readValue,
-        privilege,
+        priv,
         satp,
         status,
         ip,
@@ -96,7 +96,7 @@ interface CsrIF;
         write_fflags,
         write_fflags_value,
     input
-        privilege,
+        priv,
         status,
         frm,
         readValue
@@ -114,14 +114,14 @@ interface CsrIF;
     input
         satp,
         status,
-        privilege
+        priv
     );
 
     modport LoadStoreUnit(
     input
         satp,
         status,
-        privilege
+        priv
     );
 
     modport PipelineController(
@@ -137,7 +137,7 @@ interface CsrIF;
 
     modport InterruptController(
     input
-        privilege,
+        priv,
         status,
         ip,
         ie

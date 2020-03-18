@@ -212,10 +212,10 @@ module ExecuteStage(
     logic fencePermissionError;
     always_comb begin
         csrPermissionError = valid &&
-            csr.status.TVM == 1 && csr.privilege != Privilege_Machine &&
+            csr.status.TVM == 1 && csr.priv != Privilege_Machine &&
             op.csrWriteEnable && prevStage.csrAddr == CSR_ADDR_SATP;
         fencePermissionError = valid &&
-            csr.status.TVM == 1 && csr.privilege != Privilege_Machine &&
+            csr.status.TVM == 1 && csr.priv != Privilege_Machine &&
             op.unit == ExecuteUnitType_LoadStore && op.command.mem.fence == FenceType_Vma;
     end
 
@@ -390,7 +390,7 @@ module ExecuteStage(
             trapInfo.value = '0;
             trapInfo.cause.isInterrupt = 0;
 
-            unique case (csr.privilege)
+            unique case (csr.priv)
             Privilege_Machine:      trapInfo.cause.code = EXCEPTION_CODE_ECALL_FROM_U;
             Privilege_Supervisor:   trapInfo.cause.code = EXCEPTION_CODE_ECALL_FROM_S;
             default:                trapInfo.cause.code = EXCEPTION_CODE_ECALL_FROM_M;
@@ -408,7 +408,7 @@ module ExecuteStage(
             trapInfo.cause.code = EXCEPTION_CODE_ILLEGAL_INSN;
             trapInfo.value = prevStage.insn;
         end
-        else if (valid && op.isWfi && csr.privilege != Privilege_Machine && csr.status.TW) begin
+        else if (valid && op.isWfi && csr.priv != Privilege_Machine && csr.status.TW) begin
             trapInfo.valid = 1;
             trapInfo.cause.isInterrupt = 0;
             trapInfo.cause.code = EXCEPTION_CODE_ILLEGAL_INSN;
