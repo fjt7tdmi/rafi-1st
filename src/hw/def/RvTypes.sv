@@ -77,10 +77,10 @@ typedef enum logic [1:0]
 
 typedef enum logic [1:0]
 {
-    Privilege_User         = 2'b00,
-    Privilege_Supervisor   = 2'b01,
-    Privilege_Machine      = 2'b11
-} Privilege;
+    Priv_User         = 2'b00,
+    Priv_Supervisor   = 2'b01,
+    Priv_Machine      = 2'b11
+} Priv;
 
 typedef logic [REG_ADDR_WIDTH-1:0] reg_addr_t;
 

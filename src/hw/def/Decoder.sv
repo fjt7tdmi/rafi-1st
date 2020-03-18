@@ -138,7 +138,7 @@ function automatic Op DecodeRV32I(insn_t insn);
     op.command = '0;
     op.intRegWriteSrcType = IntRegWriteSrcType_Result;
     op.trapOpType = TrapOpType_Ecall;
-    op.trapReturnPrivilege = Privilege_User;
+    op.trapReturnPriv = Priv_User;
     op.imm = '0;
     op.isTrap = 0;
     op.isTrapReturn = 0;
@@ -269,15 +269,15 @@ function automatic Op DecodeRV32I(insn_t insn);
             end
             else if (csr == 12'b0000_0000_0010 && rs1 == 5'b00000) begin
                 op.isTrapReturn = 1;
-                op.trapReturnPrivilege = Privilege_User;
+                op.trapReturnPriv = Priv_User;
             end
             else if (csr == 12'b0001_0000_0010 && rs1 == 5'b00000) begin
                 op.isTrapReturn = 1;
-                op.trapReturnPrivilege = Privilege_Supervisor;
+                op.trapReturnPriv = Priv_Supervisor;
             end
             else if (csr == 12'b0011_0000_0010 && rs1 == 5'b00000) begin
                 op.isTrapReturn = 1;
-                op.trapReturnPrivilege = Privilege_Machine;
+                op.trapReturnPriv = Priv_Machine;
             end
             else if (csr == 12'b0001_0000_0101 && rs1 == 5'b00000) begin
                 op.isWfi = 1;
@@ -402,7 +402,7 @@ function automatic Op DecodeRV32M(insn_t insn);
     op.command.mulDiv = MulDivCommand'(insn[14:12]);
     op.intRegWriteSrcType = IntRegWriteSrcType_Result;
     op.trapOpType = '0;
-    op.trapReturnPrivilege = '0;
+    op.trapReturnPriv = '0;
     op.imm = '0;
     op.isTrap = 0;
     op.isTrapReturn = 0;
@@ -455,7 +455,7 @@ function automatic Op DecodeRV32A(insn_t insn);
     op.command.mem.storeSrc = '0;
     op.intRegWriteSrcType = IntRegWriteSrcType_Memory;
     op.trapOpType = '0;
-    op.trapReturnPrivilege = '0;
+    op.trapReturnPriv = '0;
     op.imm = '0;
     op.isTrap = 0;
     op.isTrapReturn = 0;
@@ -491,7 +491,7 @@ function automatic Op DecodeRV32F(insn_t insn);
     op.command = '0;
     op.intRegWriteSrcType = '0;
     op.trapOpType = '0;
-    op.trapReturnPrivilege = '0;
+    op.trapReturnPriv = '0;
     op.imm = '0;
     op.isTrap = 0;
     op.isTrapReturn = 0;
@@ -729,7 +729,7 @@ function automatic Op DecodeRV32D(insn_t insn);
     op.command = '0;
     op.intRegWriteSrcType = '0;
     op.trapOpType = '0;
-    op.trapReturnPrivilege = '0;
+    op.trapReturnPriv = '0;
     op.imm = '0;
     op.isTrap = 0;
     op.isTrapReturn = 0;

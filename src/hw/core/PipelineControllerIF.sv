@@ -28,7 +28,7 @@ interface PipelineControllerIF;
     logic trapValid;
     TrapCause trapCause;
     logic trapReturnValid;
-    Privilege trapReturnPriv;
+    Priv trapReturnPriv;
 
     logic ifStall;
     logic idStall;

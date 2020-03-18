@@ -39,11 +39,11 @@ interface CsrIF;
     TrapInfo trapInfo;
     vaddr_t trapPc;
     logic trapReturn;
-    Privilege trapReturnPrivilege;
-    Privilege nextPriv;
+    Priv trapReturnPriv;
+    Priv nextPriv;
 
     // CSR values
-    Privilege privilege;
+    Priv priv;
     csr_satp_t satp;
     csr_xstatus_t status;
     csr_xip_t ip;
@@ -59,7 +59,7 @@ interface CsrIF;
     modport Csr(
     output
         readValue,
-        privilege,
+        priv,
         satp,
         status,
         ip,
@@ -83,7 +83,7 @@ interface CsrIF;
         trapInfo,
         trapPc,
         trapReturn,
-        trapReturnPrivilege
+        trapReturnPriv
     );
 
     modport ExecuteStage(
@@ -96,7 +96,7 @@ interface CsrIF;
         write_fflags,
         write_fflags_value,
     input
-        privilege,
+        priv,
         status,
         frm,
         readValue
@@ -107,21 +107,21 @@ interface CsrIF;
         trapInfo,
         trapPc,
         trapReturn,
-        trapReturnPrivilege
+        trapReturnPriv
     );
 
     modport FetchUnit(
     input
         satp,
         status,
-        privilege
+        priv
     );
 
     modport LoadStoreUnit(
     input
         satp,
         status,
-        privilege
+        priv
     );
 
     modport PipelineController(
@@ -137,7 +137,7 @@ interface CsrIF;
 
     modport InterruptController(
     input
-        privilege,
+        priv,
         status,
         ip,
         ie

@@ -111,7 +111,7 @@ module FetchUnit (
         .accessType(MemoryAccessType_Instruction),
         .satp(csr.satp),
         .status(csr.status),
-        .priv(csr.privilege),
+        .priv(csr.priv),
         .clk,
         .rst
     );

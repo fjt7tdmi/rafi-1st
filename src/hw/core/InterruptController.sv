@@ -42,10 +42,10 @@ module InterruptController(
 
     logic enabled;
     always_comb begin
-        unique case (csr.privilege)
-        Privilege_User:       enabled = csr.status.UIE;
-        Privilege_Supervisor: enabled = csr.status.SIE;
-        Privilege_Machine:    enabled = csr.status.MIE;
+        unique case (csr.priv)
+        Priv_User:       enabled = csr.status.UIE;
+        Priv_Supervisor: enabled = csr.status.SIE;
+        Priv_Machine:    enabled = csr.status.MIE;
         default:              enabled = '0;
         endcase
     end

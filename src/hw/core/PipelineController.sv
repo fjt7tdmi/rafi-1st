@@ -29,9 +29,9 @@ module PipelineController(
     csr_xtvec_t xtvec;
     always_comb begin
         unique case (csr.nextPriv)
-        Privilege_Machine:      xtvec = csr.mtvec;
-        Privilege_Supervisor:   xtvec = csr.stvec;
-        Privilege_User:         xtvec = csr.utvec;
+        Priv_Machine:      xtvec = csr.mtvec;
+        Priv_Supervisor:   xtvec = csr.stvec;
+        Priv_User:         xtvec = csr.utvec;
         default:                xtvec = '0;
         endcase
     end
@@ -50,9 +50,9 @@ module PipelineController(
     vaddr_t trap_return_pc;
     always_comb begin
         unique case (bus.trapReturnPriv)
-        Privilege_Machine:      trap_return_pc = csr.mepc;
-        Privilege_Supervisor:   trap_return_pc = csr.sepc;
-        Privilege_User:         trap_return_pc = csr.uepc;
+        Priv_Machine:      trap_return_pc = csr.mepc;
+        Priv_Supervisor:   trap_return_pc = csr.sepc;
+        Priv_User:         trap_return_pc = csr.uepc;
         default:                trap_return_pc = '0;
         endcase
     end

@@ -136,7 +136,7 @@ module LoadStoreUnit (
         .accessType(reg_access_type),
         .satp(csr.satp),
         .status(csr.status),
-        .priv(csr.privilege),
+        .priv(csr.priv),
         .clk,
         .rst
     );
