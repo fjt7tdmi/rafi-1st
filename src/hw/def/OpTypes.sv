@@ -259,7 +259,7 @@ typedef struct packed
     AluSrcType2 aluSrcType2;
     IntRegWriteSrcType intRegWriteSrcType;
     TrapOpType trapOpType;
-    Privilege trapReturnPrivilege;
+    Priv trapReturnPriv;
     word_t imm;
     logic isTrap;
     logic isTrapReturn;

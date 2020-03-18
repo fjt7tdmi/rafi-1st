@@ -49,14 +49,14 @@ module RegWriteStage(
         ctrl.trapValid = valid && prevStage.trapInfo.valid;
         ctrl.trapCause = prevStage.trapInfo.cause;
         ctrl.trapReturnValid = commit && prevStage.trapReturn;
-        ctrl.trapReturnPriv = op.trapReturnPrivilege;
+        ctrl.trapReturnPriv = op.trapReturnPriv;
 
         csr.trapInfo.valid = valid && prevStage.trapInfo.valid;
         csr.trapInfo.cause = prevStage.trapInfo.cause;
         csr.trapInfo.value = prevStage.trapInfo.value;
         csr.trapPc = prevStage.pc;
         csr.trapReturn = commit && prevStage.trapReturn;
-        csr.trapReturnPrivilege = op.trapReturnPrivilege;
+        csr.trapReturnPriv = op.trapReturnPriv;
 
         intRegFile.writeEnable = commit && op.intRegWriteEnable;
         intRegFile.writeAddr = op.rd;

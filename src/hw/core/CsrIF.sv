@@ -39,11 +39,11 @@ interface CsrIF;
     TrapInfo trapInfo;
     vaddr_t trapPc;
     logic trapReturn;
-    Privilege trapReturnPrivilege;
-    Privilege nextPriv;
+    Priv trapReturnPriv;
+    Priv nextPriv;
 
     // CSR values
-    Privilege priv;
+    Priv priv;
     csr_satp_t satp;
     csr_xstatus_t status;
     csr_xip_t ip;
@@ -83,7 +83,7 @@ interface CsrIF;
         trapInfo,
         trapPc,
         trapReturn,
-        trapReturnPrivilege
+        trapReturnPriv
     );
 
     modport ExecuteStage(
@@ -107,7 +107,7 @@ interface CsrIF;
         trapInfo,
         trapPc,
         trapReturn,
-        trapReturnPrivilege
+        trapReturnPriv
     );
 
     modport FetchUnit(

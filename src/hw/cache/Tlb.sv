@@ -43,7 +43,7 @@ module Tlb (
     // CSR
     input csr_satp_t satp,
     input csr_xstatus_t status,
-    input Privilege priv,
+    input Priv priv,
 
     // clk & rst
     input logic clk,
@@ -68,14 +68,14 @@ module Tlb (
         return entry.V;
     endfunction
 
-    function automatic logic IsFault(PageTableEntry entry, MemoryAccessType accessType, Privilege priv, csr_xstatus_t status);
+    function automatic logic IsFault(PageTableEntry entry, MemoryAccessType accessType, Priv priv, csr_xstatus_t status);
         if (!IsValidEntry(entry) || !IsLeafEntry(entry)) begin
             return 1;
         end
-        if (priv == Privilege_Supervisor && !status.SUM && entry.U) begin
+        if (priv == Priv_Supervisor && !status.SUM && entry.U) begin
             return 1;
         end
-        if (priv == Privilege_User && !entry.U) begin
+        if (priv == Priv_User && !entry.U) begin
             return 1;
         end
 
@@ -116,7 +116,7 @@ module Tlb (
     always_comb begin
         vaddr_sv32 = vaddr;
         hit = reg_valid && reg_entry_vaddr.VPN1 == vaddr_sv32.VPN1 && reg_entry_vaddr.VPN0 == vaddr_sv32.VPN0;
-        enable_translation = (priv != Privilege_Machine && satp.MODE != AddressTranslationMode_Bare);
+        enable_translation = (priv != Priv_Machine && satp.MODE != AddressTranslationMode_Bare);
     end    
 
     // next_state

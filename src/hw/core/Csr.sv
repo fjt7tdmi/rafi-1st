@@ -44,18 +44,18 @@ parameter HARDWARE_THREAD_ID = 0;
 // Functions
 //
 
-function automatic Privilege calc_next_priv(
+function automatic Priv calc_next_priv(
     TrapCause cause,
     word_t machineExceptionDelegate,
     word_t supervisorExceptionDelegate
 );
     word_t decodedCause = 1 << cause.code;
 
-    Privilege priv = Privilege_Machine;
+    Priv priv = Priv_Machine;
     if ((decodedCause & machineExceptionDelegate) != 0) begin
-        priv = Privilege_Supervisor;
+        priv = Priv_Supervisor;
         if ((decodedCause & supervisorExceptionDelegate) != 0) begin
-            priv = Privilege_User;
+            priv = Priv_User;
         end
     end
 
@@ -110,7 +110,7 @@ function automatic csr_xstatus_t write_ustatus(csr_xstatus_t currentValue, csr_x
     return (currentValue & (~mask)) | (write_value & mask);
 endfunction
 
-function automatic csr_xstatus_t UpdateStatusForTrapM(csr_xstatus_t current, Privilege prev_priv);
+function automatic csr_xstatus_t UpdateStatusForTrapM(csr_xstatus_t current, Priv prev_priv);
     csr_xstatus_t ret = current;
     ret.MPIE = current.MIE;
     ret.MIE = 0;
@@ -118,7 +118,7 @@ function automatic csr_xstatus_t UpdateStatusForTrapM(csr_xstatus_t current, Pri
     return ret;
 endfunction
 
-function automatic csr_xstatus_t UpdateStatusForTrapS(csr_xstatus_t current, Privilege prev_priv);
+function automatic csr_xstatus_t UpdateStatusForTrapS(csr_xstatus_t current, Priv prev_priv);
     csr_xstatus_t ret = current;
     ret.SPIE = current.SIE;
     ret.SIE = 0;
@@ -133,14 +133,14 @@ function automatic csr_xstatus_t UpdateStatusForTrapU(csr_xstatus_t current);
     return ret;
 endfunction
 
-function automatic csr_xstatus_t UpdateStatusForTrapReturnM(csr_xstatus_t current, Privilege mpp, logic mie);
+function automatic csr_xstatus_t UpdateStatusForTrapReturnM(csr_xstatus_t current, Priv mpp, logic mie);
     csr_xstatus_t ret = current;
     ret.MPP = mpp;
     ret.MIE = mie;
     return ret;
 endfunction
 
-function automatic csr_xstatus_t UpdateStatusForTrapReturnS(csr_xstatus_t current, Privilege spp, logic sie);
+function automatic csr_xstatus_t UpdateStatusForTrapReturnS(csr_xstatus_t current, Priv spp, logic sie);
     csr_xstatus_t ret = current;
     ret.SPP = spp[0];
     ret.SIE = sie;
@@ -161,7 +161,7 @@ module Csr(
     input logic rst
 );
     // Wires
-    Privilege next_priv;
+    Priv next_priv;
     csr_xstatus_t next_status;
 
     vaddr_t next_pc;
@@ -173,7 +173,7 @@ module Csr(
     uint64_t reg_cycle;
 
     // Registers (written by trap or trap-return)
-    Privilege reg_priv;
+    Priv reg_priv;
 
     csr_xstatus_t reg_status;
 
@@ -270,14 +270,14 @@ module Csr(
             );
         end
         else if (bus.trapReturn) begin
-            if (bus.trapReturnPrivilege == Privilege_Machine) begin
-                next_priv = Privilege'(reg_status.MPP);
+            if (bus.trapReturnPriv == Priv_Machine) begin
+                next_priv = Priv'(reg_status.MPP);
             end
-            else if (bus.trapReturnPrivilege == Privilege_Supervisor) begin
-                next_priv = Privilege'(reg_status.SPP);
+            else if (bus.trapReturnPriv == Priv_Supervisor) begin
+                next_priv = Priv'(reg_status.SPP);
             end
             else begin
-                next_priv = Privilege_User;
+                next_priv = Priv_User;
             end
         end
         else begin
@@ -286,10 +286,10 @@ module Csr(
 
         // next_status
         if (bus.trapInfo.valid) begin
-            if (next_priv == Privilege_Machine) begin
+            if (next_priv == Priv_Machine) begin
                 next_status = UpdateStatusForTrapM(reg_status, reg_priv);
             end
-            else if (next_priv == Privilege_Supervisor) begin
+            else if (next_priv == Priv_Supervisor) begin
                 next_status = UpdateStatusForTrapS(reg_status, reg_priv);
             end
             else begin
@@ -297,11 +297,11 @@ module Csr(
             end
         end
         else if (bus.trapReturn) begin
-            if (bus.trapReturnPrivilege == Privilege_Machine) begin
-                next_status = UpdateStatusForTrapReturnM(reg_status, Privilege_User, reg_status.MPIE);
+            if (bus.trapReturnPriv == Priv_Machine) begin
+                next_status = UpdateStatusForTrapReturnM(reg_status, Priv_User, reg_status.MPIE);
             end
-            else if (next_priv == Privilege_Supervisor) begin
-                next_status = UpdateStatusForTrapReturnS(reg_status, Privilege_User, reg_status.SPIE);
+            else if (next_priv == Priv_Supervisor) begin
+                next_status = UpdateStatusForTrapReturnS(reg_status, Priv_User, reg_status.SPIE);
             end
             else begin
                 next_status = reg_status;
@@ -341,7 +341,7 @@ module Csr(
         if (rst) begin
             reg_cycle <= '0;
 
-            reg_priv <= Privilege_Machine;
+            reg_priv <= Priv_Machine;
             reg_status <= '0;
 
             reg_uepc <= '0;
@@ -381,7 +381,7 @@ module Csr(
             reg_priv <= next_priv;
             reg_status <= next_status;
 
-            if (bus.trapInfo.valid && next_priv == Privilege_User) begin
+            if (bus.trapInfo.valid && next_priv == Priv_User) begin
                 reg_uepc <= bus.trapPc;
                 reg_ucause <= bus.trapInfo.cause;
                 reg_utval <= bus.trapInfo.value;
@@ -398,7 +398,7 @@ module Csr(
                     : reg_utval;
             end
 
-            if (bus.trapInfo.valid && next_priv == Privilege_Supervisor) begin
+            if (bus.trapInfo.valid && next_priv == Priv_Supervisor) begin
                 reg_sepc <= bus.trapPc;
                 reg_scause <= bus.trapInfo.cause;
                 reg_stval <= bus.trapInfo.value;
@@ -415,7 +415,7 @@ module Csr(
                     : reg_stval;
             end
 
-            if (bus.trapInfo.valid && next_priv == Privilege_Machine) begin
+            if (bus.trapInfo.valid && next_priv == Priv_Machine) begin
                 reg_mepc <= bus.trapPc;
                 reg_mcause <= bus.trapInfo.cause;
                 reg_mtval <= bus.trapInfo.value;
