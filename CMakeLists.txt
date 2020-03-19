@@ -534,6 +534,8 @@ if (verilator_FOUND)
         src/hw/def/DecoderRV32C.sv
         src/hw/div/DivUnit.sv
         src/hw/module/BlockRam.sv
+        src/hw/module/BlockRamWithReset.sv
+        src/hw/module/MultiBankBlockRam.sv
         src/hw/fp/FpClassifier.sv
         src/hw/fp/FpComparator.sv
         src/hw/fp/FpConverter.sv
@@ -1060,6 +1062,8 @@ if (verilator_FOUND)
         src/hw/def/Rv32Types.sv
         src/hw/def/CacheTypes.sv
         src/hw/module/BlockRam.sv
+        src/hw/module/BlockRamWithReset.sv
+        src/hw/module/MultiBankBlockRam.sv
         src/hw/cache/DCache.sv
     )
     target_link_libraries(rafi-vtest-dcache
