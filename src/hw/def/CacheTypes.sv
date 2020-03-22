@@ -108,6 +108,12 @@ typedef enum logic [2:0]
     DCacheCommand_Invalidate        = 3'h4
 } DCacheCommand;
 
+typedef enum logic
+{
+    ICacheCommand_Fetch      = 1'h0,
+    ICacheCommand_Invalidate = 1'h1
+} ICacheCommand;
+
 // ----------------------------------------------------------------------------
 
 endpackage
