@@ -20,9 +20,9 @@ import Rv32Types::*;
 
 import RafiTypes::*;
 
-module PipelineController(
-    PipelineControllerIF.PipelineController bus,
-    CsrIF.PipelineController csr,
+module MainPipeController(
+    MainPipeControllerIF.MainPipeController bus,
+    CsrIF.MainPipeController csr,
     input logic clk,
     input logic rst
 );

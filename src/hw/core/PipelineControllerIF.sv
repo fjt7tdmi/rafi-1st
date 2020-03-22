@@ -18,7 +18,7 @@ import BasicTypes::*;
 import RvTypes::*;
 import Rv32Types::*;
 
-interface PipelineControllerIF;
+interface MainPipeControllerIF;
     vaddr_t nextPc;
 
     logic flush;
@@ -81,7 +81,7 @@ interface PipelineControllerIF;
         trapReturnPriv
     );
 
-    modport PipelineController(
+    modport MainPipeController(
     output
         nextPc,
         flush,

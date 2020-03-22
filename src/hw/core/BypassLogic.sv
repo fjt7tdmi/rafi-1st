@@ -22,7 +22,7 @@ import RafiTypes::*;
 
 module IntBypassLogic(
     IntBypassLogicIF.BypassLogic bus,
-    PipelineControllerIF.BypassLogic ctrl,
+    MainPipeControllerIF.BypassLogic ctrl,
     input clk,
     input rst
 );
@@ -115,7 +115,7 @@ endmodule
 
 module FpBypassLogic(
     FpBypassLogicIF.BypassLogic bus,
-    PipelineControllerIF.BypassLogic ctrl,
+    MainPipeControllerIF.BypassLogic ctrl,
     input clk,
     input rst
 );

@@ -26,7 +26,7 @@ import DecoderRV32C::*;
 module DecodeStage(
     InsnBufferIF.DecodeStage insnBuffer,
     DecodeStageIF.ThisStage nextStage,
-    PipelineControllerIF.DecodeStage ctrl,
+    MainPipeControllerIF.DecodeStage ctrl,
     input logic clk,
     input logic rst
 );

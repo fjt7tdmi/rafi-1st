@@ -42,7 +42,7 @@ endfunction
 module ExecuteStage(
     RegReadStageIF.NextStage prevStage,
     ExecuteStageIF.ThisStage nextStage,
-    PipelineControllerIF.ExecuteStage ctrl,
+    MainPipeControllerIF.ExecuteStage ctrl,
     CsrIF.ExecuteStage csr,
     FetchUnitIF.ExecuteStage fetchUnit,
     LoadStoreUnitIF.ExecuteStage loadStoreUnit,
@@ -333,7 +333,7 @@ module ExecuteStage(
         loadStoreUnit.srcFpRegValue2 = srcFpRegValue2;
     end
 
-    // PipelineController
+    // MainPipeController
     always_comb begin
         ctrl.exStallReq = !done || (loadStoreUnit.enable && !loadStoreUnit.done);
         ctrl.flushReq = valid && !ctrl.exStallReq && (

@@ -42,7 +42,7 @@ module Core (
     DecodeStageIF decodeStageIF();
     RegReadStageIF regReadStageIF();
     ExecuteStageIF executeStageIF();
-    PipelineControllerIF pipelineControllerIF();
+    MainPipeControllerIF mainPipeControllerIF();
     InterruptControllerIF interruptControllerIF();
     IntRegFileIF intRegFileIF();
     FpRegFileIF fpRegFileIF();
@@ -64,28 +64,28 @@ module Core (
     FetchStage fetchStage(
         .insnBuffer(insnBufferIF.FetchStage),
         .fetchUnit(fetchUnitIF.FetchStage),
-        .ctrl(pipelineControllerIF.FetchStage),
+        .ctrl(mainPipeControllerIF.FetchStage),
         .interrupt(interruptControllerIF.FetchStage),
         .clk,
         .rst(rst_internal)
     );
     InsnBuffer insnBuffer(
         .bus(insnBufferIF.InsnBuffer),
-        .ctrl(pipelineControllerIF.InsnBuffer),
+        .ctrl(mainPipeControllerIF.InsnBuffer),
         .clk,
         .rst(rst_internal)
     );
     DecodeStage decodeStage(
         .insnBuffer(insnBufferIF.InsnBuffer),
         .nextStage(decodeStageIF.ThisStage),
-        .ctrl(pipelineControllerIF.DecodeStage),
+        .ctrl(mainPipeControllerIF.DecodeStage),
         .clk,
         .rst(rst_internal)
     );
     RegReadStage regReadStage(
         .prevStage(decodeStageIF.NextStage),
         .nextStage(regReadStageIF.ThisStage),
-        .ctrl(pipelineControllerIF.RegReadStage),
+        .ctrl(mainPipeControllerIF.RegReadStage),
         .intRegFile(intRegFileIF.RegReadStage),
         .fpRegFile(fpRegFileIF.RegReadStage),
         .clk,
@@ -94,7 +94,7 @@ module Core (
     ExecuteStage executeStage(
         .prevStage(regReadStageIF.NextStage),
         .nextStage(executeStageIF.ThisStage),
-        .ctrl(pipelineControllerIF.ExecuteStage),
+        .ctrl(mainPipeControllerIF.ExecuteStage),
         .csr(csrIF.ExecuteStage),
         .fetchUnit(fetchUnitIF.ExecuteStage),
         .loadStoreUnit(loadStoreUnitIF.ExecuteStage),
@@ -105,7 +105,7 @@ module Core (
     );
     RegWriteStage regWriteStage(
         .prevStage(executeStageIF.NextStage),
-        .ctrl(pipelineControllerIF.RegWriteStage),
+        .ctrl(mainPipeControllerIF.RegWriteStage),
         .csr(csrIF.RegWriteStage),
         .intRegFile(intRegFileIF.RegWriteStage),
         .fpRegFile(fpRegFileIF.RegWriteStage),
@@ -125,13 +125,13 @@ module Core (
     );
     IntBypassLogic intBypassLogic(
         .bus(intBypassLogicIF.BypassLogic),
-        .ctrl(pipelineControllerIF.BypassLogic),
+        .ctrl(mainPipeControllerIF.BypassLogic),
         .clk,
         .rst(rst_internal)
     );
     FpBypassLogic fpBypassLogic(
         .bus(fpBypassLogicIF.BypassLogic),
-        .ctrl(pipelineControllerIF.BypassLogic),
+        .ctrl(mainPipeControllerIF.BypassLogic),
         .clk,
         .rst(rst_internal)
     );
@@ -140,9 +140,9 @@ module Core (
         .clk,
         .rst(rst_internal)
     );
-    PipelineController pipelineController(
-        .bus(pipelineControllerIF.PipelineController),
-        .csr(csrIF.PipelineController),
+    MainPipeController mainPipeController(
+        .bus(mainPipeControllerIF.MainPipeController),
+        .csr(csrIF.MainPipeController),
         .clk,
         .rst(rst_internal)
     );

@@ -23,7 +23,7 @@ import RafiTypes::*;
 
 module RegWriteStage(
     ExecuteStageIF.NextStage prevStage,
-    PipelineControllerIF.RegWriteStage ctrl,
+    MainPipeControllerIF.RegWriteStage ctrl,
     CsrIF.RegWriteStage csr,
     IntRegFileIF.RegWriteStage intRegFile,
     FpRegFileIF.RegWriteStage fpRegFile,

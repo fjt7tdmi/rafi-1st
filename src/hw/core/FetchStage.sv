@@ -24,7 +24,7 @@ import RafiTypes::*;
 module FetchStage(
     InsnBufferIF.FetchStage insnBuffer,
     FetchUnitIF.FetchStage fetchUnit,
-    PipelineControllerIF.FetchStage ctrl,
+    MainPipeControllerIF.FetchStage ctrl,
     InterruptControllerIF.FetchStage interrupt,
     input   logic clk,
     input   logic rst

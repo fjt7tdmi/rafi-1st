@@ -124,7 +124,7 @@ interface CsrIF;
         priv
     );
 
-    modport PipelineController(
+    modport MainPipeController(
     input
         mtvec,
         stvec,

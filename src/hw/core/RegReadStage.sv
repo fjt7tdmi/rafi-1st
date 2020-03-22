@@ -24,7 +24,7 @@ import RafiTypes::*;
 module RegReadStage(
     DecodeStageIF.NextStage prevStage,
     RegReadStageIF.ThisStage nextStage,
-    PipelineControllerIF.RegReadStage ctrl,
+    MainPipeControllerIF.RegReadStage ctrl,
     IntRegFileIF.RegReadStage intRegFile,
     FpRegFileIF.RegReadStage fpRegFile,
     input   logic clk,
