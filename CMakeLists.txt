@@ -575,8 +575,8 @@ if (verilator_FOUND)
         src/hw/core/ExecuteStageIF.sv
         src/hw/core/FetchStage.sv
         src/hw/core/MulDivUnit.sv
-        src/hw/core/PipelineController.sv
-        src/hw/core/PipelineControllerIF.sv
+        src/hw/core/MainPipeController.sv
+        src/hw/core/MainPipeControllerIF.sv
         src/hw/core/RegFile.sv
         src/hw/core/RegFileIF.sv
         src/hw/core/RegReadStage.sv
