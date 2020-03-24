@@ -38,10 +38,14 @@ module Core (
 );
     logic rst_internal;
 
+    FetchAddrGenerateStageIF fetchAddrGenerateStageIF();
+    FetchAddrTranslateStageIF fetchAddrTranslateStageIF();
+    ICacheReadStageIF iCacheReadStageIF();
     InsnBufferIF insnBufferIF();
     DecodeStageIF decodeStageIF();
     RegReadStageIF regReadStageIF();
     ExecuteStageIF executeStageIF();
+    FetchPipeControllerIF fetchPipeControllerIF();
     MainPipeControllerIF mainPipeControllerIF();
     InterruptControllerIF interruptControllerIF();
     IntRegFileIF intRegFileIF();
@@ -61,6 +65,35 @@ module Core (
         .clk
     );
 
+    // FetchPipe
+    FetchAddrGenerateStage fetchAddrGenerateStage(
+        .nextStage(fetchAddrGenerateStageIF.ThisStage),
+        .ctrl(fetchPipeControllerIF.FetchAddrGenerateStage),
+        .clk,
+        .rst(rst_internal)
+    );
+    FetchAddrTranslateStage fetchAddrTranslateStage(
+        .prevStage(fetchAddrGenerateStageIF.NextStage),
+        .nextStage(fetchAddrTranslateStageIF.ThisStage),
+        .ctrl(fetchPipeControllerIF.FetchAddrTranslateStage),
+        .clk,
+        .rst(rst_internal)
+    );
+    ICacheReadStage iCacheReadStage(
+        .prevStage(fetchAddrTranslateStageIF.NextStage),
+        .nextStage(iCacheReadStageIF.ThisStage),
+        .ctrl(fetchPipeControllerIF.ICacheReadStage),
+        .clk,
+        .rst(rst_internal)
+    );
+    InsnTraverseStage insnTraverseStage(
+        .prevStage(iCacheReadStageIF.NextStage),
+        .insnBuffer(insnBufferIF.FetchStage),
+        .ctrl(fetchPipeControllerIF.InsnTraverseStage),
+        .interrupt(interruptControllerIF.FetchStage),
+        .clk,
+        .rst(rst_internal)
+    );
     FetchStage fetchStage(
         .insnBuffer(insnBufferIF.FetchStage),
         .fetchUnit(fetchUnitIF.FetchStage),
@@ -69,12 +102,28 @@ module Core (
         .clk,
         .rst(rst_internal)
     );
+    FetchUnit fetchUnit(
+        .bus(fetchUnitIF.FetchUnit),
+        .mem(busAccessUnitIF.FetchUnit),
+        .csr(csrIF.FetchUnit),
+        .clk,
+        .rst(rst_internal)
+    );
+    FetchPipeController fetchPipeController(
+        .bus(fetchPipeControllerIF.FetchPipeController),
+        .clk,
+        .rst(rst_internal)
+    );
+
+    // InsnBuffer
     InsnBuffer insnBuffer(
         .bus(insnBufferIF.InsnBuffer),
         .ctrl(mainPipeControllerIF.InsnBuffer),
         .clk,
         .rst(rst_internal)
     );
+
+    // MainPipe
     DecodeStage decodeStage(
         .insnBuffer(insnBufferIF.InsnBuffer),
         .nextStage(decodeStageIF.ThisStage),
@@ -112,7 +161,6 @@ module Core (
         .clk,
         .rst(rst_internal)
     );
-
     IntRegFile intRegFile(
         .bus(intRegFileIF.RegFile),
         .clk,
@@ -140,30 +188,24 @@ module Core (
         .clk,
         .rst(rst_internal)
     );
+    LoadStoreUnit loadStoreUnit(
+        .bus(loadStoreUnitIF.LoadStoreUnit),
+        .mem(busAccessUnitIF.LoadStoreUnit),
+        .csr(csrIF.LoadStoreUnit),
+        .clk,
+        .rst(rst_internal)
+    );
     MainPipeController mainPipeController(
         .bus(mainPipeControllerIF.MainPipeController),
         .csr(csrIF.MainPipeController),
         .clk,
         .rst(rst_internal)
     );
+
+    // Bus Access
     InterruptController interruptController(
         .bus(interruptControllerIF.InterruptController),
         .csr(csrIF.InterruptController),
-        .clk,
-        .rst(rst_internal)
-    );
-
-    FetchUnit fetchUnit(
-        .bus(fetchUnitIF.FetchUnit),
-        .mem(busAccessUnitIF.FetchUnit),
-        .csr(csrIF.FetchUnit),
-        .clk,
-        .rst(rst_internal)
-    );
-    LoadStoreUnit loadStoreUnit(
-        .bus(loadStoreUnitIF.LoadStoreUnit),
-        .mem(busAccessUnitIF.LoadStoreUnit),
-        .csr(csrIF.LoadStoreUnit),
         .clk,
         .rst(rst_internal)
     );

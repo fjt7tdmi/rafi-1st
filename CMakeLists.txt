@@ -555,8 +555,6 @@ if (verilator_FOUND)
         src/hw/core/FetchUnitIF.sv
         src/hw/core/FetchUnitInvalidater.sv
         src/hw/core/FetchUnit.sv
-        src/hw/core/InsnBufferIF.sv
-        src/hw/core/InsnBuffer.sv
         src/hw/core/InterruptControllerIF.sv
         src/hw/core/InterruptController.sv
         src/hw/core/LoadValueUnit.sv
@@ -573,10 +571,21 @@ if (verilator_FOUND)
         src/hw/core/DecodeStageIF.sv
         src/hw/core/ExecuteStage.sv
         src/hw/core/ExecuteStageIF.sv
+        src/hw/core/FetchAddrGenerateStage.sv
+        src/hw/core/FetchAddrGenerateStageIF.sv
+        src/hw/core/FetchAddrTranslateStage.sv
+        src/hw/core/FetchAddrTranslateStageIF.sv
+        src/hw/core/FetchPipeController.sv
+        src/hw/core/FetchPipeControllerIF.sv
         src/hw/core/FetchStage.sv
         src/hw/core/MulDivUnit.sv
-        src/hw/core/PipelineController.sv
-        src/hw/core/PipelineControllerIF.sv
+        src/hw/core/ICacheReadStage.sv
+        src/hw/core/ICacheReadStageIF.sv
+        src/hw/core/InsnBufferIF.sv
+        src/hw/core/InsnBuffer.sv
+        src/hw/core/InsnTraverseStage.sv
+        src/hw/core/MainPipeController.sv
+        src/hw/core/MainPipeControllerIF.sv
         src/hw/core/RegFile.sv
         src/hw/core/RegFileIF.sv
         src/hw/core/RegReadStage.sv
