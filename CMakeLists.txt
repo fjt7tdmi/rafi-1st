@@ -547,6 +547,7 @@ if (verilator_FOUND)
         src/hw/fp/FpUnit.sv
         src/hw/fp/SqrtUnit.sv
         src/hw/mul/MulUnit.sv
+        src/hw/cache/ICache.sv
         src/hw/cache/ICacheReplacer.sv
         src/hw/cache/DCache.sv
         src/hw/cache/Tlb.sv

@@ -28,5 +28,64 @@ module ICacheReadStage(
     input   logic clk,
     input   logic rst
 );
-    // TODO: impl
+    // Dummy
+    paddr_t memAddr;
+    logic memReadEnable;
+    logic memReadDone;
+    icache_line_t memReadValue;
+    always_comb begin
+        memReadDone = 0;
+        memReadValue = '0;
+    end
+
+    // ICache
+    logic nextStageValid;
+    logic nextStageCacheMiss;
+    icache_line_t nextStageReadValue;
+
+    ICache #(
+        .LINE_SIZE(ICACHE_LINE_SIZE),
+        .TAG_WIDTH(ICACHE_TAG_WIDTH),
+        .INDEX_WIDTH(ICACHE_INDEX_WIDTH)
+    ) iCache (
+        .memAddr(memAddr),
+        .memReadEnable(memReadEnable),
+        .memReadDone(memReadDone),
+        .memReadValue(memReadValue),
+        .nextStageValid(nextStageValid),
+        .nextStageCacheMiss(nextStageCacheMiss),
+        .nextStageReadValue(nextStageReadValue),
+        .stall(ctrl.stallFromICacheReadStage),
+        .fetchEnable(prevStage.valid),
+        .addr(prevStage.pc_paddr),
+        .invalidateDone(ctrl.invalidateICacheDone),
+        .invalidateEnable(ctrl.invalidateICache),
+        .clk,
+        .rst
+    );
+
+    // ICacheReadStageIF
+    always_ff @(posedge clk) begin
+        if (rst || ctrl.flush) begin
+            nextStage.valid <= '0;
+            nextStage.fault <= '0;
+            nextStage.pc_vaddr <= '0;
+            nextStage.pc_paddr <= '0;
+            nextStage.iCacheLine <= '0;
+        end
+        else if (ctrl.stall) begin
+            nextStage.valid <= nextStage.valid;
+            nextStage.fault <= nextStage.fault;
+            nextStage.pc_vaddr <= nextStage.pc_vaddr;
+            nextStage.pc_paddr <= nextStage.pc_paddr;
+            nextStage.iCacheLine <= nextStage.iCacheLine;
+        end
+        else begin
+            nextStage.valid <= nextStageValid;
+            nextStage.fault <= prevStage.fault;
+            nextStage.pc_vaddr <= prevStage.pc_vaddr;
+            nextStage.pc_paddr <= prevStage.pc_paddr;
+            nextStage.iCacheLine <= nextStageReadValue;
+        end
+    end
 endmodule
