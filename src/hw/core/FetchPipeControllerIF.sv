@@ -35,6 +35,7 @@ interface FetchPipeControllerIF;
     // ICacheReadStage
     logic invalidateICache;
     logic invalidateICacheDone;
+    logic stallFromICacheReadStage;
 
     // InsnTraverseStage
     logic stallFromInsnTraverseStage;
@@ -62,6 +63,7 @@ interface FetchPipeControllerIF;
     modport ICacheReadStage(
     output
         invalidateICacheDone,
+        stallFromICacheReadStage,
     input
         stall,
         flush,
@@ -92,6 +94,7 @@ interface FetchPipeControllerIF;
     input
         invalidateITlbDone,
         invalidateICacheDone,
+        stallFromICacheReadStage,
         stallFromInsnTraverseStage,
         flushFromMainPipe,
         flushReason
