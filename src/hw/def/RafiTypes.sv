@@ -56,11 +56,14 @@ typedef logic [$clog2(INSN_BUFFER_ENTRY_COUNT):0] insn_buffer_entry_count_t;
 // ----------------------------------------------------------------------------
 // enum
 
-typedef enum logic [1:0]
+typedef enum logic [2:0]
 {
-    FlushReason_Branch      = 2'h0,
-    FlushReason_Trap        = 2'h1,
-    FlushReason_TrapValid   = 2'h2
+    FlushReason_Branch          = 3'h1,
+    FlushReason_Trap            = 3'h2,
+    FlushReason_Invalidate      = 3'h3,
+    FlushReason_ITlbMiss        = 3'h4,
+    FlushReason_ICacheMiss      = 3'h5,
+    FlushReason_InsnBufferFull  = 3'h6
 } FlushReason;
 
 // ----------------------------------------------------------------------------
@@ -69,7 +72,7 @@ typedef enum logic [1:0]
 typedef struct packed
 {
     vaddr_t pc;
-    logic[15:0] insn;
+    logic [15:0] insn;
     logic fault;
     logic interruptValid;
     logic [3:0] interruptCode;

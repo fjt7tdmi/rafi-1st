@@ -76,19 +76,15 @@ module FetchAddrTranslateStage(
     always_ff @(posedge clk) begin
         if (rst || ctrl.flush) begin
             nextStage.valid <= '0;
-            nextStage.fault <= '0;
+            nextStage.tlbFault <= '0;
+            nextStage.tlbMiss <= '0;
             nextStage.pc_vaddr <= '0;
             nextStage.pc_paddr <= '0;
         end
-        else if (ctrl.stall) begin
-            nextStage.valid <= nextStage.valid;
-            nextStage.fault <= nextStage.fault;
-            nextStage.pc_vaddr <= nextStage.pc_vaddr;
-            nextStage.pc_paddr <= nextStage.pc_paddr;
-        end
         else begin
-            nextStage.valid <= prevStage.valid && done;
-            nextStage.fault <= fault;
+            nextStage.valid <= prevStage.valid;
+            nextStage.tlbFault <= fault;
+            nextStage.tlbMiss <= !done;
             nextStage.pc_vaddr <= prevStage.pc_vaddr;
             nextStage.pc_paddr <= pc_paddr;
         end

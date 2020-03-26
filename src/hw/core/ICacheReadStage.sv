@@ -43,6 +43,8 @@ module ICacheReadStage(
     logic nextStageCacheMiss;
     icache_line_t nextStageReadValue;
 
+    logic icacheStall;
+
     ICache #(
         .LINE_SIZE(ICACHE_LINE_SIZE),
         .TAG_WIDTH(ICACHE_TAG_WIDTH),
@@ -55,11 +57,11 @@ module ICacheReadStage(
         .nextStageValid(nextStageValid),
         .nextStageCacheMiss(nextStageCacheMiss),
         .nextStageReadValue(nextStageReadValue),
-        .stall(ctrl.stallFromICacheReadStage),
+        .stall(icacheStall),
         .fetchEnable(prevStage.valid),
         .addr(prevStage.pc_paddr),
-        .invalidateDone(ctrl.invalidateICacheDone),
-        .invalidateEnable(ctrl.invalidateICache),
+        .invalidateDone(ctrl.cacheDone),
+        .invalidateEnable(ctrl.cacheInvalidate),
         .clk,
         .rst
     );
@@ -73,17 +75,14 @@ module ICacheReadStage(
 
     always_ff @(posedge clk) begin
         if (rst || ctrl.flush) begin
-            nextStage.fault <= '0;
+            nextStage.tlbFault <= '0;
+            nextStage.tlbMiss <= '0;
             nextStage.pc_vaddr <= '0;
             nextStage.pc_paddr <= '0;
         end
-        else if (ctrl.stall) begin
-            nextStage.fault <= nextStage.fault;
-            nextStage.pc_vaddr <= nextStage.pc_vaddr;
-            nextStage.pc_paddr <= nextStage.pc_paddr;
-        end
         else begin
-            nextStage.fault <= prevStage.fault;
+            nextStage.tlbFault <= prevStage.tlbFault;
+            nextStage.tlbMiss <= prevStage.tlbMiss;
             nextStage.pc_vaddr <= prevStage.pc_vaddr;
             nextStage.pc_paddr <= prevStage.pc_paddr;
         end

@@ -22,81 +22,85 @@ import RafiTypes::*;
 
 interface FetchPipeControllerIF;
     // Common
-    logic stall;
     logic flush;
-
-    // FetchAddrGenerateStage
     vaddr_t flushTargetPc;
 
     // FetchAddrTranslateStage
-    logic invalidateITlb;
-    logic invalidateITlbDone;
+    logic tlbInvalidate;
+    logic tlbReplace;
+    logic tlbDone;
 
     // ICacheReadStage
-    logic invalidateICache;
-    logic invalidateICacheDone;
-    logic stallFromICacheReadStage;
+    logic cacheInvalidate;
+    logic cacheReplace;
+    logic cacheDone;
 
     // InsnTraverseStage
-    logic stallFromInsnTraverseStage;
+    logic flushFromFetchPipe;
+    FlushReason flushReasonFromFetchPipe;
+    vaddr_t flushTargetPcFromFetchPipe;
 
     // MainPipeController
     logic flushFromMainPipe;
-    FlushReason flushReason;
+    FlushReason flushReasonFromMainPipe;
+    vaddr_t flushTargetPcFromMainPipe;
 
     modport FetchAddrGenerateStage(
     input
-        stall,
         flush,
         flushTargetPc
     );
 
     modport FetchAddrTranslateStage(
     output
-        invalidateITlbDone,
+        tlbDone,
     input
-        stall,
         flush,
-        invalidateITlb
+        flushTargetPc,
+        tlbInvalidate,
+        tlbReplace
     );
 
     modport ICacheReadStage(
     output
-        invalidateICacheDone,
-        stallFromICacheReadStage,
+        cacheDone,
     input
-        stall,
         flush,
-        invalidateICache
+        flushTargetPc,
+        cacheInvalidate,
+        cacheReplace
     );
 
     modport InsnTraverseStage(
     output
-        stallFromInsnTraverseStage,
-    input
-        stall,
-        flush
+        flushFromFetchPipe,
+        flushReasonFromFetchPipe,
+        flushTargetPcFromFetchPipe
     );
 
     modport MainPipeController(
     output
         flushFromMainPipe,
-        flushReason
+        flushReasonFromMainPipe,
+        flushTargetPcFromMainPipe
     );
 
     modport FetchPipeController(
     output
-        stall,
         flush,
         flushTargetPc,
-        invalidateITlb,
-        invalidateICache,
+        tlbInvalidate,
+        tlbReplace,
+        cacheInvalidate,
+        cacheReplace,
     input
-        invalidateITlbDone,
-        invalidateICacheDone,
-        stallFromICacheReadStage,
-        stallFromInsnTraverseStage,
+        tlbDone,
+        cacheDone,
+        flushFromFetchPipe,
+        flushReasonFromFetchPipe,
+        flushTargetPcFromFetchPipe,
         flushFromMainPipe,
-        flushReason
+        flushReasonFromMainPipe,
+        flushTargetPcFromMainPipe
     );
 endinterface
