@@ -22,29 +22,32 @@ import CacheTypes::*;
 
 interface ICacheReadStageIF;
     logic valid;
-    logic fault;
+    logic tlbFault;
+    logic tlbMiss;
+    logic cacheMiss;
     vaddr_t pc_vaddr;
     paddr_t pc_paddr;
     icache_line_t cacheLine;
-    logic cacheMiss;
 
     modport ThisStage(
     output
         valid,
-        fault,
+        tlbFault,
+        tlbMiss,
+        cacheMiss,
         pc_vaddr,
         pc_paddr,
-        cacheLine,
-        cacheMiss
+        cacheLine
     );
 
     modport NextStage(
     input
         valid,
-        fault,
+        tlbFault,
+        tlbMiss,
+        cacheMiss,
         pc_vaddr,
         pc_paddr,
-        cacheLine,
-        cacheMiss
+        cacheLine
     );
 endinterface

@@ -60,7 +60,7 @@ typedef enum logic [2:0]
 {
     FlushReason_Branch          = 3'h1,
     FlushReason_Trap            = 3'h2,
-    FlushReason_TrapValid       = 3'h3,
+    FlushReason_Invalidate      = 3'h3,
     FlushReason_ITlbMiss        = 3'h4,
     FlushReason_ICacheMiss      = 3'h5,
     FlushReason_InsnBufferFull  = 3'h6

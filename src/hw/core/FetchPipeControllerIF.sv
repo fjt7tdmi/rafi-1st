@@ -23,25 +23,27 @@ import RafiTypes::*;
 interface FetchPipeControllerIF;
     // Common
     logic flush;
-
-    // FetchAddrGenerateStage
     vaddr_t flushTargetPc;
 
     // FetchAddrTranslateStage
-    logic invalidateITlb;
-    logic invalidateITlbDone;
+    logic tlbInvalidate;
+    logic tlbReplace;
+    logic tlbDone;
 
     // ICacheReadStage
-    logic invalidateICache;
-    logic invalidateICacheDone;
+    logic cacheInvalidate;
+    logic cacheReplace;
+    logic cacheDone;
 
     // InsnTraverseStage
     logic flushFromFetchPipe;
     FlushReason flushReasonFromFetchPipe;
+    vaddr_t flushTargetPcFromFetchPipe;
 
     // MainPipeController
     logic flushFromMainPipe;
     FlushReason flushReasonFromMainPipe;
+    vaddr_t flushTargetPcFromMainPipe;
 
     modport FetchAddrGenerateStage(
     input
@@ -51,44 +53,54 @@ interface FetchPipeControllerIF;
 
     modport FetchAddrTranslateStage(
     output
-        invalidateITlbDone,
+        tlbDone,
     input
         flush,
-        invalidateITlb
+        flushTargetPc,
+        tlbInvalidate,
+        tlbReplace
     );
 
     modport ICacheReadStage(
     output
-        invalidateICacheDone,
+        cacheDone,
     input
         flush,
-        invalidateICache
+        flushTargetPc,
+        cacheInvalidate,
+        cacheReplace
     );
 
     modport InsnTraverseStage(
     output
         flushFromFetchPipe,
-        flushReasonFromFetchPipe
+        flushReasonFromFetchPipe,
+        flushTargetPcFromFetchPipe
     );
 
     modport MainPipeController(
     output
         flushFromMainPipe,
-        flushReasonFromMainPipe
+        flushReasonFromMainPipe,
+        flushTargetPcFromMainPipe
     );
 
     modport FetchPipeController(
     output
         flush,
         flushTargetPc,
-        invalidateITlb,
-        invalidateICache,
+        tlbInvalidate,
+        tlbReplace,
+        cacheInvalidate,
+        cacheReplace,
     input
-        invalidateITlbDone,
-        invalidateICacheDone,
+        tlbDone,
+        cacheDone,
         flushFromFetchPipe,
         flushReasonFromFetchPipe,
+        flushTargetPcFromFetchPipe,
         flushFromMainPipe,
-        flushReasonFromMainPipe
+        flushReasonFromMainPipe,
+        flushTargetPcFromMainPipe
     );
 endinterface
