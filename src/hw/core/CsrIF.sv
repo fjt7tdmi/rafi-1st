@@ -86,6 +86,13 @@ interface CsrIF;
         trapReturnPriv
     );
 
+    modport FetchAddrTranslateStage(
+    input
+        satp,
+        status,
+        priv
+    );
+
     modport ExecuteStage(
     output
         readAddr,

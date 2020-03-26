@@ -47,7 +47,7 @@ module InsnTraverseStage(
     logic stall;
     always_comb begin
         index = prevStage.pc_vaddr[INDEX_WIDTH+$clog2(INSN_SIZE)-1:$clog2(INSN_SIZE)];
-        insns = prevStage.iCacheLine;
+        insns = prevStage.cacheLine;
         insn = insns[index];
         stall = insnBuffer.writableEntryCount < 2;
     end

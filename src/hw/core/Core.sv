@@ -76,6 +76,7 @@ module Core (
         .prevStage(fetchAddrGenerateStageIF.NextStage),
         .nextStage(fetchAddrTranslateStageIF.ThisStage),
         .ctrl(fetchPipeControllerIF.FetchAddrTranslateStage),
+        .csr(csrIF.FetchAddrTranslateStage),
         .clk,
         .rst(rst_internal)
     );
