@@ -25,8 +25,72 @@ module FetchAddrTranslateStage(
     FetchAddrGenerateStageIF.NextStage prevStage,
     FetchAddrTranslateStageIF.ThisStage nextStage,
     FetchPipeControllerIF.FetchAddrTranslateStage ctrl,
+    CsrIF.FetchAddrTranslateStage csr,
     input   logic clk,
     input   logic rst
 );
-    // TODO: impl
+    // Dummy
+    paddr_t memAddr;
+    logic memReadEnable;
+    logic memWriteEnable;
+    uint32_t memWriteValue;
+    logic memReadDone;
+    logic memWriteDone;
+    uint32_t memReadValue;
+
+    // TLB
+    logic done;
+    logic fault;
+    paddr_t pc_paddr;
+    logic enable;
+    TlbCommand command;
+
+    Tlb tlb (
+        .memAddr(memAddr),
+        .memReadEnable(memReadEnable),
+        .memWriteEnable(memWriteEnable),
+        .memWriteValue(memWriteValue),
+        .memReadDone(memReadDone),
+        .memWriteDone(memWriteDone),
+        .memReadValue(memReadValue),
+        .done(done),
+        .fault(fault),
+        .paddr(pc_paddr),
+        .enable(enable),
+        .command(command),
+        .vaddr(prevStage.pc_vaddr),
+        .accessType(MemoryAccessType_Instruction),
+        .satp(csr.satp),
+        .status(csr.status),
+        .priv(csr.priv),
+        .clk,
+        .rst
+    );
+
+    always_comb begin
+        enable = prevStage.valid;
+        command = TlbCommand_Translate; // TODO: impl invalidate
+    end
+
+    // FetchAddrTranslateStageIF
+    always_ff @(posedge clk) begin
+        if (rst || ctrl.flush) begin
+            nextStage.valid <= '0;
+            nextStage.fault <= '0;
+            nextStage.pc_vaddr <= '0;
+            nextStage.pc_paddr <= '0;
+        end
+        else if (ctrl.stall) begin
+            nextStage.valid <= nextStage.valid;
+            nextStage.fault <= nextStage.fault;
+            nextStage.pc_vaddr <= nextStage.pc_vaddr;
+            nextStage.pc_paddr <= nextStage.pc_paddr;
+        end
+        else begin
+            nextStage.valid <= prevStage.valid && done;
+            nextStage.fault <= fault;
+            nextStage.pc_vaddr <= prevStage.pc_vaddr;
+            nextStage.pc_paddr <= pc_paddr;
+        end
+    end
 endmodule

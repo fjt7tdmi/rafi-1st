@@ -1,12 +1,12 @@
 /*
  * Copyright 2018 Akifumi Fujita
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,7 +25,8 @@ interface ICacheReadStageIF;
     logic fault;
     vaddr_t pc_vaddr;
     paddr_t pc_paddr;
-    icache_line_t iCacheLine;
+    icache_line_t cacheLine;
+    logic cacheMiss;
 
     modport ThisStage(
     output
@@ -33,7 +34,8 @@ interface ICacheReadStageIF;
         fault,
         pc_vaddr,
         pc_paddr,
-        iCacheLine
+        cacheLine,
+        cacheMiss
     );
 
     modport NextStage(
@@ -42,6 +44,7 @@ interface ICacheReadStageIF;
         fault,
         pc_vaddr,
         pc_paddr,
-        iCacheLine
+        cacheLine,
+        cacheMiss
     );
 endinterface

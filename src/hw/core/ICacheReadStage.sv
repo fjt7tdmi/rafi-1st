@@ -65,27 +65,27 @@ module ICacheReadStage(
     );
 
     // ICacheReadStageIF
+    always_comb begin
+        nextStage.valid = nextStageValid;
+        nextStage.cacheLine = nextStageReadValue;
+        nextStage.cacheMiss = nextStageCacheMiss;
+    end
+
     always_ff @(posedge clk) begin
         if (rst || ctrl.flush) begin
-            nextStage.valid <= '0;
             nextStage.fault <= '0;
             nextStage.pc_vaddr <= '0;
             nextStage.pc_paddr <= '0;
-            nextStage.iCacheLine <= '0;
         end
         else if (ctrl.stall) begin
-            nextStage.valid <= nextStage.valid;
             nextStage.fault <= nextStage.fault;
             nextStage.pc_vaddr <= nextStage.pc_vaddr;
             nextStage.pc_paddr <= nextStage.pc_paddr;
-            nextStage.iCacheLine <= nextStage.iCacheLine;
         end
         else begin
-            nextStage.valid <= nextStageValid;
             nextStage.fault <= prevStage.fault;
             nextStage.pc_vaddr <= prevStage.pc_vaddr;
             nextStage.pc_paddr <= prevStage.pc_paddr;
-            nextStage.iCacheLine <= nextStageReadValue;
         end
     end
 endmodule
