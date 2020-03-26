@@ -27,5 +27,39 @@ module FetchAddrGenerateStage(
     input   logic clk,
     input   logic rst
 );
-    // TODO: impl
+    vaddr_t reg_pc;
+
+    vaddr_t next_pc;
+
+    // next_pc
+    always_comb begin
+        if (ctrl.flush) begin
+            next_pc = ctrl.flushTargetPc;
+        end
+        else begin
+            next_pc = reg_pc + (reg_pc[1] ? 2 : 4);
+        end
+    end
+
+    // PC
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            reg_pc <= INITIAL_PC;
+        end
+        else begin
+            reg_pc <= next_pc;
+        end
+    end
+
+    // FetchAddrTranslateStageIF
+    always_ff @(posedge clk) begin
+        if (rst || ctrl.flush) begin
+            nextStage.valid <= 0;
+            nextStage.pc_vaddr <= '0;
+        end
+        else begin
+            nextStage.valid <= 1;
+            nextStage.pc_vaddr <= reg_pc;
+        end
+    end
 endmodule
