@@ -22,7 +22,6 @@ import RafiTypes::*;
 
 interface FetchPipeControllerIF;
     // Common
-    logic stall;
     logic flush;
 
     // FetchAddrGenerateStage
@@ -35,18 +34,17 @@ interface FetchPipeControllerIF;
     // ICacheReadStage
     logic invalidateICache;
     logic invalidateICacheDone;
-    logic stallFromICacheReadStage;
 
     // InsnTraverseStage
-    logic stallFromInsnTraverseStage;
+    logic flushFromFetchPipe;
+    FlushReason flushReasonFromFetchPipe;
 
     // MainPipeController
     logic flushFromMainPipe;
-    FlushReason flushReason;
+    FlushReason flushReasonFromMainPipe;
 
     modport FetchAddrGenerateStage(
     input
-        stall,
         flush,
         flushTargetPc
     );
@@ -55,7 +53,6 @@ interface FetchPipeControllerIF;
     output
         invalidateITlbDone,
     input
-        stall,
         flush,
         invalidateITlb
     );
@@ -63,30 +60,25 @@ interface FetchPipeControllerIF;
     modport ICacheReadStage(
     output
         invalidateICacheDone,
-        stallFromICacheReadStage,
     input
-        stall,
         flush,
         invalidateICache
     );
 
     modport InsnTraverseStage(
     output
-        stallFromInsnTraverseStage,
-    input
-        stall,
-        flush
+        flushFromFetchPipe,
+        flushReasonFromFetchPipe
     );
 
     modport MainPipeController(
     output
         flushFromMainPipe,
-        flushReason
+        flushReasonFromMainPipe
     );
 
     modport FetchPipeController(
     output
-        stall,
         flush,
         flushTargetPc,
         invalidateITlb,
@@ -94,9 +86,9 @@ interface FetchPipeControllerIF;
     input
         invalidateITlbDone,
         invalidateICacheDone,
-        stallFromICacheReadStage,
-        stallFromInsnTraverseStage,
+        flushFromFetchPipe,
+        flushReasonFromFetchPipe,
         flushFromMainPipe,
-        flushReason
+        flushReasonFromMainPipe
     );
 endinterface

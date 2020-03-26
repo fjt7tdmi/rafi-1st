@@ -80,12 +80,6 @@ module FetchAddrTranslateStage(
             nextStage.pc_vaddr <= '0;
             nextStage.pc_paddr <= '0;
         end
-        else if (ctrl.stall) begin
-            nextStage.valid <= nextStage.valid;
-            nextStage.fault <= nextStage.fault;
-            nextStage.pc_vaddr <= nextStage.pc_vaddr;
-            nextStage.pc_paddr <= nextStage.pc_paddr;
-        end
         else begin
             nextStage.valid <= prevStage.valid && done;
             nextStage.fault <= fault;

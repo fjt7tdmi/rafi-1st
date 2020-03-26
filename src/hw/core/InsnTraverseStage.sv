@@ -44,23 +44,18 @@ module InsnTraverseStage(
     logic [INDEX_WIDTH-1:0] index;
     insn_t [INSN_COUNT_IN_LINE-1:0] insns;
     insn_t insn;
-    logic stall;
+    logic insnBufferFull;
     always_comb begin
         index = prevStage.pc_vaddr[INDEX_WIDTH+$clog2(INSN_SIZE)-1:$clog2(INSN_SIZE)];
         insns = prevStage.cacheLine;
         insn = insns[index];
-        stall = insnBuffer.writableEntryCount < 2;
-    end
-
-    // FetchUnit
-    always_comb begin
-        ctrl.stallFromInsnTraverseStage = stall;
+        insnBufferFull = insnBuffer.writableEntryCount < 2;
     end
 
     // InsnBuffer
     always_comb begin
-        insnBuffer.writeLow = !stall && prevStage.valid && ~fetch_compressed_insn;
-        insnBuffer.writeHigh = !stall && prevStage.valid;
+        insnBuffer.writeLow = !insnBufferFull && prevStage.valid && ~fetch_compressed_insn;
+        insnBuffer.writeHigh = !insnBufferFull && prevStage.valid;
         insnBuffer.writeEntryLow.pc = pc_low;
         insnBuffer.writeEntryLow.insn = insn[15:0];
         insnBuffer.writeEntryLow.fault = prevStage.fault;

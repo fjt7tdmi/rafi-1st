@@ -43,6 +43,8 @@ module ICacheReadStage(
     logic nextStageCacheMiss;
     icache_line_t nextStageReadValue;
 
+    logic icacheStall;
+
     ICache #(
         .LINE_SIZE(ICACHE_LINE_SIZE),
         .TAG_WIDTH(ICACHE_TAG_WIDTH),
@@ -55,7 +57,7 @@ module ICacheReadStage(
         .nextStageValid(nextStageValid),
         .nextStageCacheMiss(nextStageCacheMiss),
         .nextStageReadValue(nextStageReadValue),
-        .stall(ctrl.stallFromICacheReadStage),
+        .stall(icacheStall),
         .fetchEnable(prevStage.valid),
         .addr(prevStage.pc_paddr),
         .invalidateDone(ctrl.invalidateICacheDone),
@@ -76,11 +78,6 @@ module ICacheReadStage(
             nextStage.fault <= '0;
             nextStage.pc_vaddr <= '0;
             nextStage.pc_paddr <= '0;
-        end
-        else if (ctrl.stall) begin
-            nextStage.fault <= nextStage.fault;
-            nextStage.pc_vaddr <= nextStage.pc_vaddr;
-            nextStage.pc_paddr <= nextStage.pc_paddr;
         end
         else begin
             nextStage.fault <= prevStage.fault;
