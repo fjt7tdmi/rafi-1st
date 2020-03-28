@@ -24,6 +24,7 @@ import RafiTypes::*;
 interface DecodeStageIF;
     logic valid;
     vaddr_t pc;
+    paddr_t pc_paddr_debug;
     insn_t insn;
     logic isCompressedInsn;
     Op op;
@@ -34,6 +35,7 @@ interface DecodeStageIF;
     output
         valid,
         pc,
+        pc_paddr_debug,
         insn,
         isCompressedInsn,
         op,
@@ -45,6 +47,7 @@ interface DecodeStageIF;
     input
         valid,
         pc,
+        pc_paddr_debug,
         insn,
         isCompressedInsn,
         op,

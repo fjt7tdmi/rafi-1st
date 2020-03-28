@@ -24,6 +24,7 @@ import RafiTypes::*;
 interface ExecuteStageIF;
     logic valid;
     vaddr_t pc;
+    paddr_t pc_paddr_debug;
     insn_t insn;
     Op op;
 
@@ -40,6 +41,7 @@ interface ExecuteStageIF;
     output
         valid,
         pc,
+        pc_paddr_debug,
         insn,
         op,
         dstIntRegValue,
@@ -54,6 +56,7 @@ interface ExecuteStageIF;
     input
         valid,
         pc,
+        pc_paddr_debug,
         insn,
         op,
         dstIntRegValue,

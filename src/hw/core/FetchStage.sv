@@ -64,11 +64,13 @@ module FetchStage(
         insnBuffer.writeLow = !stall && fetchUnit.valid && ~fetch_compressed_insn;
         insnBuffer.writeHigh = !stall && fetchUnit.valid;
         insnBuffer.writeEntryLow.pc = pc_low;
+        insnBuffer.writeEntryLow.pc_paddr_debug = '0;
         insnBuffer.writeEntryLow.insn = insn[15:0];
         insnBuffer.writeEntryLow.fault = fetchUnit.fault;
         insnBuffer.writeEntryLow.interruptValid = interrupt.valid;
         insnBuffer.writeEntryLow.interruptCode = interrupt.code;
         insnBuffer.writeEntryHigh.pc = fetch_compressed_insn ? pc_low : pc_high;
+        insnBuffer.writeEntryHigh.pc_paddr_debug = '0;
         insnBuffer.writeEntryHigh.insn = insn[31:16];
         insnBuffer.writeEntryHigh.fault = fetchUnit.fault;
         insnBuffer.writeEntryHigh.interruptValid = interrupt.valid;

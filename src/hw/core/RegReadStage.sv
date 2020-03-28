@@ -44,6 +44,7 @@ module RegReadStage(
             nextStage.valid <= '0;
             nextStage.op <= '0;
             nextStage.pc <= '0;
+            nextStage.pc_paddr_debug <= '0;
             nextStage.insn <= '0;
             nextStage.isCompressedInsn <= '0;
             nextStage.csrAddr <= '0;
@@ -58,6 +59,7 @@ module RegReadStage(
             nextStage.valid <= nextStage.valid;
             nextStage.op <= nextStage.op;
             nextStage.pc <= nextStage.pc;
+            nextStage.pc_paddr_debug <= nextStage.pc_paddr_debug;
             nextStage.insn <= nextStage.insn;
             nextStage.isCompressedInsn <= nextStage.isCompressedInsn;
             nextStage.csrAddr <= nextStage.csrAddr;
@@ -72,6 +74,7 @@ module RegReadStage(
             nextStage.valid <= prevStage.valid;
             nextStage.op <= prevStage.op;
             nextStage.pc <= prevStage.pc;
+            nextStage.pc_paddr_debug <= prevStage.pc_paddr_debug;
             nextStage.insn <= prevStage.insn;
             nextStage.isCompressedInsn <= prevStage.isCompressedInsn;
             nextStage.csrAddr <= prevStage.csrAddr;
