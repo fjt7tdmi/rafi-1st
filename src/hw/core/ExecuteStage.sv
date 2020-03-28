@@ -437,6 +437,7 @@ module ExecuteStage(
         if (rst || ctrl.exStallReq) begin
             nextStage.valid <= '0;
             nextStage.pc <= '0;
+            nextStage.pc_paddr_debug <= '0;
             nextStage.insn <= '0;
             nextStage.op <= '0;
             nextStage.dstIntRegValue <= '0;
@@ -450,6 +451,7 @@ module ExecuteStage(
             nextStage.valid <= prevStage.valid;
             nextStage.insn <= prevStage.insn;
             nextStage.pc <= prevStage.pc;
+            nextStage.pc_paddr_debug <= prevStage.pc_paddr_debug;
             nextStage.op <= prevStage.op;
             nextStage.dstIntRegValue <= dstIntRegValue;
             nextStage.dstFpRegValue <= dstFpRegValue;

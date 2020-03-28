@@ -41,10 +41,12 @@ module DecodeStage(
 
     logic valid;
     vaddr_t pc;
+    paddr_t pc_paddr_debug;
     insn_t insn;
     always_comb begin
         valid = (insnBuffer.readableEntryCount == 1 && is_compressed) || insnBuffer.readableEntryCount >= 2;
         pc = insnBuffer.readEntryLow.pc;
+        pc_paddr_debug = insnBuffer.readEntryLow.pc_paddr_debug;
         insn = is_compressed ? {16'h0, insn_low} : {insn_high, insn_low};
     end
 
@@ -103,6 +105,7 @@ module DecodeStage(
         if (rst || ctrl.flush) begin
             nextStage.valid <= '0;
             nextStage.pc <= '0;
+            nextStage.pc_paddr_debug <= '0;
             nextStage.op <= '0;
             nextStage.insn <= '0;
             nextStage.isCompressedInsn <= '0;
@@ -112,6 +115,7 @@ module DecodeStage(
         else if (ctrl.idStall) begin
             nextStage.valid <= nextStage.valid;
             nextStage.pc <= nextStage.pc;
+            nextStage.pc_paddr_debug <= nextStage.pc_paddr_debug;
             nextStage.op <= nextStage.op;
             nextStage.insn <= nextStage.insn;
             nextStage.isCompressedInsn <= nextStage.isCompressedInsn;
@@ -121,6 +125,7 @@ module DecodeStage(
         else if (!valid) begin
             nextStage.valid <= '0;
             nextStage.pc <= '0;
+            nextStage.pc_paddr_debug <= '0;
             nextStage.op <= '0;
             nextStage.insn <= '0;
             nextStage.isCompressedInsn <= '0;
@@ -130,6 +135,7 @@ module DecodeStage(
         else begin
             nextStage.valid <= valid;
             nextStage.pc <= pc;
+            nextStage.pc_paddr_debug <= pc_paddr_debug;
             nextStage.op <= op;
             nextStage.insn <= insn;
             nextStage.isCompressedInsn <= is_compressed;

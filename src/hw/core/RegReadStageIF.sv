@@ -24,6 +24,7 @@ import RafiTypes::*;
 interface RegReadStageIF;
     logic valid;
     vaddr_t pc;
+    paddr_t pc_paddr_debug;
     insn_t insn;
     logic isCompressedInsn;
     Op op;
@@ -39,6 +40,7 @@ interface RegReadStageIF;
     output
         valid,
         pc,
+        pc_paddr_debug,
         insn,
         isCompressedInsn,
         op,
@@ -55,6 +57,7 @@ interface RegReadStageIF;
     input
         valid,
         pc,
+        pc_paddr_debug,
         insn,
         isCompressedInsn,
         op,

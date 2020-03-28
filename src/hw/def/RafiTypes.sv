@@ -72,6 +72,7 @@ typedef enum logic [2:0]
 typedef struct packed
 {
     vaddr_t pc;
+    paddr_t pc_paddr_debug;
     logic [15:0] insn;
     logic fault;
     logic interruptValid;
